@@ -13,7 +13,7 @@ public class GoingToLeastWorkedStation : EnemyState
 
     public GoingToLeastWorkedStation(EnemyController enemy,
                                     EnemyStateMachine machine,
-                                    WaypointService waypointService)
+                                    IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {
         hasArrived = false;

@@ -9,7 +9,7 @@ public class BossDefend : BossState
     private float _timer;
     public BossDefend(EnemyBossController enemy,
                                     BossStateMachine machine,
-                                    WaypointService waypointService)
+                                    IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {
         _timer = 0f;

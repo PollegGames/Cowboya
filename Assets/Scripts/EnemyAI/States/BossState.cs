@@ -5,9 +5,9 @@ public abstract class BossState
 {
     protected EnemyBossController enemy;
     protected BossStateMachine stateMachine;
-    protected WaypointService waypointService;
+    protected IWaypointService waypointService;
 
-    protected BossState(EnemyBossController enemy, BossStateMachine stateMachine, WaypointService waypointService)
+    protected BossState(EnemyBossController enemy, BossStateMachine stateMachine, IWaypointService waypointService)
     {
         this.enemy = enemy;
         this.stateMachine = stateMachine;

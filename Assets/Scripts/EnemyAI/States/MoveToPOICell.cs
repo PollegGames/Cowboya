@@ -13,7 +13,7 @@ public class MoveToPOICell : BossState
 
     public MoveToPOICell(EnemyBossController enemy,
                                     BossStateMachine machine,
-                                    WaypointService waypointService)
+                                    IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {
         hasArrived = false;

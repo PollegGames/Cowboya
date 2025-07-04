@@ -12,7 +12,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
     private List<Vector3> currentPath;
     private List<RoomWaypoint> currentPathWaypoints;
     private int pathIndex;
-    private WaypointService waypointService;
+    private IWaypointService waypointService;
 
     [SerializeField] private RobotBehaviour robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
@@ -45,7 +45,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
 
     }
 
-    public void Initialize(WaypointService waypointService, EnemiesSpawner spawner)
+    public void Initialize(IWaypointService waypointService, EnemiesSpawner spawner)
     {
         this.waypointService = waypointService;
         waypointService.Subscribe(this);

@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public class BossIdle : BossState
 {
-    public BossIdle(EnemyBossController enemy, BossStateMachine machine, WaypointService waypointService)
+    public BossIdle(EnemyBossController enemy, BossStateMachine machine, IWaypointService waypointService)
         : base(enemy, machine, waypointService)
     {
     }

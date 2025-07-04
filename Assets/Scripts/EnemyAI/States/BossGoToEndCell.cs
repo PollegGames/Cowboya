@@ -8,7 +8,7 @@ public class BossGoToEndCell : BossState
 
     public BossGoToEndCell(EnemyBossController enemy,
                                     BossStateMachine machine,
-                                    WaypointService waypointService)
+                                    IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {
         hasArrived = false;
