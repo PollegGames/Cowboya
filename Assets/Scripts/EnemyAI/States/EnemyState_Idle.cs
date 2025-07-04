@@ -9,7 +9,7 @@ public class EnemyState_Idle : EnemyState
     private float _timer;
     public EnemyState_Idle(EnemyController enemy,
                                     EnemyStateMachine machine,
-                                    WaypointService waypointService)
+                                    IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {
         _timer = 0f;

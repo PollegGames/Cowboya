@@ -13,7 +13,7 @@ public class GoingToRestStation : EnemyState
 
     public GoingToRestStation(EnemyController enemy,
                                     EnemyStateMachine machine,
-                                    WaypointService waypointService)
+                                    IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {
         hasArrived = false;

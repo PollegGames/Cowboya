@@ -38,7 +38,7 @@ public class FactoryManager : MonoBehaviour
         }
     }
 
-    public WaypointService GetWayPointService()
+    public IWaypointService GetWayPointService()
     {
         return waypointService;
     }

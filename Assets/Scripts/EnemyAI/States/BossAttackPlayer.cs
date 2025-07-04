@@ -6,7 +6,7 @@ public class BossAttackPlayer : BossState
     private Vector3 playerTransform;
     private float stopDistance = 1.5f;
 
-    public BossAttackPlayer(EnemyBossController enemy, BossStateMachine machine, WaypointService waypointService)
+    public BossAttackPlayer(EnemyBossController enemy, BossStateMachine machine, IWaypointService waypointService)
         : base(enemy, machine, waypointService)
     {
         playerTransform = enemy.memory.LastKnownPlayerPosition;

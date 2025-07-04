@@ -8,7 +8,7 @@ public class EnemiesSpawner : MonoBehaviour
     [SerializeField] private Transform enemiesParent;
     // Expose enemies count via public property
     private MapManager mapManager;
-    private WaypointService waypointService;
+    private IWaypointService waypointService;
     private List<GameObject> spawnedEnemies = new List<GameObject>();
     private List<GameObject> spawnedboss = new List<GameObject>();
     private GameUIViewModel gameUIViewModel;
@@ -21,7 +21,7 @@ public class EnemiesSpawner : MonoBehaviour
         }
     }
 
-    public void InitMapManager(MapManager mapManager, WaypointService waypointService, GameUIViewModel viewModel)
+    public void InitMapManager(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel)
     {
         this.waypointService = waypointService;
         this.mapManager = mapManager;
