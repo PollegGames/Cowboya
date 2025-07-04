@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4dafb71b71b836e4b82f4979010f1d2a
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53581
+  packageName: Update manager
+  packageVersion: 3.2
+  assetPath: Assets/UpdateManager/Example Scene/UpdateManagerExampleScene.unity
+  uploadId: 378862

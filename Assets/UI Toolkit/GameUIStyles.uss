@@ -1,0 +1,41 @@
+/* 1. Layout général */
+.horizontal-layout {
+    flex-direction: row;
+}
+.vertical-layout {
+    flex-direction: column;
+}
+
+/* 2. Conteneur des barres (centré en haut) */
+.bars-container {
+    height: auto;
+}
+
+/* 3. Style pour .statbar (HealthBar / EnergyBar) */
+.statbar {
+    width: 120px;
+    height: 28px;
+    background-color: #2A2A2A;
+    border: 2px solid #555555;
+    border-radius: 6px;
+    margin: 0 6px;      /* un peu de marge horizontale entre les deux */
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* 4. Style pour la mini-map (fond + bordure autour) */
+.minibackground {
+    background-color: #1F1F1F;  /* gris foncé pour séparer du reste */
+    border: 1px solid #444444;  /* bordure discrète */
+    border-radius: 4px;
+    padding: 4px;               /* léger padding autour de la grille */
+    /* align-self: flex-start est géré dans le UXML */
+}
+
+/* 5. Zone de preview (mini-map elle-même) */
+.grid-preview {
+    background-color: #000000;  /* noir pour la texture */
+    border: 1px solid #666666;  /* légère bordure grise */
+    border-radius: 2px;
+}

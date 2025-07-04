@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: deb7353ca7b0b0a4fadfd0a066131408
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53581
+  packageName: Update manager
+  packageVersion: 3.2
+  assetPath: Assets/UpdateManager/Example Scene/Scripts/ExampleUpdateManagerUpdate.cs
+  uploadId: 378862

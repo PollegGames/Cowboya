@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 588a4b20a9c83e84787ebdc87697b908
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53581
+  packageName: Update manager
+  packageVersion: 3.2
+  assetPath: Assets/UpdateManager/Scripts/OverridableMonoBehaviour.cs
+  uploadId: 378862

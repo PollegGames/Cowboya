@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 1a332e4a804b1f149905c53cec182ac2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53581
+  packageName: Update manager
+  packageVersion: 3.2
+  assetPath: Assets/UpdateManager/Scripts/Utility/Singleton.cs
+  uploadId: 378862

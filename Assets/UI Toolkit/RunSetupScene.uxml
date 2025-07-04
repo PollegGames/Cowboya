@@ -1,0 +1,54 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/RunSetupScene.uss?fileID=7433441132597879392&amp;guid=275173b1c507f5147a19f50f783719cc&amp;type=3#RunSetupScene" />
+    <engine:VisualElement class="root horizontal-layout" style="margin: 18px; height: 1021px; width: 1898px;">
+        <engine:VisualElement name="VisualElement" class="left-panel vertical-layout setup-container" style="height: 956px; margin: 29px 10px 29px 29px; width: 496px; padding-right: -105px;">
+            <engine:Label text="GRID SETUP" class="section-title" style="-unity-text-align: upper-center; width: 243px; font-size: 24px;" />
+            <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label text="WIDTH" class="int-label" style="width: 203px;" />
+                <engine:Button name="width-minus-button" text="−" class="int-button" />
+                <engine:IntegerField name="width-field" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="width-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label text="HEIGHT" class="int-label" style="width: 205px;" />
+                <engine:Button name="height-minus-button" text="−" class="int-button" />
+                <engine:IntegerField name="height-field" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="height-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:Label name="cells-available-label" text="Cells Available: 0" style="-unity-text-align: upper-center; width: 340px; font-size: 24px;" />
+            <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label text="POI CELLS" class="int-label" style="width: 201px;" />
+                <engine:Button name="poi-minus-button" text="−" class="int-button" />
+                <engine:IntegerField name="poi-field" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="poi-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label text="BLOCKED CELLS" class="int-label" style="width: 198px;" />
+                <engine:Button name="blocked-minus-button" text="−" class="int-button" />
+                <engine:IntegerField name="blocked-field" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="blocked-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:TextField name="seed-field" label="SEED" style="font-size: 24px; width: 387px;" />
+            <engine:Toggle name="random-seed-toggle" label="RANDOMIZE" style="-unity-font-style: italic; font-size: 16px;" />
+            <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label text="ENEMY COUNT" class="int-label" style="width: 210px;" />
+                <engine:Button name="enemy-minus-button" text="−" class="int-button" />
+                <engine:IntegerField name="enemy-count-field" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="enemy-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label text="BOSS COUNT" class="int-label" style="width: 206px;" />
+                <engine:Button name="boss-minus-button" text="−" class="int-button" />
+                <engine:IntegerField name="boss-count-field" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="boss-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:Button name="validate-button" text="GENERATE PREVIEW GRID" class="validate-button" style="font-size: 24px;" />
+            <engine:VisualElement class="separator" style="width: 319px; align-self: center;" />
+            <engine:Button name="run-button" text="START RUN" class="run-button" style="margin-bottom: 20px; font-size: 24px; margin-top: 17px;" />
+        </engine:VisualElement>
+        <engine:VisualElement class="right-panel vertical-layout" style="height: 946px; padding: 0 20px 0 10px; width: 1567px; margin: 29px; align-items: flex-start; justify-content: flex-start;">
+            <engine:Label name="status-label" text="Waiting for validation…" class="section-title" style="-unity-text-align: upper-center; font-size: 30px; width: 1324px;" />
+            <engine:VisualElement name="preview" class="grid-preview" style="height: 918px; width: 1435px; margin-top: 0;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 0014af68e727e2748977a28ddc9f07d6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53581
+  packageName: Update manager
+  packageVersion: 3.2
+  assetPath: Assets/UpdateManager/Example Scene/Scripts/Counter.cs
+  uploadId: 378862

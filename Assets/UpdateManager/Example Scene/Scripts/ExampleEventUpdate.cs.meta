@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8ba817520f2f4c244bb349c82c07d25b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53581
+  packageName: Update manager
+  packageVersion: 3.2
+  assetPath: Assets/UpdateManager/Example Scene/Scripts/ExampleEventUpdate.cs
+  uploadId: 378862

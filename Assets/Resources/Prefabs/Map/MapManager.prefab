@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2109682297266300020
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6405638046548786876}
+  - component: {fileID: 9105121939494992887}
+  m_Layer: 0
+  m_Name: MapManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6405638046548786876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109682297266300020}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9105121939494992887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109682297266300020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d54fd85f3eb408d418a8e3f635087444, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellWidth: 47
+  cellHeight: 11
+  mapConfig: {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
+  blockedPrefab: {fileID: 542146199199913260, guid: 27a6b4d046762a446821621f345c75d1, type: 3}
+  startPrefab: {fileID: 542146199199913260, guid: b6280165da96e5042ac64d6d6fcd9697, type: 3}
+  endPrefab: {fileID: 542146199199913260, guid: 54e02337c6434194292e57d54ded47ac, type: 3}
+  defaultPOI_Prefab: {fileID: 542146199199913260, guid: 3d6b903f23f088d4ab161eccb58e9190, type: 3}
+  receptionPOI_Prefab: {fileID: 542146199199913260, guid: 3d6b903f23f088d4ab161eccb58e9190, type: 3}
+  securityPOI_Prefab: {fileID: 542146199199913260, guid: 61ec338c4d025b14eb781d8691fbccd7, type: 3}
+  pathToPOIPrefab: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+  emptyPrefab: {fileID: 542146199199913260, guid: 698d313749aa0524a957563038d9f5cf, type: 3}

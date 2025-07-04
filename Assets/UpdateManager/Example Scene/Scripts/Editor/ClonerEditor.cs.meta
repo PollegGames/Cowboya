@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2c1b0f493868eca438985ec36d447399
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 53581
+  packageName: Update manager
+  packageVersion: 3.2
+  assetPath: Assets/UpdateManager/Example Scene/Scripts/Editor/ClonerEditor.cs
+  uploadId: 378862
