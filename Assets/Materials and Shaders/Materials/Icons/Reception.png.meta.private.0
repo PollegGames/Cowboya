@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9fb7e124bf2b7cb40911356d5e8839af
+guid: b41ad99e0ac13184caf431d126cf2439
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8690629438673076078
-    second: Coop pronto a rajouter dans notre liste_0
+      213: -6241922607756613096
+    second: Reception_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Coop pronto a rajouter dans notre liste_0
+      name: Reception_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1733
-        height: 120
+        width: 1024
+        height: 1024
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e6f39a6fd615b9870800000000000000
-      internalID: 8690629438673076078
+      spriteID: 81aef29957c3069a0800000000000000
+      internalID: -6241922607756613096
       vertices: []
       indices: 
       edges: []
@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Reception_0: -6241922607756613096
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
