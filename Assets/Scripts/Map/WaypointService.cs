@@ -15,7 +15,16 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     private void Awake()
     {
-        pathFinder = new WaypointPathFinder(registry);
+        var connectors = new INeighborConnector[]
+        {
+            new AxisNeighborConnector(Axis.Horizontal, Bidirection.Both),
+            new AxisNeighborConnector(Axis.Vertical, Bidirection.Forward,
+                filter: wp => wp.type == WaypointType.LiftGoingUp),
+            new AxisNeighborConnector(Axis.Vertical, Bidirection.Forward, invert: true,
+                filter: wp => wp.type == WaypointType.LiftGoingDown)
+        };
+
+        pathFinder = new WaypointPathFinder(registry, connectors);
         reservationService = new WaypointReservationService(registry);
     }
 

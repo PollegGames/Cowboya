@@ -259,6 +259,8 @@
     <Compile Include="Assets\Resources\Prefabs\Robots\Scripts\GroundChecker.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\BossDefend.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\INeighborConnector.cs" />
+    <Compile Include="Assets\Scripts\Map\AxisNeighborConnector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
