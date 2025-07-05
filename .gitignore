@@ -6,3 +6,6 @@ obj/
 Build/
 Builds/
 Logs/
+/.git/**
+/.plastic/
+plastic.wktree
