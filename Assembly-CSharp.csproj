@@ -215,6 +215,9 @@
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpOnPlayerTouch.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotNavigationListener.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IWaypointNotifier.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IWaypointQueries.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IWaypointService.cs" />
     <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />

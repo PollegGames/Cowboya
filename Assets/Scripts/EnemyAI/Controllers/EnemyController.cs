@@ -13,7 +13,8 @@ public class EnemyController : BaseAgentController, IRobotNavigationListener
     private List<RoomWaypoint> currentPathWaypoints;
 
     private int pathIndex;
-    public IWaypointService waypointService;
+    private IWaypointQueries waypointQueries;
+    private IWaypointNotifier waypointNotifier;
 
     [SerializeField] private RobotBehaviour robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
@@ -38,12 +39,13 @@ public class EnemyController : BaseAgentController, IRobotNavigationListener
         robotBehaviour.OnStateChanged += HandleStateChange;
     }
 
-    public void Initialize(IWaypointService waypointService, EnemiesSpawner spawner)
+    public void Initialize(IWaypointQueries waypointQueries, IWaypointNotifier waypointNotifier, EnemiesSpawner spawner)
     {
-        this.waypointService = waypointService;
-        waypointService.Subscribe(this);
+        this.waypointQueries = waypointQueries;
+        this.waypointNotifier = waypointNotifier;
+        waypointNotifier.Subscribe(this);
         memory.SetSpawner(spawner);
-        stateMachine.ChangeState(new EnemyState_Idle(this, stateMachine, waypointService));
+        stateMachine.ChangeState(new EnemyState_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
     protected override void Update()
@@ -112,7 +114,7 @@ public class EnemyController : BaseAgentController, IRobotNavigationListener
 
         lastAttemptedWaypoint = start;
 
-        var raw = waypointService.FindWorldPath(start, target);
+        var raw = waypointQueries.FindWorldPath(start, target);
         if (raw == null || raw.Count == 0)
         {
             Debug.LogError($"No path from {start.name} to {target.name}.");
@@ -139,7 +141,7 @@ public class EnemyController : BaseAgentController, IRobotNavigationListener
     {
         var agentY = bodyReference.position.y;
 
-        var candidates = waypointService.GetActiveWaypoints()
+        var candidates = waypointQueries.GetActiveWaypoints()
             .Where(wp => Mathf.Abs(wp.WorldPos.y - agentY) < 5f && wp != exclude)
             .OrderBy(wp => Vector2.Distance(bodyReference.position, wp.WorldPos))
             .ToList();

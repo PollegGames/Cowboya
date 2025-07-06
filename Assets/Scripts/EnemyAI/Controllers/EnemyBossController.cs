@@ -12,7 +12,8 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
     private List<Vector3> currentPath;
     private List<RoomWaypoint> currentPathWaypoints;
     private int pathIndex;
-    private IWaypointService waypointService;
+    private IWaypointQueries waypointQueries;
+    private IWaypointNotifier waypointNotifier;
 
     [SerializeField] private RobotBehaviour robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
@@ -41,16 +42,17 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
             robotBehaviour = GetComponent<RobotBehaviour>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
-        stateMachine.ChangeState(new BossIdle(this, stateMachine, waypointService));
+        stateMachine.ChangeState(new BossIdle(this, stateMachine, null));
 
     }
 
-    public void Initialize(IWaypointService waypointService, EnemiesSpawner spawner)
+    public void Initialize(IWaypointQueries waypointQueries, IWaypointNotifier waypointNotifier, EnemiesSpawner spawner)
     {
-        this.waypointService = waypointService;
-        waypointService.Subscribe(this);
+        this.waypointQueries = waypointQueries;
+        this.waypointNotifier = waypointNotifier;
+        waypointNotifier.Subscribe(this);
         memory.SetSpawner(spawner);
-        stateMachine.ChangeState(new BossIdle(this, stateMachine, waypointService));
+        stateMachine.ChangeState(new BossIdle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
     private void Update()
@@ -118,7 +120,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
 
         lastAttemptedWaypoint = start;
 
-        var raw = waypointService.FindWorldPath(start, target);
+        var raw = waypointQueries.FindWorldPath(start, target);
         if (raw == null || raw.Count == 0)
         {
             Debug.LogError($"No path from {start.name} to {target.name}.");
@@ -145,7 +147,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
     {
         var agentY = bodyReference.position.y;
 
-        var candidates = waypointService.GetActiveWaypoints()
+        var candidates = waypointQueries.GetActiveWaypoints()
             .Where(wp => Mathf.Abs(wp.WorldPos.y - agentY) < 5f && wp != exclude)
             .OrderBy(wp => Vector2.Distance(bodyReference.position, wp.WorldPos))
             .ToList();
