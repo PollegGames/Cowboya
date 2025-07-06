@@ -1,5 +1,17 @@
 # Cowboya
 
+Cowboya is a comedic 2D rogue‑lite where you pilot a robot through a sprawling
+factory. Each run lets you gather gears and special resources to improve your
+machine back at camp. Attacks can be rearranged into custom combos, energy and
+health are upgraded over time, and a morality system tweaks how enemies react to
+you.
+
+## Screenshots
+
+![Cover image 1](Assets/Doc/Couverture.PNG)
+![Cover image 2](Assets/Doc/Couverture%202.PNG)
+![Cover image 3](Assets/Doc/Couverture%203.PNG)
+
 ## Running Edit Mode Tests
 
 This project uses Unity's built in Test Framework. Edit mode tests live under
