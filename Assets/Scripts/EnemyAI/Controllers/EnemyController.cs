@@ -14,7 +14,7 @@ public class EnemyController : BaseAgentController, IRobotNavigationListener
 
     private int pathIndex;
     private IWaypointQueries waypointQueries;
-    private IWaypointNotifier waypointNotifier;
+    public IWaypointService waypointService;
 
     [SerializeField] private RobotBehaviour robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
@@ -39,10 +39,10 @@ public class EnemyController : BaseAgentController, IRobotNavigationListener
         robotBehaviour.OnStateChanged += HandleStateChange;
     }
 
-    public void Initialize(IWaypointQueries waypointQueries, IWaypointNotifier waypointNotifier, EnemiesSpawner spawner)
+    public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointNotifier, EnemiesSpawner spawner)
     {
         this.waypointQueries = waypointQueries;
-        this.waypointNotifier = waypointNotifier;
+        this.waypointService = waypointNotifier;
         waypointNotifier.Subscribe(this);
         memory.SetSpawner(spawner);
         stateMachine.ChangeState(new EnemyState_Idle(this, stateMachine, (IWaypointService)waypointQueries));
