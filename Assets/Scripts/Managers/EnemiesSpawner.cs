@@ -82,7 +82,7 @@ public class EnemiesSpawner : MonoBehaviour
             enemy.SetActive(true);
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
-            var ec = enemy.GetComponent<EnemyController>();
+            var ec = enemy.GetComponent<EnemyWorkerController>();
             ec.Initialize(waypointService, waypointService, this);
 
             Debug.Log($"Enemy spread to {spawnPos} and initialized");
@@ -107,7 +107,7 @@ public class EnemiesSpawner : MonoBehaviour
             enemy.SetActive(true);
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
-            var ec = enemy.GetComponent<EnemyBossController>();
+            var ec = enemy.GetComponent<EnemyController>();
             ec.Initialize(waypointService, waypointService, this);
 
             Debug.Log($"Boss spread to {spawnPos} and initialized");
@@ -142,7 +142,7 @@ public class EnemiesSpawner : MonoBehaviour
         enemyGO.SetActive(true);
 
         // 4) Initialize its AI (waypoint service, etc.)
-        var ec = enemyGO.GetComponent<EnemyController>();
+        var ec = enemyGO.GetComponent<EnemyWorkerController>();
         ec.Initialize(waypointService, waypointService, this);
 
         // 5) Let its Memory know who the spawner is, so it can call back on “OnStuck”

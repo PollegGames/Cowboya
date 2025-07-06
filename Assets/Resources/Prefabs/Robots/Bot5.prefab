@@ -5104,6 +5104,7 @@ GameObject:
   - component: {fileID: 8918370125487379436}
   - component: {fileID: 8027441940180791310}
   - component: {fileID: 6603793096190714630}
+  - component: {fileID: 9062504079035036979}
   m_Layer: 6
   m_Name: Bot5
   m_TagString: Player
@@ -5147,9 +5148,6 @@ MonoBehaviour:
   - bone: {fileID: 9206399112885104982}
     restRotation: 0
     force: 700
-  - bone: {fileID: 9206399112436540778}
-    restRotation: 0
-    force: 100
 --- !u!114 &5046356896636356325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5204,13 +5202,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   energyBot: {fileID: 6178835051735462}
   healthBot: {fileID: 2375878962877187776}
-  RobotInfo:
-    RobotName: CowBoyBot
-    MaxHealth: 100
-    CurrentHealth: 100
-    MaxEnergy: 100
-    CurrentEnergy: 100
-    AttackEnergyCost: 5
+  Stats:
+    RobotName: 
+    MaxHealth: 1
+    CurrentHealth: 1
+    MaxEnergy: 1
+    CurrentEnergy: 1
+    AttackEnergyCost: 1
   hips: {fileID: 9206399112436540778}
 --- !u!114 &8782515306010581955
 MonoBehaviour:
@@ -5283,6 +5281,7 @@ MonoBehaviour:
   robotBehaviour: {fileID: 340242974285803334}
   bodyReference: {fileID: 9206399112885104982}
   maximumLerp: 10
+  inputSource: {fileID: 9062504079035036979}
   energyBot: {fileID: 6178835051735462}
 --- !u!114 &3067009131450268787
 MonoBehaviour:
@@ -5368,15 +5367,17 @@ MonoBehaviour:
   - {fileID: 9206399112872844465}
   - {fileID: 9206399113594718195}
   - {fileID: 9206399112352681965}
-  fixedJoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 9206399112233741188}
+  - {fileID: 1008493805044246288}
+  - {fileID: 119122012215267576}
+  - {fileID: 8449701390147253327}
+  fixedJoints: []
   ikSolvers:
   - {fileID: 4623276914685148842}
   - {fileID: 4623276914685148842}
   - {fileID: 3599177575120226896}
   - {fileID: 6432768999300876613}
+  - {fileID: 5883253071486982448}
 --- !u!114 &6603793096190714630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5392,6 +5393,18 @@ MonoBehaviour:
   bodyJoint: {fileID: 1008493805044246288}
   torsoJoint: {fileID: 119122012215267576}
   lowTorsoJoint: {fileID: 8449701390147253327}
+--- !u!114 &9062504079035036979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d586f98c8b434a0aa73f8a138d3be39a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9206399113579118250
 GameObject:
   m_ObjectHideFlags: 0

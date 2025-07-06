@@ -57,7 +57,7 @@ public class SceneInitiator : GameInitiator
 
         factoryManager.SetPlayerInstanceHead(playerInitiator.playerInstance, playerInitiator.playerHeadTransform);
 
-        gameUIViewModel?.SetPlayer(playerInitiator.playerPlayerStateController);
+        gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
         SetCinemachineTarget(playerInitiator.playerHeadTransform);
 
         Debug.Log("Player initialized.");

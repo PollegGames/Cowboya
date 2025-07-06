@@ -40,7 +40,7 @@ public class EnemyMemory : MonoBehaviour
     /// Called when EnemyController detects it’s “stuck.” 
     /// Memory will now tell the spawner to create a brand-new enemy, then destroy this one.
     /// </summary>
-    public void OnStuck(EnemyController controller)
+    public void OnStuck(EnemyWorkerController controller)
     {
         Debug.Log($"[EnemyMemory] Enemy stuck at {controller.transform.position}. Requesting respawn.");
 
@@ -61,7 +61,7 @@ public class EnemyMemory : MonoBehaviour
     /// Called when EnemyController detects it’s “stuck.” 
     /// Memory will now tell the spawner to create a brand-new enemy, then destroy this one.
     /// </summary>
-    public void OnBossStuck(EnemyBossController controller)
+    public void OnBossStuck(EnemyController controller)
     {
         Debug.Log($"[EnemyMemory] Boss stuck at {controller.transform.position}. Requesting respawn.");
 

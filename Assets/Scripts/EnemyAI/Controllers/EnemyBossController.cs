@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections;
 
 [RequireComponent(typeof(BossStateMachine), typeof(EnemyMemory))]
-public class EnemyBossController : BossAgentController, IRobotNavigationListener
+public class EnemyController : PhysicsBaseAgentController, IRobotNavigationListener
 {
     private BossStateMachine stateMachine;
     private MovementMonitor movementMonitor;
@@ -15,7 +15,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
     private IWaypointQueries waypointQueries;
     private IWaypointNotifier waypointNotifier;
 
-    [SerializeField] private PlayerStateController robotBehaviour;
+    [SerializeField] private RobotStateController robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
     [SerializeField] private float arrivalThresholdY = 2f;
     [SerializeField] private float deadZoneX = 5f;
@@ -39,10 +39,10 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
         movementMonitor = new MovementMonitor();
 
         if (robotBehaviour == null)
-            robotBehaviour = GetComponent<PlayerStateController>();
+            robotBehaviour = GetComponent<RobotStateController>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
-        stateMachine.ChangeState(new BossIdle(this, stateMachine, null));
+        stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, null));
 
     }
 
@@ -52,7 +52,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
         this.waypointNotifier = waypointNotifier;
         waypointNotifier.Subscribe(this);
         memory.SetSpawner(spawner);
-        stateMachine.ChangeState(new BossIdle(this, stateMachine, (IWaypointService)waypointQueries));
+        stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
     private void Update()

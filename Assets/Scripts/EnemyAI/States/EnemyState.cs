@@ -4,9 +4,10 @@
 public abstract class EnemyState
 {
     protected EnemyController enemy;
-    protected EnemyStateMachine stateMachine;
+    protected BossStateMachine stateMachine;
     protected IWaypointService waypointService;
-    protected EnemyState(EnemyController enemy, EnemyStateMachine stateMachine, IWaypointService waypointService)
+
+    protected EnemyState(EnemyController enemy, BossStateMachine stateMachine, IWaypointService waypointService)
     {
         this.enemy = enemy;
         this.stateMachine = stateMachine;

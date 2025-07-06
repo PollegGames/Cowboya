@@ -6,10 +6,10 @@ public class WorkerSlot : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var enemy = collision.GetComponentInParent<EnemyController>();
+        var enemy = collision.GetComponentInParent<EnemyWorkerController>();
         if (enemy == null) return;
         Debug.Log($"[WorkerSlot] {enemy.name} entered the slot.");
-        if (enemy.workerState == WorkerState.ReadyToWork)
+        if (enemy.workerState == WorkerStatus.ReadyToWork)
         {
             factoryMachine.OnWorkerReady(enemy);
         }

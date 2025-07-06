@@ -11,7 +11,7 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] private float forceSide = 5f;
     [SerializeField] private LegJointLimiter legJointLimiter;
     [SerializeField] private BodyJointLimiter bodyJointLimiter;
-    [SerializeField] private PlayerStateController robotBehaviour;
+    [SerializeField] private RobotStateController robotBehaviour;
 
     [Header("Body Rotation")]
     [SerializeField] private Rigidbody2D bodyReference;
@@ -34,7 +34,7 @@ public class PlayerMovementController : MonoBehaviour
         locomotion.OnJumpEnded += HandleJumpEnd;
 
         if (robotBehaviour == null)
-            robotBehaviour = GetComponent<PlayerStateController>();
+            robotBehaviour = GetComponent<RobotStateController>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
 

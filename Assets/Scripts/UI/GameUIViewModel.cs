@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public class GameUIViewModel : MonoBehaviour
 {
     public VisualElement ui;
-    private PlayerStateController robotBehaviour;
+    private RobotStateController robotBehaviour;
     [SerializeField] private RunMapConfigSO config;
     [SerializeField] private VictorySetup victorySetup;
 
@@ -21,7 +21,7 @@ public class GameUIViewModel : MonoBehaviour
         UpdateVictoryStatsUI();
     }
 
-    public void SetPlayer(PlayerStateController robot)
+    public void SetPlayer(RobotStateController robot)
     {
         if (robot != null && robot.Stats != null)
         {

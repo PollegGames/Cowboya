@@ -15,7 +15,7 @@ public class FactoryMachine : MonoBehaviour
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private MachineType machineType;
 
-    private EnemyController currentWorker;
+    private EnemyWorkerController currentWorker;
     private bool haveWorkerConnected = false;
     public bool HaveWorkerConnected => haveWorkerConnected;
 
@@ -37,7 +37,7 @@ public class FactoryMachine : MonoBehaviour
             meshRenderer.material = isOn ? materialOn : materialOff;
     }
 
-    public void OnWorkerReady(EnemyController newWorker)
+    public void OnWorkerReady(EnemyWorkerController newWorker)
     {
         if (!isOn) return;
 
@@ -48,7 +48,7 @@ public class FactoryMachine : MonoBehaviour
                 if (machineType == MachineType.WorkStation)
                 {
                     currentWorker.stateMachine.ChangeState(
-                        new GoingToRestStation(
+                        new Worker_GoingToRestStation(
                             currentWorker, currentWorker.stateMachine, currentWorker.waypointService));
                 }
             }
@@ -56,13 +56,13 @@ public class FactoryMachine : MonoBehaviour
             if (machineType == MachineType.WorkStation)
             {
                 newWorker.stateMachine.ChangeState(
-                    new EnemyState_Work(
+                    new Worker_IsWork(
                         newWorker, newWorker.stateMachine, newWorker.waypointService));
             }
             else
             {
                 newWorker.stateMachine.ChangeState(
-                   new EnemyState_Idle(
+                   new Worker_Idle(
                        newWorker, newWorker.stateMachine, newWorker.waypointService));
             }
         }

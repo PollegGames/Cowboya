@@ -5,9 +5,9 @@ using UnityEngine;
 /// </summary>
 public class BossStateMachine : MonoBehaviour
 {
-    private BossState currentState;
+    private EnemyState currentState;
 
-    public BossState CurrentState => currentState;
+    public EnemyState CurrentState => currentState;
     private void Update()
     {
         currentState?.UpdateState();
@@ -17,7 +17,7 @@ public class BossStateMachine : MonoBehaviour
     /// Permet de changer l'état actuel de l'ennemi.
     /// </summary>
     /// <param name="newState">Le nouvel état à activer.</param>
-    public void ChangeState(BossState newState)
+    public void ChangeState(EnemyState newState)
     {
         currentState?.ExitState();
         currentState = newState;

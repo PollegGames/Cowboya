@@ -4483,13 +4483,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   energyBot: {fileID: 5398157975759058039}
   healthBot: {fileID: 1976096450392993643}
-  RobotInfo:
-    RobotName: Boss
-    MaxHealth: 30
-    CurrentHealth: 30
-    MaxEnergy: 30
-    CurrentEnergy: 30
-    AttackEnergyCost: 5
+  Stats:
+    RobotName: 
+    MaxHealth: 1
+    CurrentHealth: 1
+    MaxEnergy: 1
+    CurrentEnergy: 1
+    AttackEnergyCost: 1
   hips: {fileID: 3392093481179504074}
 --- !u!114 &7188059881045560196
 MonoBehaviour:
@@ -4576,10 +4576,10 @@ MonoBehaviour:
   - {fileID: 5773208471996699822}
   - {fileID: 4472958890978182366}
   - {fileID: 553861781250421296}
-  fixedJoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 3497312347630537695}
+  - {fileID: 5120231806531619291}
+  - {fileID: 1600711879991610248}
+  fixedJoints: []
   ikSolvers:
   - {fileID: 6592260153268661156}
   - {fileID: 6695492996797371852}

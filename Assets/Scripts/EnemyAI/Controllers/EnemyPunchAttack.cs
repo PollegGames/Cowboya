@@ -30,13 +30,13 @@ public class EnemyPunchAttack : MonoBehaviour
     private bool useRightArmNext = true;
     private float lastPunchTime = 0f;
 
-    private PlayerStateController robotBehaviour;
+    private RobotStateController robotBehaviour;
 
     [SerializeField] private EnemyMemory memory;
     private bool playerInAttackZone = false;
     private void Awake()
     {
-        robotBehaviour = GetComponent<PlayerStateController>();
+        robotBehaviour = GetComponent<RobotStateController>();
     }
     private void Start()
     {

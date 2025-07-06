@@ -4,11 +4,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerTemplate", menuName = "Robot/PlayerTemplate")]
 public class PlayerTemplate : RobotTemplate
 {
-    private PlayerStateController robotBehaviour;
-    public PlayerStateController InitializePlayerStateController(GameObject robotInstance)
+    private RobotStateController robotBehaviour;
+    public RobotStateController InitializePlayerStateController(GameObject robotInstance)
     {
         // Get PlayerStateController component
-        robotBehaviour = robotInstance.GetComponent<PlayerStateController>();
+        robotBehaviour = robotInstance.GetComponent<RobotStateController>();
         Debug.Log("PlayerStateController initialized.");
         return robotBehaviour;
     }
