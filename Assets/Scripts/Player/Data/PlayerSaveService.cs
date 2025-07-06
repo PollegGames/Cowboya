@@ -2,15 +2,15 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SaveSystem : MonoBehaviour
+public class PlayerSaveService : MonoBehaviour
 {
     [SerializeField] private PlayerTemplate runtimePlayerData; // Assign in the Inspector
 
     private static string saveFilePath => Path.Combine(Application.persistentDataPath, "savefileCowBoya.json");
     public SaveData CurrentSaveData { get; private set; }
 
-    // Singleton pattern to access SaveSystem easily
-    public static SaveSystem Instance { get; private set; }
+    // Singleton pattern to access PlayerSaveService easily
+    public static PlayerSaveService Instance { get; private set; }
 
     private void Awake()
     {
@@ -34,10 +34,10 @@ public class SaveSystem : MonoBehaviour
         {
             CurrentSaveData = new SaveData(); // Ensure CurrentSaveData is not null before saving
         }
-        RobotBehaviour robotBehaviour = runtimePlayerData.RobotGameObjectPrefab.GetComponent<RobotBehaviour>();
-        CurrentSaveData.MaxHealth = robotBehaviour.RobotInfo.MaxHealth;
-        CurrentSaveData.MaxEnergy = robotBehaviour.RobotInfo.MaxEnergy;
-        CurrentSaveData.AttackEnergyCost = robotBehaviour.RobotInfo.AttackEnergyCost;
+        PlayerStateController robotBehaviour = runtimePlayerData.RobotGameObjectPrefab.GetComponent<PlayerStateController>();
+        CurrentSaveData.MaxHealth = robotBehaviour.PlayerStats.MaxHealth;
+        CurrentSaveData.MaxEnergy = robotBehaviour.PlayerStats.MaxEnergy;
+        CurrentSaveData.AttackEnergyCost = robotBehaviour.PlayerStats.AttackEnergyCost;
         // CurrentSaveData.experience = runtimePlayerData.experience;
         // Map other fields as needed
 

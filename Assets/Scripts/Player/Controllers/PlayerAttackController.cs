@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackHandler : MonoBehaviour
+public class PlayerAttackController : MonoBehaviour
 {
     public List<Attack> Attacks { get; private set; } = new List<Attack>();
 

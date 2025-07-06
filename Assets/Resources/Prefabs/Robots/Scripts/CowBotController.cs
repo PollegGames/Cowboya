@@ -31,7 +31,7 @@ public class CowBotController : MonoBehaviour, IController
     private string IsAttacking = "IsAttacking";
 
     [Header("Dependencies")]
-    [SerializeField] private RobotBehaviour robotBehaviour;
+    [SerializeField] private PlayerStateController robotBehaviour;
 
     [Header("Flip Settings")]
     [SerializeField] private Transform points;
@@ -42,7 +42,7 @@ public class CowBotController : MonoBehaviour, IController
     {
         if (robotBehaviour == null)
         {
-            robotBehaviour = GetComponent<RobotBehaviour>();
+            robotBehaviour = GetComponent<PlayerStateController>();
         }
 
         robotBehaviour.OnStateChanged += HandleStateChange;

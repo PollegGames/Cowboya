@@ -7,11 +7,11 @@ public class AttackHitbox : MonoBehaviour
 
     public int DamageCost = 5;
     private bool isActive = false;
-    private RobotBehaviour attacker;
+    private PlayerStateController attacker;
 
     private void Awake()
     {
-        attacker = GetComponentInParent<RobotBehaviour>();
+        attacker = GetComponentInParent<PlayerStateController>();
     }
 
     public void Activate() => isActive = true;
@@ -21,9 +21,9 @@ public class AttackHitbox : MonoBehaviour
     {
         if (!isActive) return;
 
-        RobotBehaviour target = other.GetComponentInParent<RobotBehaviour>();
+        PlayerStateController target = other.GetComponentInParent<PlayerStateController>();
         if (target == null || target == attacker)
-            return; // Ne touche pas soi-même ou objet sans RobotBehaviour
+            return; // Ne touche pas soi-même ou objet sans PlayerStateController
 
 
         // Applique les dégâts

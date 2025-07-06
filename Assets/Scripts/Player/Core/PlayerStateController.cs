@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-public class RobotBehaviour : MonoBehaviour
+public class PlayerStateController : MonoBehaviour
 {
     public event Action<RobotState> OnStateChanged;
     public RobotState CurrentState { get; private set; } = RobotState.Alive;
@@ -10,7 +10,7 @@ public class RobotBehaviour : MonoBehaviour
     [SerializeField] private HealthBot healthBot;
     public HealthBot Health => healthBot;
 
-    [SerializeField] public RobotInfo RobotInfo;
+    [SerializeField] public PlayerStats Stats;
     private bool isGrounded = true;
 
     [Header("Hips Rigidbody")]
@@ -32,20 +32,20 @@ public class RobotBehaviour : MonoBehaviour
 
     public bool CanPerformAttack()
     {
-        return RobotInfo.CurrentEnergy > RobotInfo.AttackEnergyCost && CurrentState == RobotState.Alive;
+        return Stats.CurrentEnergy > Stats.AttackEnergyCost && CurrentState == RobotState.Alive;
     }
 
 
     public bool CanPerformEnergy(float energyCost)
     {
-        return RobotInfo.CurrentEnergy > energyCost && CurrentState == RobotState.Alive;
+        return Stats.CurrentEnergy > energyCost && CurrentState == RobotState.Alive;
     }
 
     public void HandleJump(float jumpForce)
     {
         if (!CanJump()) return;
 
-        Debug.Log("RobotBehaviour: Jumping with force " + jumpForce);
+        Debug.Log("PlayerStateController: Jumping with force " + jumpForce);
         isGrounded = false;
         hips.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         StartCoroutine(ResetGrounded());
@@ -63,14 +63,14 @@ public class RobotBehaviour : MonoBehaviour
 
     public void PerformAttack(AttackType attackType)
     {
-        if (CurrentState != RobotState.Alive || !RobotInfo.AbleToAttack) return;
+        if (CurrentState != RobotState.Alive || !Stats.AbleToAttack) return;
 
-        energyBot.RechargingEnergy(-RobotInfo.AttackEnergyCost);
+        energyBot.RechargingEnergy(-Stats.AttackEnergyCost);
     }
 
     public void PerformAttackbyEnergy(float energycost)
     {
-        if (CurrentState != RobotState.Alive || !RobotInfo.AbleToAttack) return;
+        if (CurrentState != RobotState.Alive || !Stats.AbleToAttack) return;
 
         energyBot.RechargingEnergy(-energycost);
     }
@@ -80,12 +80,12 @@ public class RobotBehaviour : MonoBehaviour
         if (CurrentState == RobotState.Dead)
             return;
 
-        RobotInfo.UpdateEnergy(energyChange);
-        if (RobotInfo.CurrentEnergy == 0)
+        Stats.UpdateEnergy(energyChange);
+        if (Stats.CurrentEnergy == 0)
         {
             UpdateState(RobotState.Faint);
         }
-        else if (RobotInfo.CurrentEnergy >= RobotInfo.AttackEnergyCost)
+        else if (Stats.CurrentEnergy >= Stats.AttackEnergyCost)
         {
             UpdateState(RobotState.Alive);
         }
@@ -93,8 +93,8 @@ public class RobotBehaviour : MonoBehaviour
 
     private void HandleHealthChange(float healthChange)
     {
-        RobotInfo.UpdateHealth(healthChange);
-        if (RobotInfo.CurrentHealth <= 0)
+        Stats.UpdateHealth(healthChange);
+        if (Stats.CurrentHealth <= 0)
         {
             UpdateState(RobotState.Dead);
         }

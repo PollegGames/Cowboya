@@ -27,11 +27,11 @@ public class AlternatingPunchAttack : MonoBehaviour
 
     private bool isPunching = false;
 
-    private RobotBehaviour robotBehaviour;
+    private PlayerStateController robotBehaviour;
 
     private void Awake()
     {
-        robotBehaviour = GetComponent<RobotBehaviour>();
+        robotBehaviour = GetComponent<PlayerStateController>();
     }
 
     private void Update()

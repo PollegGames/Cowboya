@@ -18,7 +18,7 @@ public class RobotLocomotionController : MonoBehaviour
     private Coroutine walkRoutine;
     public event Action OnJumpStarted;
     public event Action OnJumpEnded;
-    private RobotBehaviour robotBehaviour;
+    private PlayerStateController robotBehaviour;
 
     [SerializeField] private float energyCostPerStep = 1f;
     [SerializeField] private float energyCostPerJump = 3f;
@@ -28,9 +28,9 @@ public class RobotLocomotionController : MonoBehaviour
 
     private void Awake()
     {
-        robotBehaviour = GetComponent<RobotBehaviour>();
+        robotBehaviour = GetComponent<PlayerStateController>();
         if (robotBehaviour == null)
-            Debug.LogError("RobotLocomotionController: RobotBehaviour not found.");
+            Debug.LogError("RobotLocomotionController: PlayerStateController not found.");
     }
 
     #region Movement

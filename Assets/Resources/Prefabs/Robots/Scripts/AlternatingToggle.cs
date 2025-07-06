@@ -27,11 +27,11 @@ public class AlternatingToggle : MonoBehaviour
 
     private bool isToggling = false;
     private Coroutine toggleRoutine;
-    private RobotBehaviour robotBehaviour;
+    private PlayerStateController robotBehaviour;
 
     private void Awake()
     {
-        robotBehaviour = GetComponent<RobotBehaviour>();
+        robotBehaviour = GetComponent<PlayerStateController>();
     }
 
     private void Update()
