@@ -4,27 +4,27 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerTemplate", menuName = "Robot/PlayerTemplate")]
 public class PlayerTemplate : RobotTemplate
 {
-    private RobotBehaviour robotBehaviour;
-    public RobotBehaviour InitializeRobotBehaviour(GameObject robotInstance)
+    private PlayerStateController robotBehaviour;
+    public PlayerStateController InitializePlayerStateController(GameObject robotInstance)
     {
-        // Get RobotBehaviour component
-        robotBehaviour = robotInstance.GetComponent<RobotBehaviour>();
-        Debug.Log("RobotBehaviour initialized.");
+        // Get PlayerStateController component
+        robotBehaviour = robotInstance.GetComponent<PlayerStateController>();
+        Debug.Log("PlayerStateController initialized.");
         return robotBehaviour;
     }
 
-    public RobotInfo InitializeRobotInfo(SaveData saveData)
+    public PlayerStats InitializePlayerStats(SaveData saveData)
     {
         // Use factory to create Robot instance
         PlayerRobotFactory playerFactory =
          new PlayerRobotFactory((int)saveData.MaxHealth, (int)saveData.MaxEnergy, 0, (int)saveData.AttackEnergyCost);
 
-        robotBehaviour.RobotInfo = playerFactory.CreateRobot();
-        Debug.Log("RobotInfo initialized with health: " + robotBehaviour.RobotInfo.CurrentHealth
-        + " and energy: " + robotBehaviour.RobotInfo.CurrentEnergy 
-        + " and attack energy cost: " + robotBehaviour.RobotInfo.AttackEnergyCost);
+        robotBehaviour.Stats = playerFactory.CreateRobot();
+        Debug.Log("PlayerStats initialized with health: " + robotBehaviour.Stats.CurrentHealth
+        + " and energy: " + robotBehaviour.Stats.CurrentEnergy
+        + " and attack energy cost: " + robotBehaviour.Stats.AttackEnergyCost);
 
-        return robotBehaviour.RobotInfo;
+        return robotBehaviour.Stats;
     }
 
 }

@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public class GameUIViewModel : MonoBehaviour
 {
     public VisualElement ui;
-    private RobotBehaviour robotBehaviour;
+    private PlayerStateController robotBehaviour;
     [SerializeField] private RunMapConfigSO config;
     [SerializeField] private VictorySetup victorySetup;
 
@@ -21,14 +21,14 @@ public class GameUIViewModel : MonoBehaviour
         UpdateVictoryStatsUI();
     }
 
-    public void SetPlayer(RobotBehaviour robot)
+    public void SetPlayer(PlayerStateController robot)
     {
-        if (robot != null && robot.RobotInfo != null)
+        if (robot != null && robot.Stats != null)
         {
             robotBehaviour = robot; // Store the instance reference
-            RobotInfo robotInfo = robot.RobotInfo;
+            PlayerStats robotInfo = robot.Stats;
 
-            // Subscribe to RobotInfo events
+            // Subscribe to PlayerStats events
             robotInfo.OnEnergyChanged += UpdateEnergyBar;
             robotInfo.OnHealthChanged += UpdateHealthBar;
 
@@ -36,20 +36,20 @@ public class GameUIViewModel : MonoBehaviour
             UpdateEnergyBar();
             UpdateHealthBar();
 
-            Debug.Log("Health and energy bars bound to RobotBehaviour.");
+            Debug.Log("Health and energy bars bound to PlayerStateController.");
         }
         else
         {
-            Debug.LogError("RobotBehaviour or RobotInfo is null!");
+            Debug.LogError("PlayerStateController or PlayerStats is null!");
         }
     }
 
     private void UpdateEnergyBar()
     {
-        if (robotBehaviour != null && robotBehaviour.RobotInfo != null)
+        if (robotBehaviour != null && robotBehaviour.Stats != null)
         {
-            float currentEnergy = robotBehaviour.RobotInfo.CurrentEnergy;
-            // Debug.Log("currentEnergy of RobotInfo: " + currentEnergy);
+            float currentEnergy = robotBehaviour.Stats.CurrentEnergy;
+            // Debug.Log("currentEnergy of PlayerStats: " + currentEnergy);
             ui.Q<EnergyBar>().currentEnergy = currentEnergy; // Assuming EnergyBar is a VisualElement
             ui.Q<EnergyBar>().MarkDirtyRepaint();
         }
@@ -57,9 +57,9 @@ public class GameUIViewModel : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        if (robotBehaviour != null && robotBehaviour.RobotInfo != null)
+        if (robotBehaviour != null && robotBehaviour.Stats != null)
         {
-            float currentHealth = robotBehaviour.RobotInfo.CurrentHealth;
+            float currentHealth = robotBehaviour.Stats.CurrentHealth;
             ui.Q<HealthBar>().currentHealth = currentHealth; // Assuming HealthBar is a VisualElement
             ui.Q<HealthBar>().MarkDirtyRepaint();
         }

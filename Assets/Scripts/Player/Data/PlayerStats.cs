@@ -4,7 +4,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 [Serializable]
-public class RobotInfo
+public class PlayerStats
 {
     public string RobotName;
     public float MaxHealth = 1f;
@@ -19,8 +19,8 @@ public class RobotInfo
     public List<Module> Modules { get; set; } = new List<Module>();
     public List<Attack> Attacks { get; set; } = new List<Attack>();
 
-    public RobotInfo() { }
-    public RobotInfo(
+    public PlayerStats() { }
+    public PlayerStats(
         float currentHealth,
         float maxHealth,
         float currentEnergy,

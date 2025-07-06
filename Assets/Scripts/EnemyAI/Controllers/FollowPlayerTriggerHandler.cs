@@ -49,7 +49,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         // Assurez-vous que le collider est le joueur
         if (collider.CompareTag("Player"))
         {
-            var playerControl = collider.transform.root.GetComponent<PlayerController>();
+            var playerControl = collider.transform.root.GetComponent<PlayerMovementController>();
             if (playerControl != null)
             {
                 playerBodyReferencePosition = playerControl.BodyReference.transform.position;

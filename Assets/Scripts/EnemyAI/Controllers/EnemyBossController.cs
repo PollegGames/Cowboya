@@ -15,7 +15,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
     private IWaypointQueries waypointQueries;
     private IWaypointNotifier waypointNotifier;
 
-    [SerializeField] private RobotBehaviour robotBehaviour;
+    [SerializeField] private PlayerStateController robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
     [SerializeField] private float arrivalThresholdY = 2f;
     [SerializeField] private float deadZoneX = 5f;
@@ -39,7 +39,7 @@ public class EnemyBossController : BossAgentController, IRobotNavigationListener
         movementMonitor = new MovementMonitor();
 
         if (robotBehaviour == null)
-            robotBehaviour = GetComponent<RobotBehaviour>();
+            robotBehaviour = GetComponent<PlayerStateController>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
         stateMachine.ChangeState(new BossIdle(this, stateMachine, null));

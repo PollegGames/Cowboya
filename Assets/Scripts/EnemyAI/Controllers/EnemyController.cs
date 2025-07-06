@@ -16,7 +16,7 @@ public class EnemyController : BaseAgentController, IRobotNavigationListener
     private IWaypointQueries waypointQueries;
     public IWaypointService waypointService;
 
-    [SerializeField] private RobotBehaviour robotBehaviour;
+    [SerializeField] private PlayerStateController robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
     [SerializeField] private float arrivalThresholdY = 2f;
     [SerializeField] private float deadZoneX = 5f;

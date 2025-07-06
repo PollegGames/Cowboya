@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(RobotLocomotionController), typeof(FacingController))]
-public class PlayerController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private RobotLocomotionController locomotion;
@@ -11,12 +11,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float forceSide = 5f;
     [SerializeField] private LegJointLimiter legJointLimiter;
     [SerializeField] private BodyJointLimiter bodyJointLimiter;
-    [SerializeField] private RobotBehaviour robotBehaviour;
+    [SerializeField] private PlayerStateController robotBehaviour;
 
     [Header("Body Rotation")]
     [SerializeField] private Rigidbody2D bodyReference;
     public Rigidbody2D BodyReference => bodyReference;
     [SerializeField] private float maximumLerp = 10f;
+
+    [SerializeField] private MonoBehaviour inputSource;
+    private IPlayerInput input;
 
     private bool flipped = false;
     private float horizontalInput;
@@ -31,25 +34,29 @@ public class PlayerController : MonoBehaviour
         locomotion.OnJumpEnded += HandleJumpEnd;
 
         if (robotBehaviour == null)
-            robotBehaviour = GetComponent<RobotBehaviour>();
+            robotBehaviour = GetComponent<PlayerStateController>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
+
+        input = inputSource as IPlayerInput;
+        if (input == null)
+        {
+            Debug.LogError("PlayerMovementController: inputSource does not implement IPlayerInput");
+        }
     }
 
     private void Update()
     {
         if (robotBehaviour.CurrentState != RobotState.Alive) return;
-        ReadInput();
+        if (input != null)
+        {
+            horizontalInput = input.Movement.x;
+            verticalInput = input.Movement.y;
+        }
         TryFlip();
         CalculateAndApplyBodyRotation();
         HandleMovement();
         HandleJump();
-    }
-
-    private void ReadInput()
-    {
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
     }
 
     private void TryFlip()

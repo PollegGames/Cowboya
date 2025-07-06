@@ -6,7 +6,7 @@ public class SceneInitiator : GameInitiator
     [SerializeField] private FactoryManager factoryManager;
     [SerializeField] private GameObject sceneControllerPrefab;
     [SerializeField] private GameUIViewModel gameUIViewModel;
-    [SerializeField] private PlayerInitiator playerInitiator;
+    [SerializeField] private PlayerSpawner playerInitiator;
     [SerializeField] private EnemiesSpawner enemiesSpawner;
     [SerializeField] private MapManager mapManager;
     [SerializeField] private WaypointService waypointService;
@@ -57,7 +57,7 @@ public class SceneInitiator : GameInitiator
 
         factoryManager.SetPlayerInstanceHead(playerInitiator.playerInstance, playerInitiator.playerHeadTransform);
 
-        gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
+        gameUIViewModel?.SetPlayer(playerInitiator.playerPlayerStateController);
         SetCinemachineTarget(playerInitiator.playerHeadTransform);
 
         Debug.Log("Player initialized.");

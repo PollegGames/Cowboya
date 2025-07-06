@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerInitiator : MonoBehaviour
+public class PlayerSpawner : MonoBehaviour
 {
     [Header("Spawn Settings")]
     [SerializeField] private Vector3 _playerStartPosition;
@@ -8,14 +8,14 @@ public class PlayerInitiator : MonoBehaviour
 
     [Header("Runtime References")]
     public GameObject playerInstance { get; private set; }
-    public RobotBehaviour playerRobotBehaviour { get; private set; }
-    public RobotInfo playerRobotInfo { get; private set; }
+    public PlayerStateController playerRobotBehaviour { get; private set; }
+    public PlayerStats playerRobotInfo { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
 
     public void SetPlayerStartPosition(Vector3 startPosition)
     {
         _playerStartPosition = startPosition;
-        Debug.Log($"PlayerInitiator: Player start position set to {_playerStartPosition}");
+        Debug.Log($"PlayerSpawner: Player start position set to {_playerStartPosition}");
     }
 
     /// <summary>
@@ -32,8 +32,8 @@ public class PlayerInitiator : MonoBehaviour
         );
 
         // Setup behaviour and save-data info
-        playerRobotBehaviour = playerTemplate.InitializeRobotBehaviour(playerInstance);
-        playerRobotInfo = playerTemplate.InitializeRobotInfo(SaveSystem.Instance.CurrentSaveData);
+        playerRobotBehaviour = playerTemplate.InitializePlayerStateController(playerInstance);
+        playerRobotInfo = playerTemplate.InitializePlayerStats(PlayerSaveService.Instance.CurrentSaveData);
 
         // Locate "WholeBody" container
         Transform wholeBody = playerInstance.transform.Find("WholeBody");
