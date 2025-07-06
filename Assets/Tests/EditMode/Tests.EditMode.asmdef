@@ -1,0 +1,6 @@
+{
+  "name": "Tests.EditMode",
+  "references": [
+    "Assembly-CSharp"
+  ]
+}
