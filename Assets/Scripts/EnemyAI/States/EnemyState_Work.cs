@@ -5,14 +5,11 @@ using UnityEngine;
 /// </summary>
 public class EnemyState_Work : EnemyState
 {
-    private const float Work_DURATION = 5f;
-    private float _timer;
     public EnemyState_Work(EnemyController enemy,
                                     EnemyStateMachine machine,
                                     IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {
-        _timer = 0f;
     }
 
     public override void EnterState()

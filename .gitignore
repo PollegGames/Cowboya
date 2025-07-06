@@ -9,3 +9,6 @@ Logs/
 /.git/**
 /.plastic/
 plastic.wktree
+.plastic/plastic.wktree
+.plastic/plastic.wktree
+Assets/Resources/Prefabs/Map/ROOM_Empty.prefab
