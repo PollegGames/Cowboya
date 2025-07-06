@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using UnityEngine;
-
 public class SceneInitiatorTests
 {
     private GameObject _gameObject;

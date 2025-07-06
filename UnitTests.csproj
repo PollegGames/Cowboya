@@ -19,7 +19,7 @@
     <RootNamespace></RootNamespace>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>UnitTests</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
     <BaseDirectory>.</BaseDirectory>
   </PropertyGroup>
@@ -65,260 +65,26 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.25f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_AttackPlayer.cs" />
-    <Compile Include="Assets\UpdateManager\Example Scene\Scripts\Counter.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
-    <Compile Include="Assets\Tests\TestingPlaceholders\SquareMover.cs" />
-    <Compile Include="Assets\Scripts\Game\LoadRunSetupScene.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
-    <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
     <Compile Include="Assets\Tests\UnitTests\GridFactoryTests.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
-    <Compile Include="Assets\Scripts\Map\SecuritySystem.cs" />
     <Compile Include="Assets\Tests\UnitTests\GridManagerTests.cs" />
-    <Compile Include="Assets\Scripts\Map\AxisNeighborConnector.cs" />
-    <Compile Include="Assets\Scripts\Game\SceneInitiator.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\AnimatorBaseAgentController.cs" />
-    <Compile Include="Assets\Scripts\Map\CameraController.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\HeadTargetController.cs" />
-    <Compile Include="Assets\Scripts\FactoryCore\LiftController.cs" />
-    <Compile Include="Assets\Scripts\Game\EndVictoryLoad.cs" />
-    <Compile Include="Assets\Scripts\Navigation\PathSolver.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\Tests\UnitTests\WaypointServiceTests.cs" />
-    <Compile Include="Assets\Scripts\Navigation\EdgeCellProcessor.cs" />
     <Compile Include="Assets\Tests\UnitTests\ICellProcessorTests.cs" />
-    <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
     <Compile Include="Assets\Tests\UnitTests\PositionTriggerZoneTests.cs" />
-    <Compile Include="Assets\UpdateManager\Scripts\OverridableMonoBehaviour.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyStateMachine.cs" />
-    <Compile Include="Assets\Scripts\Navigation\PriorityQueue.cs" />
-    <Compile Include="Assets\Scripts\Map\WaypointService.cs" />
-    <Compile Include="Assets\Scripts\Game\TargetAim.cs" />
-    <Compile Include="Assets\Scripts\Robots\EnergyBot.cs" />
-    <Compile Include="Assets\Scripts\Map\WaypointReservationService.cs" />
-    <Compile Include="Assets\UpdateManager\Scripts\Utility\Singleton.cs" />
-    <Compile Include="Assets\Scripts\Navigation\RunMapConfigSO.cs" />
-    <Compile Include="Assets\Scripts\Navigation\Cell.cs" />
-    <Compile Include="Assets\Scripts\Robots\BodyJointLimiter.cs" />
-    <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
-    <Compile Include="Assets\Scripts\Robots\ArcTargetFollower.cs" />
-    <Compile Include="Assets\Scripts\Navigation\GridFactory.cs" />
     <Compile Include="Assets\Tests\UnitTests\SceneInitiatorTests.cs" />
     <Compile Include="Assets\Tests\UnitTests\CellPropertiesTests.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_IsWork.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
-    <Compile Include="Assets\Scripts\Navigation\MapManager.cs" />
-    <Compile Include="Assets\Scripts\FactoryCore\PositionTriggerZone.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\INeighborConnector.cs" />
     <Compile Include="Assets\Tests\UnitTests\IRobotNavigationListenerTests.cs" />
-    <Compile Include="Assets\Shapes2D\Scripts\Shape.cs" />
-    <Compile Include="Assets\Scripts\Setup\ShowLoadingScreenDisposable.cs" />
     <Compile Include="Assets\Tests\UnitTests\GridRendererTests.cs" />
-    <Compile Include="Assets\Scripts\Setup\SaveData.cs" />
-    <Compile Include="Assets\Scripts\OBSOLETE\SkewSprite.cs" />
-    <Compile Include="Assets\Scripts\Game\SceneController.cs" />
-    <Compile Include="Assets\Scripts\Robots\DamageFeedback.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IWaypointQueries.cs" />
-    <Compile Include="Assets\Scripts\Navigation\PathFinder.cs" />
-    <Compile Include="Assets\Scripts\Robots\BodyBalance.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
-    <Compile Include="Assets\Scripts\Map\DoorController.cs" />
-    <Compile Include="Assets\Scripts\UI\RunSetupManager.cs" />
-    <Compile Include="Assets\Scripts\Map\WarpMeshXYSkew.cs" />
-    <Compile Include="Assets\Scripts\Machines\WorkerSlot.cs" />
-    <Compile Include="Assets\UpdateManager\Example Scene\Scripts\ExampleEventUpdate.cs" />
-    <Compile Include="Assets\UpdateManager\Example Scene\Scripts\ExampleUpdateManagerUpdate.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
-    <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshByVertexColor.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\EnemyState.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\ICellProcessor.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Core\BossStateMachine.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\Tests\UnitTests\FactoryManagerTests.cs" />
-    <Compile Include="Assets\Scripts\Player\Core\PlayerSpawner.cs" />
-    <Compile Include="Assets\Scripts\UI\HealthBar.cs" />
-    <Compile Include="Assets\Scripts\Game\TeleportToFactoryEntrance.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
-    <Compile Include="Assets\Scripts\Menu\MainMenuController.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Idle.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_GoToEndCell.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
-    <Compile Include="Assets\Scripts\Map\LiftDirection.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\WorkerState.cs" />
-    <Compile Include="Assets\Scripts\Map\SecurityCamera.cs" />
-    <Compile Include="Assets\Scripts\Managers\VictorySetup.cs" />
-    <Compile Include="Assets\Scripts\Robots\LegJointLimiter.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyPunchAttack.cs" />
-    <Compile Include="Assets\Scripts\UI\GameUIViewModel.cs" />
-    <Compile Include="Assets\Scripts\UI\EnergyBar.cs" />
-    <Compile Include="Assets\Scripts\Map\FactoryAlarmStatus.cs" />
-    <Compile Include="Assets\Scripts\Map\WaypointPathFinder.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_MoveToPOICell.cs" />
     <Compile Include="Assets\Tests\UnitTests\MapManagerTests.cs" />
-    <Compile Include="Assets\Scripts\Game\TeleportToBaseCamp.cs" />
-    <Compile Include="Assets\Scripts\Map\WaypointRegistry.cs" />
-    <Compile Include="Assets\UpdateManager\Example Scene\Scripts\ExampleUnityUpdate.cs" />
-    <Compile Include="Assets\Scripts\FactoryCore\LiftShaftController.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\PlayerTemplate.cs" />
-    <Compile Include="Assets\Scripts\FactoryCore\RoomManager.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\Tests\UnitTests\RoomWaypointTests.cs" />
-    <Compile Include="Assets\Scripts\Robots\PlainMath.cs" />
-    <Compile Include="Assets\Scripts\Player\Data\PlayerStats.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\EnemyRobotFactory.cs" />
-    <Compile Include="Assets\Scripts\UI\LocalizedButton.cs" />
-    <Compile Include="Assets\Scripts\Game\BulletScript.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\RobotFactory.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IWaypointNotifier.cs" />
     <Compile Include="Assets\Tests\UnitTests\RoomManagerTests.cs" />
-    <Compile Include="Assets\Scripts\Navigation\CellProcessor.cs" />
-    <Compile Include="Assets\Tests\TestingPlaceholders\SquareMovementData.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_WaitBeforeGoingToPOI.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
-    <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshZSkew.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
-    <Compile Include="Assets\Scripts\Machines\FactoryMachine.cs" />
-    <Compile Include="Assets\Scripts\Robots\Attack.cs" />
-    <Compile Include="Assets\Scripts\Navigation\BlockedCellProcessor.cs" />
-    <Compile Include="Assets\Scripts\Map\AlarmFlasher.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
-    <Compile Include="Assets\Scripts\Navigation\GridRenderer.cs" />
-    <Compile Include="Assets\Scripts\Robots\IgnoreCollision.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
-    <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />
-    <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
-    <Compile Include="Assets\Scripts\Player\Interfaces\IPlayerInput.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\RobotTemplate.cs" />
-    <Compile Include="Assets\Scripts\Navigation\CellProperties.cs" />
-    <Compile Include="Assets\Scripts\Managers\EnemiesSpawner.cs" />
-    <Compile Include="Assets\Scripts\Player\Controllers\PlayerAttackController.cs" />
-    <Compile Include="Assets\Scripts\Player\Controllers\PlayerMovementController.cs" />
-    <Compile Include="Assets\Scripts\Machines\ToggleBox.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\PhysicsBaseAgentController.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
-    <Compile Include="Assets\Scripts\OBSOLETE\WarpMesh.cs" />
-    <Compile Include="Assets\Scripts\Robots\HealthBot.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\AllyRobotFactory.cs" />
-    <Compile Include="Assets\Scripts\Setup\GameInitiator.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IWaypointService.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\FacingController.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\RobotStateController.cs" />
     <Compile Include="Assets\Tests\UnitTests\CellProcessorTests.cs" />
-    <Compile Include="Assets\Scripts\Navigation\LockEndRoomDoorProcessor.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToRestStation.cs" />
-    <Compile Include="Assets\Scripts\Map\DoorDirection.cs" />
-    <Compile Include="Assets\Scripts\Navigation\PathCellProcessor.cs" />
-    <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyWorkerController.cs" />
-    <Compile Include="Assets\Scripts\OBSOLETE\WarpOnPlayerTouch.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IRobotNavigationListener.cs" />
-    <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
-    <Compile Include="Assets\Scripts\Robots\Module.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
-    <Compile Include="Assets\Scripts\Game\GameHUDEvents.cs" />
-    <Compile Include="Assets\Scripts\Robots\IKController.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyBossController.cs" />
-    <Compile Include="Assets\Scripts\Game\StartVictoryLoad.cs" />
-    <Compile Include="Assets\Scripts\Robots\AttackType.cs" />
-    <Compile Include="Assets\Scripts\Map\RoomWaypoint.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyMemory.cs" />
     <Compile Include="Assets\Tests\UnitTests\EnemiesSpawnerTests.cs" />
     <Compile Include="Assets\Tests\UnitTests\CellTests.cs" />
-    <Compile Include="Assets\Scripts\Setup\LoadingScreen.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
-    <Compile Include="Assets\Scripts\UI\StartMenuUI.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
-    <Compile Include="Assets\RoomTilt.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\PlayerRobotFactory.cs" />
-    <Compile Include="Assets\UpdateManager\Scripts\UpdateManager.cs" />
-    <Compile Include="Assets\Scripts\Machines\ToggleButton.cs" />
-    <Compile Include="Assets\Resources\Prefabs\Robots\ObsoloteVersionRobotScripts\IController.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
-    <Compile Include="Assets\Scripts\Navigation\RoomProperties.cs" />
-    <Compile Include="Assets\Scripts\RobotFactory\RobotLocomotionController.cs" />
-    <Compile Include="Assets\Scripts\Player\Controllers\PlayerInputReader.cs" />
-    <Compile Include="Assets\Scripts\Navigation\EndpointsFactory.cs" />
-    <Compile Include="Assets\UpdateManager\Example Scene\Scripts\Cloner.cs" />
-    <Compile Include="Assets\Scripts\Robots\RobotState.cs" />
-    <Compile Include="Assets\Scripts\Robots\FootStepper.cs" />
-    <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
-    <Compile Include="Assets\Scripts\FactoryCore\FactoryManager.cs" />
-    <Compile Include="Assets\Scripts\Robots\GroundChecker.cs" />
-    <Compile Include="Assets\Resources\Prefabs\Robots\ObsoloteVersionRobotScripts\CowBotController.cs" />
-    <Compile Include="Assets\Scripts\Robots\AlternatingPunchAttack.cs" />
-    <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
-    <Compile Include="Assets\Shapes2D\Scripts\Shapes2DPrefs.cs" />
-    <Compile Include="Assets\Scripts\Map\LiftData.cs" />
+    <Compile Include="Assets\Tests\UnitTests\PlayerInitiatorTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
-    <None Include="Assets\Shapes2D\Shaders\Triangle.cginc" />
-    <None Include="Assets\UI Toolkit\MenuButtonsTemplate.uss" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Roboto-Bold - License.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
-    <None Include="Assets\UpdateManager\READ ME.txt" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Unity - OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
-    <None Include="Assets\Shapes2D\Shaders\Common.cginc" />
-    <None Include="Assets\UI Toolkit\SaveTemplate.uxml" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald-Bold - OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Roboto-Bold - AFL.txt" />
-    <None Include="Assets\Shapes2D\Shaders\Ellipse.cginc" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Anton OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
-    <None Include="Assets\Shapes2D\Shaders\Shape.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
-    <None Include="Assets\UI Toolkit\MenuButtonsTemplate.uxml" />
-    <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
-    <None Include="Assets\UI Toolkit\MainMenuVisualTree.uxml" />
-    <None Include="Assets\Shapes2D\Shaders\Rectangle.cginc" />
-    <None Include="Assets\UI Toolkit\RunSetupScene.uss" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
-    <None Include="Assets\UI Toolkit\GameUIStyles.uss" />
-    <None Include="Assets\UI Toolkit\GameHUDVisualTree.uxml" />
-    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
-    <None Include="Assets\Materials and Shaders\Test\SkewShader.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
-    <None Include="Assets\Shapes2D\Shaders\Polygon.cginc" />
-    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-    <None Include="Assets\Shapes2D\changelog.txt" />
-    <None Include="Assets\UI Toolkit\MainMenuStyle.uss" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets\Shapes2D\Shaders\Path.cginc" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
-    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
-    <None Include="Assets\UI Toolkit\RunSetupScene.uxml" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
-    <None Include="Assets\Shapes2D\readme.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Bangers - OFL.txt" />
+    <None Include="Assets\Tests\UnitTests\Unit.Tests.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -785,20 +551,8 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.25f1\Editor\Data\Managed\UnityEngine\UnityEditor.XRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>Library\PackageCache\com.unity.collections\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>Library\PackageCache\com.unity.ext.nunit\net40\unity-custom\nunit.framework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>Library\PackageCache\com.unity.visualscripting\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil\Mono.Cecil.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
@@ -1289,340 +1043,20 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.25f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.2D.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.2D.Runtime.dll</HintPath>
+    <Reference Include="UnityEngine.TestRunner">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.TestRunner.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.InputSystem.ForUI">
-      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.ForUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Addressables.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Addressables.Editor.dll</HintPath>
+    <Reference Include="UnityEditor.TestRunner">
+      <HintPath>Library\ScriptAssemblies\UnityEditor.TestRunner.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Rider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Searcher.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="PsdPlugin">
-      <HintPath>Library\ScriptAssemblies\PsdPlugin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Common.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Common.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Common.Path.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Common.Path.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Shaders">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.IK.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.IK.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ResourceManager">
-      <HintPath>Library\ScriptAssemblies\Unity.ResourceManager.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Cinemachine.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.SpriteShape.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.SpriteShape.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.IK.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.IK.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Runtime.Shared">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.Shared.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Timeline.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UniTask.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\UniTask.TextMeshPro.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Timeline">
-      <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Editor.Shared">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.Shared.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ShaderGraph.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Aseprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Aseprite.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Multiplayer.Center.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Multiplayer.Center.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UniTask.Linq">
-      <HintPath>Library\ScriptAssemblies\UniTask.Linq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Splines">
-      <HintPath>Library\ScriptAssemblies\Unity.Splines.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ScriptableBuildPipeline.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Mathematics.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.GPUDriven.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.GPUDriven.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Cinemachine">
-      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Animation.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Animation.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.InternalAPIEditorBridge.001">
-      <HintPath>Library\ScriptAssemblies\Unity.InternalAPIEditorBridge.001.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ScriptableBuildPipeline">
-      <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Collections">
-      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="PPv2URPConverters">
-      <HintPath>Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ProBuilder.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Addressables">
-      <HintPath>Library\ScriptAssemblies\Unity.Addressables.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.PixelPerfect.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.PixelPerfect.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Rendering.LightTransport.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Rendering.LightTransport.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ProBuilder.AddOns.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.AddOns.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UniTask.DOTween">
-      <HintPath>Library\ScriptAssemblies\UniTask.DOTween.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Core">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.InternalAPIEngineBridge.001">
-      <HintPath>Library\ScriptAssemblies\Unity.InternalAPIEngineBridge.001.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Tilemap.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Tilemap.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Config.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Splines.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Splines.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Aseprite.Common">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Aseprite.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ProBuilder.AssetIdRemapUtility">
-      <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.AssetIdRemapUtility.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Animation.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Animation.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Collections.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Collections.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Tilemap.Extras.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Tilemap.Extras.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Shared.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Multiplayer.Center.Common">
-      <HintPath>Library\ScriptAssemblies\Unity.Multiplayer.Center.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Core.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Flow.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.PlasticSCM.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Tilemap.Extras">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Tilemap.Extras.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Common.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Common.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.State.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Mathematics">
-      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.ProBuilder">
-      <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.State">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.SpriteShape.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.SpriteShape.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UniTask.Addressables">
-      <HintPath>Library\ScriptAssemblies\UniTask.Addressables.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Psdimporter.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Psdimporter.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Burst.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.PixelPerfect">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.PixelPerfect.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Burst">
-      <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualStudio.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Flow">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Rendering.LightTransport.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.Rendering.LightTransport.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UniTask">
-      <HintPath>Library\ScriptAssemblies\UniTask.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
