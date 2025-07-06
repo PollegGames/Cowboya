@@ -125,6 +125,7 @@
     <Compile Include="Assets\Scripts\Setup\SaveData.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\SkewSprite.cs" />
     <Compile Include="Assets\Scripts\Game\SceneController.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IWaypointQueries.cs" />
     <Compile Include="Assets\Resources\Prefabs\Robots\Scripts\AttackType.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathFinder.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
@@ -180,6 +181,7 @@
     <Compile Include="Assets\Scripts\UI\LocalizedButton.cs" />
     <Compile Include="Assets\Scripts\Game\BulletScript.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotFactory.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IWaypointNotifier.cs" />
     <Compile Include="Assets\Scripts\Navigation\CellProcessor.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
@@ -221,9 +223,6 @@
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpOnPlayerTouch.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotNavigationListener.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IWaypointNotifier.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IWaypointQueries.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IWaypointService.cs" />
     <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
@@ -262,8 +261,6 @@
     <Compile Include="Assets\Resources\Prefabs\Robots\Scripts\GroundChecker.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\BossDefend.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\INeighborConnector.cs" />
-    <Compile Include="Assets\Scripts\Map\AxisNeighborConnector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
