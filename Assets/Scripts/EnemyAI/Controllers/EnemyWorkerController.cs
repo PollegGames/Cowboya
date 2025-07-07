@@ -29,7 +29,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         robotBehaviour.OnStateChanged += HandleStateChange;
     }
 
-    public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointNotifier, EnemiesSpawner spawner)
+    public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointNotifier, IRobotRespawnService respawnService)
     {
         this.waypointQueries = waypointQueries;
         this.waypointService = waypointNotifier;
@@ -37,7 +37,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
             arrivalThresholdX, arrivalThresholdY, deadZoneX, deadZoneY);
         pathFollower.OnStuck += () => memory.OnStuck(this);
         waypointNotifier.Subscribe(pathFollower);
-        memory.SetSpawner(spawner);
+        memory.SetRespawnService(respawnService);
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 

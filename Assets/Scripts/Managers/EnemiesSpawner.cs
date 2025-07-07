@@ -9,16 +9,22 @@ public class EnemiesSpawner : MonoBehaviour
     // Expose enemies count via public property
     private MapManager mapManager;
     private IWaypointService waypointService;
+    private IRobotRespawnService respawnService;
     private List<GameObject> spawnedWorkers = new List<GameObject>();
     private List<GameObject> spawnedEnemies = new List<GameObject>();
     private GameUIViewModel gameUIViewModel;
 
-    public void InitMapManager(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel)
+    public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService)
     {
         this.waypointService = waypointService;
         this.mapManager = mapManager;
         this.gameUIViewModel = viewModel;
-        Debug.Log("EnemiesSpawner: MapManager and WaypointService initialized.");
+        this.respawnService = respawnService;
+
+        if (respawnService is RobotRespawnService service)
+            service.Initialize(this);
+
+        Debug.Log("EnemiesSpawner: services initialized.");
     }
 
     // Create enemies and store them, but don't position them yet
@@ -83,7 +89,7 @@ public class EnemiesSpawner : MonoBehaviour
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = worker.GetComponent<EnemyWorkerController>();
-            ec.Initialize(waypointService, waypointService, this);
+            ec.Initialize(waypointService, waypointService, respawnService);
 
             Debug.Log($"Worker spread to {spawnPos} and initialized");
         }
@@ -111,7 +117,7 @@ public class EnemiesSpawner : MonoBehaviour
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = enemy.GetComponent<EnemyController>();
-            ec.Initialize(waypointService, waypointService, this);
+            ec.Initialize(waypointService, waypointService, respawnService);
 
             Debug.Log($"Enemy spread to {spawnPos} and initialized");
         }
@@ -146,12 +152,9 @@ public class EnemiesSpawner : MonoBehaviour
 
         // 4) Initialize its AI (waypoint service, etc.)
         var ec = enemyGO.GetComponent<EnemyWorkerController>();
-        ec.Initialize(waypointService, waypointService, this);
+        ec.Initialize(waypointService, waypointService, respawnService);
 
-        // 5) Let its Memory know who the spawner is, so it can call back on “OnStuck”
-        var mem = enemyGO.GetComponent<RobotMemory>();
-
-        // 6) Keep track of it
+        // 5) Keep track of it
         spawnedWorkers.Add(enemyGO);
 
         Debug.Log($"[EnemiesSpawner] Spawned new enemy at {spawnPos}.");

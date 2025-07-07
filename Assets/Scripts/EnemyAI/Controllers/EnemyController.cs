@@ -37,7 +37,7 @@ public class EnemyController : PhysicsBaseAgentController
 
     }
 
-    public void Initialize(IWaypointQueries waypointQueries, IWaypointNotifier waypointNotifier, EnemiesSpawner spawner)
+    public void Initialize(IWaypointQueries waypointQueries, IWaypointNotifier waypointNotifier, IRobotRespawnService respawnService)
     {
         this.waypointQueries = waypointQueries;
         this.waypointNotifier = waypointNotifier;
@@ -45,7 +45,7 @@ public class EnemyController : PhysicsBaseAgentController
             arrivalThresholdX, arrivalThresholdY, deadZoneX, deadZoneY);
         pathFollower.OnStuck += () => memory.OnBossStuck(this);
         waypointNotifier.Subscribe(pathFollower);
-        memory.SetSpawner(spawner);
+        memory.SetRespawnService(respawnService);
         stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 

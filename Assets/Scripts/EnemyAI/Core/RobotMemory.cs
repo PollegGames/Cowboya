@@ -13,7 +13,7 @@ public class RobotMemory : MonoBehaviour
     public bool WasRecentlyAttacked { get; private set; }
     public float TimeSinceLastAttack { get; private set; }
 
-    private EnemiesSpawner spawner;
+    private IRobotRespawnService respawnService;
     public RoomWaypoint LastVisitedPoint { get; private set; }
 
     private void Update()
@@ -25,9 +25,9 @@ public class RobotMemory : MonoBehaviour
         if (WasRecentlyAttacked)
             TimeSinceLastAttack += Time.deltaTime;
     }
-    public void SetSpawner(EnemiesSpawner s)
+    public void SetRespawnService(IRobotRespawnService service)
     {
-        spawner = s;
+        respawnService = service;
     }
 
 
@@ -44,13 +44,13 @@ public class RobotMemory : MonoBehaviour
     {
         Debug.Log($"[EnemyMemory] Enemy stuck at {controller.transform.position}. Requesting respawn.");
 
-        if (spawner != null)
+        if (respawnService != null)
         {
-            spawner.SpawnEnemyAtRandom();
+            respawnService.RespawnWorker();
         }
         else
         {
-            Debug.LogError("[EnemyMemory] Cannot respawn: spawner is null!");
+            Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
         }
 
         // Finally, destroy the stuck enemy’s GameObject:
@@ -65,13 +65,13 @@ public class RobotMemory : MonoBehaviour
     {
         Debug.Log($"[EnemyMemory] Boss stuck at {controller.transform.position}. Requesting respawn.");
 
-        if (spawner != null)
+        if (respawnService != null)
         {
-            spawner.SpawnBossAtRandom();
+            respawnService.RespawnBoss();
         }
         else
         {
-            Debug.LogError("[EnemyMemory] Cannot respawn: spawner is null!");
+            Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
         }
 
         // Finally, destroy the stuck enemy’s GameObject:
