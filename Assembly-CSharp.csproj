@@ -234,6 +234,9 @@
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyWorkerController.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpOnPlayerTouch.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotNavigationListener.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IEnemyStateMachine.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IWorkerStateMachine.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IRobotMemory.cs" />
     <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
     <Compile Include="Assets\Scripts\Robots\Module.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />

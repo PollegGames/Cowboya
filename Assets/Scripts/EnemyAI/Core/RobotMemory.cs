@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Stocke les informations mémorisées par l'ennemi, comme la dernière position connue du joueur, les agressions subies, etc.
 /// </summary>
-public class RobotMemory : MonoBehaviour
+public class RobotMemory : MonoBehaviour, IRobotMemory
 {
     [Header("Player Memory")]
     public Vector3 LastKnownPlayerPosition { get; private set; }
