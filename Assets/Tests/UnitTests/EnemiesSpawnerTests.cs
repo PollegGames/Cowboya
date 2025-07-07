@@ -14,7 +14,7 @@ public class EnemiesSpawnerTests
     }
 
     [Test]
-    public void InitMapManager_SetsDependencies()
+    public void Initialize_SetsDependencies()
     {
         // TODO: Assert initialization
     }
