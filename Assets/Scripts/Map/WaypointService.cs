@@ -8,24 +8,20 @@ public enum Bidirection { Both, Forward }
 
 public class WaypointService : MonoBehaviour, IWaypointService
 {
-    private WaypointRegistry registry = new();
-    private WaypointPathFinder pathFinder;
-    private WaypointReservationService reservationService;
+    [SerializeField] private MonoBehaviour registryBehaviour;
+    [SerializeField] private MonoBehaviour pathFinderBehaviour;
+    [SerializeField] private MonoBehaviour reservationServiceBehaviour;
+
+    private IWaypointRegistry registry;
+    private IPathFinder pathFinder;
+    private IPOIReservationService reservationService;
     private readonly HashSet<IRobotNavigationListener> robots = new();
 
     private void Awake()
     {
-        var connectors = new INeighborConnector[]
-        {
-            new AxisNeighborConnector(Axis.Horizontal, Bidirection.Both),
-            new AxisNeighborConnector(Axis.Vertical, Bidirection.Forward,
-                filter: wp => wp.type == WaypointType.LiftGoingUp),
-            new AxisNeighborConnector(Axis.Vertical, Bidirection.Forward, invert: true,
-                filter: wp => wp.type == WaypointType.LiftGoingDown)
-        };
-
-        pathFinder = new WaypointPathFinder(registry, connectors);
-        reservationService = new WaypointReservationService(registry);
+        registry = registryBehaviour as IWaypointRegistry;
+        pathFinder = pathFinderBehaviour as IPathFinder;
+        reservationService = reservationServiceBehaviour as IPOIReservationService;
     }
 
     #region Registration & Notification

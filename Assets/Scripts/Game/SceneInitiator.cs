@@ -22,13 +22,17 @@ public class SceneInitiator : GameInitiator
     }
     private void BindOfObjects()
     {
-        factoryManager = Instantiate(factoryManager);
-        sceneControllerPrefab = Instantiate(sceneControllerPrefab);
-        gameUIViewModel = Instantiate(gameUIViewModel);
-        playerInitiator = Instantiate(playerInitiator);
-        enemiesSpawner = Instantiate(enemiesSpawner);
-        mapManager = Instantiate(mapManager);
-        waypointService = Instantiate(waypointService);
+        if (factoryManager == null) factoryManager = FindObjectOfType<FactoryManager>();
+        if (sceneControllerPrefab == null)
+        {
+            var sc = FindObjectOfType<SceneController>();
+            sceneControllerPrefab = sc != null ? sc.gameObject : null;
+        }
+        if (gameUIViewModel == null) gameUIViewModel = FindObjectOfType<GameUIViewModel>();
+        if (playerInitiator == null) playerInitiator = FindObjectOfType<PlayerSpawner>();
+        if (enemiesSpawner == null) enemiesSpawner = FindObjectOfType<EnemiesSpawner>();
+        if (mapManager == null) mapManager = FindObjectOfType<MapManager>();
+        if (waypointService == null) waypointService = FindObjectOfType<WaypointService>();
     }
 
     protected override void InitializeSceneSpecificObjects()

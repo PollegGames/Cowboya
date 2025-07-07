@@ -2,16 +2,18 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class WaypointReservationService
+public class WaypointReservationService : MonoBehaviour, IPOIReservationService
 {
+    [SerializeField] private MonoBehaviour registryBehaviour;
+    private IWaypointRegistry registry;
+
     private readonly HashSet<RoomWaypoint> _reservedWaypoints = new();
     private readonly Dictionary<RoomWaypoint, int> _workUsageCounts = new();
     private readonly Dictionary<RoomWaypoint, int> _securityUsageCounts = new();
-    private readonly WaypointRegistry registry;
 
-    public WaypointReservationService(WaypointRegistry registry)
+    private void Awake()
     {
-        this.registry = registry;
+        registry = registryBehaviour as IWaypointRegistry;
     }
 
     public RoomWaypoint GetLeastUsedFreeWorkPoint(RoomWaypoint exclude = null)
