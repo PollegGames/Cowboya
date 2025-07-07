@@ -70,6 +70,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Tests\TestingPlaceholders\SquareMover.cs" />
     <Compile Include="Assets\Scripts\Game\LoadRunSetupScene.cs" />
+    <Compile Include="Assets\Scripts\Game\FactorySetupLoader.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IMover.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
@@ -203,6 +204,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />
+    <Compile Include="Assets\Scripts\Player\Interfaces\ISaveService.cs" />
     <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\IPlayerInput.cs" />

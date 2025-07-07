@@ -21,6 +21,7 @@ public class SceneBootstrapper : MonoBehaviour
         var sceneController = Instantiate(config.sceneControllerPrefab);
         var viewModel = Instantiate(config.gameUIViewModelPrefab);
         var victory = Instantiate(config.victorySetupPrefab);
+        var saveService = Instantiate(config.saveServicePrefab);
 
         var initiator = FindObjectOfType<SceneInitiator>();
         if (initiator != null)
@@ -35,7 +36,8 @@ public class SceneBootstrapper : MonoBehaviour
                 waypointService,
                 respawnService,
                 config.mapConfig,
-                victory
+                victory,
+                saveService
             );
         }
     }

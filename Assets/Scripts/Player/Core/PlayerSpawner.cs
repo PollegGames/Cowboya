@@ -22,7 +22,7 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
     /// Instantiates the player robot prefab, initializes its behavior and info,
     /// then finds the "Head" Transform nested under "WholeBody".
     /// </summary>
-    public void InitializePlayer()
+    public void InitializePlayer(ISaveService saveService)
     {
         // Instantiate the robot
         playerInstance = Instantiate(
@@ -33,7 +33,7 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
 
         // Setup behaviour and save-data info
         playerRobotBehaviour = playerTemplate.InitializePlayerStateController(playerInstance);
-        playerRobotInfo = playerTemplate.InitializePlayerStats(PlayerSaveService.Instance.CurrentSaveData);
+        playerRobotInfo = playerTemplate.InitializePlayerStats(saveService.CurrentSaveData);
 
         // Locate "WholeBody" container
         Transform wholeBody = playerInstance.transform.Find("WholeBody");

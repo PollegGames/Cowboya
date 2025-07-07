@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class SceneInitiator : GameInitiator
 {
     private IFactoryManager factoryManager;
@@ -12,6 +13,7 @@ public class SceneInitiator : GameInitiator
     private IRobotRespawnService respawnService;
     private RunMapConfigSO mapConfig;
     private VictorySetup victorySetup;
+    private ISaveService saveService;
 
      private SceneController sceneController;
 
@@ -25,7 +27,8 @@ public class SceneInitiator : GameInitiator
         IWaypointService waypointService,
         IRobotRespawnService respawnService,
         RunMapConfigSO mapConfig,
-        VictorySetup victorySetup)
+        VictorySetup victorySetup,
+        ISaveService saveService)
     {
         this.factoryManager = factoryManager;
         this.sceneControllerPrefab = sceneControllerPrefab;
@@ -37,6 +40,7 @@ public class SceneInitiator : GameInitiator
         this.respawnService = respawnService;
         this.mapConfig = mapConfig;
         this.victorySetup = victorySetup;
+        this.saveService = saveService;
 
         InitializeSceneSpecificObjects();
     }
@@ -63,7 +67,7 @@ public class SceneInitiator : GameInitiator
 
         playerInitiator.SetPlayerStartPosition(startPos);
 
-        playerInitiator.InitializePlayer();
+        playerInitiator.InitializePlayer(saveService);
 
         factoryManager.SetPlayerInstanceHead(playerInitiator.playerInstance, playerInitiator.playerHeadTransform);
 
