@@ -28,12 +28,22 @@ public class MapManager : MonoBehaviour
     // ---------------------------------------------------------------- Instances & services
     private Dictionary<Vector2, GameObject> roomInstances;
     private GridManager gridManager;
-    private GridRenderer gridRenderer;
+
+    private IGridBuilder gridBuilder;
+    private IRoomRenderer roomRenderer;
+    private IRoomProcessor roomProcessor;
 
     private int gridWidth = 6;
     private int gridHeight = 8;
     private int wallCount = 5;
     private int pointsOfInterestCount = 3;
+
+    public void Construct(IGridBuilder builder, IRoomRenderer renderer, IRoomProcessor processor)
+    {
+        gridBuilder = builder;
+        roomRenderer = renderer;
+        roomProcessor = processor;
+    }
 
     /// <summary>
     /// Applique les champs du ScriptableObject aux variables internes.
@@ -50,12 +60,11 @@ public class MapManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Initialise GridManager / GridRenderer avec les valeurs courantes.
+    /// Initialise internal services with the current configuration values.
     /// </summary>
     private void BootSystems()
     {
         gridManager = new GridManager(gridWidth, gridHeight, cellWidth, cellHeight, wallCount, pointsOfInterestCount);
-        gridRenderer = new GridRenderer(CreatePrefabMapping(),CreatePOIPrefabMapping(), transform);
     }
 
     /// <summary>
@@ -82,34 +91,31 @@ public class MapManager : MonoBehaviour
     /// </summary>
     public void InitializeGrid()
     {
-        BootSystems();
-        // 1) Construction logique
-        var gridFactory = new GridFactory();
-        gridFactory.CreateGrid(gridWidth, gridHeight, 0);
-        gridFactory.AssignStartAndEndCells(new EndpointsFactory(), gridWidth, gridHeight);
-        gridFactory.AssignPOICells(new EndpointsFactory(), pointsOfInterestCount, gridWidth, gridHeight);
-        gridFactory.SolvePaths(pointsOfInterestCount, wallCount, new PathSolver(gridFactory, new PathFinder()), gridWidth, gridHeight);
-        gridFactory.AssignBlockedCells(wallCount);
-
-        var cellDataGrid = gridFactory.cellDataGrid;
-
-        // 2) Post-processors
-        var roomProcessors = new List<ICellProcessor>
+        if (gridBuilder == null || roomRenderer == null || roomProcessor == null)
         {
-            new EdgeCellProcessor(gridWidth, gridHeight),
-            new PathCellProcessor(gridWidth, gridHeight, UsageType.PathToPOI),
-            new BlockedCellProcessor(gridWidth, gridHeight),
-            new LockEndRoomDoorProcessor(gridWidth, gridHeight),
-        };
-        foreach (var p in roomProcessors) p.ProcessCells(cellDataGrid);
+            Debug.LogError("MapManager services not configured.");
+            return;
+        }
 
-        // 3) Rendu visuel
-        roomInstances = gridRenderer.Render(cellDataGrid,
-                                            new Vector2(cellWidth, cellHeight),
-                                            transform.position,
-                                            emptyPrefab);
+        BootSystems();
 
-        // 4) Assignation des propriétés
+        var cellDataGrid = gridBuilder.BuildGrid(
+            gridWidth,
+            gridHeight,
+            wallCount,
+            pointsOfInterestCount);
+
+        roomProcessor.ProcessRooms(cellDataGrid, gridWidth, gridHeight);
+
+        roomInstances = roomRenderer.RenderRooms(
+            cellDataGrid,
+            CreatePrefabMapping(),
+            CreatePOIPrefabMapping(),
+            new Vector2(cellWidth, cellHeight),
+            transform.position,
+            transform,
+            emptyPrefab);
+
         gridManager.AssignRoomProperties(roomInstances, cellDataGrid);
     }
 

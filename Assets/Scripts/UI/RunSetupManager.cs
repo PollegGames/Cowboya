@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+
 /// <summary>
 /// Gère la scène RunSetupScene : saisie des paramètres, validation, prévisualisation
 /// et lancement du run.
@@ -319,6 +320,10 @@ public class RunSetupManager : MonoBehaviour
         DestroyOldInstances();
         factoryManagerInstance = Instantiate(factoryManagerPrefab);
         mapManagerInstance = Instantiate(mapManagerPrefab);
+        var gridBuilder = mapManagerInstance.gameObject.AddComponent<GridBuilder>();
+        var roomRenderer = mapManagerInstance.gameObject.AddComponent<RoomRenderer>();
+        var roomProcessor = mapManagerInstance.gameObject.AddComponent<RoomProcessor>();
+        mapManagerInstance.Construct(gridBuilder, roomRenderer, roomProcessor);
         waypointServiceInstance = Instantiate(waypointServicePrefab);
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 
