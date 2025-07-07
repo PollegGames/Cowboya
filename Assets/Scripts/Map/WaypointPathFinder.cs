@@ -2,15 +2,23 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class WaypointPathFinder
+public class WaypointPathFinder : MonoBehaviour, IPathFinder
 {
-    private readonly WaypointRegistry registry;
-    private readonly List<INeighborConnector> connectors;
+    [SerializeField] private MonoBehaviour registryBehaviour;
+    private IWaypointRegistry registry;
+    private List<INeighborConnector> connectors;
 
-    public WaypointPathFinder(WaypointRegistry registry, params INeighborConnector[] connectors)
+    private void Awake()
     {
-        this.registry = registry;
-        this.connectors = connectors?.ToList() ?? new List<INeighborConnector>();
+        registry = registryBehaviour as IWaypointRegistry;
+        connectors = new List<INeighborConnector>
+        {
+            new AxisNeighborConnector(Axis.Horizontal, Bidirection.Both),
+            new AxisNeighborConnector(Axis.Vertical, Bidirection.Forward,
+                filter: wp => wp.type == WaypointType.LiftGoingUp),
+            new AxisNeighborConnector(Axis.Vertical, Bidirection.Forward, invert: true,
+                filter: wp => wp.type == WaypointType.LiftGoingDown)
+        };
     }
 
     public List<RoomWaypoint> FindWorldPath(RoomWaypoint start, RoomWaypoint end)

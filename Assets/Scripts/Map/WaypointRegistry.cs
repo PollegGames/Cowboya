@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-public class WaypointRegistry
+public class WaypointRegistry : MonoBehaviour, IWaypointRegistry
 {
     private readonly Dictionary<RoomManager, List<RoomWaypoint>> roomWaypoints = new();
 
