@@ -223,6 +223,10 @@
     <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyWorkerController.cs" />
+    <Compile Include="Assets\Scripts\Navigation\Movement\WaypointPathFollower.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IMover.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\ITargetSelector.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\UpdateLoop.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpOnPlayerTouch.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotNavigationListener.cs" />
     <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
