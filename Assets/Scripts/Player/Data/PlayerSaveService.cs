@@ -1,29 +1,15 @@
 using System.IO;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-public class PlayerSaveService : MonoBehaviour
+public class PlayerSaveService : MonoBehaviour, ISaveService
 {
     [SerializeField] private PlayerTemplate runtimePlayerData; // Assign in the Inspector
 
     private static string saveFilePath => Path.Combine(Application.persistentDataPath, "savefileCowBoya.json");
     public SaveData CurrentSaveData { get; private set; }
 
-    // Singleton pattern to access PlayerSaveService easily
-    public static PlayerSaveService Instance { get; private set; }
-
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
+        DontDestroyOnLoad(gameObject);
         LoadGame(); // Load game data when the game starts
     }
 
@@ -72,9 +58,4 @@ public class PlayerSaveService : MonoBehaviour
         Debug.Log("Save data reset.");
     }
 
-    // Method to handle loading the base camp scene with save data
-    public void LoadFactorySetup()
-    {
-        SceneManager.LoadScene("RunSetupScene");
-    }
 }

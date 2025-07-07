@@ -12,5 +12,6 @@ public class SceneBootstrapConfigSO : ScriptableObject
     public SceneController sceneControllerPrefab;
     public GameUIViewModel gameUIViewModelPrefab;
     public VictorySetup victorySetupPrefab;
+    public PlayerSaveService saveServicePrefab;
     public RunMapConfigSO mapConfig;
 }
