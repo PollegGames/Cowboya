@@ -4,7 +4,11 @@ using System.Collections;
 [RequireComponent(typeof(WorkerStateMachine), typeof(RobotMemory))]
 public class EnemyWorkerController : AnimatorBaseAgentController
 {
-    public WorkerStateMachine stateMachine;
+    [SerializeField] public WorkerStateMachine stateMachine;
+    [SerializeField] private RobotMemory memoryComponent;
+
+    private IWorkerStateMachine stateMachineInterface;
+    public IRobotMemory memory { get; private set; }
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     public IWaypointService waypointService;
@@ -15,16 +19,19 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneX = 5f;
     [SerializeField] private float deadZoneY = 5f;
 
-    public RobotMemory memory { get; private set; }
-
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
-
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
 
     private void Awake()
     {
-        stateMachine = GetComponent<WorkerStateMachine>();
-        memory = GetComponent<RobotMemory>();
+        if (stateMachine == null)
+            stateMachine = GetComponent<WorkerStateMachine>();
+        stateMachineInterface = stateMachine;
+
+        if (memoryComponent == null)
+            memoryComponent = GetComponent<RobotMemory>();
+        memory = memoryComponent;
+
         animator = GetComponentInChildren<Animator>();
         robotBehaviour.OnStateChanged += HandleStateChange;
     }

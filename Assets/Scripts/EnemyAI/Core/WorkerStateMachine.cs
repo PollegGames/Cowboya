@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Machine à états finis (FSM) pour gérer les différents comportements d'un ennemi.
 /// </summary>
-public class WorkerStateMachine : MonoBehaviour
+public class WorkerStateMachine : MonoBehaviour, IWorkerStateMachine
 {
     private WorkerState currentState;
 

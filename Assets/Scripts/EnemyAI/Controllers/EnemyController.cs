@@ -4,7 +4,11 @@ using System.Collections;
 [RequireComponent(typeof(EnemyStateMachine), typeof(RobotMemory))]
 public class EnemyController : PhysicsBaseAgentController
 {
-    private EnemyStateMachine stateMachine;
+    [SerializeField] private EnemyStateMachine stateMachine;
+    [SerializeField] private RobotMemory memoryComponent;
+
+    private IEnemyStateMachine stateMachineInterface;
+    public IRobotMemory memory { get; private set; }
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     private IWaypointNotifier waypointNotifier;
@@ -19,15 +23,19 @@ public class EnemyController : PhysicsBaseAgentController
     public Transform BodyReference => bodyReference;
 
     [SerializeField] private EnemyPunchAttack punchAttack;
-    public RobotMemory memory { get; private set; }
 
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
 
     protected override void Awake()
     {
         base.Awake();
-        stateMachine = GetComponent<EnemyStateMachine>();
-        memory = GetComponent<RobotMemory>();
+        if (stateMachine == null)
+            stateMachine = GetComponent<EnemyStateMachine>();
+        stateMachineInterface = stateMachine;
+
+        if (memoryComponent == null)
+            memoryComponent = GetComponent<RobotMemory>();
+        memory = memoryComponent;
 
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();
