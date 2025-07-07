@@ -10,6 +10,7 @@ public class SceneInitiator : GameInitiator
     [SerializeField] private EnemiesSpawner enemiesSpawner;
     [SerializeField] private MapManager mapManager;
     [SerializeField] private WaypointService waypointService;
+    [SerializeField] private RobotRespawnService respawnService;
     [SerializeField] private RunMapConfigSO mapConfig;
     [SerializeField] private VictorySetup victorySetup;
 
@@ -33,6 +34,7 @@ public class SceneInitiator : GameInitiator
         if (enemiesSpawner == null) enemiesSpawner = FindObjectOfType<EnemiesSpawner>();
         if (mapManager == null) mapManager = FindObjectOfType<MapManager>();
         if (waypointService == null) waypointService = FindObjectOfType<WaypointService>();
+        if (respawnService == null) respawnService = FindObjectOfType<RobotRespawnService>();
     }
 
     protected override void InitializeSceneSpecificObjects()
@@ -69,7 +71,7 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeEnemies()
     {
-        enemiesSpawner?.InitMapManager(mapManager, waypointService, gameUIViewModel);
+        enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService);
         enemiesSpawner?.CreateWorkers(mapConfig.enemyCount);
         enemiesSpawner?.CreateEnemy(mapConfig.bossCount);
         enemiesSpawner?.SpreadEnemies();
