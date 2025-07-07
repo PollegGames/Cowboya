@@ -1,40 +1,44 @@
-using TMPro;
 using UnityEngine;
 
 public class SceneInitiator : GameInitiator
 {
-    [SerializeField] private FactoryManager factoryManager;
-    [SerializeField] private GameObject sceneControllerPrefab;
-    [SerializeField] private GameUIViewModel gameUIViewModel;
-    [SerializeField] private PlayerSpawner playerInitiator;
-    [SerializeField] private EnemiesSpawner enemiesSpawner;
-    [SerializeField] private MapManager mapManager;
-    [SerializeField] private WaypointService waypointService;
-    [SerializeField] private RobotRespawnService respawnService;
-    [SerializeField] private RunMapConfigSO mapConfig;
-    [SerializeField] private VictorySetup victorySetup;
+    private IFactoryManager factoryManager;
+    private GameObject sceneControllerPrefab;
+    private GameUIViewModel gameUIViewModel;
+    private IPlayerSpawner playerInitiator;
+    private IEnemiesSpawner enemiesSpawner;
+    private MapManager mapManager;
+    private IWaypointService waypointService;
+    private IRobotRespawnService respawnService;
+    private RunMapConfigSO mapConfig;
+    private VictorySetup victorySetup;
 
      private SceneController sceneController;
 
-    private void Start()
+    public void Construct(
+        IFactoryManager factoryManager,
+        GameObject sceneControllerPrefab,
+        GameUIViewModel gameUIViewModel,
+        IPlayerSpawner playerInitiator,
+        IEnemiesSpawner enemiesSpawner,
+        MapManager mapManager,
+        IWaypointService waypointService,
+        IRobotRespawnService respawnService,
+        RunMapConfigSO mapConfig,
+        VictorySetup victorySetup)
     {
-        BindOfObjects();
+        this.factoryManager = factoryManager;
+        this.sceneControllerPrefab = sceneControllerPrefab;
+        this.gameUIViewModel = gameUIViewModel;
+        this.playerInitiator = playerInitiator;
+        this.enemiesSpawner = enemiesSpawner;
+        this.mapManager = mapManager;
+        this.waypointService = waypointService;
+        this.respawnService = respawnService;
+        this.mapConfig = mapConfig;
+        this.victorySetup = victorySetup;
+
         InitializeSceneSpecificObjects();
-    }
-    private void BindOfObjects()
-    {
-        if (factoryManager == null) factoryManager = FindObjectOfType<FactoryManager>();
-        if (sceneControllerPrefab == null)
-        {
-            var sc = FindObjectOfType<SceneController>();
-            sceneControllerPrefab = sc != null ? sc.gameObject : null;
-        }
-        if (gameUIViewModel == null) gameUIViewModel = FindObjectOfType<GameUIViewModel>();
-        if (playerInitiator == null) playerInitiator = FindObjectOfType<PlayerSpawner>();
-        if (enemiesSpawner == null) enemiesSpawner = FindObjectOfType<EnemiesSpawner>();
-        if (mapManager == null) mapManager = FindObjectOfType<MapManager>();
-        if (waypointService == null) waypointService = FindObjectOfType<WaypointService>();
-        if (respawnService == null) respawnService = FindObjectOfType<RobotRespawnService>();
     }
 
     protected override void InitializeSceneSpecificObjects()
