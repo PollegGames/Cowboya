@@ -4,7 +4,7 @@ using UnityEngine;
 /// Base class for agents (player, enemies, allies) that handles movement, facing, and jumping using physical components.
 /// Uses RobotLocomotionController, FacingController, and LegJointLimiter instead of Animator.
 /// </summary>
-public abstract class PhysicsBaseAgentController : MonoBehaviour
+public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
 {
     [Header("Movement & Facing Modules")]
     [SerializeField] protected RobotLocomotionController locomotion;

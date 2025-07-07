@@ -4,7 +4,7 @@ using UnityEngine;
 /// Classe de base pour le déplacement horizontal et vertical.
 /// Utilisée par le joueur, les ennemis et les alliés.
 /// </summary>
-public abstract class AnimatorBaseAgentController : MonoBehaviour
+public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
 {
     [Header("Movement Settings")]
     [SerializeField] protected float moveSpeed = 3f;
