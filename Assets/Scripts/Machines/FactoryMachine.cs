@@ -15,15 +15,21 @@ public class FactoryMachine : MonoBehaviour
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private MachineType machineType;
 
+    public event System.Action<FactoryMachine, bool> OnMachineStateChanged;
+
     private EnemyWorkerController currentWorker;
     private bool haveWorkerConnected = false;
     public bool HaveWorkerConnected => haveWorkerConnected;
+    public MachineType MachineType => machineType;
+    public EnemyWorkerController CurrentWorker => currentWorker;
 
     public void SetState(bool on)
     {
+        if (isOn == on) return;
         Debug.Log($"Setting FactoryMachine state to {(on ? "On" : "Off")}");
         isOn = on;
         meshRenderer.material = on ? materialOn : materialOff;
+        OnMachineStateChanged?.Invoke(this, isOn);
     }
 
     public void Toggle()
