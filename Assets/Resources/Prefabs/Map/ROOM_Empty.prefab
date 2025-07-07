@@ -1383,7 +1383,6 @@ MonoBehaviour:
   - {fileID: 5308979060611538755}
   - {fileID: 4803655476366571333}
   - {fileID: 1261790192328730080}
-  waypointService: {fileID: 0}
 --- !u!114 &5857107069788241263
 MonoBehaviour:
   m_ObjectHideFlags: 0

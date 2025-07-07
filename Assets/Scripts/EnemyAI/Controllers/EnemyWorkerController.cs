@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(EnemyStateMachine), typeof(EnemyMemory))]
+[RequireComponent(typeof(WorkerStateMachine), typeof(RobotMemory))]
 public class EnemyWorkerController : AnimatorBaseAgentController
 {
-    public EnemyStateMachine stateMachine;
+    public WorkerStateMachine stateMachine;
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     public IWaypointService waypointService;
@@ -15,7 +15,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneX = 5f;
     [SerializeField] private float deadZoneY = 5f;
 
-    public EnemyMemory memory { get; private set; }
+    public RobotMemory memory { get; private set; }
 
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
 
@@ -23,8 +23,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
 
     private void Awake()
     {
-        stateMachine = GetComponent<EnemyStateMachine>();
-        memory = GetComponent<EnemyMemory>();
+        stateMachine = GetComponent<WorkerStateMachine>();
+        memory = GetComponent<RobotMemory>();
         animator = GetComponentInChildren<Animator>();
         robotBehaviour.OnStateChanged += HandleStateChange;
     }

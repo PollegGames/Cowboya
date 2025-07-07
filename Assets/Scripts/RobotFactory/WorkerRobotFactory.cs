@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Enemy Robot Factory
-public class EnemyRobotFactory : RobotFactory
+public class WorkerRobotFactory : RobotFactory
 {
-    public EnemyRobotFactory()
+    public WorkerRobotFactory()
     {
-        health = 20;
-        energy = 30;
+        health = 5;
+        energy = 5;
         morality = -10;
-        energyAttackCost = 5;
+        energyAttackCost = 1;
     }
 
     public override RobotStats CreateRobot()

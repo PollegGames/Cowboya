@@ -26,7 +26,7 @@ public class GameUIViewModel : MonoBehaviour
         if (robot != null && robot.Stats != null)
         {
             robotBehaviour = robot; // Store the instance reference
-            PlayerStats robotInfo = robot.Stats;
+            RobotStats robotInfo = robot.Stats;
 
             // Subscribe to PlayerStats events
             robotInfo.OnEnergyChanged += UpdateEnergyBar;

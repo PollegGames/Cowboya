@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Stocke les informations mémorisées par l'ennemi, comme la dernière position connue du joueur, les agressions subies, etc.
 /// </summary>
-public class EnemyMemory : MonoBehaviour
+public class RobotMemory : MonoBehaviour
 {
     [Header("Player Memory")]
     public Vector3 LastKnownPlayerPosition { get; private set; }
@@ -67,7 +67,7 @@ public class EnemyMemory : MonoBehaviour
 
         if (spawner != null)
         {
-            spawner.SpawnEnemyAtRandom();
+            spawner.SpawnBossAtRandom();
         }
         else
         {

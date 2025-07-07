@@ -66,8 +66,8 @@ public class SceneInitiator : GameInitiator
     private void InitializeEnemies()
     {
         enemiesSpawner?.InitMapManager(mapManager, waypointService, gameUIViewModel);
-        enemiesSpawner?.CreateEnemies(mapConfig.enemyCount);
-        enemiesSpawner?.CreateBoss(mapConfig.bossCount);
+        enemiesSpawner?.CreateWorkers(mapConfig.enemyCount);
+        enemiesSpawner?.CreateEnemy(mapConfig.bossCount);
         enemiesSpawner?.SpreadEnemies();
     }
 

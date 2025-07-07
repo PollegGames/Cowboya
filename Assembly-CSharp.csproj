@@ -71,6 +71,7 @@
     <Compile Include="Assets\Tests\TestingPlaceholders\SquareMover.cs" />
     <Compile Include="Assets\Scripts\Game\LoadRunSetupScene.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IMover.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
     <Compile Include="Assets\Tests\UnitTests\GridFactoryTests.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Assets\Scripts\Navigation\RunMapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Navigation\Cell.cs" />
     <Compile Include="Assets\Scripts\Robots\BodyJointLimiter.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyController.cs" />
     <Compile Include="Assets\Shapes2D\Scripts\PolyMap.cs" />
     <Compile Include="Assets\Scripts\Robots\ArcTargetFollower.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridFactory.cs" />
@@ -111,6 +113,8 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_IsWork.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\Scripts\Navigation\MapManager.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\UpdateLoop.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\ITargetSelector.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\PositionTriggerZone.cs" />
     <Compile Include="Assets\Scripts\Interfaces\INeighborConnector.cs" />
     <Compile Include="Assets\Tests\UnitTests\IRobotNavigationListenerTests.cs" />
@@ -125,6 +129,7 @@
     <Compile Include="Assets\Scripts\Navigation\PathFinder.cs" />
     <Compile Include="Assets\Scripts\Robots\BodyBalance.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Core\WorkerStateMachine.cs" />
     <Compile Include="Assets\Scripts\Map\DoorController.cs" />
     <Compile Include="Assets\Scripts\UI\RunSetupManager.cs" />
     <Compile Include="Assets\Scripts\Map\WarpMeshXYSkew.cs" />
@@ -132,16 +137,17 @@
     <Compile Include="Assets\UpdateManager\Example Scene\Scripts\ExampleEventUpdate.cs" />
     <Compile Include="Assets\UpdateManager\Example Scene\Scripts\ExampleUpdateManagerUpdate.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Core\RobotMemory.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshByVertexColor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\EnemyState.cs" />
     <Compile Include="Assets\Scripts\Interfaces\ICellProcessor.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Core\BossStateMachine.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\Tests\UnitTests\FactoryManagerTests.cs" />
     <Compile Include="Assets\Scripts\Player\Core\PlayerSpawner.cs" />
     <Compile Include="Assets\Scripts\UI\HealthBar.cs" />
     <Compile Include="Assets\Scripts\Game\TeleportToFactoryEntrance.cs" />
+    <Compile Include="Assets\Scripts\RobotFactory\WorkerRobotFactory.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
     <Compile Include="Assets\Scripts\Menu\MainMenuController.cs" />
@@ -172,6 +178,7 @@
     <Compile Include="Assets\Scripts\Robots\PlainMath.cs" />
     <Compile Include="Assets\Scripts\Player\Data\PlayerStats.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\EnemyRobotFactory.cs" />
+    <Compile Include="Assets\Scripts\Navigation\Movement\WaypointPathFollower.cs" />
     <Compile Include="Assets\Scripts\UI\LocalizedButton.cs" />
     <Compile Include="Assets\Scripts\Game\BulletScript.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotFactory.cs" />
@@ -223,10 +230,6 @@
     <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyWorkerController.cs" />
-    <Compile Include="Assets\Scripts\Navigation\Movement\WaypointPathFollower.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IMover.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\ITargetSelector.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\UpdateLoop.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpOnPlayerTouch.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotNavigationListener.cs" />
     <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
@@ -235,11 +238,9 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\Scripts\Game\GameHUDEvents.cs" />
     <Compile Include="Assets\Scripts\Robots\IKController.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyBossController.cs" />
     <Compile Include="Assets\Scripts\Game\StartVictoryLoad.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackType.cs" />
     <Compile Include="Assets\Scripts\Map\RoomWaypoint.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyMemory.cs" />
     <Compile Include="Assets\Tests\UnitTests\EnemiesSpawnerTests.cs" />
     <Compile Include="Assets\Tests\UnitTests\CellTests.cs" />
     <Compile Include="Assets\Scripts\Setup\LoadingScreen.cs" />
@@ -1517,12 +1518,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Multiplayer.Center.Common">
-      <HintPath>Library\ScriptAssemblies\Unity.Multiplayer.Center.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.VisualScripting.Core.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Center.Common">
+      <HintPath>Library\ScriptAssemblies\Unity.Multiplayer.Center.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Flow.Editor">

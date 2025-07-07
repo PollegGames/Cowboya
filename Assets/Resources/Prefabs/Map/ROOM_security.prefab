@@ -774,7 +774,6 @@ MonoBehaviour:
   - {fileID: 1693577635688933943}
   - {fileID: 6502087620192996029}
   - {fileID: 7682366956585669325}
-  waypointService: {fileID: 0}
 --- !u!114 &5857107069788241263
 MonoBehaviour:
   m_ObjectHideFlags: 0

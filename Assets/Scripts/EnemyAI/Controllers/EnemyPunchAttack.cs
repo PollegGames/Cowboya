@@ -32,7 +32,7 @@ public class EnemyPunchAttack : MonoBehaviour
 
     private RobotStateController robotBehaviour;
 
-    [SerializeField] private EnemyMemory memory;
+    [SerializeField] private RobotMemory memory;
     private bool playerInAttackZone = false;
     private void Awake()
     {

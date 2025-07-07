@@ -5,22 +5,9 @@ using UnityEngine;
 /// </summary>
 public class EnemyStateMachine : MonoBehaviour
 {
-    private WorkerState currentState;
+    private EnemyState currentState;
 
-    public WorkerState enemyState
-    {
-        get => currentState;
-        set
-        {
-            if (currentState != null)
-            {
-                currentState.ExitState();
-            }
-            currentState = value;
-            currentState?.EnterState();
-        }
-    }
-
+    public EnemyState CurrentState => currentState;
     private void Update()
     {
         currentState?.UpdateState();
@@ -30,7 +17,7 @@ public class EnemyStateMachine : MonoBehaviour
     /// Permet de changer l'état actuel de l'ennemi.
     /// </summary>
     /// <param name="newState">Le nouvel état à activer.</param>
-    public void ChangeState(WorkerState newState)
+    public void ChangeState(EnemyState newState)
     {
         currentState?.ExitState();
         currentState = newState;

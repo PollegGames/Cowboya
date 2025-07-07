@@ -5,7 +5,7 @@ public class HealthBot : MonoBehaviour
 {
     public event Action<float> OnHealthChanged;
     [SerializeField] private DamageFeedback damageFeedback;
-    [SerializeField] private EnemyMemory memory = null;
+    [SerializeField] private RobotMemory memory = null;
 
     public void TakeDamage(int damage)
     {

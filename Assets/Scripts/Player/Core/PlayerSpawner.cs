@@ -9,7 +9,7 @@ public class PlayerSpawner : MonoBehaviour
     [Header("Runtime References")]
     public GameObject playerInstance { get; private set; }
     public RobotStateController playerRobotBehaviour { get; private set; }
-    public PlayerStats playerRobotInfo { get; private set; }
+    public RobotStats playerRobotInfo { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
 
     public void SetPlayerStartPosition(Vector3 startPosition)

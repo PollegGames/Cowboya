@@ -6,7 +6,7 @@ using UnityEngine;
 public class Worker_IsWork : WorkerState
 {
     public Worker_IsWork(EnemyWorkerController enemy,
-                                    EnemyStateMachine machine,
+                                    WorkerStateMachine machine,
                                     IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {

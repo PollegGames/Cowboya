@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(BossStateMachine), typeof(EnemyMemory))]
+[RequireComponent(typeof(EnemyStateMachine), typeof(RobotMemory))]
 public class EnemyController : PhysicsBaseAgentController
 {
-    private BossStateMachine stateMachine;
+    private EnemyStateMachine stateMachine;
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     private IWaypointNotifier waypointNotifier;
@@ -19,15 +19,15 @@ public class EnemyController : PhysicsBaseAgentController
     public Transform BodyReference => bodyReference;
 
     [SerializeField] private EnemyPunchAttack punchAttack;
-    public EnemyMemory memory { get; private set; }
+    public RobotMemory memory { get; private set; }
 
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
 
     protected override void Awake()
     {
         base.Awake();
-        stateMachine = GetComponent<BossStateMachine>();
-        memory = GetComponent<EnemyMemory>();
+        stateMachine = GetComponent<EnemyStateMachine>();
+        memory = GetComponent<RobotMemory>();
 
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();

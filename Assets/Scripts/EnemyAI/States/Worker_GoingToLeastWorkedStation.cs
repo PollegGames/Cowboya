@@ -12,7 +12,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
     private bool hasArrived;
 
     public Worker_GoingToLeastWorkedStation(EnemyWorkerController enemy,
-                                    EnemyStateMachine machine,
+                                    WorkerStateMachine machine,
                                     IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {

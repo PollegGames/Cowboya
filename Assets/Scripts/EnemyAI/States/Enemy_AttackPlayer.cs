@@ -6,7 +6,7 @@ public class Enemy_AttackPlayer : EnemyState
     private Vector3 playerTransform;
     private float stopDistance = 1.5f;
 
-    public Enemy_AttackPlayer(EnemyController enemy, BossStateMachine machine, IWaypointService waypointService)
+    public Enemy_AttackPlayer(EnemyController enemy, EnemyStateMachine machine, IWaypointService waypointService)
         : base(enemy, machine, waypointService)
     {
         playerTransform = enemy.memory.LastKnownPlayerPosition;

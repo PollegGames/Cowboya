@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cdbaae1338bf11449a917b22038cab8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 9206399113533570876, guid: 124cddd2c9136ae4cafa668d5e05d093, type: 3}
-  bossPrefab: {fileID: 8465636778725824547, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+  workerPrefab: {fileID: 9206399113533570876, guid: 124cddd2c9136ae4cafa668d5e05d093, type: 3}
+  enemyPrefab: {fileID: 8465636778725824547, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
   enemiesParent: {fileID: 2678707949269354773}

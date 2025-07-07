@@ -8,7 +8,7 @@ public class Worker_Idle : WorkerState
     private const float IDLE_DURATION = 10f;
     private float _timer;
     public Worker_Idle(EnemyWorkerController enemy,
-                                    EnemyStateMachine machine,
+                                    WorkerStateMachine machine,
                                     IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {

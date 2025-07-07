@@ -12,7 +12,7 @@ public class Enemy_MoveToPOICell : EnemyState
     private bool hasArrived;
 
     public Enemy_MoveToPOICell(EnemyController enemy,
-                                    BossStateMachine machine,
+                                    EnemyStateMachine machine,
                                     IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {

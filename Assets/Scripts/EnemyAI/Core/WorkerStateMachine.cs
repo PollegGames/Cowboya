@@ -3,11 +3,24 @@ using UnityEngine;
 /// <summary>
 /// Machine à états finis (FSM) pour gérer les différents comportements d'un ennemi.
 /// </summary>
-public class BossStateMachine : MonoBehaviour
+public class WorkerStateMachine : MonoBehaviour
 {
-    private EnemyState currentState;
+    private WorkerState currentState;
 
-    public EnemyState CurrentState => currentState;
+    public WorkerState enemyState
+    {
+        get => currentState;
+        set
+        {
+            if (currentState != null)
+            {
+                currentState.ExitState();
+            }
+            currentState = value;
+            currentState?.EnterState();
+        }
+    }
+
     private void Update()
     {
         currentState?.UpdateState();
@@ -17,7 +30,7 @@ public class BossStateMachine : MonoBehaviour
     /// Permet de changer l'état actuel de l'ennemi.
     /// </summary>
     /// <param name="newState">Le nouvel état à activer.</param>
-    public void ChangeState(EnemyState newState)
+    public void ChangeState(WorkerState newState)
     {
         currentState?.ExitState();
         currentState = newState;

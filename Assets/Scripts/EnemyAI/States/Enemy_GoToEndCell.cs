@@ -7,7 +7,7 @@ public class Enemy_GoToEndCell : EnemyState
     private bool hasArrived;
 
     public Enemy_GoToEndCell(EnemyController enemy,
-                                    BossStateMachine machine,
+                                    EnemyStateMachine machine,
                                     IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {

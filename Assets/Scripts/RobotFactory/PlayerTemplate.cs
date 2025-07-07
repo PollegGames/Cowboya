@@ -13,7 +13,7 @@ public class PlayerTemplate : RobotTemplate
         return robotBehaviour;
     }
 
-    public PlayerStats InitializePlayerStats(SaveData saveData)
+    public RobotStats InitializePlayerStats(SaveData saveData)
     {
         // Use factory to create Robot instance
         PlayerRobotFactory playerFactory =

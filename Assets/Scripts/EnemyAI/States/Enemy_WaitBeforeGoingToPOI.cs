@@ -8,7 +8,7 @@ public class Enemy_WaitBeforeGoingToPOI : EnemyState
     private const float Work_DURATION = 5f;
     private float _timer;
     public Enemy_WaitBeforeGoingToPOI(EnemyController enemy,
-                                    BossStateMachine machine,
+                                    EnemyStateMachine machine,
                                     IWaypointService waypointService)
       : base(enemy, machine, waypointService)
     {

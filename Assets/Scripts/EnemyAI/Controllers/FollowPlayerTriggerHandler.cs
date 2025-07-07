@@ -21,7 +21,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     public Vector3 PlayerBodyReferencePosition => playerBodyReferencePosition;
 
-    [SerializeField] private EnemyMemory memory;
+    [SerializeField] private RobotMemory memory;
 
     public event Action<bool> OnPlayerDetectInAttackZoneChanged;
 

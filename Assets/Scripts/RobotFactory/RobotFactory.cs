@@ -13,11 +13,11 @@ public abstract class RobotFactory
     protected List<Module> modules = new List<Module>();
     protected List<Attack> attacks = new List<Attack>();
 
-    public abstract PlayerStats CreateRobot();
+    public abstract RobotStats CreateRobot();
 
-    public List<PlayerStats> CreateMany(int count)
+    public List<RobotStats> CreateMany(int count)
     {
-        List<PlayerStats> robots = new List<PlayerStats>();
+        List<RobotStats> robots = new List<RobotStats>();
         for (int i = 0; i < count; i++)
         {
             robots.Add(CreateRobot());

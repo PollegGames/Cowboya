@@ -5148,6 +5148,9 @@ MonoBehaviour:
   - bone: {fileID: 9206399112885104982}
     restRotation: 0
     force: 700
+  - bone: {fileID: 9206399112436540778}
+    restRotation: 0
+    force: 100
 --- !u!114 &5046356896636356325
 MonoBehaviour:
   m_ObjectHideFlags: 0

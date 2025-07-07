@@ -13,8 +13,8 @@ public class AllyRobotFactory : RobotFactory
         energyAttackCost = 1;
     }
 
-    public override PlayerStats CreateRobot()
+    public override RobotStats CreateRobot()
     {
-        return new PlayerStats(health, health, energy, energy, energyAttackCost, morality, new List<Module>(modules), new List<Attack>(attacks));
+        return new RobotStats(health, health, energy, energy, energyAttackCost, morality, new List<Module>(modules), new List<Attack>(attacks));
     }
 }

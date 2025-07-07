@@ -10,7 +10,7 @@ public class RobotStateController : MonoBehaviour
     [SerializeField] private HealthBot healthBot;
     public HealthBot Health => healthBot;
 
-    [SerializeField] public PlayerStats Stats;
+    [SerializeField] public RobotStats Stats;
     private bool isGrounded = true;
 
     [Header("Hips Rigidbody")]
