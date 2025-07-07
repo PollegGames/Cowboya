@@ -20,6 +20,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneY = 5f;
 
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
+
+    public WorkerCondition activityState { get; private set; } = WorkerCondition.Active;
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
 
     private void Awake()
@@ -72,6 +74,11 @@ public class EnemyWorkerController : AnimatorBaseAgentController
 
     public RoomWaypoint GetClosestWaypoint(RoomWaypoint exclude = null) =>
         pathFollower.GetClosestWaypoint(exclude);
+
+    public void SetWorkerState(WorkerCondition newState)
+    {
+        activityState = newState;
+    }
 
     private void HandleStateChange(RobotState newState)
     {
