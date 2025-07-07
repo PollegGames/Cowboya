@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviour
+public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
 {
     [Header("Spawn Settings")]
     [SerializeField] private Vector3 _playerStartPosition;

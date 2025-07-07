@@ -3,7 +3,7 @@ using System;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
-public class FactoryManager : MonoBehaviour
+public class FactoryManager : MonoBehaviour, IFactoryManager
 {
     [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
     [SerializeField] private VictorySetup victorySetup;

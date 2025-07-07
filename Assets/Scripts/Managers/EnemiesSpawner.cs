@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class EnemiesSpawner : MonoBehaviour
+public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
 {
     [SerializeField] private GameObject workerPrefab;
     [SerializeField] private GameObject enemyPrefab;
