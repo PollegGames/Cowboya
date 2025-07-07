@@ -3,6 +3,7 @@ using UnityEngine;
 // Navigation services
 public class SceneBootstrapper : MonoBehaviour
 {
+    [SerializeField] private SceneInitiator sceneInitiator;
     [SerializeField] private SceneBootstrapConfigSO config;
 
     private void Awake()
@@ -28,7 +29,7 @@ public class SceneBootstrapper : MonoBehaviour
         var victory = Instantiate(config.victorySetupPrefab);
         var saveService = Instantiate(config.saveServicePrefab);
 
-        var initiator = FindObjectOfType<SceneInitiator>();
+        var initiator = sceneInitiator;
         if (initiator != null)
         {
             initiator.Construct(

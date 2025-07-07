@@ -47,6 +47,7 @@ public class SceneInitiator : GameInitiator
 
     protected override void InitializeSceneSpecificObjects()
     {
+        InitializeSharedObjects();
         InitializeFactory();
         InitializeSceneController();
         InitializePlayer();

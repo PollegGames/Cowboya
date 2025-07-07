@@ -12,12 +12,7 @@ public abstract class GameInitiator : MonoBehaviour
     protected EventSystem _mainEventSystem;
     protected CinemachineCamera _cinemachine;
 
-    private void Awake()
-    {
-        InitializeSharedObjects();
-    }
-
-     private void InitializeSharedObjects()
+     protected void InitializeSharedObjects()
     {
         // Instantiate or ensure the Main Camera exists
         if (_mainCamera == null)

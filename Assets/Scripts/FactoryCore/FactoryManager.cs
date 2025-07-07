@@ -11,12 +11,12 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     public event Action<AlarmState> OnFactoryAlarmChanged;
     private AlarmState lastAlarmState;
     private MapManager mapManager;
-    private WaypointService waypointService;
+    private IWaypointService waypointService;
 
     public GameObject playerInstance { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
 
-    public void Initialize(MapManager mapManager, WaypointService waypointService, VictorySetup victorySetup)
+    public void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup)
     {
         this.mapManager = mapManager;
         this.waypointService = waypointService;

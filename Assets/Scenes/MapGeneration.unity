@@ -1111,22 +1111,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7036970083250814977, guid: 56073e0a8583fb143b33c102c62335b7, type: 3}
-      propertyPath: mapConfig
-      value: 
-      objectReference: {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
-    - target: {fileID: 7036970083250814977, guid: 56073e0a8583fb143b33c102c62335b7, type: 3}
-      propertyPath: BossToSpawn
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7036970083250814977, guid: 56073e0a8583fb143b33c102c62335b7, type: 3}
-      propertyPath: victorySetup
-      value: 
-      objectReference: {fileID: 11400000, guid: 71f325ff527d30649a5443ec4acf43a7, type: 2}
-    - target: {fileID: 7036970083250814977, guid: 56073e0a8583fb143b33c102c62335b7, type: 3}
-      propertyPath: EnemiesToSpawn
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

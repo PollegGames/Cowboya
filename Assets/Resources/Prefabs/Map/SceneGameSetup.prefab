@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6285928566043176854}
   - component: {fileID: 7036970083250814977}
+  - component: {fileID: 1254461616249376093}
   m_Layer: 0
   m_Name: SceneGameSetup
   m_TagString: Untagged
@@ -47,11 +48,17 @@ MonoBehaviour:
   _mainCameraPrefab: {fileID: 6635916704080066916, guid: 05589c79f421cb74a998093bbfd79eba, type: 3}
   _mainEventSystemPrefab: {fileID: 8626408467057125329, guid: f0ca364be76020d4aaa0bbb596cc1b71, type: 3}
   _cinemachinePrefab: {fileID: 54266978932554417, guid: 2b5d202b8e1ef7748b1ebdedf019607c, type: 3}
-  factoryManager: {fileID: 6981664151106890608, guid: f02021092afcfe942b2c9cc210afa438, type: 3}
-  sceneControllerPrefab: {fileID: 5063093597393919596, guid: 3bf2939990ae2ab4f91281497ab365f7, type: 3}
-  gameUIViewModel: {fileID: 7317822581930453079, guid: 5a8f0b8511669f44fa106314ede53f67, type: 3}
-  playerInitiator: {fileID: 5820416828568501574, guid: 94148c9f0d540b34bb2caf91444aeaa3, type: 3}
-  enemiesSpawner: {fileID: 7661712566910772079, guid: 500f7608aa6f8e040bcf804be8f28463, type: 3}
-  mapManager: {fileID: 9105121939494992887, guid: 398503820e7095647a626d5d727af413, type: 3}
-  waypointService: {fileID: 604041955278505729, guid: cd189dbc195162d4f82e578e1bf48275, type: 3}
-  EnemiesToSpawn: 10
+--- !u!114 &1254461616249376093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3482957290180540059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3776fb0019814e99ba27ce491b643b0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneInitiator: {fileID: 7036970083250814977}
+  config: {fileID: 11400000, guid: 919e2e698569b534cb43b878f2ec23c8, type: 2}

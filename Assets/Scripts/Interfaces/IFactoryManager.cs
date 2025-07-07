@@ -5,7 +5,7 @@ public interface IFactoryManager
 {
     event Action<AlarmState> OnFactoryAlarmChanged;
 
-    void Initialize(MapManager mapManager, WaypointService waypointService, VictorySetup victorySetup);
+    void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup);
     IWaypointService GetWayPointService();
     Vector3 GetStartCellWorldPosition();
     void SetPlayerInstanceHead(GameObject playerInstance, Transform head);

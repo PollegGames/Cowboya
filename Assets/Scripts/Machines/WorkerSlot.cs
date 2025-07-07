@@ -8,7 +8,6 @@ public class WorkerSlot : MonoBehaviour
     {
         var enemy = collision.GetComponentInParent<EnemyWorkerController>();
         if (enemy == null) return;
-        Debug.Log($"[WorkerSlot] {enemy.name} entered the slot.");
         if (enemy.workerState == WorkerStatus.ReadyToWork)
         {
             factoryMachine.OnWorkerReady(enemy);

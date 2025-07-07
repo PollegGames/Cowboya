@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a52a8dd55cf64393a31c134554f94a07, type: 3}
+  m_Name: SceneTutorialBoostrap
+  m_EditorClassIdentifier: 
+  factoryManagerPrefab: {fileID: 6981664151106890608, guid: f02021092afcfe942b2c9cc210afa438, type: 3}
+  playerSpawnerPrefab: {fileID: 5820416828568501574, guid: 94148c9f0d540b34bb2caf91444aeaa3, type: 3}
+  enemiesSpawnerPrefab: {fileID: 7661712566910772079, guid: 500f7608aa6f8e040bcf804be8f28463, type: 3}
+  mapManagerPrefab: {fileID: 9105121939494992887, guid: 398503820e7095647a626d5d727af413, type: 3}
+  waypointServicePrefab: {fileID: 604041955278505729, guid: cd189dbc195162d4f82e578e1bf48275, type: 3}
+  respawnServicePrefab: {fileID: 2201941774247748942, guid: 2738a4e7ee710ef4ab66ab6cca2af1a3, type: 3}
+  sceneControllerPrefab: {fileID: 3662908670334199631, guid: 3bf2939990ae2ab4f91281497ab365f7, type: 3}
+  gameUIViewModelPrefab: {fileID: 7317822581930453079, guid: 5a8f0b8511669f44fa106314ede53f67, type: 3}
+  victorySetupPrefab: {fileID: 11400000, guid: 71f325ff527d30649a5443ec4acf43a7, type: 2}
+  saveServicePrefab: {fileID: 8639871701414128267, guid: 21ef7e4e5e1583347918aa524ea63ead, type: 3}
+  mapConfig: {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}

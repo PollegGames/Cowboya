@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class SceneController : MonoBehaviour
 {
     public static SceneController instance;
-    [SerializeField] private FactoryManager factoryManager;
+    [SerializeField] private IFactoryManager factoryManager;
     [SerializeField] private GameUIViewModel gameUIViewModel;
 
     private void Awake()
@@ -19,7 +19,7 @@ public class SceneController : MonoBehaviour
             Destroy(gameObject); // Destroy duplicate instances
         }
     }
-    public void Initialize(FactoryManager factoryManager, GameUIViewModel gameUIViewModel)
+    public void Initialize(IFactoryManager factoryManager, GameUIViewModel gameUIViewModel)
     {
         this.factoryManager = factoryManager;
         this.gameUIViewModel = gameUIViewModel;
