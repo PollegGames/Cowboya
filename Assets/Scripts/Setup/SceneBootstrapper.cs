@@ -27,6 +27,7 @@ public class SceneBootstrapper : MonoBehaviour
         var sceneController = Instantiate(config.sceneControllerPrefab);
         var viewModel = Instantiate(config.gameUIViewModelPrefab);
         var victory = Instantiate(config.victorySetupPrefab);
+        viewModel.SetVictorySetup(victory);
         var saveService = Instantiate(config.saveServicePrefab);
 
         var initiator = sceneInitiator;

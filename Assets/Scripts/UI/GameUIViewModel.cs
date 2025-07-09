@@ -16,6 +16,23 @@ public class GameUIViewModel : MonoBehaviour
         ui = GetComponent<UIDocument>().rootVisualElement;
     }
 
+    public void SetVictorySetup(VictorySetup setup)
+    {
+        victorySetup = setup;
+
+        if (ui == null)
+        {
+            ui = GetComponent<UIDocument>().rootVisualElement;
+        }
+
+        ui.Unbind();
+
+        if (victorySetup != null)
+        {
+            ui.Bind(victorySetup);
+        }
+    }
+
     public void SetPlayer(RobotStateController robot)
     {
         if (robot != null && robot.Stats != null)
