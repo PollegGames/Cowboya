@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1438863450590991510}
   - component: {fileID: 6981664151106890608}
+  - component: {fileID: 6490878726091708083}
   m_Layer: 0
   m_Name: FactoryManager
   m_TagString: Untagged
@@ -46,3 +47,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   factoryAlarmStatus: {fileID: 11400000, guid: ce6d93aba8639b74f8e3f0b7ef4b3919, type: 2}
   victorySetup: {fileID: 11400000, guid: 71f325ff527d30649a5443ec4acf43a7, type: 2}
+  machineWorkerManager: {fileID: 6490878726091708083}
+--- !u!114 &6490878726091708083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7920476149619145681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acc73c0bcaf32d741a67b8d6aa16e659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  factoryManager: {fileID: 6981664151106890608}

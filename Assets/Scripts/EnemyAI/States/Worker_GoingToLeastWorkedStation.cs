@@ -10,7 +10,8 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
 {
     private RoomWaypoint targetPoint;
     private bool hasArrived;
-
+    private float readyStartTime;      // moment où on est passé en ReadyToWork
+    private const float MaxReadyDuration = 20f; // 20 secondes
     public Worker_GoingToLeastWorkedStation(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,
                                     IWaypointService waypointService)
@@ -25,7 +26,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
         targetPoint = waypointService.GetLeastUsedFreeWorkPoint(enemy.memory.LastVisitedPoint);
         if (targetPoint == null)
         {
-            stateMachine.ChangeState(new Worker_Idle(
+            stateMachine.ChangeState(new Worker_GoingToRestStation(
                 enemy, stateMachine, waypointService));
             return;
         }
@@ -35,19 +36,36 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
 
     public override void UpdateState()
     {
-        if (hasArrived) return;
-
-        if (enemy.HasArrivedAtDestination())
+        // si pas encore arrivé, on vérifie l’arrivée
+        if (!hasArrived)
         {
-            hasArrived = true;
-            enemy.SetMovement(0f);
-            enemy.SetVerticalMovement(0f);
+            if (enemy.HasArrivedAtDestination())
+            {
+                hasArrived = true;
+                enemy.SetMovement(0f);
+                enemy.SetVerticalMovement(0f);
 
-            enemy.memory.SetLastVisitedPoint(targetPoint);
-            waypointService.ReleasePOI(targetPoint);
+                // mémoriser le POI et le libérer
+                enemy.memory.SetLastVisitedPoint(targetPoint);
+                waypointService.ReleasePOI(targetPoint);
 
-            enemy.workerState = WorkerStatus.ReadyToWork;
-            Debug.Log($"[GoingToLeastWorkedStation] Arrived at {targetPoint.name}. Changing state to Work.");
+                enemy.workerState = WorkerStatus.ReadyToWork;
+                readyStartTime = Time.time; // démarrer le timer
+                Debug.Log($"[GoingToLeastWorkedStation] Arrived at {targetPoint.name}. Changing state to ReadyToWork.");
+            }
+
+            return;
+        }
+
+        // arrivé et en ReadyToWork : on vérifie le timer
+        if (enemy.workerState == WorkerStatus.ReadyToWork &&
+            Time.time - readyStartTime >= MaxReadyDuration)
+        {
+            Debug.Log($"[GoingToLeastWorkedStation] ReadyToWork for {MaxReadyDuration}s. Going to rest machine.");
+
+            // passer à l'état aller se reposer
+            stateMachine.ChangeState(new Worker_GoingToRestStation(
+                enemy, stateMachine, waypointService));
         }
     }
 

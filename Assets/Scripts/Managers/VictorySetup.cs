@@ -8,9 +8,6 @@ public class VictorySetup : ScriptableObject
     public int robotsSavedTarget;
     public int robotsKilledTarget;
 
-    [NonSerialized] public int currentSaved = 0;
-    [NonSerialized] public int currentKilled = 0;
-
-    public void RegisterRobotSaved() => currentSaved++;
-    public void RegisterRobotKilled() => currentKilled++;
+    public int currentSaved;
+    public int currentKilled;
 }

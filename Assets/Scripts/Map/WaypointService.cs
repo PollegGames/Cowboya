@@ -117,6 +117,23 @@ public class WaypointService : MonoBehaviour, IWaypointService
         return endPoints[0];
     }
 
+    public RoomWaypoint GetStartPoint()
+    {
+        var startPoint = GetActiveWaypoints()
+            .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Start
+            && wp.type == WaypointType.Center)
+            .ToList();
+
+        if (startPoint.Count == 0)
+        {
+            Debug.LogWarning("[WaypointService] No end points found.");
+            return null;
+        }
+
+        // Return the first end point found
+        return startPoint[0];
+    }
+
     public event Action<RoomWaypoint> OnPOIReleased;
 
 

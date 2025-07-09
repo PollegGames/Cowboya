@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public enum MachineType
 {
@@ -7,73 +8,119 @@ public enum MachineType
     SecurityStation,
 }
 
+[RequireComponent(typeof(MeshRenderer))]
 public class FactoryMachine : MonoBehaviour
 {
-    public bool isOn = true;
-    public Material materialOn;
-    public Material materialOff;
-    [SerializeField] private MeshRenderer meshRenderer;
+    [SerializeField] private bool isOn = true;
     [SerializeField] private MachineType machineType;
+    [SerializeField] private Material materialOn;
+    [SerializeField] private Material materialOff;
 
-    public event System.Action<FactoryMachine, bool> OnMachineStateChanged;
-
+    private MeshRenderer meshRenderer;
     private EnemyWorkerController currentWorker;
-    private bool haveWorkerConnected = false;
-    public bool HaveWorkerConnected => haveWorkerConnected;
-    public MachineType MachineType => machineType;
-    public EnemyWorkerController CurrentWorker => currentWorker;
 
+    public event Action<FactoryMachine, bool> OnMachineStateChanged;
+
+    public bool IsOn => isOn;
+    public bool HasWorker => currentWorker != null;
+    public EnemyWorkerController CurrentWorker => currentWorker;
+    public MachineType Type => machineType;
+
+    private void Awake()
+    {
+        meshRenderer = GetComponent<MeshRenderer>();
+        ApplyMaterial();
+    }
+
+    /// <summary>
+    /// Sets the machine's on/off state and updates the material.
+    /// </summary>
     public void SetState(bool on)
     {
         if (isOn == on) return;
-        Debug.Log($"Setting FactoryMachine state to {(on ? "On" : "Off")}");
         isOn = on;
-        meshRenderer.material = on ? materialOn : materialOff;
+        ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, isOn);
     }
 
-    public void Toggle()
+    /// <summary>
+    /// Toggles the machine state.
+    /// </summary>
+    public void ToggleState() => SetState(!isOn);
+
+    private void ApplyMaterial()
     {
-        SetState(!isOn);
+        if (meshRenderer == null) return;
+        if (materialOn == null || materialOff == null) return;
+        meshRenderer.material = isOn ? materialOn : materialOff;
     }
 
     private void OnValidate()
     {
-        if (meshRenderer != null)
-            meshRenderer.material = isOn ? materialOn : materialOff;
+        if (meshRenderer == null)
+            meshRenderer = GetComponent<MeshRenderer>();
+        ApplyMaterial();
     }
 
+    /// <summary>
+    /// Called when a worker arrives at this machine.
+    /// Sends workers to the appropriate state based on machine status and type.
+    /// </summary>
     public void OnWorkerReady(EnemyWorkerController newWorker)
     {
-        if (!isOn) return;
-
-        if (newWorker != null)
+        // If the machine is off, send any worker to rest
+        if (!isOn)
         {
-            if (currentWorker != null)
-            {
-                if (machineType == MachineType.WorkStation)
-                {
-                    currentWorker.stateMachine.ChangeState(
-                        new Worker_GoingToRestStation(
-                            currentWorker, currentWorker.stateMachine, currentWorker.waypointService));
-                }
-            }
-
-            if (machineType == MachineType.WorkStation)
-            {
-                newWorker.stateMachine.ChangeState(
-                    new Worker_IsWork(
-                        newWorker, newWorker.stateMachine, newWorker.waypointService));
-            }
-            else
-            {
-                newWorker.stateMachine.ChangeState(
-                   new Worker_Idle(
-                       newWorker, newWorker.stateMachine, newWorker.waypointService));
-            }
+            SendWorkerToRest(currentWorker);
+            SendWorkerToRest(newWorker);
         }
+        else if (machineType == MachineType.WorkStation)
+        {
+            // Send existing worker to rest before assigning new
+            SendWorkerToRest(currentWorker);
+            // Assign the new worker to work
+            SetWorkerToWork(newWorker);
+            currentWorker = newWorker;
+        }
+        else
+        {
+            // Machine is rest
+            // Send existing worker to work before assigning new
+            SendWorkerToWork(currentWorker);
+            // Assign the new worker to rest
+            SendWorkerToRest(newWorker);
+            currentWorker = newWorker;
+        }
+    }
 
-        currentWorker = newWorker;
-        haveWorkerConnected = true;
+    /// <summary>
+    /// Helper to send a worker to the rest station state.
+    /// </summary>
+    private void SendWorkerToRest(EnemyWorkerController worker)
+    {
+        if (worker == null) return;
+        worker.stateMachine.ChangeState(
+            new Worker_GoingToRestStation(worker, worker.stateMachine, worker.waypointService));
+    }
+
+    private void SendWorkerToStartRoom(EnemyWorkerController worker)
+    {
+        if (worker == null) return;
+        worker.stateMachine.ChangeState(
+            new Worker_GoingToStartRoom(worker, worker.stateMachine, worker.waypointService));
+    }
+
+    private void SendWorkerToWork(EnemyWorkerController worker)
+    {
+        if (worker == null) return;
+        worker.stateMachine.ChangeState(
+            new Worker_GoingToLeastWorkedStation(worker, worker.stateMachine, worker.waypointService));
+    }
+
+    private void SetWorkerToWork(EnemyWorkerController worker)
+    {
+        if (worker == null) return;
+        worker.stateMachine.ChangeState(
+            new Worker_IsWork(worker, worker.stateMachine, worker.waypointService));
     }
 }

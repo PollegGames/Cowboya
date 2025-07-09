@@ -31,6 +31,7 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
                             && wp.type == WaypointType.Work
                          && wp != exclude)
                 .ToList();
+            return works.FirstOrDefault();
         }
 
         if (!works.Any()) return null;
@@ -60,13 +61,7 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
             return best;
         }
 
-        var rest = GetFirstRestPoint(exclude);
-        if (rest != null)
-        {
-            _reservedWaypoints.Add(rest);
-            Debug.Log($"[WaypointReservation] Assigned REST '{rest.name}'.");
-        }
-        return rest;
+        return GetFirstRestPoint(exclude);
     }
 
     public RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null)

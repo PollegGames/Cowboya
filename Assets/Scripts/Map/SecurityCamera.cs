@@ -99,8 +99,7 @@ public class SecurityCamera : MonoBehaviour
     {
         if (reportRescueToFactory && roomManager?.FactoryManager != null)
         {
-            SceneController.instance.RobotSaved();
-            Debug.Log($"[{name}] SecurityCamera: Robot rescued.");
+            // SceneController.instance.RobotSaved();
         }
     }
 

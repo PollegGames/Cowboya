@@ -84,6 +84,8 @@
     <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWorkerStateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyStateMachine.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToStartRoom.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Resting.cs" />
     <Compile Include="Assets\Scripts\Navigation\PriorityQueue.cs" />
     <Compile Include="Assets\Scripts\Map\WaypointService.cs" />
     <Compile Include="Assets\Scripts\Game\TargetAim.cs" />
@@ -94,13 +96,14 @@
     <Compile Include="Assets\Scripts\Navigation\Cell.cs" />
     <Compile Include="Assets\Scripts\Robots\BodyJointLimiter.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyController.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Core\WorkerCondition.cs" />
     <Compile Include="Assets\Scripts\Robots\ArcTargetFollower.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridFactory.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_IsWork.cs" />
     <Compile Include="Assets\Scripts\Navigation\MapManager.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\UpdateLoop.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridBuilder.cs" />
     <Compile Include="Assets\Scripts\Interfaces\ITargetSelector.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\UpdateLoop.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\PositionTriggerZone.cs" />
     <Compile Include="Assets\Scripts\Interfaces\INeighborConnector.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IFactoryManager.cs" />
@@ -175,6 +178,7 @@
     <Compile Include="Assets\Scripts\Navigation\CellProperties.cs" />
     <Compile Include="Assets\Scripts\Managers\EnemiesSpawner.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerAttackController.cs" />
+    <Compile Include="Assets\Scripts\Machines\MachineWorkerManager.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerMovementController.cs" />
     <Compile Include="Assets\Scripts\Machines\ToggleBox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\PhysicsBaseAgentController.cs" />
@@ -191,6 +195,7 @@
     <Compile Include="Assets\Scripts\Navigation\LockEndRoomDoorProcessor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToRestStation.cs" />
     <Compile Include="Assets\Scripts\Map\DoorDirection.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Saved.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPOIReservationService.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />

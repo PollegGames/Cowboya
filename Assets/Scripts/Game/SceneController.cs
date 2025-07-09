@@ -5,7 +5,6 @@ public class SceneController : MonoBehaviour
 {
     public static SceneController instance;
     [SerializeField] private IFactoryManager factoryManager;
-    [SerializeField] private GameUIViewModel gameUIViewModel;
 
     private void Awake()
     {
@@ -19,10 +18,9 @@ public class SceneController : MonoBehaviour
             Destroy(gameObject); // Destroy duplicate instances
         }
     }
-    public void Initialize(IFactoryManager factoryManager, GameUIViewModel gameUIViewModel)
+    public void Initialize(IFactoryManager factoryManager)
     {
         this.factoryManager = factoryManager;
-        this.gameUIViewModel = gameUIViewModel;
     }
 
     public void LoadScene(string sceneName)
@@ -44,13 +42,11 @@ public class SceneController : MonoBehaviour
     public void RobotKilled()
     {
         factoryManager.OnRobotKilled();
-        gameUIViewModel.UpdateVictoryStatsUI();
     }
 
     public void RobotSaved()
     {
         factoryManager.OnRobotSaved();
-        gameUIViewModel.UpdateVictoryStatsUI();
     }
 
 }

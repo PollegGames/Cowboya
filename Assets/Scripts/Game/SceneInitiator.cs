@@ -81,8 +81,8 @@ public class SceneInitiator : GameInitiator
     private void InitializeEnemies()
     {
         enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService);
-        enemiesSpawner?.CreateWorkers(mapConfig.enemyCount);
-        enemiesSpawner?.CreateEnemy(mapConfig.bossCount);
+        enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
+        enemiesSpawner?.CreateEnemy(mapConfig.enemiesCount);
         enemiesSpawner?.SpreadEnemies();
     }
 
@@ -91,7 +91,7 @@ public class SceneInitiator : GameInitiator
         if ( sceneControllerPrefab != null)
         {
             sceneController = sceneControllerPrefab.GetComponent<SceneController>();
-            sceneController.Initialize(factoryManager,gameUIViewModel);
+            sceneController.Initialize(factoryManager);
         }
     }
 
@@ -99,8 +99,10 @@ public class SceneInitiator : GameInitiator
     {
         if (victorySetup != null)
         {
-            victorySetup.robotsSavedTarget = mapConfig.enemyCount;
-            victorySetup.robotsKilledTarget = mapConfig.bossCount;
+            victorySetup.robotsSavedTarget = mapConfig.workersCount;
+            victorySetup.robotsKilledTarget = mapConfig.enemiesCount;
+            victorySetup.currentSaved = 0;
+            victorySetup.currentKilled = 0;
         }
         else
         {

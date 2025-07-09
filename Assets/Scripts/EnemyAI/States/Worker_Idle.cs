@@ -17,7 +17,7 @@ public class Worker_Idle : WorkerState
 
     public override void EnterState()
     {
-        enemy.workerState = WorkerStatus.ReadyToWork;
+        enemy.workerState = WorkerStatus.Idle;
         _timer = 0f;
         enemy.SetMovement(0);
     }

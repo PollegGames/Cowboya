@@ -774,6 +774,7 @@ MonoBehaviour:
   - {fileID: 1693577635688933943}
   - {fileID: 6502087620192996029}
   - {fileID: 7682366956585669325}
+  machinesInRoom: []
 --- !u!114 &5857107069788241263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4084,11 +4085,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5624182743426667770}
   m_SourcePrefab: {fileID: 100100000, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
---- !u!23 &2023580984835764631 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 3865668901669927916, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
-  m_PrefabInstance: {fileID: 3004087102453418619}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3330058247501651799 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 542146199199913260, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
@@ -4107,10 +4103,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOn: 1
+  machineType: 2
   materialOn: {fileID: 2100000, guid: e4c8fe212ac65394cb2979609eeb3a94, type: 2}
   materialOff: {fileID: 2100000, guid: 57633b0e550a91e4c98965050e121a39, type: 2}
-  meshRenderer: {fileID: 2023580984835764631}
-  machineType: 2
 --- !u!4 &5224136935988081166 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7047981207480481909, guid: 70d45b433127c5748ade8b290ea25526, type: 3}

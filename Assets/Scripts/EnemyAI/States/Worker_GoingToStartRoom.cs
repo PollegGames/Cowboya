@@ -2,23 +2,21 @@ using UnityEngine;
 
 public class Worker_GoingToStartRoom : WorkerState
 {
-    private RoomWaypoint target;
     private bool hasArrived;
 
     public Worker_GoingToStartRoom(EnemyWorkerController enemy,
                                    WorkerStateMachine machine,
-                                   IWaypointService waypointService,
-                                   RoomWaypoint targetWp)
+                                   IWaypointService waypointService)
         : base(enemy, machine, waypointService)
     {
-        target = targetWp;
         hasArrived = false;
     }
 
     public override void EnterState()
     {
         enemy.SetWorkerState(WorkerCondition.Active);
-        enemy.SetDestination(target);
+        var startRoom = waypointService.GetStartPoint();
+        enemy.SetDestination(startRoom);
     }
 
     public override void UpdateState()

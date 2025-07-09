@@ -9,28 +9,18 @@ using UnityEngine;
 public class MachineWorkerManager : MonoBehaviour
 {
     [SerializeField] private FactoryManager factoryManager;
-    [SerializeField] private List<FactoryMachine> machines;
+    private List<FactoryMachine> machines = new List<FactoryMachine>();
 
     // Track workers waiting on a specific machine
     private readonly Dictionary<EnemyWorkerController, FactoryMachine> waitingWorkers = new();
 
-    private void Awake()
+    public void RegisterMachine(FactoryMachine machine)
     {
-        SubscribeToMachineEvents();
+        if (machine == null || machines.Contains(machine))
+            return;
+        machines.Add(machine);
+        machine.OnMachineStateChanged += HandleMachineStateChanged;
     }
-
-    /// <summary>
-    /// Subscribe to each machine's state change event.
-    /// </summary>
-    public void SubscribeToMachineEvents()
-    {
-        foreach (var m in machines)
-        {
-            if (m != null)
-                m.OnMachineStateChanged += HandleMachineStateChanged;
-        }
-    }
-
     private void HandleMachineStateChanged(FactoryMachine machine, bool isOn)
     {
         if (isOn)
@@ -48,10 +38,8 @@ public class MachineWorkerManager : MonoBehaviour
         // Store that this worker was attached to this machine
         waitingWorkers[worker] = machine;
 
-        if (machine.MachineType == MachineType.RestStation)
-            AssignToStartRoom(worker);
-        else
-            AssignToRestPoint(worker);
+
+        AssignToRestPoint(worker);
     }
 
     private void OnMachineTurnedOn(FactoryMachine machine)
@@ -76,26 +64,9 @@ public class MachineWorkerManager : MonoBehaviour
     public void AssignToRestPoint(EnemyWorkerController worker)
     {
         var rest = factoryManager.GetWayPointService().GetFirstRestPoint(worker.memory.LastVisitedPoint);
-        if (rest == null)
-        {
-            AssignToStartRoom(worker);
-            return;
-        }
-
         worker.stateMachine.ChangeState(new Worker_GoingToRestStation(worker, worker.stateMachine, worker.waypointService));
         worker.SetDestination(rest);
         SetWorkerState(worker, WorkerCondition.Resting);
-    }
-
-    /// <summary>
-    /// Direct worker to the start room. When arrived they enter the Saved state.
-    /// </summary>
-    public void AssignToStartRoom(EnemyWorkerController worker)
-    {
-        Vector3 pos = factoryManager.GetStartCellWorldPosition();
-        RoomWaypoint wp = factoryManager.GetWayPointService().GetClosestWaypoint(pos);
-        worker.stateMachine.ChangeState(new Worker_GoingToStartRoom(worker, worker.stateMachine, worker.waypointService, wp));
-        worker.SetDestination(wp);
     }
 
     /// <summary>
@@ -103,6 +74,7 @@ public class MachineWorkerManager : MonoBehaviour
     /// </summary>
     public void SetWorkerState(EnemyWorkerController worker, WorkerCondition state)
     {
+        Debug.Log($"Setting worker {worker.name} state to {state}");
         worker.SetWorkerState(state);
     }
 }

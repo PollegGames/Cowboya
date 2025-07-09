@@ -10,7 +10,7 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        LoadGame(); // Load game data when the game starts
+        LoadGame();
     }
 
     // Save the current save data to a file

@@ -32,7 +32,6 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
     public virtual void SetMovement(float input)
     {
         direction = Mathf.Clamp(input, -1f, 1f);
-        Debug.Log($"Boss SetMovement: {direction}");
         locomotion.HandleMovement(direction);
         TryFlip(direction);
     }

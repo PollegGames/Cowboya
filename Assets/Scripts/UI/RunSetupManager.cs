@@ -132,8 +132,8 @@ public class RunSetupManager : MonoBehaviour
             heightField.value = config.gridHeight;
             poiField.value = config.poiCount;
             blockedField.value = config.blockedCount;
-            enemyCountField.value = config.enemyCount;
-            bossCountField.value = config.bossCount;
+            enemyCountField.value = config.workersCount;
+            bossCountField.value = config.enemiesCount;
             seedField.value = config.seed;
 
             // Initialiser “Cells Available” à la valeur correcte
@@ -275,8 +275,8 @@ public class RunSetupManager : MonoBehaviour
         config.gridHeight = h;
         config.poiCount = poi;
         config.blockedCount = blocked;
-        config.enemyCount = enemies;
-        config.bossCount = boss;
+        config.workersCount = enemies;
+        config.enemiesCount = boss;
         config.seed = randomSeedToggle.value
                                 ? Random.Range(0, 999999).ToString()
                                 : seedField.value;

@@ -11,14 +11,9 @@ public class GameUIViewModel : MonoBehaviour
     [SerializeField] private RunMapConfigSO config;
     [SerializeField] private VictorySetup victorySetup;
 
-    private Label robotsSavedLabel;
-    private Label robotsKillsLabel;
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
-        robotsSavedLabel = ui.Q<Label>("robots-saved-label");
-        robotsKillsLabel = ui.Q<Label>("robots-kills-label");
-        UpdateVictoryStatsUI();
     }
 
     public void SetPlayer(RobotStateController robot)
@@ -65,14 +60,6 @@ public class GameUIViewModel : MonoBehaviour
         }
     }
 
-    public void UpdateVictoryStatsUI()
-    {
-        if (victorySetup != null)
-        {
-            Debug.Log($"Updating victory stats: {victorySetup.currentSaved}/{victorySetup.robotsSavedTarget}, {victorySetup.currentKilled}/{victorySetup.robotsKilledTarget}");
-            robotsSavedLabel.text = $"Robots saved {victorySetup.currentSaved}/{victorySetup.robotsSavedTarget}";
-            robotsKillsLabel.text = $"Robots kills {victorySetup.currentKilled}/{victorySetup.robotsKilledTarget}";
-        }
-    }
+
 
 }

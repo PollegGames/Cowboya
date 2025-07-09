@@ -7,6 +7,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 {
     [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
     [SerializeField] private VictorySetup victorySetup;
+    [SerializeField] private MachineWorkerManager machineWorkerManager;
 
     public event Action<AlarmState> OnFactoryAlarmChanged;
     private AlarmState lastAlarmState;
@@ -22,7 +23,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         this.waypointService = waypointService;
         this.victorySetup = victorySetup;
         mapManager.InitializeGrid();
-        mapManager.RegisterFactoryInEachRoom(this);
+        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager);
         waypointService.BuildAllNeighbors();
         SetupFactoryState();
     }
@@ -76,13 +77,15 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 
     public void OnRobotSaved()
     {
-        victorySetup.RegisterRobotSaved();
+        victorySetup.currentSaved++;
+        Debug.Log("Robot SAVED");
         // Optionally: Check for victory condition here
     }
 
     public void OnRobotKilled()
     {
-        victorySetup.RegisterRobotKilled();
+        victorySetup.currentKilled++;
+        Debug.Log("Robot KILLED");
         // Optionally: Check for victory condition here
     }
 

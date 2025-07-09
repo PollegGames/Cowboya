@@ -882,7 +882,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542146199199913260}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cc28e6ac3fe0dc8469bebf1fbf8d73ff, type: 3}
   m_Name: 
@@ -906,10 +906,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOn: 1
+  machineType: 0
   materialOn: {fileID: 2100000, guid: e4c8fe212ac65394cb2979609eeb3a94, type: 2}
   materialOff: {fileID: 2100000, guid: 57633b0e550a91e4c98965050e121a39, type: 2}
-  meshRenderer: {fileID: 3865668901669927916}
-  machineType: 0
 --- !u!1 &1273394523665273949
 GameObject:
   m_ObjectHideFlags: 0
@@ -1015,8 +1014,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7059215410678446038}
-        m_TargetAssemblyTypeName: FactoryMachine, Assembly-CSharp
-        m_MethodName: Toggle
+        m_TargetAssemblyTypeName: FactoryMachine, Game
+        m_MethodName: ToggleState
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

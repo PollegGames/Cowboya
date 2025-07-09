@@ -12,7 +12,6 @@ public class ToggleBox : MonoBehaviour
     {
         if (!isActive) return;
 
-        Debug.Log($"ToggleBox activated by {other.name}");
         // Get ToggleButton on the same GameObject as the collider
         ToggleButton toggleButton = other.GetComponent<ToggleButton>();
         if (toggleButton != null)

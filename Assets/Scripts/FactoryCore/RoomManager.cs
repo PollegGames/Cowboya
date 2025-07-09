@@ -15,13 +15,16 @@ public class RoomManager : MonoBehaviour
     [Header("Zone Detection")]
     public PositionTriggerZone triggerZone;
     [SerializeField] private List<RoomWaypoint> waypoints;
+    [SerializeField] private List<FactoryMachine> machinesInRoom = new();
+
     public IWaypointService waypointService;
 
     /// <summary>
     /// Call this immediately after Instantiate().
     /// </summary>
     public void Initialize(
-        FactoryManager factoryManager)
+        FactoryManager factoryManager,
+        MachineWorkerManager machineWorkerManager)
     {
         FactoryManager = factoryManager;
 
@@ -32,6 +35,12 @@ public class RoomManager : MonoBehaviour
         foreach (var wp in waypoints)
             wp.parentRoom = this;
         waypointService.RegisterRoomWaypoints(this, waypoints);
+
+        // 3) register machines in this room
+        foreach (var machine in machinesInRoom)
+        {
+           machineWorkerManager.RegisterMachine(machine);
+        }
 
         // 4) hook up alarm + triggers
         factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;

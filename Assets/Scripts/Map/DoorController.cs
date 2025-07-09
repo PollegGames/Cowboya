@@ -35,6 +35,7 @@ public class DoorController : MonoBehaviour
     private Vector3 rightOpenPos;
 
     private int entitiesInside = 0;
+    private int securityEntitiesInside = 0;
 
     [Header("Door Settings")]
     public float safetyCheckInterval = 30f;
@@ -100,6 +101,17 @@ public class DoorController : MonoBehaviour
         EvaluateDoorState();
     }
 
+    public void OnSecurityEntityEnterZone()
+    {
+        securityEntitiesInside++;
+        EvaluateDoorState();
+    }
+
+    public void OnSecurityEntityExitZone()
+    {
+        securityEntitiesInside = Mathf.Max(0, securityEntitiesInside - 1); // Ensure it never goes negative
+        EvaluateDoorState();
+    }
     public void EvaluateDoorState()
     {
         if (isWall)
@@ -109,7 +121,9 @@ public class DoorController : MonoBehaviour
             return;
         }
 
-        bool shouldLock = (isAlarmActive && alarmLocksDoor) || (!isAlarmActive && normalRequiresBadge);
+        bool shouldLock = (isAlarmActive && alarmLocksDoor)
+            || (!isAlarmActive && normalRequiresBadge)
+            || (securityEntitiesInside > 0);
 
         if (shouldLock)
         {
@@ -117,7 +131,7 @@ public class DoorController : MonoBehaviour
         }
         else
         {
-            if (entitiesInside > 0)
+            if (entitiesInside > 0 || securityEntitiesInside > 0)
             {
                 OpenDoor();
             }

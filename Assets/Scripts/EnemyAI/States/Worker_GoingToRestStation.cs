@@ -25,7 +25,7 @@ public class Worker_GoingToRestStation : WorkerState
         targetPoint = waypointService.GetFirstRestPoint();
         if (targetPoint == null)
         {
-            stateMachine.ChangeState(new Worker_Idle(enemy, stateMachine, waypointService));
+            stateMachine.ChangeState(new Worker_GoingToStartRoom(enemy, stateMachine, waypointService));
             return;
         }
         enemy.SetDestination(targetPoint);
