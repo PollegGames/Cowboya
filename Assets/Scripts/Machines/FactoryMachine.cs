@@ -18,6 +18,7 @@ public class FactoryMachine : MonoBehaviour
 
     private MeshRenderer meshRenderer;
     private EnemyWorkerController currentWorker;
+    private IWaypointService waypointService;
 
     public event Action<FactoryMachine, bool> OnMachineStateChanged;
 
@@ -25,6 +26,11 @@ public class FactoryMachine : MonoBehaviour
     public bool HasWorker => currentWorker != null;
     public EnemyWorkerController CurrentWorker => currentWorker;
     public MachineType Type => machineType;
+
+    public void Initialize(IWaypointService service)
+    {
+        waypointService = service;
+    }
 
     private void Awake()
     {
@@ -98,6 +104,8 @@ public class FactoryMachine : MonoBehaviour
             SendWorkerToRest(newWorker);
             currentWorker = newWorker;
         }
+
+        waypointService?.ReleaseMachine(this);
     }
 
     /// <summary>

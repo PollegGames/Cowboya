@@ -14,6 +14,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     private IWaypointRegistry registry;
     private IPathFinder pathFinder;
+    private IMachineReservationService machineReservationService;
     private IPOIReservationService reservationService;
     private readonly HashSet<IRobotNavigationListener> robots = new();
 
@@ -21,6 +22,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
     {
         registry = registryBehaviour as IWaypointRegistry;
         pathFinder = pathFinderBehaviour as IPathFinder;
+        machineReservationService = reservationServiceBehaviour as IMachineReservationService;
         reservationService = reservationServiceBehaviour as IPOIReservationService;
     }
 
@@ -133,6 +135,17 @@ public class WaypointService : MonoBehaviour, IWaypointService
         // Return the first end point found
         return startPoint[0];
     }
+    #region Machine Reservation
+    public FactoryMachine ReserveFreeMachine(RoomManager room, EnemyWorkerController worker) =>
+        machineReservationService?.ReserveFreeMachine(room, worker);
+
+    public void ReleaseMachine(FactoryMachine machine) =>
+        machineReservationService?.ReleaseMachine(machine);
+
+    public bool IsMachineReserved(FactoryMachine machine) =>
+        machineReservationService?.IsMachineReserved(machine) ?? false;
+    #endregion
+
 
     public event Action<RoomWaypoint> OnPOIReleased;
 
