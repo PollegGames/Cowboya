@@ -82,7 +82,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         foreach (var worker in spawnedWorkers)
         {
             // 1) pick & apply a real spawn position
-            var spawnPos = waypointService.GetWorkOrRestPoint();
+            RoomWaypoint spawnPos = waypointService.GetWorkOrRestPoint();
             worker.transform.position = spawnPos.WorldPos;
             // 2) turn it on
             worker.SetActive(true);
@@ -90,6 +90,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = worker.GetComponent<EnemyWorkerController>();
             ec.Initialize(waypointService, waypointService, respawnService);
+            // release the reservation so the point can be reused later
+            waypointService.ReleasePOI(spawnPos);
 
             Debug.Log($"Worker spread to {spawnPos} and initialized");
         }
@@ -118,6 +120,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = enemy.GetComponent<EnemyController>();
             ec.Initialize(waypointService, waypointService, respawnService);
+            // release the reservation so the point can be reused later
+            waypointService.ReleasePOI(spawnPos);
 
             Debug.Log($"Enemy spread to {spawnPos} and initialized");
         }
