@@ -131,6 +131,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = enemy.GetComponent<EnemyController>();
             ec.Initialize(waypointService, waypointService, respawnService);
+
+            if (spawnPos.type == WaypointType.Rest)
+            {
+                var sm = enemy.GetComponent<EnemyStateMachine>();
+                sm?.ChangeState(new Enemy_SecurityGuardRest(ec, sm, waypointService));
+            }
             // release the reservation so the point can be reused later
             waypointService.ReleasePOI(spawnPos);
 
