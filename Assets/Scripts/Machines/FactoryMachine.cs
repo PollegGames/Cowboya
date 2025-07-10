@@ -38,6 +38,12 @@ public class FactoryMachine : MonoBehaviour
     public void SetState(bool on)
     {
         if (isOn == on) return;
+
+        if (!on)
+        {
+            SendCurrentWorkerToRest();
+        }
+
         isOn = on;
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, isOn);
@@ -72,6 +78,7 @@ public class FactoryMachine : MonoBehaviour
         if (!isOn)
         {
             SendWorkerToRest(currentWorker);
+            currentWorker = null;
             SendWorkerToRest(newWorker);
         }
         else if (machineType == MachineType.WorkStation)
@@ -115,5 +122,14 @@ public class FactoryMachine : MonoBehaviour
         if (worker == null) return;
         worker.stateMachine.ChangeState(
             new Worker_IsWork(worker, worker.stateMachine, worker.waypointService));
+    }
+
+    /// <summary>
+    /// Sends the currently assigned worker to the rest station and clears the reference.
+    /// </summary>
+    private void SendCurrentWorkerToRest()
+    {
+        SendWorkerToRest(currentWorker);
+        currentWorker = null;
     }
 }
