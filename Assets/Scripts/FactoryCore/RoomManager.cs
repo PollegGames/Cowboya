@@ -24,7 +24,8 @@ public class RoomManager : MonoBehaviour
     /// </summary>
     public void Initialize(
         FactoryManager factoryManager,
-        MachineWorkerManager machineWorkerManager)
+        MachineWorkerManager machineWorkerManager,
+        MachineSecurityManager machineSecurityManager)
     {
         FactoryManager = factoryManager;
 
@@ -41,6 +42,7 @@ public class RoomManager : MonoBehaviour
         {
             machine.Initialize(waypointService);
             machineWorkerManager.RegisterMachine(machine);
+            machineSecurityManager?.RegisterMachine(machine);
         }
 
         // 4) hook up alarm + triggers

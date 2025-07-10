@@ -183,6 +183,9 @@
     <Compile Include="Assets\Scripts\Managers\EnemiesSpawner.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerAttackController.cs" />
     <Compile Include="Assets\Scripts\Machines\MachineWorkerManager.cs" />
+    <Compile Include="Assets\Scripts\Machines\MachineSecurityManager.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Controllers\SecurityGuardAI.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateMachine.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerMovementController.cs" />
     <Compile Include="Assets\Scripts\Machines\ToggleBox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\PhysicsBaseAgentController.cs" />
