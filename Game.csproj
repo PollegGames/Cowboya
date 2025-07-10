@@ -121,6 +121,7 @@
     <Compile Include="Assets\Scripts\UI\RunSetupManager.cs" />
     <Compile Include="Assets\Scripts\Map\WarpMeshXYSkew.cs" />
     <Compile Include="Assets\Scripts\Machines\WorkerSlot.cs" />
+    <Compile Include="Assets\Scripts\Machines\SecuritySlot.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotRespawnService.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotMemory.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotRespawnService.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_WaitBeforeGoingToPOI.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshZSkew.cs" />
     <Compile Include="Assets\Scripts\Machines\FactoryMachine.cs" />
+    <Compile Include="Assets\Scripts\Machines\SecurityMachine.cs" />
     <Compile Include="Assets\Scripts\Robots\Attack.cs" />
     <Compile Include="Assets\Scripts\Navigation\BlockedCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Map\AlarmFlasher.cs" />
@@ -174,6 +176,7 @@
     <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_SecurityGuardRest.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_SecurityCheck.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\IPlayerInput.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotTemplate.cs" />
     <Compile Include="Assets\Scripts\Navigation\CellProperties.cs" />
