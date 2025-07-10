@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public class Worker_Idle : WorkerState
 {
-    private const float IDLE_DURATION = 10f;
+    private const float IDLE_DURATION = 5f;
     private float _timer;
     public Worker_Idle(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,
@@ -27,7 +27,7 @@ public class Worker_Idle : WorkerState
         _timer += Time.deltaTime;
         if (_timer >= IDLE_DURATION)
         {
-            Debug.Log("[Idle] 5 seconds elapsed → moving to next POI.");
+            Debug.Log($"[Idle] {IDLE_DURATION} seconds elapsed → moving to next POI.");
             stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(enemy, stateMachine, waypointService));
         }
     }

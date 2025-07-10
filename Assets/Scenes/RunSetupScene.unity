@@ -151,7 +151,7 @@ MonoBehaviour:
   uiDocument: {fileID: 1322428931}
   miniMapPreviewPrefab: {fileID: 3342523019363970719, guid: 07d87633fe6d9da4889d1a434dbad7ae, type: 3}
   miniMapRT: {fileID: 8400000, guid: 3ec24fa63371daf4ca2932b49657c1ac, type: 2}
-  config: {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
+  config: {fileID: 11400000, guid: 7389573697e35074e8cf50f45fae4d43, type: 2}
   victorySetup: {fileID: 11400000, guid: 71f325ff527d30649a5443ec4acf43a7, type: 2}
   factoryManagerPrefab: {fileID: 6981664151106890608, guid: f02021092afcfe942b2c9cc210afa438, type: 3}
   mapManagerPrefab: {fileID: 9105121939494992887, guid: 398503820e7095647a626d5d727af413, type: 3}

@@ -103,13 +103,6 @@ public class FactoryMachine : MonoBehaviour
             new Worker_GoingToRestStation(worker, worker.stateMachine, worker.waypointService));
     }
 
-    private void SendWorkerToStartRoom(EnemyWorkerController worker)
-    {
-        if (worker == null) return;
-        worker.stateMachine.ChangeState(
-            new Worker_GoingToStartRoom(worker, worker.stateMachine, worker.waypointService));
-    }
-
     private void SendWorkerToWork(EnemyWorkerController worker)
     {
         if (worker == null) return;

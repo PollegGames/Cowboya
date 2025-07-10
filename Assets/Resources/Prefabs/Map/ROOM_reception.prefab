@@ -3601,6 +3601,10 @@ PrefabInstance:
       propertyPath: perimeterBlocked
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4536504392865045297, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
+      propertyPath: safetyCheckInterval
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4766303202453746598, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: roomManager
       value: 
@@ -3940,6 +3944,10 @@ PrefabInstance:
       propertyPath: normalRequiresBadge
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4183952749486616820, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
+      propertyPath: safetyCheckInterval
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4488139476526621830, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: roomManager
       value: 
@@ -4033,10 +4041,6 @@ PrefabInstance:
     - target: {fileID: 3036150070442820856, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
       propertyPath: m_LocalPosition.z
       value: -1.67
-      objectReference: {fileID: 0}
-    - target: {fileID: 5226794923736213634, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
-      propertyPath: m_Mesh
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5226794923736213634, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
       propertyPath: m_VersionIndex

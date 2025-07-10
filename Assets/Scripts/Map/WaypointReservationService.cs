@@ -20,18 +20,21 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
     {
         var works = registry.GetActiveWaypoints()
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Empty
-                         && wp.type == WaypointType.Work
-                         && wp != exclude
-                         && !_reservedWaypoints.Contains(wp))
+                    && wp.type == WaypointType.Work
+                    && wp.parentRoom.machinesInRoom
+                        .Where((m) => m.IsOn && m.CurrentWorker == null).ToList().Any()
+                    && wp != exclude
+                    && !_reservedWaypoints.Contains(wp))
             .ToList();
         if (!works.Any())
         {
             works = registry.GetActiveWaypoints()
                 .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Empty
-                            && wp.type == WaypointType.Work
-                         && wp != exclude)
+                    && wp.type == WaypointType.Work
+                     && wp.parentRoom.machinesInRoom
+                        .Where((m) => m.IsOn).ToList().Count > 0
+                    && wp != exclude)
                 .ToList();
-            return works.FirstOrDefault();
         }
 
         if (!works.Any()) return null;
@@ -39,7 +42,6 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
         var best = works.OrderBy(wp => _workUsageCounts.TryGetValue(wp, out var c) ? c : 0).First();
         _workUsageCounts[best] = _workUsageCounts.TryGetValue(best, out var count) ? count + 1 : 1;
         _reservedWaypoints.Add(best);
-        Debug.Log($"[WaypointReservation] Assigned EMPTY WORK '{best.name}' (count={_workUsageCounts[best]}).");
         return best;
     }
 
@@ -47,9 +49,9 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
     {
         var works = registry.GetActiveWaypoints()
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Empty
-                         && wp.type == WaypointType.Center
-                            && wp != exclude
-                         && !_reservedWaypoints.Contains(wp))
+                && wp.type == WaypointType.Work
+                && wp != exclude
+                && !_reservedWaypoints.Contains(wp))
             .ToList();
 
         if (works.Any())
@@ -66,19 +68,55 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
 
     public RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null)
     {
+        var candidates = registry.GetActiveWaypoints()
+            .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.POI && wp.type == WaypointType.Rest)
+            .ToList();
+        var filterSteps = new List<System.Func<RoomWaypoint, bool>>
+            {
+                wp => wp.parentRoom.machinesInRoom.Any(m => m.IsOn && m.CurrentWorker == null)
+                    && wp != exclude
+                    && !_reservedWaypoints.Contains(wp),
+
+                // 2: machine on && not excluded && not reserved
+                wp => wp.parentRoom.machinesInRoom.Any(m => m.IsOn)
+                    && wp != exclude
+                    && !_reservedWaypoints.Contains(wp),
+
+                // 3: machine on && not excluded
+                wp => wp.parentRoom.machinesInRoom.Any(m => m.IsOn)
+                    && wp != exclude,
+
+                // 4: machine on only
+                wp => wp.parentRoom.machinesInRoom.Any(m => m.IsOn),
+
+                // 5: any Rest in POI (fallback)
+                wp => true
+            };
+
+        foreach (var step in filterSteps)
+        {
+            var found = candidates.FirstOrDefault(step);
+            if (found != null)
+            {
+                // Reserve and return
+                _reservedWaypoints.Add(found);
+                Debug.Log($"[WaypointReservation] Assigned REST point '{found.name}'.");
+                return found;
+            }
+        }
+        // As a final fallback, try to return the Start waypoint if it exists
         return registry.GetActiveWaypoints()
-            .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.POI
-                         && wp.type == WaypointType.Rest
-                         && wp != exclude)
-            .FirstOrDefault();
+            .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Start
+                && wp.type == WaypointType.Center)
+            .FirstOrDefault(); ;
     }
 
     public RoomWaypoint GetFirstFreeSecurityPoint()
     {
         var security = registry.GetActiveWaypoints()
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.POI
-                         && wp.type == WaypointType.Security
-                         && !_reservedWaypoints.Contains(wp))
+                && wp.type == WaypointType.Security
+                && !_reservedWaypoints.Contains(wp))
             .ToList();
         if (!security.Any())
         {

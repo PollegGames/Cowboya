@@ -185,6 +185,7 @@ GameObject:
   - component: {fileID: 8505160515933744807}
   - component: {fileID: 5579768388783519933}
   - component: {fileID: 574345331645963513}
+  - component: {fileID: 6927027784846965603}
   m_Layer: 7
   m_Name: Worker
   m_TagString: Enemy
@@ -331,11 +332,13 @@ MonoBehaviour:
   points: {fileID: 7353721863927515775}
   poles: {fileID: 5653714254752795455}
   stateMachine: {fileID: 9201182588516880390}
+  memoryComponent: {fileID: 0}
   robotBehaviour: {fileID: 340242974285803334}
   arrivalThresholdX: 0.5
   arrivalThresholdY: 2
   deadZoneX: 1
   deadZoneY: 5
+  updateLoop: 0
 --- !u!114 &9201182588516880390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,6 +408,20 @@ MonoBehaviour:
   - {fileID: 9042889523777022955}
   - {fileID: 3599177575120226896}
   - {fileID: 8707094994689484171}
+--- !u!114 &6927027784846965603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fcdf7d50ffe16449b37f6ab3d1ab120, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftLegJoint: {fileID: 9206399113579118249}
+  rightLegJoint: {fileID: 1967472705241727288}
 --- !u!1001 &446331177930903255
 PrefabInstance:
   m_ObjectHideFlags: 0

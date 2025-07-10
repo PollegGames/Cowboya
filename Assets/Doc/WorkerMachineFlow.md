@@ -28,3 +28,5 @@ This document describes how `MachineWorkerManager` reacts to machine state chang
 - **No free rest points**: `AssignToRestPoint` automatically calls `AssignToStartRoom`.
 - **Simultaneous machine toggles**: each event is processed individually; `waitingWorkers` tracks workers per machine so multiple toggles are handled gracefully.
 
+## Schema 
+![alt text](image.png)

@@ -29,7 +29,7 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
 
         queue.Enqueue(start);
         visited.Add(start);
-        cameFrom[start] = null;
+        cameFrom[start] = null; //TODO ArgumentNullException: Value cannot be null.
 
         while (queue.Count > 0)
         {

@@ -24,5 +24,8 @@ public enum WorkerStatus
     Working,
     GoingToWork,
     GoingToRest,
-    Idle
+    Idle,
+    Resting,
+    GoingToStartRoom,
+    Saved
 }

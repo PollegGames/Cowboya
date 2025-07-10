@@ -8,7 +8,7 @@ public class WorkerSlot : MonoBehaviour
     {
         var enemy = collision.GetComponentInParent<EnemyWorkerController>();
         if (enemy == null) return;
-        if (enemy.workerState == WorkerStatus.ReadyToWork || enemy.workerState == WorkerStatus.Idle)
+        if (enemy.workerState == WorkerStatus.ReadyToWork || enemy.workerState == WorkerStatus.Resting)
         {
             factoryMachine.OnWorkerReady(enemy);
         }

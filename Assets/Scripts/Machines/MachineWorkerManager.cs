@@ -38,8 +38,7 @@ public class MachineWorkerManager : MonoBehaviour
         // Store that this worker was attached to this machine
         waitingWorkers[worker] = machine;
 
-
-        AssignToRestPoint(worker);
+        AssignToFirstFreePointAvailable(worker);
     }
 
     private void OnMachineTurnedOn(FactoryMachine machine)
@@ -51,9 +50,8 @@ public class MachineWorkerManager : MonoBehaviour
             {
                 var worker = pair.Key;
                 waitingWorkers.Remove(worker);
-                SetWorkerState(worker, WorkerCondition.Active);
                 // Pseudocode: tell worker to resume work on this machine
-                // worker.stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(worker, worker.stateMachine, worker.waypointService));
+                AssignToFirstFreePointAvailable(worker);
             }
         }
     }
@@ -61,21 +59,10 @@ public class MachineWorkerManager : MonoBehaviour
     /// <summary>
     /// Send worker to nearest rest point. Falls back to start room if none free.
     /// </summary>
-    public void AssignToRestPoint(EnemyWorkerController worker)
+    public void AssignToFirstFreePointAvailable(EnemyWorkerController worker)
     {
-        var rest = factoryManager.GetWayPointService().GetFirstRestPoint(worker.memory.LastVisitedPoint);
-        worker.stateMachine.ChangeState(new Worker_GoingToRestStation(worker, worker.stateMachine, worker.waypointService));
-        worker.SetDestination(rest);
-        SetWorkerState(worker, WorkerCondition.Resting);
+        worker.stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(worker, worker.stateMachine, worker.waypointService));
     }
 
-    /// <summary>
-    /// Wrapper to update the worker activity state.
-    /// </summary>
-    public void SetWorkerState(EnemyWorkerController worker, WorkerCondition state)
-    {
-        Debug.Log($"Setting worker {worker.name} state to {state}");
-        worker.SetWorkerState(state);
-    }
 }
 

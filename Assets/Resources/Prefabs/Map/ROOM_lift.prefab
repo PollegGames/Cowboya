@@ -1563,7 +1563,7 @@ MonoBehaviour:
   - {fileID: 3581408214910875063}
   - {fileID: 3441786534093158895}
   - {fileID: 2628173617427191960}
-  waypointService: {fileID: 0}
+  machinesInRoom: []
 --- !u!114 &4796804523035431174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5010,6 +5010,10 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
+    - target: {fileID: 4536504392865045297, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
+      propertyPath: safetyCheckInterval
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4766303202453746598, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: roomManager
       value: 
@@ -5353,6 +5357,10 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
+    - target: {fileID: 4183952749486616820, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
+      propertyPath: safetyCheckInterval
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4488139476526621830, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: roomManager
       value: 

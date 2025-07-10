@@ -38,7 +38,7 @@ public class DoorController : MonoBehaviour
     private int securityEntitiesInside = 0;
 
     [Header("Door Settings")]
-    public float safetyCheckInterval = 30f;
+    public float safetyCheckInterval = 5f;
 
     private void Start()
     {
@@ -64,9 +64,29 @@ public class DoorController : MonoBehaviour
             roomManager.OnRoomAlarmChanged += OnRoomAlarmChanged;
 
         UpdateStatusPanel();
-
+        // Start the safety check coroutine
+        StartCoroutine(SafetyCheckRoutine());
     }
 
+
+    private IEnumerator SafetyCheckRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(safetyCheckInterval);
+
+            if (isWall) continue; // Don't do anything if it's a wall
+
+            if (entitiesInside > 0 || securityEntitiesInside > 0)
+            {
+                OpenDoor();
+            }
+            else
+            {
+                CloseDoor();
+            }
+        }
+    }
 
     private void OnDestroy()
     {
@@ -144,7 +164,7 @@ public class DoorController : MonoBehaviour
         UpdateStatusPanel();
     }
 
-
+    private Coroutine slidingCoroutine;
     private void OpenDoor()
     {
         if (isOpen || isAnimating) return;
@@ -153,8 +173,9 @@ public class DoorController : MonoBehaviour
         if (solidCollider != null)
             solidCollider.enabled = false;
 
-        StopAllCoroutines();
-        StartCoroutine(SlidePanels(leftOpenPos, rightOpenPos));
+        if (slidingCoroutine != null)
+            StopCoroutine(slidingCoroutine);
+        slidingCoroutine = StartCoroutine(SlidePanels(leftOpenPos, rightOpenPos));
     }
 
     private void CloseDoor(bool forceClose = false)
@@ -165,8 +186,9 @@ public class DoorController : MonoBehaviour
         if (solidCollider != null)
             solidCollider.enabled = true;
 
-        StopAllCoroutines();
-        StartCoroutine(SlidePanels(leftClosedPos, rightClosedPos));
+        if (slidingCoroutine != null)
+            StopCoroutine(slidingCoroutine);
+        slidingCoroutine = StartCoroutine(SlidePanels(leftClosedPos, rightClosedPos));
     }
 
     private IEnumerator SlidePanels(Vector3 leftTarget, Vector3 rightTarget)

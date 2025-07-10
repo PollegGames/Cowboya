@@ -15,7 +15,7 @@ public class RoomManager : MonoBehaviour
     [Header("Zone Detection")]
     public PositionTriggerZone triggerZone;
     [SerializeField] private List<RoomWaypoint> waypoints;
-    [SerializeField] private List<FactoryMachine> machinesInRoom = new();
+    public List<FactoryMachine> machinesInRoom = new();
 
     public IWaypointService waypointService;
 

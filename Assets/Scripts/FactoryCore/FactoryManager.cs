@@ -6,13 +6,13 @@ using System.Linq;
 public class FactoryManager : MonoBehaviour, IFactoryManager
 {
     [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
-    [SerializeField] private VictorySetup victorySetup;
     [SerializeField] private MachineWorkerManager machineWorkerManager;
 
     public event Action<AlarmState> OnFactoryAlarmChanged;
     private AlarmState lastAlarmState;
     private MapManager mapManager;
     private IWaypointService waypointService;
+    private VictorySetup victorySetup;
 
     public GameObject playerInstance { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody

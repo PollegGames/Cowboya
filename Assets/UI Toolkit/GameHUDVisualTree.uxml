@@ -4,28 +4,28 @@
         <engine:VisualElement style="flex-grow: 1; width: auto; height: auto; flex-direction: row;">
             <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 89px; margin-left: 0; flex-direction: column;">
                 <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 53px; margin-left: 0;">
-                    <engine:IntegerField label="Robots saved" value="42"  data-source-path="currentSaved" enabled="true" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true">
+                    <engine:IntegerField label="Robots saved" value="42" data-source-path="currentSaved" enabled="true" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup">
                         <Bindings>
-                            <engine:DataBinding property="value" data-source-path="currentSaved"  binding-mode="ToTarget" />
+                            <engine:DataBinding property="value" data-source-path="currentSaved" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
                     </engine:IntegerField>
                     <engine:TextField label="/" placeholder-text="filler text" style="width: 14px;" />
-                    <engine:IntegerField value="42"  data-source-path="robotsSavedTarget" enabled="true" focusable="false" select-line-by-triple-click="false" select-word-by-double-click="false" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true">
+                    <engine:IntegerField value="42" data-source-path="robotsSavedTarget" enabled="true" focusable="false" select-line-by-triple-click="false" select-word-by-double-click="false" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup">
                         <Bindings>
-                            <engine:DataBinding property="value" data-source-path="robotsSavedTarget"  binding-mode="ToTarget" />
+                            <engine:DataBinding property="value" data-source-path="robotsSavedTarget" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
                     </engine:IntegerField>
                 </engine:VisualElement>
                 <engine:VisualElement name="VisualElement" enabled="true" class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 53px; margin-left: 0;">
-                    <engine:IntegerField label="Robots killed" value="42"  data-source-path="currentKilled" select-all-on-mouse-up="false" select-all-on-focus="false" select-line-by-triple-click="false" select-word-by-double-click="false" readonly="true">
+                    <engine:IntegerField label="Robots killed" value="42" data-source-path="currentKilled" select-all-on-mouse-up="false" select-all-on-focus="false" select-line-by-triple-click="false" select-word-by-double-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup">
                         <Bindings>
-                            <engine:DataBinding property="value" data-source-path="currentKilled"  binding-mode="ToTarget" />
+                            <engine:DataBinding property="value" data-source-path="currentKilled" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
                     </engine:IntegerField>
                     <engine:TextField label="/" placeholder-text="filler text" style="width: 14px;" />
-                    <engine:IntegerField value="42"  data-source-path="robotsKilledTarget" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true">
+                    <engine:IntegerField value="42" data-source-path="robotsKilledTarget" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup">
                         <Bindings>
-                            <engine:DataBinding property="value" data-source-path="robotsKilledTarget"  binding-mode="ToTarget" />
+                            <engine:DataBinding property="value" data-source-path="robotsKilledTarget" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
                     </engine:IntegerField>
                 </engine:VisualElement>

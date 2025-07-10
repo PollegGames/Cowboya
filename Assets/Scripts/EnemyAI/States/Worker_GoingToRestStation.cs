@@ -22,7 +22,7 @@ public class Worker_GoingToRestStation : WorkerState
     public override void EnterState()
     {
         enemy.workerState = WorkerStatus.GoingToRest;
-        targetPoint = waypointService.GetFirstRestPoint();
+        targetPoint = waypointService.GetFirstRestPoint(enemy.memory.LastVisitedPoint);
         if (targetPoint == null)
         {
             stateMachine.ChangeState(new Worker_GoingToStartRoom(enemy, stateMachine, waypointService));
@@ -42,7 +42,7 @@ public class Worker_GoingToRestStation : WorkerState
             enemy.SetVerticalMovement(0f);
 
             enemy.memory.SetLastVisitedPoint(targetPoint);
-            stateMachine.ChangeState(new Worker_Idle(enemy, stateMachine, waypointService));
+            stateMachine.ChangeState(new Worker_Resting(enemy, stateMachine, waypointService));
 
         }
     }

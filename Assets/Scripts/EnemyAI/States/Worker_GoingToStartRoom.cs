@@ -14,7 +14,7 @@ public class Worker_GoingToStartRoom : WorkerState
 
     public override void EnterState()
     {
-        enemy.SetWorkerState(WorkerCondition.Active);
+        enemy.workerState = WorkerStatus.GoingToStartRoom;
         var startRoom = waypointService.GetStartPoint();
         enemy.SetDestination(startRoom);
     }

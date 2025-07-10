@@ -9,28 +9,10 @@ public class GameUIViewModel : MonoBehaviour
     public VisualElement ui;
     private RobotStateController robotBehaviour;
     [SerializeField] private RunMapConfigSO config;
-    [SerializeField] private VictorySetup victorySetup;
 
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
-    }
-
-    public void SetVictorySetup(VictorySetup setup)
-    {
-        victorySetup = setup;
-
-        if (ui == null)
-        {
-            ui = GetComponent<UIDocument>().rootVisualElement;
-        }
-
-        ui.Unbind();
-
-        if (victorySetup != null)
-        {
-            ui.Bind(victorySetup);
-        }
     }
 
     public void SetPlayer(RobotStateController robot)

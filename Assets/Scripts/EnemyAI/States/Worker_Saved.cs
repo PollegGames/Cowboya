@@ -7,7 +7,7 @@ public class Worker_Saved : WorkerState
 
     public override void EnterState()
     {
-        enemy.SetWorkerState(WorkerCondition.Saved);
+        enemy.workerState = WorkerStatus.Saved;
         enemy.SetMovement(0f);
         SceneController.instance?.RobotSaved();
     }

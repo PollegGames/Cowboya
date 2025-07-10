@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47eeb42f1fd366642856156ffc865a5b, type: 3}
   m_Name: RunMapConfig StressTest
   m_EditorClassIdentifier: 
-  gridWidth: 8
-  gridHeight: 8
-  poiCount: 10
+  gridWidth: 6
+  gridHeight: 6
+  poiCount: 5
   blockedCount: 5
-  enemyCount: 20
-  bossCount: 5
+  workersCount: 10
+  enemiesCount: 2
   seed: 85606
