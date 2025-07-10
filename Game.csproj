@@ -198,6 +198,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Saved.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPOIReservationService.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IMachineReservationService.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyWorkerController.cs" />

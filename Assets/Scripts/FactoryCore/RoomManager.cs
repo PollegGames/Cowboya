@@ -39,7 +39,8 @@ public class RoomManager : MonoBehaviour
         // 3) register machines in this room
         foreach (var machine in machinesInRoom)
         {
-           machineWorkerManager.RegisterMachine(machine);
+            machine.Initialize(waypointService);
+            machineWorkerManager.RegisterMachine(machine);
         }
 
         // 4) hook up alarm + triggers

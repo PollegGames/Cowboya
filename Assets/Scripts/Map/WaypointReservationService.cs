@@ -10,6 +10,7 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
     private readonly HashSet<RoomWaypoint> _reservedWaypoints = new();
     private readonly Dictionary<RoomWaypoint, int> _workUsageCounts = new();
     private readonly Dictionary<RoomWaypoint, int> _securityUsageCounts = new();
+    private readonly Dictionary<FactoryMachine, EnemyWorkerController> _reservedMachines = new();
 
     private void Awake()
     {
@@ -22,7 +23,7 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Empty
                     && wp.type == WaypointType.Work
                     && wp.parentRoom.machinesInRoom
-                        .Where((m) => m.IsOn && m.CurrentWorker == null).ToList().Any()
+                        .Any(m => m.IsOn && m.CurrentWorker == null && !_reservedMachines.ContainsKey(m))
                     && wp != exclude
                     && !_reservedWaypoints.Contains(wp))
             .ToList();
@@ -50,6 +51,7 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
         var works = registry.GetActiveWaypoints()
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Empty
                 && wp.type == WaypointType.Work
+                && wp.parentRoom.machinesInRoom.Any(m => m.IsOn && m.CurrentWorker == null && !_reservedMachines.ContainsKey(m))
                 && wp != exclude
                 && !_reservedWaypoints.Contains(wp))
             .ToList();
@@ -73,7 +75,7 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
             .ToList();
         var filterSteps = new List<System.Func<RoomWaypoint, bool>>
             {
-                wp => wp.parentRoom.machinesInRoom.Any(m => m.IsOn && m.CurrentWorker == null)
+                wp => wp.parentRoom.machinesInRoom.Any(m => m.IsOn && m.CurrentWorker == null && !_reservedMachines.ContainsKey(m))
                     && wp != exclude
                     && !_reservedWaypoints.Contains(wp),
 
@@ -137,5 +139,25 @@ public class WaypointReservationService : MonoBehaviour, IPOIReservationService
         if (_workUsageCounts.TryGetValue(poi, out var wc) && wc > 0) _workUsageCounts[poi] = wc - 1;
         if (_securityUsageCounts.TryGetValue(poi, out var sc) && sc > 0) _securityUsageCounts[poi] = sc - 1;
         Debug.Log($"[WaypointReservation] Released POI '{poi.name}'.");
+    }
+
+    public FactoryMachine ReserveFreeMachine(RoomManager room, EnemyWorkerController worker)
+    {
+        if (room == null) return null;
+        var machine = room.machinesInRoom.FirstOrDefault(m => m.IsOn && m.CurrentWorker == null && !_reservedMachines.ContainsKey(m));
+        if (machine != null)
+            _reservedMachines[machine] = worker;
+        return machine;
+    }
+
+    public void ReleaseMachine(FactoryMachine machine)
+    {
+        if (machine == null) return;
+        _reservedMachines.Remove(machine);
+    }
+
+    public bool IsMachineReserved(FactoryMachine machine)
+    {
+        return machine != null && _reservedMachines.ContainsKey(machine);
     }
 }
