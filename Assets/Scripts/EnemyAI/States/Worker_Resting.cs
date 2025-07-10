@@ -11,6 +11,7 @@ public class Worker_Resting : WorkerState
     {
         enemy.workerState = WorkerStatus.Resting;
         enemy.SetMovement(0f);
+        _timer = 0f;
     }
 
     public override void UpdateState()
@@ -23,6 +24,9 @@ public class Worker_Resting : WorkerState
         }
     }
 
-    public override void ExitState() { }
+    public override void ExitState()
+    {
+        waypointService.ReleasePOI(enemy.memory.LastVisitedPoint);
+    }
 }
 
