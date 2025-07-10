@@ -7,6 +7,9 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 {
     [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
     [SerializeField] private MachineWorkerManager machineWorkerManager;
+    [SerializeField] private MachineSecurityManager machineSecurityManager;
+
+    public MachineSecurityManager SecurityManager => machineSecurityManager;
 
     public event Action<AlarmState> OnFactoryAlarmChanged;
     private AlarmState lastAlarmState;
@@ -23,7 +26,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         this.waypointService = waypointService;
         this.victorySetup = victorySetup;
         mapManager.InitializeGrid();
-        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager);
+        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager);
         waypointService.BuildAllNeighbors();
         SetupFactoryState();
     }

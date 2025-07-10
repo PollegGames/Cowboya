@@ -10,16 +10,18 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     private MapManager mapManager;
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
+    private MachineSecurityManager securityManager;
     private List<GameObject> spawnedWorkers = new List<GameObject>();
     private List<GameObject> spawnedEnemies = new List<GameObject>();
     private GameUIViewModel gameUIViewModel;
 
-    public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService)
+    public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService, MachineSecurityManager securityManager)
     {
         this.waypointService = waypointService;
         this.mapManager = mapManager;
         this.gameUIViewModel = viewModel;
         this.respawnService = respawnService;
+        this.securityManager = securityManager;
 
         if (respawnService is RobotRespawnService service)
             service.Initialize(this);
@@ -131,6 +133,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = enemy.GetComponent<EnemyController>();
             ec.Initialize(waypointService, waypointService, respawnService);
+            var guardAI = enemy.GetComponent<SecurityGuardAI>();
+            guardAI?.Initialize(waypointService, securityManager);
 
             if (spawnPos.type == WaypointType.Rest)
             {
@@ -174,6 +178,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         // 4) Initialize its AI (waypoint service, etc.)
         var ec = enemyGO.GetComponent<EnemyWorkerController>();
         ec.Initialize(waypointService, waypointService, respawnService);
+        var guardAI = enemyGO.GetComponent<SecurityGuardAI>();
+        guardAI?.Initialize(waypointService, securityManager);
 
         // 5) Keep track of it
         spawnedWorkers.Add(enemyGO);

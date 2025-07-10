@@ -145,13 +145,13 @@ public class MapManager : MonoBehaviour
         };
     }
 
-    public void RegisterFactoryInEachRoom(FactoryManager factoryManager, MachineWorkerManager machineWorkerManager)
+    public void RegisterFactoryInEachRoom(FactoryManager factoryManager, MachineWorkerManager machineWorkerManager, MachineSecurityManager machineSecurityManager)
     {
         foreach (var roomGO in roomInstances.Values)
         {
             var rm = roomGO.GetComponent<RoomManager>();
             if (rm != null)
-                rm.Initialize(factoryManager, machineWorkerManager);
+                rm.Initialize(factoryManager, machineWorkerManager, machineSecurityManager);
         }
     }
 
