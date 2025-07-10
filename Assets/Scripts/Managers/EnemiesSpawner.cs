@@ -109,8 +109,19 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             }
             else
             {
-                //other enemies spawn at the first free security point
-                spawnPos = waypointService.GetFirstFreeSecurityPoint();
+                // Security guards spawn at POI security points, with a chance to use Rest points
+                bool useRest = Random.value < 0.5f;
+                spawnPos = useRest
+                    ? waypointService.GetFirstRestPoint()
+                    : waypointService.GetFirstFreeSecurityPoint();
+
+                // Fallback in case the chosen type has no free waypoint
+                if (spawnPos == null)
+                {
+                    spawnPos = useRest
+                        ? waypointService.GetFirstFreeSecurityPoint()
+                        : waypointService.GetFirstRestPoint();
+                }
             }
             enemy.transform.position = spawnPos.WorldPos;
 
