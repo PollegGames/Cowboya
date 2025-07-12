@@ -98,6 +98,23 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             Debug.Log($"Worker spread to {spawnPos} and initialized");
         }
 
+        // Collect all free security waypoints first
+        var securityPoints = new List<RoomWaypoint>();
+        while (true)
+        {
+            var sec = waypointService.GetFirstFreeSecurityPoint();
+            if (sec == null || sec.type != WaypointType.Security)
+            {
+                // Release fallback point and stop collecting
+                if (sec != null && sec.type != WaypointType.Security)
+                    waypointService.ReleasePOI(sec);
+                break;
+            }
+            securityPoints.Add(sec);
+        }
+
+        int securityIndex = 0;
+
         //enemies
         for (int i = 0; i < spawnedEnemies.Count; i++)
         {
@@ -109,22 +126,17 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
                 //the boss always spawns at the end point
                 spawnPos = waypointService.GetEndPoint();
             }
+            else if (securityIndex < securityPoints.Count)
+            {
+                // fill all collected security points first
+                spawnPos = securityPoints[securityIndex++];
+            }
             else
             {
-                // Security guards spawn at POI security points, with a chance to use Rest points
-                bool useRest = Random.value < 0.5f;
-                spawnPos = useRest
-                    ? waypointService.GetFirstRestPoint()
-                    : waypointService.GetFirstFreeSecurityPoint();
-
-                // Fallback in case the chosen type has no free waypoint
-                if (spawnPos == null)
-                {
-                    spawnPos = useRest
-                        ? waypointService.GetFirstFreeSecurityPoint()
-                        : waypointService.GetFirstRestPoint();
-                }
+                // remaining guards go to rest points
+                spawnPos = waypointService.GetFirstRestPoint();
             }
+
             enemy.transform.position = spawnPos.WorldPos;
 
             // 2) turn it on
@@ -146,6 +158,10 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
 
             Debug.Log($"Enemy spread to {spawnPos} and initialized");
         }
+
+        // release any unused reserved security points
+        for (int j = securityIndex; j < securityPoints.Count; j++)
+            waypointService.ReleasePOI(securityPoints[j]);
     }
 
     /// <summary>
