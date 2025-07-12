@@ -32,9 +32,20 @@ public class Enemy_SecurityGuardRest : EnemyState
                 targetPoint = waypointService.GetFirstFreeSecurityPoint();
                 if (targetPoint == null)
                 {
+                    targetPoint = waypointService.GetFirstRestPoint();
+                }
+
+                if (targetPoint == null)
+                {
+                    targetPoint = waypointService.GetStartPoint();
+                }
+
+                if (targetPoint == null)
+                {
                     stateMachine.ChangeState(new Enemy_Idle(enemy, stateMachine, waypointService));
                     return;
                 }
+
                 enemy.SetDestination(targetPoint);
                 moving = true;
             }
@@ -46,7 +57,10 @@ public class Enemy_SecurityGuardRest : EnemyState
             enemy.SetMovement(0f);
             enemy.SetVerticalMovement(0f);
             enemy.memory.SetLastVisitedPoint(targetPoint);
-            waypointService.ReleasePOI(targetPoint);
+            if (targetPoint.type == WaypointType.Security || targetPoint.type == WaypointType.Rest)
+            {
+                waypointService.ReleasePOI(targetPoint);
+            }
             stateMachine.ChangeState(new Enemy_Idle(enemy, stateMachine, waypointService));
         }
     }
