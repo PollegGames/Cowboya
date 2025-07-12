@@ -5,10 +5,15 @@ public class Enemy_AttackPlayer : EnemyState
 {
     private Vector3 playerTransform;
     private float stopDistance = 1.5f;
+    private readonly EnemyState previousState;
 
-    public Enemy_AttackPlayer(EnemyController enemy, EnemyStateMachine machine, IWaypointService waypointService)
+    public Enemy_AttackPlayer(EnemyController enemy,
+                              EnemyStateMachine machine,
+                              IWaypointService waypointService,
+                              EnemyState previousState)
         : base(enemy, machine, waypointService)
     {
+        this.previousState = previousState;
         playerTransform = enemy.memory.LastKnownPlayerPosition;
     }
 
@@ -24,7 +29,14 @@ public class Enemy_AttackPlayer : EnemyState
 
         if (playerTransform == Vector3.zero)
         {
-            stateMachine.ChangeState(new Enemy_GoToEndCell(enemy, stateMachine, waypointService));
+            if (previousState != null)
+            {
+                stateMachine.ChangeState(previousState);
+            }
+            else
+            {
+                stateMachine.ChangeState(new Enemy_GoToEndCell(enemy, stateMachine, waypointService));
+            }
             return;
         }
 
