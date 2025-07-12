@@ -7,16 +7,19 @@ public class Enemy_ReactivateMachine : EnemyState
 {
     private readonly FactoryMachine targetMachine;
     private RoomWaypoint targetPoint;
+    private readonly RoomWaypoint returnPoint;
     private bool hasArrived;
 
     public Enemy_ReactivateMachine(
         EnemyController enemy,
         EnemyStateMachine machine,
         IWaypointService waypointService,
-        FactoryMachine machineToActivate)
+        FactoryMachine machineToActivate,
+        RoomWaypoint returnPoint)
         : base(enemy, machine, waypointService)
     {
         targetMachine = machineToActivate;
+        this.returnPoint = returnPoint;
     }
 
     public override void EnterState()
@@ -40,7 +43,7 @@ public class Enemy_ReactivateMachine : EnemyState
             enemy.SetMovement(0f);
             enemy.SetVerticalMovement(0f);
             targetMachine.SetState(true);
-            stateMachine.ChangeState(new Enemy_SecurityGuardRest(enemy, stateMachine, waypointService));
+            stateMachine.ChangeState(new Enemy_ReturnToSecurityPost(enemy, stateMachine, waypointService, returnPoint));
         }
     }
 

@@ -21,21 +21,21 @@ public class SecurityGuardAI : MonoBehaviour
     {
         waypointService = service;
         securityManager = manager;
-        if (securityManager != null)
-            securityManager.OnMachineTurnedOff += HandleMachineTurnedOff;
+        securityManager?.RegisterGuard(this);
     }
 
     private void OnDestroy()
     {
-        if (securityManager != null)
-            securityManager.OnMachineTurnedOff -= HandleMachineTurnedOff;
+        securityManager?.UnregisterGuard(this);
     }
 
-    private void HandleMachineTurnedOff(FactoryMachine machine)
+    public void ReactivateMachine(FactoryMachine machine)
     {
         if (controller == null || stateMachine == null || waypointService == null)
             return;
-        stateMachine.ChangeState(new Enemy_ReactivateMachine(controller, stateMachine, waypointService, machine));
+        var returnPoint = controller.memory.LastVisitedPoint;
+        stateMachine.ChangeState(new Enemy_ReactivateMachine(
+            controller, stateMachine, waypointService, machine, returnPoint));
     }
 }
 
