@@ -9,9 +9,8 @@ public enum MachineType
 }
 
 [RequireComponent(typeof(MeshRenderer))]
-public class FactoryMachine : MonoBehaviour
+public class FactoryMachine : BaseMachine
 {
-    [SerializeField] private bool isOn = true;
     [SerializeField] private MachineType machineType;
     [SerializeField] private Material materialOn;
     [SerializeField] private Material materialOff;
@@ -43,22 +42,32 @@ public class FactoryMachine : MonoBehaviour
     /// </summary>
     public void SetState(bool on)
     {
-        if (isOn == on) return;
-
-        if (!on)
-        {
-            SendCurrentWorkerToRest();
-        }
-
-        isOn = on;
-        ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, isOn);
+        if (on)
+            PowerOn();
+        else
+            PowerOff();
     }
 
     /// <summary>
     /// Toggles the machine state.
     /// </summary>
     public void ToggleState() => SetState(!isOn);
+
+    public override void PowerOn()
+    {
+        base.PowerOn();
+        ApplyMaterial();
+        OnMachineStateChanged?.Invoke(this, true);
+    }
+
+    public override void PowerOff()
+    {
+        if (!isOn) return;
+        SendCurrentWorkerToRest();
+        base.PowerOff();
+        ApplyMaterial();
+        OnMachineStateChanged?.Invoke(this, false);
+    }
 
     private void ApplyMaterial()
     {
@@ -78,8 +87,10 @@ public class FactoryMachine : MonoBehaviour
     /// Called when a worker arrives at this machine.
     /// Sends workers to the appropriate state based on machine status and type.
     /// </summary>
-    public void OnWorkerReady(EnemyWorkerController newWorker)
+    public override void AttachRobot(GameObject robot)
     {
+        var newWorker = robot.GetComponent<EnemyWorkerController>();
+        if (newWorker == null) return;
         // If the machine is off, send any worker to rest
         if (!isOn)
         {
@@ -106,6 +117,8 @@ public class FactoryMachine : MonoBehaviour
         }
 
         waypointService?.ReleaseMachine(this);
+        isOccupied = true;
+        OnRobotAssigned?.Invoke(this);
     }
 
     /// <summary>
@@ -139,5 +152,12 @@ public class FactoryMachine : MonoBehaviour
     {
         SendWorkerToRest(currentWorker);
         currentWorker = null;
+    }
+
+    public override void ReleaseRobot()
+    {
+        SendCurrentWorkerToRest();
+        isOccupied = false;
+        base.ReleaseRobot();
     }
 }

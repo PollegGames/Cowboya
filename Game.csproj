@@ -91,6 +91,7 @@
     <Compile Include="Assets\Scripts\Game\TargetAim.cs" />
     <Compile Include="Assets\Scripts\Robots\EnergyBot.cs" />
     <Compile Include="Assets\Scripts\Map\WaypointReservationService.cs" />
+    <Compile Include="Assets\Scripts\Services\StationReservationService.cs" />
     <Compile Include="Assets\Scripts\Navigation\RunMapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPlayerSpawner.cs" />
     <Compile Include="Assets\Scripts\Navigation\Cell.cs" />
@@ -120,8 +121,11 @@
     <Compile Include="Assets\Scripts\Map\DoorController.cs" />
     <Compile Include="Assets\Scripts\UI\RunSetupManager.cs" />
     <Compile Include="Assets\Scripts\Map\WarpMeshXYSkew.cs" />
+    <Compile Include="Assets\Scripts\Machines\BaseMachine.cs" />
     <Compile Include="Assets\Scripts\Machines\WorkerSlot.cs" />
     <Compile Include="Assets\Scripts\Machines\SecuritySlot.cs" />
+    <Compile Include="Assets\Scripts\Machines\SecurityStation.cs" />
+    <Compile Include="Assets\Scripts\Machines\RestingMachine.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotRespawnService.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotMemory.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotRespawnService.cs" />
@@ -187,6 +191,9 @@
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\SecurityGuardAI.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReturnToSecurityPost.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\GoPowerOnMachineState.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\WorkState.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\RestState.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerMovementController.cs" />
     <Compile Include="Assets\Scripts\Machines\ToggleBox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\PhysicsBaseAgentController.cs" />
@@ -232,6 +239,7 @@
     <Compile Include="Assets\Scripts\Navigation\EndpointsFactory.cs" />
     <Compile Include="Assets\Scripts\Navigation\RoomRenderer.cs" />
     <Compile Include="Assets\Scripts\Robots\RobotState.cs" />
+    <Compile Include="Assets\Scripts\Robots\RobotRole.cs" />
     <Compile Include="Assets\Scripts\Robots\FootStepper.cs" />
     <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />

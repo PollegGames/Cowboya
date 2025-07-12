@@ -9,6 +9,7 @@ using UnityEngine;
 public class MachineWorkerManager : MonoBehaviour
 {
     [SerializeField] private FactoryManager factoryManager;
+    [SerializeField] private StationReservationService reservationService;
     private List<FactoryMachine> machines = new List<FactoryMachine>();
 
     // Track workers waiting on a specific machine
@@ -19,6 +20,7 @@ public class MachineWorkerManager : MonoBehaviour
         if (machine == null || machines.Contains(machine))
             return;
         machines.Add(machine);
+        reservationService?.RegisterMachine(machine, RobotRole.Worker);
         machine.OnMachineStateChanged += HandleMachineStateChanged;
     }
     private void HandleMachineStateChanged(FactoryMachine machine, bool isOn)

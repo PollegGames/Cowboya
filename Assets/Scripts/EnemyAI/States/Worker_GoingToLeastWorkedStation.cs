@@ -32,7 +32,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
             return;
         }
 
-        reservedMachine = waypointService.ReserveFreeMachine(targetPoint.parentRoom, enemy);
+        reservedMachine = StationReservationService.Instance?.ReserveStation(RobotRole.Worker) as FactoryMachine;
 
         enemy.SetDestination(targetPoint);
     }
