@@ -4,13 +4,12 @@ This document outlines how security guards react when a `FactoryMachine` is swit
 
 1. **Registration**
    - `MachineSecurityManager.RegisterMachine` subscribes to each machine's `OnMachineStateChanged` event.
-   - When a machine turns off, `MachineSecurityManager` raises `OnMachineTurnedOff`.
+   - Security guards call `RegisterGuard` during initialization so the manager can dispatch them.
 2. **Notification**
-   - `SecurityGuardAI` components subscribe to `OnMachineTurnedOff` during initialization.
-   - Upon notification, the guard's state machine switches to `Enemy_ReactivateMachine` with the target machine.
+   - When a machine turns off, `MachineSecurityManager` chooses the nearest available guard and calls `ReactivateMachine` on it.
 3. **Reactivation**
-   - `Enemy_ReactivateMachine` moves the guard to the closest waypoint near the machine.
-   - Once in range, it calls `FactoryMachine.SetState(true)` and returns the guard to `Enemy_SecurityGuardRest`.
+   - `SecurityGuardAI.ReactivateMachine` switches the guard to `Enemy_ReactivateMachine`.
+   - After turning the machine back on, the guard enters `Enemy_ReturnToSecurityPost` to go back to its previous post.
 
 This shared state-machine approach keeps behaviour consistent across all robot types.
 
