@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class WorkerSlot : MonoBehaviour
 {
-    [SerializeField] private FactoryMachine factoryMachine;
+    [SerializeField] private BaseMachine machine;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -10,7 +10,7 @@ public class WorkerSlot : MonoBehaviour
         if (enemy == null) return;
         if (enemy.workerState == WorkerStatus.ReadyToWork || enemy.workerState == WorkerStatus.Resting)
         {
-            factoryMachine.OnWorkerReady(enemy);
+            machine.AttachRobot(enemy.gameObject);
         }
     }
 }

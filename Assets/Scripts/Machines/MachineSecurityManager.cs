@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 public class MachineSecurityManager : MonoBehaviour
 {
+    [SerializeField] private StationReservationService reservationService;
     private readonly List<FactoryMachine> machines = new();
     private readonly List<SecurityGuardAI> guards = new();
 
@@ -21,6 +22,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (machine == null || machines.Contains(machine))
             return;
         machines.Add(machine);
+        reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
         machine.OnMachineStateChanged += HandleMachineStateChanged;
     }
 
