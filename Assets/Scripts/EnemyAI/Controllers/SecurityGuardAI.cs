@@ -19,7 +19,7 @@ public class SecurityGuardAI : MonoBehaviour
 
     public void Initialize(IWaypointService service, MachineSecurityManager manager)
     {
-        waypointService = service;
+        this.waypointService = service;
         securityManager = manager;
         securityManager?.RegisterGuard(this);
     }

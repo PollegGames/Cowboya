@@ -25,6 +25,7 @@ public class Worker_GoingToRestStation : WorkerState
         targetPoint = waypointService.GetFirstRestPoint(enemy.memory.LastVisitedPoint);
         if (targetPoint == null)
         {
+            Debug.LogWarning("[GoingToRestStation] No rest point found. Returning to start room.");
             stateMachine.ChangeState(new Worker_GoingToStartRoom(enemy, stateMachine, waypointService));
             return;
         }

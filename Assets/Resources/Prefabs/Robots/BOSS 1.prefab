@@ -574,7 +574,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 5050512216460365516, guid: e811bf1a4aa70cd45a392d1b2ae63103, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.7754278, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1032,7 +1032,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 5769112115733104237, guid: 6bea254d8634dc243a558598632629c0, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.7754278, a: 1}
+  m_Color: {r: 0.34871078, g: 0.3773585, b: 0.14061944, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1277,7 +1277,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7231989488834368577, guid: 2adf1de4f0d2389448ba5e44c0a4f6eb, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.7754278, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1663,7 +1663,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 2089177775728913353, guid: e717cc3bc40327145bdd3eb58bd43774, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.7754278, a: 1}
+  m_Color: {r: 0.34871078, g: 0.3773585, b: 0.14061944, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2221,7 +2221,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -6199720543617963891, guid: 1cdfae5fc169c1f468104a707c1046f4, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.7754278, a: 1}
+  m_Color: {r: 0.33962262, g: 0.227921, b: 0.11374155, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3297,7 +3297,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7262119653502517537, guid: 319d40949072d5d43b4c9fbe967fa92a, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.7754278, a: 1}
+  m_Color: {r: 0.33962262, g: 0.227921, b: 0.11374155, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4384,7 +4384,7 @@ GameObject:
   - component: {fileID: 4282379396995134653}
   - component: {fileID: 4039218795842909479}
   m_Layer: 7
-  m_Name: SecurityGuard
+  m_Name: BOSS 1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

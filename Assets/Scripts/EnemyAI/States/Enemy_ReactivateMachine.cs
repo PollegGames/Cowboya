@@ -24,6 +24,7 @@ public class Enemy_ReactivateMachine : EnemyState
 
     public override void EnterState()
     {
+        Debug.Log($"Entering ReactivateMachine state for {targetMachine.name}");
         hasArrived = false;
         if (targetMachine == null)
         {

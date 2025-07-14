@@ -27,6 +27,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
         targetPoint = waypointService.GetLeastUsedFreeWorkPoint(enemy.memory.LastVisitedPoint);
         if (targetPoint == null)
         {
+            Debug.LogWarning("[GoingToLeastWorkedStation] No free work point found. Going to rest.");
             stateMachine.ChangeState(new Worker_GoingToRestStation(
                 enemy, stateMachine, waypointService));
             return;

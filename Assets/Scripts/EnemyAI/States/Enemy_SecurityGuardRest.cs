@@ -37,11 +37,6 @@ public class Enemy_SecurityGuardRest : EnemyState
 
                 if (targetPoint == null)
                 {
-                    targetPoint = waypointService.GetStartPoint();
-                }
-
-                if (targetPoint == null)
-                {
                     stateMachine.ChangeState(new Enemy_Idle(enemy, stateMachine, waypointService));
                     return;
                 }

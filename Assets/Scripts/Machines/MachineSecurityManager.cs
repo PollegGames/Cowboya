@@ -30,6 +30,7 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (guard == null || guards.Contains(guard))
             return;
+        Debug.Log($"Registering guard: {guard.name}");
         guards.Add(guard);
     }
 
@@ -51,6 +52,7 @@ public class MachineSecurityManager : MonoBehaviour
 
     private void DispatchGuard(FactoryMachine machine)
     {
+        Debug.Log($"Dispatching guard for machine: {machine.name}");
         if (machine == null || guards.Count == 0)
             return;
 

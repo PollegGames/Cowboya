@@ -26,9 +26,10 @@ public class StationReservationService : MonoBehaviour
         if (machine == null || machines.Contains(machine)) return;
         machines.Add(machine);
         machineRoles[machine] = role;
-        machine.OnFreed += HandleMachineFreed;
+        machine.OnRobotFreed += HandleMachineFreed;
         machine.OnRobotAssigned += HandleMachineOccupied;
         machine.OnPoweredOff += HandleMachinePoweredOff;
+        machine.OnPoweredOn += HandleMachinePoweredOn;
         if (machine.IsOn && !machine.IsOccupied)
             available[role].Add(machine);
     }
@@ -49,9 +50,12 @@ public class StationReservationService : MonoBehaviour
 
     private void HandleMachinePoweredOff(BaseMachine machine)
     {
-        var role = machineRoles[machine];
-        available[role].Remove(machine);
-        OnMachinePoweredOff?.Invoke(machine);
+        NotifyPowerChanged(machine, false);
+    }
+
+    private void HandleMachinePoweredOn(BaseMachine machine)
+    {
+        NotifyPowerChanged(machine, true);
     }
 
     public void NotifyPowerChanged(BaseMachine machine, bool isOn)

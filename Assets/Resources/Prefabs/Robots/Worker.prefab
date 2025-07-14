@@ -332,7 +332,7 @@ MonoBehaviour:
   points: {fileID: 7353721863927515775}
   poles: {fileID: 5653714254752795455}
   stateMachine: {fileID: 9201182588516880390}
-  memoryComponent: {fileID: 0}
+  memoryComponent: {fileID: 8505160515933744807}
   robotBehaviour: {fileID: 340242974285803334}
   arrivalThresholdX: 0.5
   arrivalThresholdY: 2

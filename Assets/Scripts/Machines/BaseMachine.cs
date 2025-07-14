@@ -1,8 +1,14 @@
 using UnityEngine;
 using System;
-
+public enum MachineType
+{
+    WorkStation,
+    RestStation,
+    SecurityMachine,
+}
 public abstract class BaseMachine : MonoBehaviour
 {
+    [SerializeField] private MachineType machineType;
     [SerializeField] protected bool isOn = true;
     [SerializeField] protected bool isOccupied = false;
     [SerializeField] protected BoxCollider2D trigger;
@@ -11,18 +17,41 @@ public abstract class BaseMachine : MonoBehaviour
     public bool IsOccupied => isOccupied;
 
     public event Action<BaseMachine> OnRobotAssigned;
-    public event Action<BaseMachine> OnFreed;
+    public event Action<BaseMachine> OnRobotFreed;
+    public event Action<BaseMachine> OnPoweredOn;
     public event Action<BaseMachine> OnPoweredOff;
 
-    protected virtual void Awake()
+    protected IWaypointService waypointService;
+    public MachineType Type => machineType;    protected virtual void Awake()
     {
         if (trigger == null)
             trigger = GetComponentInChildren<BoxCollider2D>();
     }
 
+    public void Initialize(IWaypointService service)
+    {
+        waypointService = service;
+    }
+
+    /// <summary>
+    /// Sets the machine's on/off state and updates the material.
+    /// </summary>
+    public void SetState(bool on)
+    {
+        if (on)
+            PowerOn();
+        else
+            PowerOff();
+    }
+
+    /// <summary>
+    /// Toggles the machine state.
+    /// </summary>
+    public void ToggleState() => SetState(!isOn);
     public virtual void PowerOn()
     {
         isOn = true;
+        OnPoweredOn?.Invoke(this);
     }
 
     public virtual void PowerOff()
@@ -41,6 +70,6 @@ public abstract class BaseMachine : MonoBehaviour
     public virtual void ReleaseRobot()
     {
         isOccupied = false;
-        OnFreed?.Invoke(this);
+        OnRobotFreed?.Invoke(this);
     }
 }

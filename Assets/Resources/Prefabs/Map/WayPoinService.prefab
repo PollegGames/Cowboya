@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 604041955278505729}
   - component: {fileID: -5462409205980452977}
   - component: {fileID: -6827164659556106694}
-  - component: {fileID: -4335620136771677527}
   m_Layer: 0
   m_Name: WayPoinService
   m_TagString: Untagged
@@ -49,7 +48,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   registryBehaviour: {fileID: -5462409205980452977}
   pathFinderBehaviour: {fileID: -6827164659556106694}
-  reservationServiceBehaviour: {fileID: -4335620136771677527}
 --- !u!114 &-5462409205980452977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,19 +70,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cad562aada298c4182587dc02763a35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  registryBehaviour: {fileID: -5462409205980452977}
---- !u!114 &-4335620136771677527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 502773755664635899}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14f347e07e12a254782e0f2828263024, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   registryBehaviour: {fileID: -5462409205980452977}
