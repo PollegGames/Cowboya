@@ -17,5 +17,5 @@ MonoBehaviour:
   poiCount: 2
   blockedCount: 1
   workersCount: 2
-  enemiesCount: 2
+  enemiesCount: 1
   seed: 85606

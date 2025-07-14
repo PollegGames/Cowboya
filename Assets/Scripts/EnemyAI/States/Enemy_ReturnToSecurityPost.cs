@@ -20,6 +20,7 @@ public class Enemy_ReturnToSecurityPost : EnemyState
 
     public override void EnterState()
     {
+        enemy.EnemyStatus = EnemyStatus.GoingToSecurityPost;
         hasArrived = false;
         if (targetPoint == null)
         {

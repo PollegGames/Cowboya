@@ -18,6 +18,7 @@ public class Enemy_Idle : EnemyState
 
     public override void EnterState()
     {
+        enemy.EnemyStatus = EnemyStatus.Idle;
         hasArrived = false;
         originPoint = null;
     }
@@ -36,7 +37,6 @@ public class Enemy_Idle : EnemyState
             // On fixe la destination au dernier point visité
             enemy.SetDestination(originPoint);
 
-            Debug.Log($"[Enemy_Idle] Moving to idle origin at {originPoint.WorldPos}");
         }
 
         if (hasArrived) return;
@@ -47,20 +47,18 @@ public class Enemy_Idle : EnemyState
             hasArrived = true;
             enemy.SetMovement(0f);
             enemy.SetVerticalMovement(0f);
-            Debug.Log("[Enemy_Idle] Arrived at origin, stopping movement.");
 
             // Si l'ennemi s'est trop éloigné du point d'origine, on réinitialise l'état Idle
             float distFromOrigin = Vector3.Distance(enemy.transform.position, originPoint.WorldPos);
             if (distFromOrigin > idleRadius)
             {
-                Debug.Log($"[Enemy_Idle] Distance {distFromOrigin} > idleRadius {idleRadius}, retrying Idle state.");
-                stateMachine.ChangeState(new Enemy_Idle(enemy, stateMachine, waypointService, idleRadius));
+                hasArrived = false;
+                originPoint = null;
             }
         }
     }
 
     public override void ExitState()
     {
-        Debug.Log("[Enemy_Idle] Exiting Idle state.");
     }
 }

@@ -24,10 +24,12 @@ public class Enemy_ReactivateMachine : EnemyState
 
     public override void EnterState()
     {
+        enemy.EnemyStatus = EnemyStatus.ReactivatingMachine;
         Debug.Log($"Entering ReactivateMachine state for {targetMachine.name}");
         hasArrived = false;
         if (targetMachine == null)
         {
+            Debug.LogError("Target machine is null, cannot reactivate.");
             stateMachine.ChangeState(new Enemy_Idle(enemy, stateMachine, waypointService));
             return;
         }
@@ -40,6 +42,7 @@ public class Enemy_ReactivateMachine : EnemyState
         if (hasArrived) return;
         if (enemy.HasArrivedAtDestination())
         {
+            Debug.Log($"Machine {targetMachine.name} reactivated by {enemy.name}");
             hasArrived = true;
             enemy.SetMovement(0f);
             enemy.SetVerticalMovement(0f);

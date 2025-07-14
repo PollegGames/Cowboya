@@ -155,7 +155,6 @@
     <Compile Include="Assets\Scripts\UI\EnergyBar.cs" />
     <Compile Include="Assets\Scripts\Map\FactoryAlarmStatus.cs" />
     <Compile Include="Assets\Scripts\Map\WaypointPathFinder.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_MoveToPOICell.cs" />
     <Compile Include="Assets\Scripts\Game\TeleportToBaseCamp.cs" />
     <Compile Include="Assets\Scripts\Map\WaypointRegistry.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\LiftShaftController.cs" />
@@ -174,7 +173,6 @@
     <Compile Include="Assets\Scripts\RobotFactory\RobotFactory.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointNotifier.cs" />
     <Compile Include="Assets\Scripts\Navigation\CellProcessor.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_WaitBeforeGoingToPOI.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshZSkew.cs" />
     <Compile Include="Assets\Scripts\Machines\SecuritySlot.cs" />
     <Compile Include="Assets\Scripts\Machines\FactoryMachine.cs" />
@@ -185,7 +183,6 @@
     <Compile Include="Assets\Scripts\Robots\IgnoreCollision.cs" />
     <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />
     <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_SecurityCheck.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\IPlayerInput.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotTemplate.cs" />

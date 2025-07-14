@@ -18,3 +18,16 @@ public abstract class EnemyState
     public abstract void UpdateState();
     public abstract void ExitState();
 }
+
+public enum EnemyStatus
+{
+    ReadyToCheckSecurity,
+    CheckingSecurity,
+    GoingToSecurityPost,
+    GoingToRest,
+    Idle,
+    Resting,
+    GoingToStartRoom,
+    Saved,
+    ReactivatingMachine
+}

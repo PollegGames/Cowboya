@@ -13,4 +13,5 @@ public interface IFactoryManager
     void OnRobotKilled();
     GameObject playerInstance { get; }
     Transform playerHeadTransform { get; }
+    MachineSecurityManager SecurityManager { get; }
 }

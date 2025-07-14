@@ -16,6 +16,7 @@ public class Enemy_SecurityGuardRest : EnemyState
 
     public override void EnterState()
     {
+        enemy.EnemyStatus = EnemyStatus.Resting;
         _timer = 0f;
         moving = false;
         enemy.SetMovement(0f);

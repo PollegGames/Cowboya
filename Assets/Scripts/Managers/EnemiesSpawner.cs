@@ -16,12 +16,18 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     private List<GameObject> spawnedEnemies = new List<GameObject>();
     private GameUIViewModel gameUIViewModel;
 
-    public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService)
+    public void Initialize(
+        MapManager mapManager,
+        IWaypointService waypointService,
+        GameUIViewModel viewModel,
+        IRobotRespawnService respawnService,
+        MachineSecurityManager securityManager)
     {
         this.waypointService = waypointService;
         this.mapManager = mapManager;
         this.gameUIViewModel = viewModel;
         this.respawnService = respawnService;
+        this.securityManager = securityManager;
 
         if (respawnService is RobotRespawnService service)
             service.Initialize(this);
@@ -134,11 +140,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             var guardAI = enemy.GetComponent<SecurityGuardAI>();
             guardAI?.Initialize(waypointService, securityManager);
 
-            if (spawnPos.type == WaypointType.Rest)
-            {
-                var sm = enemy.GetComponent<EnemyStateMachine>();
-                sm?.ChangeState(new Enemy_SecurityGuardRest(ec, sm, waypointService));
-            }
             // release the reservation so the point can be reused later
             waypointService.ReleasePOI(spawnPos);
 

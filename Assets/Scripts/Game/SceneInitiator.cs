@@ -80,7 +80,7 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeEnemies()
     {
-        enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService);
+        enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager );
         enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
         enemiesSpawner?.CreateEnemy(mapConfig.enemiesCount);
         enemiesSpawner?.SpreadEnemies();

@@ -25,6 +25,7 @@ public class EnemyController : PhysicsBaseAgentController
     [SerializeField] private EnemyPunchAttack punchAttack;
 
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
+    public EnemyStatus EnemyStatus { get; set; } = EnemyStatus.Idle;
 
     protected override void Awake()
     {

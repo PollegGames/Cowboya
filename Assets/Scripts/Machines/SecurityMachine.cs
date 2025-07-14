@@ -49,7 +49,7 @@ public class SecurityMachine : BaseMachine
         }
 
         SendGuardToRest(currentGuard);
-        SetGuardToCheck(guard);
+        SetGuardToSecurityPost(guard);
         currentGuard = guard;
         base.AttachRobot(robot);
     }
@@ -68,11 +68,11 @@ public class SecurityMachine : BaseMachine
         sm?.ChangeState(new Enemy_SecurityGuardRest(guard, sm, waypointService));
     }
 
-    private void SetGuardToCheck(EnemyController guard)
+    private void SetGuardToSecurityPost(EnemyController guard)
     {
         if (guard == null) return;
         var sm = guard.GetComponent<EnemyStateMachine>();
-        sm?.ChangeState(new Enemy_SecurityCheck(guard, sm, waypointService));
+        sm?.ChangeState(new Enemy_Idle(guard, sm, waypointService));
     }
 
     private void SendCurrentGuardToRest()
