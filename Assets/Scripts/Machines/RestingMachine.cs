@@ -8,12 +8,6 @@ public class RestingMachine : BaseMachine
 
     private MeshRenderer meshRenderer;
     private EnemyWorkerController currentWorker;
-    private IWaypointService waypointService;
-
-    public void Initialize(IWaypointService service)
-    {
-        waypointService = service;
-    }
 
     protected override void Awake()
     {
@@ -57,8 +51,7 @@ public class RestingMachine : BaseMachine
         SendWorkerToWork(currentWorker);
         SendWorkerToRest(worker);
         currentWorker = worker;
-        isOccupied = true;
-        OnRobotAssigned?.Invoke(this);
+        base.AttachRobot(robot);
     }
 
     public override void ReleaseRobot()

@@ -5,6 +5,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
 {
     [SerializeField] private GameObject workerPrefab;
     [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObject bossPrefab;
     [SerializeField] private Transform enemiesParent;
     // Expose enemies count via public property
     private MapManager mapManager;
@@ -15,13 +16,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     private List<GameObject> spawnedEnemies = new List<GameObject>();
     private GameUIViewModel gameUIViewModel;
 
-    public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService, MachineSecurityManager securityManager)
+    public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService)
     {
         this.waypointService = waypointService;
         this.mapManager = mapManager;
         this.gameUIViewModel = viewModel;
         this.respawnService = respawnService;
-        this.securityManager = securityManager;
 
         if (respawnService is RobotRespawnService service)
             service.Initialize(this);
@@ -68,7 +68,24 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             enemy.SetActive(false);
             spawnedEnemies.Add(enemy);
         }
-        Debug.Log($"{enemiesToSpawn} boss created.");
+        Debug.Log($"{enemiesToSpawn} enemies created.");
+    }
+
+    public void CreateBoss()
+    {
+        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
+
+        var boss = Instantiate(bossPrefab,
+                Vector3.zero,
+                Quaternion.identity,
+                enemiesParent);
+
+        var robotState = boss.GetComponent<RobotStateController>();
+        robotState.Stats = enemyRobotFactory.CreateRobot();
+        robotState.Stats.RobotName = "BOSS 1";
+        boss.SetActive(false);
+        spawnedEnemies.Add(boss);
+        Debug.Log($"Boss created.");
     }
 
 
@@ -92,50 +109,18 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = worker.GetComponent<EnemyWorkerController>();
             ec.Initialize(waypointService, waypointService, respawnService);
-            // release the reservation so the point can be reused later
-            waypointService.ReleasePOI(spawnPos);
-
-            Debug.Log($"Worker spread to {spawnPos} and initialized");
+            ec.memory.SetLastVisitedPoint(spawnPos);
+            Debug.Log($"Worker spread to {spawnPos.WorldPos} and initialized");
         }
 
-        // Collect all free security waypoints first
-        var securityPoints = new List<RoomWaypoint>();
-        while (true)
-        {
-            var sec = waypointService.GetFirstFreeSecurityPoint();
-            if (sec == null || sec.type != WaypointType.Security)
-            {
-                // Release fallback point and stop collecting
-                if (sec != null && sec.type != WaypointType.Security)
-                    waypointService.ReleasePOI(sec);
-                break;
-            }
-            securityPoints.Add(sec);
-        }
 
-        int securityIndex = 0;
 
         //enemies
         for (int i = 0; i < spawnedEnemies.Count; i++)
         {
             var enemy = spawnedEnemies[i];
             // 1) pick & apply a real spawn position
-            RoomWaypoint spawnPos;
-            if (i == 0)
-            {
-                //the boss always spawns at the end point
-                spawnPos = waypointService.GetEndPoint();
-            }
-            else if (securityIndex < securityPoints.Count)
-            {
-                // fill all collected security points first
-                spawnPos = securityPoints[securityIndex++];
-            }
-            else
-            {
-                // remaining guards go to rest points
-                spawnPos = waypointService.GetFirstRestPoint();
-            }
+            RoomWaypoint spawnPos = waypointService.GetSecurityOrRestPoint();
 
             enemy.transform.position = spawnPos.WorldPos;
 
@@ -145,6 +130,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = enemy.GetComponent<EnemyController>();
             ec.Initialize(waypointService, waypointService, respawnService);
+            ec.memory.SetLastVisitedPoint(spawnPos);
             var guardAI = enemy.GetComponent<SecurityGuardAI>();
             guardAI?.Initialize(waypointService, securityManager);
 
@@ -159,9 +145,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             Debug.Log($"Enemy spread to {spawnPos} and initialized");
         }
 
-        // release any unused reserved security points
-        for (int j = securityIndex; j < securityPoints.Count; j++)
-            waypointService.ReleasePOI(securityPoints[j]);
     }
 
     /// <summary>

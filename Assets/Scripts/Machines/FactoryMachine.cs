@@ -1,57 +1,27 @@
 using UnityEngine;
 using System;
 
-public enum MachineType
-{
-    WorkStation,
-    RestStation,
-    SecurityStation,
-}
+
 
 [RequireComponent(typeof(MeshRenderer))]
 public class FactoryMachine : BaseMachine
 {
-    [SerializeField] private MachineType machineType;
     [SerializeField] private Material materialOn;
     [SerializeField] private Material materialOff;
 
     private MeshRenderer meshRenderer;
-    private EnemyWorkerController currentWorker;
-    private IWaypointService waypointService;
 
     public event Action<FactoryMachine, bool> OnMachineStateChanged;
+    private EnemyWorkerController currentWorker;
 
-    public bool IsOn => isOn;
     public bool HasWorker => currentWorker != null;
     public EnemyWorkerController CurrentWorker => currentWorker;
-    public MachineType Type => machineType;
-
-    public void Initialize(IWaypointService service)
+    protected override void Awake()
     {
-        waypointService = service;
-    }
-
-    private void Awake()
-    {
+        base.Awake();
         meshRenderer = GetComponent<MeshRenderer>();
         ApplyMaterial();
     }
-
-    /// <summary>
-    /// Sets the machine's on/off state and updates the material.
-    /// </summary>
-    public void SetState(bool on)
-    {
-        if (on)
-            PowerOn();
-        else
-            PowerOff();
-    }
-
-    /// <summary>
-    /// Toggles the machine state.
-    /// </summary>
-    public void ToggleState() => SetState(!isOn);
 
     public override void PowerOn()
     {
@@ -98,7 +68,7 @@ public class FactoryMachine : BaseMachine
             currentWorker = null;
             SendWorkerToRest(newWorker);
         }
-        else if (machineType == MachineType.WorkStation)
+        else if (Type == MachineType.WorkStation)
         {
             // Send existing worker to rest before assigning new
             SendWorkerToRest(currentWorker);
@@ -117,8 +87,7 @@ public class FactoryMachine : BaseMachine
         }
 
         waypointService?.ReleaseMachine(this);
-        isOccupied = true;
-        OnRobotAssigned?.Invoke(this);
+        base.AttachRobot(robot);
     }
 
     /// <summary>
