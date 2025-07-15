@@ -21,6 +21,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
 
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
 
+    public bool IsWorkerSpawner { get; private set; }
+
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
 
     private void Awake()
@@ -51,12 +53,14 @@ public class EnemyWorkerController : AnimatorBaseAgentController
 
     public void SetWorkerState()
     {
+        IsWorkerSpawner = false;
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
     public void SetWorkerSpawnerState()
     {
-        stateMachine.ChangeState(new Worker_Spawning(this, stateMachine, (IWaypointService)waypointQueries));
+        IsWorkerSpawner = true;
+        stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
     protected override void Update()

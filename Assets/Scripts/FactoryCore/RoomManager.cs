@@ -29,6 +29,7 @@ public class RoomManager : MonoBehaviour
         FactoryManager factoryManager,
         MachineWorkerManager machineWorkerManager,
         MachineSecurityManager machineSecurityManager,
+        SpawningWorkerManager spawningWorkerManager,
         IEnemiesSpawner enemiesSpawner)
     {
         FactoryManager = factoryManager;
@@ -52,11 +53,13 @@ public class RoomManager : MonoBehaviour
         // 4) hook up alarm + triggers
         factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
 
-        // 5) add the spawner to the spawning machines
-        if (enemiesSpawner != null){
+        // 5) register spawning machines
+        if (enemiesSpawner != null)
+        {
             foreach (var spawningMachine in spawningMachinesInRoom)
             {
                 spawningMachine.Initialize(enemiesSpawner);
+                spawningWorkerManager?.RegisterMachine(spawningMachine);
             }
         }
 

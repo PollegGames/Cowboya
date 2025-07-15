@@ -149,13 +149,14 @@ public class MapManager : MonoBehaviour
         FactoryManager factoryManager,
         MachineWorkerManager machineWorkerManager,
         MachineSecurityManager machineSecurityManager,
+        SpawningWorkerManager spawningWorkerManager,
         IEnemiesSpawner enemiesSpawner)
     {
         foreach (var roomGO in roomInstances.Values)
         {
             var rm = roomGO.GetComponent<RoomManager>();
             if (rm != null)
-                rm.Initialize(factoryManager, machineWorkerManager, machineSecurityManager,enemiesSpawner);
+                rm.Initialize(factoryManager, machineWorkerManager, machineSecurityManager, spawningWorkerManager, enemiesSpawner);
         }
     }
 

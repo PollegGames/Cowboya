@@ -30,7 +30,10 @@ public class Worker_Idle : WorkerState
             Debug.Log($"[Idle] {IDLE_DURATION} seconds elapsed → moving to next POI.");
             var returnPoint = enemy.memory.LastVisitedPoint;
             waypointService.ReleasePOI(returnPoint);
-            stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(enemy, stateMachine, waypointService));
+            if (enemy.IsWorkerSpawner)
+                stateMachine.ChangeState(new Worker_GoingToSpawningMachine(enemy, stateMachine, waypointService));
+            else
+                stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(enemy, stateMachine, waypointService));
         }
     }
 
