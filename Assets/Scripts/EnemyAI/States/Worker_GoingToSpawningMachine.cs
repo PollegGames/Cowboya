@@ -1,0 +1,53 @@
+using UnityEngine;
+
+/// <summary>
+/// Moves a worker spawner to its reserved spawning machine then
+/// switches to <see cref="Worker_Spawning"/>.
+/// </summary>
+public class Worker_GoingToSpawningMachine : WorkerState
+{
+    private RoomWaypoint targetPoint;
+    private SpawningMachine reservedMachine;
+    private bool hasArrived;
+
+    public Worker_GoingToSpawningMachine(EnemyWorkerController enemy,
+                                         WorkerStateMachine machine,
+                                         IWaypointService waypointService)
+        : base(enemy, machine, waypointService)
+    {
+    }
+
+    public override void EnterState()
+    {
+        enemy.workerState = WorkerStatus.GoingToSpawningMachine;
+        reservedMachine = StationReservationService.Instance?.ReserveStation(RobotRole.WorkerSpawner) as SpawningMachine;
+        if (reservedMachine == null)
+        {
+            Debug.LogWarning("[GoingToSpawningMachine] No spawning machine available.");
+            stateMachine.ChangeState(new Worker_Idle(enemy, stateMachine, waypointService));
+            return;
+        }
+
+        targetPoint = waypointService.GetClosestWaypoint(reservedMachine.transform.position);
+        enemy.SetDestination(targetPoint);
+        hasArrived = false;
+    }
+
+    public override void UpdateState()
+    {
+        if (hasArrived) return;
+
+        if (enemy.HasArrivedAtDestination())
+        {
+            hasArrived = true;
+            enemy.SetMovement(0f);
+            enemy.SetVerticalMovement(0f);
+            enemy.memory.SetLastVisitedPoint(targetPoint);
+
+            reservedMachine.AttachRobot(enemy.gameObject);
+            stateMachine.ChangeState(new Worker_Spawning(enemy, stateMachine, waypointService));
+        }
+    }
+
+    public override void ExitState() { }
+}

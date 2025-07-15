@@ -29,5 +29,6 @@ public enum WorkerStatus
     Resting,
     GoingToStartRoom,
     Saved,
-    Spawning
+    Spawning,
+    GoingToSpawningMachine
 }

@@ -8,6 +8,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     [SerializeField] public FactoryAlarmStatus factoryAlarmStatus;
     [SerializeField] private MachineWorkerManager machineWorkerManager;
     [SerializeField] private MachineSecurityManager machineSecurityManager;
+    [SerializeField] private SpawningWorkerManager spawningWorkerManager;
 
     public MachineSecurityManager SecurityManager => machineSecurityManager;
 
@@ -26,7 +27,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         this.waypointService = waypointService;
         this.victorySetup = victorySetup;
         mapManager.InitializeGrid();
-        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager,enemiesSpawner);
+        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager, spawningWorkerManager, enemiesSpawner);
         waypointService.BuildAllNeighbors();
         SetupFactoryState();
     }

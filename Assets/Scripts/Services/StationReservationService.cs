@@ -30,6 +30,8 @@ public class StationReservationService : MonoBehaviour
         machine.OnRobotAssigned += HandleMachineOccupied;
         machine.OnPoweredOff += HandleMachinePoweredOff;
         machine.OnPoweredOn += HandleMachinePoweredOn;
+        if (!available.ContainsKey(role))
+            available[role] = new List<BaseMachine>();
         if (machine.IsOn && !machine.IsOccupied)
             available[role].Add(machine);
     }

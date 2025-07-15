@@ -1,5 +1,6 @@
 public enum RobotRole
 {
     Worker,
-    SecurityGuard
+    SecurityGuard,
+    WorkerSpawner
 }
