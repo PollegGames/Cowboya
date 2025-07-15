@@ -50,6 +50,7 @@ public class Worker_GoingToRestStation : WorkerState
             enemy.SetVerticalMovement(0f);
 
             enemy.memory.SetLastVisitedPoint(targetPoint);
+            enemy.workerState = WorkerStatus.ReadyToRest;
             stateMachine.ChangeState(new Worker_Resting(enemy, stateMachine, waypointService));
 
         }
