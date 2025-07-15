@@ -19,6 +19,9 @@ public class IRobotNavigationListenerTests
     [Test]
     public void OnPathObsoleted_CalledOnChange()
     {
-        // TODO: Assert path obsolete handling
+        var waypointGO = new GameObject();
+        var waypoint = waypointGO.AddComponent<RoomWaypoint>();
+
+        Assert.DoesNotThrow(() => _listener.OnPathObsoleted(waypoint));
     }
 }

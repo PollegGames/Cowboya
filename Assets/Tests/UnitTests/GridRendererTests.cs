@@ -15,6 +15,14 @@ public class GridRendererTests
     [Test]
     public void Render_CreatesInstances()
     {
-        // TODO: Assert rendering
+        var cells = new Dictionary<Vector2, Cell>
+        {
+            { Vector2.zero, new Cell(Vector2.zero) }
+        };
+
+        var result = _renderer.Render(cells, Vector2.one, Vector3.zero, new GameObject());
+
+        Assert.AreEqual(1, result.Count);
+        Assert.IsTrue(result.ContainsKey(Vector2.zero));
     }
 }

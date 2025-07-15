@@ -20,12 +20,16 @@ public class SecurityGuardRestTests
     [Test]
     public void NoSecurityPoints_FallbackToRestPoint()
     {
-        // TODO: Assert rest point fallback logic
+        var state = new Enemy_SecurityGuardRest(_enemy, _stateMachine, _waypointService);
+        state.EnterState();
+        Assert.AreEqual(EnemyStatus.Resting, _enemy.EnemyStatus);
     }
 
     [Test]
     public void NoRestPoints_FallbackToStartPoint()
     {
-        // TODO: Assert start point fallback logic
+        var state = new Enemy_SecurityGuardRest(_enemy, _stateMachine, _waypointService);
+        state.EnterState();
+        Assert.AreEqual(EnemyStatus.Resting, _enemy.EnemyStatus);
     }
 }

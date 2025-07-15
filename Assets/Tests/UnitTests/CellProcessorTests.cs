@@ -21,6 +21,6 @@ public class CellProcessorTests
     [Test]
     public void ProcessCells_Implemented()
     {
-        // TODO: Assert processing
+        Assert.DoesNotThrow(() => _processor.ProcessCells(new Dictionary<Vector2, Cell>()));
     }
 }
