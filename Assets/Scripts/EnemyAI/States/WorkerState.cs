@@ -21,6 +21,7 @@ public abstract class WorkerState
 public enum WorkerStatus
 {
     ReadyToWork,
+    ReadyToRest,
     Working,
     GoingToWork,
     GoingToRest,
