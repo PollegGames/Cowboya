@@ -14,6 +14,8 @@ public class CellTests
     [Test]
     public void Constructor_InitializesValues()
     {
-        // TODO: Assert cell initialization
+        Assert.AreEqual(Vector2.zero, _cell.position);
+        Assert.IsNotNull(_cell.cellProperties);
+        Assert.AreEqual(int.MaxValue, _cell.gCost);
     }
 }

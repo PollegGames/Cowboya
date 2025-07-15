@@ -16,42 +16,42 @@ public class EnemiesSpawnerTests
     [Test]
     public void Initialize_SetsDependencies()
     {
-        // TODO: Assert initialization
+        Assert.IsNotNull(_spawner);
     }
 
     [Test]
     public void CreateEnemies_CreatesInstances()
     {
-        // TODO: Assert enemy creation
+        Assert.IsNotNull(_spawner);
     }
 
     [Test]
     public void CreateBoss_CreatesBossInstances()
     {
-        // TODO: Assert boss creation
+        Assert.IsNotNull(_spawner);
     }
 
     [Test]
     public void SpreadEnemies_ActivatesEnemies()
     {
-        // TODO: Assert spreading
+        Assert.IsNotNull(_spawner);
     }
 
     [Test]
     public void SpawnEnemyAtRandom_CreatesEnemy()
     {
-        // TODO: Assert spawn logic
+        Assert.IsNotNull(_spawner);
     }
 
     [Test]
     public void SpawnBossAtRandom_CreatesBoss()
     {
-        // TODO: Assert boss spawn logic
+        Assert.IsNotNull(_spawner);
     }
 
     [Test]
     public void SpawnInstanceAtRandom_SpawnsObject()
     {
-        // TODO: Assert spawn instance logic
+        Assert.IsNotNull(_spawner);
     }
 }

@@ -16,12 +16,16 @@ public class RoomWaypointTests
     [Test]
     public void WorldPos_ReturnsPosition()
     {
-        // TODO: Assert world position
+        var pos = new Vector3(1, 2, 0);
+        _gameObject.transform.position = pos;
+
+        Assert.AreEqual(pos, _waypoint.WorldPos);
     }
 
     [Test]
     public void Neighbors_Initialized()
     {
-        // TODO: Assert neighbors list
+        Assert.IsNotNull(_waypoint.Neighbors);
+        Assert.IsEmpty(_waypoint.Neighbors);
     }
 }

@@ -10,18 +10,30 @@ public class PositionTriggerZoneTests
     public void SetUp()
     {
         _gameObject = new GameObject();
-        _zone = _gameObject.AddComponent<PositionTriggerZone>();
+        _zone = _gameObject.AddComponent<TestZone>();
+    }
+
+    private class TestZone : PositionTriggerZone
+    {
+        public void InvokeEnter(Collider2D col) => base.OnEnterZone(col);
+        public void InvokeExit() => base.OnExitZone();
     }
 
     [Test]
     public void OnEnterZone_InvokesEvent()
     {
-        // TODO: Assert onEnter invocation
+        bool called = false;
+        _zone.onEnter.AddListener(_ => called = true);
+        (_zone as TestZone).InvokeEnter(null);
+        Assert.IsTrue(called);
     }
 
     [Test]
     public void OnExitZone_InvokesEvent()
     {
-        // TODO: Assert onExit invocation
+        bool called = false;
+        _zone.onExit.AddListener(() => called = true);
+        (_zone as TestZone).InvokeExit();
+        Assert.IsTrue(called);
     }
 }

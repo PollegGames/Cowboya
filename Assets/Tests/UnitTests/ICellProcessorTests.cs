@@ -20,6 +20,6 @@ public class ICellProcessorTests
     [Test]
     public void ProcessCells_ProcessesData()
     {
-        // TODO: Assert cell processing
+        Assert.DoesNotThrow(() => _processor.ProcessCells(new Dictionary<Vector2, Cell>()));
     }
 }
