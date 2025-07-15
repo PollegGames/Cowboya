@@ -22,7 +22,14 @@ public class Worker_GoingToRestStation : WorkerState
     public override void EnterState()
     {
         enemy.workerState = WorkerStatus.GoingToRest;
+        // Try to find a rest point, excluding the last one visited to
+        // encourage some variety. However if this yields no result (for
+        // example when there is only one rest station in the map), retry
+        // without the exclusion so the worker can reuse the same point.
         targetPoint = waypointService.GetFirstRestPoint(enemy.memory.LastVisitedPoint);
+        if (targetPoint == null)
+            targetPoint = waypointService.GetFirstRestPoint();
+
         if (targetPoint == null)
         {
             Debug.LogWarning("[GoingToRestStation] No rest point found. Returning to start room.");
