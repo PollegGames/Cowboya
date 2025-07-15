@@ -58,6 +58,21 @@ public class EnemyController : PhysicsBaseAgentController
         stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
+    public void SetSecurityGuardState()
+    {
+        stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, (IWaypointService)waypointQueries));
+    }
+
+    public void SetFollowerState(FactoryAlarmStatus factoryAlarmStatus)
+    {
+        stateMachine.ChangeState(new Enemy_Follower(this, stateMachine, (IWaypointService)waypointQueries, factoryAlarmStatus));
+    }
+
+    public void SetState(EnemyState newState)
+    {
+        stateMachine.ChangeState(newState);
+    }
+
     private void Update()
     {
         if (updateLoop == UpdateLoop.Update)

@@ -17,6 +17,8 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private List<RoomWaypoint> waypoints;
     public List<FactoryMachine> factorymMachinesInRoom = new();
     public List<RestingMachine> restingMachinesInRoom = new();
+    public List<SecurityMachine> securityMachinesInRoom = new();
+    public List<SpawningMachine> spawningMachinesInRoom = new();
 
     public IWaypointService waypointService;
 
@@ -26,7 +28,8 @@ public class RoomManager : MonoBehaviour
     public void Initialize(
         FactoryManager factoryManager,
         MachineWorkerManager machineWorkerManager,
-        MachineSecurityManager machineSecurityManager)
+        MachineSecurityManager machineSecurityManager,
+        IEnemiesSpawner enemiesSpawner)
     {
         FactoryManager = factoryManager;
 
@@ -48,6 +51,14 @@ public class RoomManager : MonoBehaviour
 
         // 4) hook up alarm + triggers
         factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
+
+        // 5) add the spawner to the spawning machines
+        if (enemiesSpawner != null){
+            foreach (var spawningMachine in spawningMachinesInRoom)
+            {
+                spawningMachine.Initialize(enemiesSpawner);
+            }
+        }
 
     }
 

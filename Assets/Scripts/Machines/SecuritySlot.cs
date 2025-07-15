@@ -8,7 +8,7 @@ public class SecuritySlot : MonoBehaviour
     {
         var guard = collision.GetComponentInParent<EnemyController>();
         if (guard == null) return;
-        if (guard.EnemyStatus == EnemyStatus.Idle)
+        if (guard.EnemyStatus == EnemyStatus.ReadyToCheckSecurity)
         {
             securityMachine.AttachRobot(guard.gameObject);
         }

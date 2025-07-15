@@ -20,6 +20,8 @@ public class FactoryAlarmStatus : ScriptableObject
     }
 
     public event Action<AlarmState> OnAlarmStateChanged;
+
+    public Vector3 LastPlayerPosition { get; set; }
 }
 
 public enum AlarmState

@@ -1,35 +1,29 @@
 using UnityEngine;
 
 /// <summary>
-/// Exemple d'implémentation d'un état simple : Idle (stationnaire) avec un rayon limite
-/// pour éviter les boucles infinies.
+/// Exemple d'implémentation d'un état simple : Work (stationnaire).
 /// </summary>
-public class Enemy_Idle : EnemyState
+public class Worker_Spawning : WorkerState
 {
     private bool hasArrived;
-    private readonly float idleRadius = 2f;// Rayon d'indulgence
+    private readonly float idleRadius = 2f;// Rayon d'indulgence      
     private RoomWaypoint originPoint;
-
-    public Enemy_Idle(EnemyController enemy, EnemyStateMachine machine, IWaypointService waypointService)
-        : base(enemy, machine, waypointService)
+    public Worker_Spawning(EnemyWorkerController enemy,
+                                    WorkerStateMachine machine,
+                                    IWaypointService waypointService)
+      : base(enemy, machine, waypointService)
     {
     }
 
     public override void EnterState()
     {
-        enemy.EnemyStatus = EnemyStatus.Idle;
+        enemy.workerState = WorkerStatus.Spawning;
         hasArrived = false;
         originPoint = null;
     }
 
     public override void UpdateState()
     {
-        // Priorité : passer en attaque si le joueur est connu et qu'on a été attaqué
-        if (enemy.memory.LastKnownPlayerPosition != Vector3.zero && enemy.memory.WasRecentlyAttacked)
-        {
-            stateMachine.ChangeState(new Enemy_AttackPlayer(enemy, stateMachine, waypointService, this));
-            return;
-        }
         if (originPoint == null && enemy.memory.LastVisitedPoint != null)
         {
             originPoint = enemy.memory.LastVisitedPoint;
@@ -59,5 +53,6 @@ public class Enemy_Idle : EnemyState
 
     public override void ExitState()
     {
+        // Nettoyage éventuel à la sortie de l'état
     }
 }

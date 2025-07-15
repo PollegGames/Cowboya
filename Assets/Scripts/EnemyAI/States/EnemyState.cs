@@ -29,5 +29,6 @@ public enum EnemyStatus
     Resting,
     GoingToStartRoom,
     Saved,
-    ReactivatingMachine
+    ReactivatingMachine,
+    Following
 }

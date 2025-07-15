@@ -28,5 +28,6 @@ public enum WorkerStatus
     Idle,
     Resting,
     GoingToStartRoom,
-    Saved
+    Saved,
+    Spawning
 }

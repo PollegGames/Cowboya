@@ -9,7 +9,10 @@ public interface IEnemiesSpawner
         IRobotRespawnService respawnService,
         MachineSecurityManager securityManager);
     void CreateWorkers(int workersToSpawn);
-    void CreateEnemy(int enemiesToSpawn);
+    void CreateEnemies(int enemiesToSpawn);
+    void CreateBoss();
+    GameObject CreateAngGetFollowerGuard();
+    void CreateWorkersSpawner(int workersToSpawn);
     void SpreadEnemies();
     void SpawnEnemyAtRandom();
     void SpawnBossAtRandom();

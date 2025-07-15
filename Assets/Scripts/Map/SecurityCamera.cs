@@ -97,9 +97,28 @@ public class SecurityCamera : MonoBehaviour
 
     private void OnSecondaryZoneEnter(Collider2D enemyCollider)
     {
-        if (reportRescueToFactory && roomManager?.FactoryManager != null)
+        // 1) Make sure we have a FactoryAlarmStatus to update
+        var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
+        if (factoryAlarm != null)
         {
-            // SceneController.instance.RobotSaved();
+            // 2) Try get the EnemyController (and its memory) from this collider
+            var ec = enemyCollider.GetComponent<EnemyController>();
+            if (ec != null)
+            {
+                var memory = ec.memory;
+                if (memory != null && memory.WasRecentlyAttacked)
+                {
+                    // 3) If they were recently attacked, raise the alarm
+                    factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
+                    factoryAlarm.LastPlayerPosition = memory.LastKnownPlayerPosition;
+                }
+            }
+
+            // 4) (Optional) your existing rescue-report logic
+            if (reportRescueToFactory)
+            {
+                SceneController.instance.RobotSaved();
+            }
         }
     }
 

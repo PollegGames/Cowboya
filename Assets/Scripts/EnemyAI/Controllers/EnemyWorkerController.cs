@@ -49,6 +49,16 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
+    public void SetWorkerState()
+    {
+        stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
+    }
+
+    public void SetWorkerSpawnerState()
+    {
+        stateMachine.ChangeState(new Worker_Spawning(this, stateMachine, (IWaypointService)waypointQueries));
+    }
+
     protected override void Update()
     {
         base.Update();

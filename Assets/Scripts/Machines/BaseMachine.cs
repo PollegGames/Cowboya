@@ -5,6 +5,7 @@ public enum MachineType
     WorkStation,
     RestStation,
     SecurityMachine,
+    SpawningMachine
 }
 public abstract class BaseMachine : MonoBehaviour
 {

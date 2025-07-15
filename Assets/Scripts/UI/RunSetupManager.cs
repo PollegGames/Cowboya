@@ -29,6 +29,8 @@ public class RunSetupManager : MonoBehaviour
     [SerializeField] private MapManager mapManagerPrefab;
     private MapManager mapManagerInstance;
     [SerializeField] private WaypointService waypointServicePrefab;
+
+    [SerializeField] private IEnemiesSpawner enemiesSpawner;
     private WaypointService waypointServiceInstance;
 
     // =============== Références internes UI
@@ -325,6 +327,8 @@ public class RunSetupManager : MonoBehaviour
         var roomProcessor = mapManagerInstance.gameObject.AddComponent<RoomProcessor>();
         mapManagerInstance.Construct(gridBuilder, roomRenderer, roomProcessor);
         waypointServiceInstance = Instantiate(waypointServicePrefab);
+        enemiesSpawner.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager);
+        
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 
         // 1) Génère la grille       
@@ -332,7 +336,7 @@ public class RunSetupManager : MonoBehaviour
             mapManagerInstance.BuildFromConfig(config);
         if (factoryManagerInstance != null)
         {
-            factoryManagerInstance.Initialize(mapManagerInstance, waypointServiceInstance, victorySetup);
+            factoryManagerInstance.Initialize(mapManagerInstance, waypointServiceInstance, victorySetup, enemiesSpawner);
         }
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;

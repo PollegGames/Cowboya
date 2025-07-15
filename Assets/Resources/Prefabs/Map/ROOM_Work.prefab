@@ -1386,6 +1386,8 @@ MonoBehaviour:
   factorymMachinesInRoom:
   - {fileID: 3446343881485897289}
   restingMachinesInRoom: []
+  securityMachinesInRoom: []
+  spawningMachinesInRoom: []
 --- !u!114 &5857107069788241263
 MonoBehaviour:
   m_ObjectHideFlags: 0

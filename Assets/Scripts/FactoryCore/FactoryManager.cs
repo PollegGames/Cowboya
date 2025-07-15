@@ -5,7 +5,7 @@ using System.Linq;
 
 public class FactoryManager : MonoBehaviour, IFactoryManager
 {
-    [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
+    [SerializeField] public FactoryAlarmStatus factoryAlarmStatus;
     [SerializeField] private MachineWorkerManager machineWorkerManager;
     [SerializeField] private MachineSecurityManager machineSecurityManager;
 
@@ -20,13 +20,13 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     public GameObject playerInstance { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
 
-    public void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup)
+    public void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup,IEnemiesSpawner enemiesSpawner)
     {
         this.mapManager = mapManager;
         this.waypointService = waypointService;
         this.victorySetup = victorySetup;
         mapManager.InitializeGrid();
-        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager);
+        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager,enemiesSpawner);
         waypointService.BuildAllNeighbors();
         SetupFactoryState();
     }

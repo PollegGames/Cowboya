@@ -58,7 +58,7 @@ public class SceneInitiator : GameInitiator
     private void InitializeFactory()
     {
         mapManager.BuildFromConfig(mapConfig);
-        factoryManager.Initialize(mapManager, waypointService, victorySetup);
+        factoryManager.Initialize(mapManager, waypointService, victorySetup, enemiesSpawner);
         Debug.Log("FactoryManager initialized.");
     }
 
@@ -82,7 +82,8 @@ public class SceneInitiator : GameInitiator
     {
         enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager );
         enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
-        enemiesSpawner?.CreateEnemy(mapConfig.enemiesCount);
+        enemiesSpawner?.CreateWorkersSpawner(mapConfig.blockedCount);
+        enemiesSpawner?.CreateEnemies(mapConfig.enemiesCount);
         enemiesSpawner?.SpreadEnemies();
     }
 

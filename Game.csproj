@@ -111,6 +111,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\UpdateLoop.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\PositionTriggerZone.cs" />
     <Compile Include="Assets\Scripts\Interfaces\INeighborConnector.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Spawning.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IFactoryManager.cs" />
     <Compile Include="Assets\Scripts\Setup\ShowLoadingScreenDisposable.cs" />
     <Compile Include="Assets\Scripts\Setup\SaveData.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />
     <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Follower.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\IPlayerInput.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotTemplate.cs" />
     <Compile Include="Assets\Scripts\Navigation\CellProperties.cs" />
@@ -229,6 +231,7 @@
     <Compile Include="Assets\Scripts\RobotFactory\PlayerRobotFactory.cs" />
     <Compile Include="Assets\Scripts\Machines\ToggleButton.cs" />
     <Compile Include="Assets\Scripts\Navigation\RoomProcessor.cs" />
+    <Compile Include="Assets\Scripts\Machines\SpawningMachine.cs" />
     <Compile Include="Assets\Scripts\Navigation\RoomProperties.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotLocomotionController.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerInputReader.cs" />

@@ -19,6 +19,8 @@ public class WaypointService : MonoBehaviour, IWaypointService
     private readonly HashSet<RoomWaypoint> reservedWaypoints = new();
     private readonly Dictionary<RoomWaypoint, int> workUsageCounts = new();
     private readonly Dictionary<RoomWaypoint, int> securityUsageCounts = new();
+
+    private readonly Dictionary<RoomWaypoint, int> workSpawnersUsageCounts = new();
     private readonly Dictionary<FactoryMachine, EnemyWorkerController> reservedMachines = new();
 
     // Listeners
@@ -164,6 +166,32 @@ public class WaypointService : MonoBehaviour, IWaypointService
         }
 
         return GetFirstRestPoint(exclude);
+    }
+
+    //Get the center point of a blocked room
+    public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null)
+    {
+        var blockedRooms = registry.GetActiveWaypoints()
+            .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Blocked
+                && wp.type == WaypointType.Center
+                && wp != exclude
+                && !reservedWaypoints.Contains(wp))
+            .ToList();
+
+        if (blockedRooms.Any())
+        {
+            var best = blockedRooms
+                .OrderBy(wp => workSpawnersUsageCounts.TryGetValue(wp, out var c) ? c : 0)
+                .First();
+            workSpawnersUsageCounts[best] = workSpawnersUsageCounts.TryGetValue(best, out var count)
+                ? count + 1
+                : 1;
+            reservedWaypoints.Add(best);
+            Debug.Log($"[WaypointReservation] Assigned BLOCKED ROOM CENTER '{best.WorldPos}' (count={workSpawnersUsageCounts[best]}).");
+            return best;
+        }
+
+        return null;
     }
     
      public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null)
