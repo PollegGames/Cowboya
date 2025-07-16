@@ -63,9 +63,12 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     #region Queries & Pathfinding
     public List<RoomWaypoint> GetActiveWaypoints() => registry.GetActiveWaypoints();
+    public List<RoomWaypoint> GetAllWaypoints() => registry.GetAllWaypoints();
     public List<RoomWaypoint> FindWorldPath(RoomWaypoint start, RoomWaypoint end) => pathFinder.FindWorldPath(start, end);
     public RoomWaypoint GetClosestWaypoint(Vector2 position)
         => GetActiveWaypoints().OrderBy(wp => Vector2.Distance(wp.WorldPos, position)).FirstOrDefault();
+    public RoomWaypoint GetClosestInactiveWaypoint(Vector2 position)
+        => GetAllWaypoints().OrderBy(wp => Vector2.Distance(wp.WorldPos, position)).FirstOrDefault();
     public RoomWaypoint GetEndPoint()
     {
         var ep = GetActiveWaypoints()
@@ -171,9 +174,9 @@ public class WaypointService : MonoBehaviour, IWaypointService
     //Get the center point of a blocked room
     public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null)
     {
-        var blockedRooms = registry.GetActiveWaypoints()
+        var blockedRooms = registry.GetAllWaypoints()
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Blocked
-                && wp.type == WaypointType.Center
+                && wp.type == WaypointType.Security
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp))
             .ToList();

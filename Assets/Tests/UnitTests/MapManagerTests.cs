@@ -48,7 +48,7 @@ public class MapManagerTests
         typeof(MapManager).GetField("roomInstances", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_manager, instances);
 
         var factory = new GameObject().AddComponent<FactoryManager>();
-        _manager.RegisterFactoryInEachRoom(factory, null, null, null);
+        _manager.RegisterFactoryInEachRoom(factory, null, null, null,null);
 
         Assert.AreEqual(factory, roomManager.FactoryManager);
     }

@@ -55,7 +55,6 @@ public class EnemyController : PhysicsBaseAgentController
         pathFollower.OnStuck += () => memory.OnBossStuck(this);
         waypointNotifier.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
-        stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
     public void SetSecurityGuardState()

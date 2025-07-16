@@ -102,7 +102,7 @@ public class SecurityCamera : MonoBehaviour
         if (factoryAlarm != null)
         {
             // 2) Try get the EnemyController (and its memory) from this collider
-            var ec = enemyCollider.GetComponent<EnemyController>();
+            var ec = enemyCollider.GetComponentInParent<EnemyController>();
             if (ec != null)
             {
                 var memory = ec.memory;

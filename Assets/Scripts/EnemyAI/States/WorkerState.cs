@@ -27,6 +27,7 @@ public enum WorkerStatus
     GoingToRest,
     Idle,
     Resting,
+    ReadyToSpawnFollowers,
     GoingToStartRoom,
     Saved,
     Spawning,

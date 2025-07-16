@@ -31,7 +31,7 @@ public class Worker_Idle : WorkerState
             var returnPoint = enemy.memory.LastVisitedPoint;
             waypointService.ReleasePOI(returnPoint);
             if (enemy.IsWorkerSpawner)
-                stateMachine.ChangeState(new Worker_GoingToSpawningMachine(enemy, stateMachine, waypointService));
+                stateMachine.ChangeState(new Worker_Spawning(enemy, stateMachine, waypointService));
             else
                 stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(enemy, stateMachine, waypointService));
         }

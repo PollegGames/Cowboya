@@ -10,7 +10,6 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
 {
     private RoomWaypoint targetPoint;
     private bool hasArrived;
-    private FactoryMachine reservedMachine;
     private float readyStartTime;      // moment où on est passé en ReadyToWork
     private const float MaxReadyDuration = 20f; // 20 secondes
     public Worker_GoingToLeastWorkedStation(EnemyWorkerController enemy,
@@ -32,8 +31,6 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
                 enemy, stateMachine, waypointService));
             return;
         }
-
-        reservedMachine = StationReservationService.Instance?.ReserveStation(RobotRole.Worker) as FactoryMachine;
 
         enemy.SetDestination(targetPoint);
     }

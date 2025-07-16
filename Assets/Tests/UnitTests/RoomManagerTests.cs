@@ -17,7 +17,7 @@ public class RoomManagerTests
     public void Initialize_SetsFactoryManager()
     {
         var factory = new GameObject().AddComponent<FactoryManager>();
-        _roomManager.Initialize(factory, null, null, null);
+        _roomManager.Initialize(factory, null, null, null, null);
 
         Assert.AreEqual(factory, _roomManager.FactoryManager);
     }

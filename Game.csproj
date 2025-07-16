@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\Game\EndVictoryLoad.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRoomRenderer.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathSolver.cs" />
+    <Compile Include="Assets\Scripts\Machines\SpawningWorkerSlot.cs" />
     <Compile Include="Assets\Scripts\Navigation\EdgeCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWorkerStateMachine.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Assets\Scripts\Navigation\Cell.cs" />
     <Compile Include="Assets\Scripts\Robots\BodyJointLimiter.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyController.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToSpawningMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\WorkerCondition.cs" />
     <Compile Include="Assets\Scripts\Machines\SecurityMachine.cs" />
     <Compile Include="Assets\Scripts\Robots\ArcTargetFollower.cs" />
@@ -244,12 +246,11 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\FactoryManager.cs" />
     <Compile Include="Assets\Scripts\Robots\GroundChecker.cs" />
+    <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingPunchAttack.cs" />
     <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IEnemiesSpawner.cs" />
-    <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToSpawningMachine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\Game.asmdef" />

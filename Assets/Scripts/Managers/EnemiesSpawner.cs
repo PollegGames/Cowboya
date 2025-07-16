@@ -16,6 +16,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     private List<GameObject> spawnedWorkers = new List<GameObject>();
     private List<GameObject> spawnedEnemies = new List<GameObject>();
     private List<GameObject> spawnedWorkerSpawners = new List<GameObject>();
+    private GameObject boosInstance;
     private GameUIViewModel gameUIViewModel;
 
     public void Initialize(
@@ -57,7 +58,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         Debug.Log($"{workersToSpawn} workers created.");
     }
 
-
     public void CreateEnemies(int enemiesToSpawn)
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
@@ -83,22 +83,22 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
-        var boss = Instantiate(bossPrefab,
+        boosInstance = Instantiate(bossPrefab,
                 Vector3.zero,
                 Quaternion.identity,
                 enemiesParent);
 
-        var robotState = boss.GetComponent<RobotStateController>();
+        var robotState = boosInstance.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
         robotState.Stats.RobotName = "BOSS 1";
-        boss.SetActive(false);
+        boosInstance.SetActive(false);
         Debug.Log($"Boss created.");
     }
 
     public void CreateWorkersSpawner(int workersToSpawn)
     {
         WorkerRobotFactory workerRobotFactory = new WorkerRobotFactory();
-        spawnedWorkers.Clear();
+        spawnedWorkerSpawners.Clear();
         for (int i = 0; i < workersToSpawn; i++)
         {
             var worker = Instantiate(workerPrefab,
@@ -109,7 +109,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             robotState.Stats = workerRobotFactory.CreateRobot();
             robotState.Stats.RobotName = $"WorkerSpawner {i + 1}";
             worker.SetActive(false);
-            spawnedWorkers.Add(worker);
+            spawnedWorkerSpawners.Add(worker);
         }
         Debug.Log($"{workersToSpawn} workers created.");
     }
@@ -136,14 +136,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         return follower;
     }
 
-
     public void SpreadEnemies()
     {
-        if (spawnedWorkers.Count == 0)
-        {
-            Debug.LogWarning("No enemies to spread. Call CreateEnemies first.");
-            return;
-        }
 
         //workers
         foreach (var worker in spawnedWorkers)
@@ -157,28 +151,27 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = worker.GetComponent<EnemyWorkerController>();
             ec.Initialize(waypointService, waypointService, respawnService);
-            ec.SetWorkerState();
 
             ec.memory.SetLastVisitedPoint(spawnPos);
             Debug.Log($"Worker spread to {spawnPos.WorldPos} and initialized");
         }
+
         //workers spawners
-        foreach (var worker in spawnedWorkerSpawners)
+        foreach (var workerSpawner in spawnedWorkerSpawners)
         {
             // 1) pick & apply a real spawn position
             RoomWaypoint spawnPos = waypointService.GetBlockedRoomCenter();
-            worker.transform.position = spawnPos.WorldPos;
+            workerSpawner.transform.position = spawnPos.WorldPos;
             // 2) turn it on
-            worker.SetActive(true);
+            workerSpawner.SetActive(true);
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
-            var ec = worker.GetComponent<EnemyWorkerController>();
-            ec.Initialize(waypointService, waypointService, respawnService);
+            var ec = workerSpawner.GetComponent<EnemyWorkerController>();
             ec.SetWorkerSpawnerState();
+            ec.Initialize(waypointService, waypointService, respawnService);
             ec.memory.SetLastVisitedPoint(spawnPos);
             Debug.Log($"Worker spread to {spawnPos.WorldPos} and initialized");
         }
-
 
         //enemies
         for (int i = 0; i < spawnedEnemies.Count; i++)
@@ -206,6 +199,21 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             Debug.Log($"Enemy spread to {spawnPos} and initialized");
         }
 
+        //boss
+        if (boosInstance != null)
+        {
+            RoomWaypoint spawnPos = waypointService.GetEndPoint();
+            boosInstance.transform.position = spawnPos.WorldPos;
+            boosInstance.SetActive(true);
+
+            // 3) NOW it’s in the world at the correct spot — initialize its AI
+            var ec = boosInstance.GetComponent<EnemyController>();
+            ec.Initialize(waypointService, waypointService, respawnService);
+            ec.SetSecurityGuardState();
+            ec.memory.SetLastVisitedPoint(spawnPos);
+
+            Debug.Log($"Boss spread to {spawnPos} and initialized");
+        }
     }
 
     /// <summary>
@@ -238,7 +246,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         // 4) Initialize its AI (waypoint service, etc.)
         var ec = enemyGO.GetComponent<EnemyWorkerController>();
         ec.Initialize(waypointService, waypointService, respawnService);
-        ec.SetWorkerState();
         var guardAI = enemyGO.GetComponent<SecurityGuardAI>();
         guardAI?.Initialize(waypointService, securityManager);
 

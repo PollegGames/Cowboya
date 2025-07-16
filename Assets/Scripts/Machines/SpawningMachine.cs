@@ -26,11 +26,6 @@ public class SpawningMachine : BaseMachine
     protected override void Awake()
     {
         base.Awake();
-
-        if (factoryAlarmStatus == null)
-            Debug.LogError("SpawningMachine: FactoryAlarmStatus not assigned.");
-        if (enemiesSpawner == null)
-            Debug.LogError("SpawningMachine: EnemiesSpawner not assigned.");
     }
 
     private void OnEnable()
@@ -73,7 +68,7 @@ public class SpawningMachine : BaseMachine
         if (!isOn) return;
 
         StopSpawning();
-        SendWorkerToRest(currentWorker);
+        SendWorkerToStart(currentWorker);
         base.PowerOff();
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, false);
@@ -106,16 +101,16 @@ public class SpawningMachine : BaseMachine
 
         if (!isOn)
         {
-            SendWorkerToRest(newWorker);
+            SendWorkerToStart(newWorker);
             return;
         }
 
         if (currentWorker == null)
         {
             currentWorker = newWorker;
+            SetWorkerToSpawn(currentWorker);
+            base.AttachRobot(robot);
         }
-        SetWorkerToSpawn(currentWorker);
-        base.AttachRobot(robot);
     }
 
     private void SetWorkerToSpawn(EnemyWorkerController worker)
@@ -129,7 +124,7 @@ public class SpawningMachine : BaseMachine
     /// <summary>
     /// Helper to send a worker to the rest station state.
     /// </summary>
-    private void SendWorkerToRest(EnemyWorkerController worker)
+    private void SendWorkerToStart(EnemyWorkerController worker)
     {
         if (worker == null) return;
         worker.stateMachine.ChangeState(
@@ -138,14 +133,15 @@ public class SpawningMachine : BaseMachine
 
     public override void ReleaseRobot()
     {
-        SendWorkerToRest(currentWorker);
+        SendWorkerToStart(currentWorker);
         isOccupied = false;
         base.ReleaseRobot();
     }
 
     private void TryStartSpawning()
     {
-        if (spawnCoroutine == null && isOn && factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted)
+        if (spawnCoroutine == null && isOn && factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted
+        && currentWorker != null)
         {
             spawnCoroutine = StartCoroutine(SpawnLoop());
         }

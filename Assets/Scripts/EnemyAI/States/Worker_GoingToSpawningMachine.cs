@@ -28,7 +28,7 @@ public class Worker_GoingToSpawningMachine : WorkerState
             return;
         }
 
-        targetPoint = waypointService.GetClosestWaypoint(reservedMachine.transform.position);
+        targetPoint = waypointService.GetClosestInactiveWaypoint(reservedMachine.transform.position);
         enemy.SetDestination(targetPoint);
         hasArrived = false;
     }
@@ -45,7 +45,7 @@ public class Worker_GoingToSpawningMachine : WorkerState
             enemy.memory.SetLastVisitedPoint(targetPoint);
 
             reservedMachine.AttachRobot(enemy.gameObject);
-            stateMachine.ChangeState(new Worker_Spawning(enemy, stateMachine, waypointService));
+            enemy.workerState = WorkerStatus.ReadyToSpawnFollowers;
         }
     }
 

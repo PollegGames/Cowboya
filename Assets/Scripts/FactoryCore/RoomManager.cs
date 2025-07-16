@@ -43,26 +43,22 @@ public class RoomManager : MonoBehaviour
         waypointService.RegisterRoomWaypoints(this, waypoints);
 
         // 3) register machines in this room
-        foreach (var machine in factorymMachinesInRoom)
+        foreach (var factoryMachine in factorymMachinesInRoom)
         {
-            machine.Initialize(waypointService);
-            machineWorkerManager.RegisterMachine(machine);
-            machineSecurityManager?.RegisterMachine(machine);
+            factoryMachine.Initialize(waypointService);
+            machineWorkerManager.RegisterMachine(factoryMachine);
+            machineSecurityManager?.RegisterMachine(factoryMachine);
         }
 
         // 4) hook up alarm + triggers
         factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
 
         // 5) register spawning machines
-        if (enemiesSpawner != null)
+        foreach (var spawningMachine in spawningMachinesInRoom)
         {
-            foreach (var spawningMachine in spawningMachinesInRoom)
-            {
-                spawningMachine.Initialize(enemiesSpawner);
-                spawningWorkerManager?.RegisterMachine(spawningMachine);
-            }
+            spawningMachine.Initialize(enemiesSpawner);
+            spawningWorkerManager?.RegisterMachine(spawningMachine);
         }
-
     }
 
     private void OnDestroy()

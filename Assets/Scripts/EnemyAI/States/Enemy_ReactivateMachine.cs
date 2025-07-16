@@ -33,7 +33,11 @@ public class Enemy_ReactivateMachine : EnemyState
             stateMachine.ChangeState(new Enemy_Idle(enemy, stateMachine, waypointService));
             return;
         }
-        targetPoint = waypointService.GetClosestWaypoint(targetMachine.transform.position);
+        if (targetMachine.Type == MachineType.SpawningMachine)
+            targetPoint = waypointService.GetClosestInactiveWaypoint(targetMachine.transform.position);
+        else
+            targetPoint = waypointService.GetClosestWaypoint(targetMachine.transform.position);
+            
         enemy.SetDestination(targetPoint);
     }
 

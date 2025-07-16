@@ -18,7 +18,7 @@ public class BlockedCellProcessor : CellProcessor
             {
                 if (rightCell.cellProperties.usageType == UsageType.Blocked)
                 {
-                    BlockDoor(cell, DoorDirection.Right);
+                    LockDoor(cell, DoorDirection.Right);
                 }
             }
 
@@ -28,7 +28,7 @@ public class BlockedCellProcessor : CellProcessor
             {
                 if (leftCell.cellProperties.usageType == UsageType.Blocked)
                 {
-                    BlockDoor(cell, DoorDirection.Left);
+                    LockDoor(cell, DoorDirection.Left);
                 }
             }
         }
