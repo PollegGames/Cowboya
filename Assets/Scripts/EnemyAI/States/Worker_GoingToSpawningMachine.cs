@@ -29,7 +29,7 @@ public class Worker_GoingToSpawningMachine : WorkerState
         }
 
         targetPoint = waypointService.GetClosestWaypoint(reservedMachine.transform.position);
-        enemy.SetDestination(targetPoint);
+        enemy.SetDestination(targetPoint, includeUnavailable: true);
         hasArrived = false;
     }
 

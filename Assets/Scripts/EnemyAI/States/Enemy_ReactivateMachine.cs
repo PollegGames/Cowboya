@@ -34,7 +34,7 @@ public class Enemy_ReactivateMachine : EnemyState
             return;
         }
         targetPoint = waypointService.GetClosestWaypoint(targetMachine.transform.position);
-        enemy.SetDestination(targetPoint);
+        enemy.SetDestination(targetPoint, includeUnavailable: true);
     }
 
     public override void UpdateState()

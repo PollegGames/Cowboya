@@ -28,7 +28,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         this.victorySetup = victorySetup;
         mapManager.InitializeGrid();
         mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager, spawningWorkerManager, enemiesSpawner);
-        waypointService.BuildAllNeighbors();
+        waypointService.BuildAllNeighbors(includeUnavailable: true);
         SetupFactoryState();
     }
 

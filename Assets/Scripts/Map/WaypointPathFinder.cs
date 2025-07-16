@@ -53,18 +53,17 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
         return new List<RoomWaypoint>();
     }
 
-    public void BuildAllNeighbors()
+    public void BuildAllNeighbors(bool includeUnavailable = false)
     {
         var allWaypoints = registry.GetAllWaypoints();
         foreach (var wp in allWaypoints)
             wp.Neighbors.Clear();
 
-        var activeWaypoints = registry.GetActiveWaypoints();
-
         foreach (var connector in connectors)
-            connector.Connect(allWaypoints);
+            connector.Connect(allWaypoints, includeUnavailable);
 
-        var groups = activeWaypoints.GroupBy(wp => wp.parentRoom);
+        var groupingBase = includeUnavailable ? allWaypoints : registry.GetActiveWaypoints();
+        var groups = groupingBase.GroupBy(wp => wp.parentRoom);
         foreach (var group in groups)
         {
             var waypoints = group.ToList();

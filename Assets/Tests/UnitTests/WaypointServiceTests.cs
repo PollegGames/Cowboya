@@ -27,8 +27,14 @@ public class WaypointServiceTests
     private class DummyPathFinder : MonoBehaviour, IPathFinder
     {
         public List<RoomWaypoint> path = new();
+        public bool BuildCalled;
+        public bool IncludeFlag;
         public List<RoomWaypoint> FindWorldPath(RoomWaypoint start, RoomWaypoint end) => path;
-        public void BuildAllNeighbors() { }
+        public void BuildAllNeighbors(bool includeUnavailable = false)
+        {
+            BuildCalled = true;
+            IncludeFlag = includeUnavailable;
+        }
     }
     private class DummyListener : IRobotNavigationListener
     {
@@ -123,5 +129,30 @@ public class WaypointServiceTests
 
         var closest = _service.GetClosestWaypoint(Vector2.one);
         Assert.AreEqual(wp1, closest);
+    }
+
+    [Test]
+    public void GetAllWaypoints_DelegatesToRegistry()
+    {
+        var reg = new GameObject().AddComponent<DummyRegistry>();
+        var finder = new GameObject().AddComponent<DummyPathFinder>();
+        var wp = new GameObject().AddComponent<RoomWaypoint>();
+        reg.active = new List<RoomWaypoint> { wp };
+        InitService(reg, finder);
+
+        Assert.IsNotNull(_service.GetAllWaypoints());
+    }
+
+    [Test]
+    public void BuildAllNeighbors_ForwardsFlag()
+    {
+        var reg = new GameObject().AddComponent<DummyRegistry>();
+        var finder = new GameObject().AddComponent<DummyPathFinder>();
+        InitService(reg, finder);
+
+        _service.BuildAllNeighbors(true);
+
+        Assert.IsTrue(finder.BuildCalled);
+        Assert.IsTrue(finder.IncludeFlag);
     }
 }
