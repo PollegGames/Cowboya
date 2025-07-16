@@ -83,16 +83,36 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
-        boosInstance = Instantiate(bossPrefab,
-                Vector3.zero,
-                Quaternion.identity,
-                enemiesParent);
+        var boss = Instantiate(
+            bossPrefab,
+            Vector3.zero,
+            Quaternion.identity,
+            enemiesParent);
 
         var robotState = boosInstance.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
         robotState.Stats.RobotName = "BOSS 1";
-        boosInstance.SetActive(false);
-        Debug.Log($"Boss created.");
+
+        // Position the boss at the end room center if available
+        RoomWaypoint endPoint = waypointService.GetEndPoint();
+        if (endPoint != null)
+        {
+            boss.transform.position = endPoint.WorldPos;
+        }
+        else
+        {
+            Debug.LogWarning("[EnemiesSpawner] No end room found for boss spawn.");
+        }
+
+        // Activate and initialise the boss AI
+        boss.SetActive(true);
+        var ec = boss.GetComponent<EnemyController>();
+        ec.Initialize(waypointService, waypointService, respawnService);
+        ec.SetSecurityGuardState();
+        if (endPoint != null)
+            ec.memory.SetLastVisitedPoint(endPoint);
+
+        Debug.Log("Boss created.");
     }
 
     public void CreateWorkersSpawner(int workersToSpawn)

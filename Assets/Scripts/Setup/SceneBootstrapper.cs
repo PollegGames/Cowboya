@@ -5,6 +5,7 @@ public class SceneBootstrapper : MonoBehaviour
 {
     [SerializeField] private SceneInitiator sceneInitiator;
     [SerializeField] private SceneBootstrapConfigSO config;
+    [SerializeField] private RunProgressManager runProgressManagerPrefab;
 
     private void Awake()
     {
@@ -12,6 +13,11 @@ public class SceneBootstrapper : MonoBehaviour
         {
             Debug.LogError("SceneBootstrapper missing config");
             return;
+        }
+
+        if (RunProgressManager.Instance == null && runProgressManagerPrefab != null)
+        {
+            Instantiate(runProgressManagerPrefab);
         }
 
         var factory = Instantiate(config.factoryManagerPrefab);
@@ -40,7 +46,6 @@ public class SceneBootstrapper : MonoBehaviour
                 mapManager,
                 waypointService,
                 respawnService,
-                config.mapConfig,
                 config.victorySetupPrefab,
                 saveService
             );
