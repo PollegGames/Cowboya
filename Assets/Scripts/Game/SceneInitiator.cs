@@ -100,6 +100,7 @@ public class SceneInitiator : GameInitiator
             enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
             enemiesSpawner?.CreateWorkersSpawner(mapConfig.blockedCount);
             enemiesSpawner?.CreateEnemies(mapConfig.enemiesCount);
+            enemiesSpawner?.CreateBoss();
         }
         enemiesSpawner?.SpreadEnemies();
     }
