@@ -6,7 +6,7 @@ public interface IWaypointService : IWaypointNotifier, IWaypointQueries
     void RegisterRoomWaypoints(RoomManager room, IEnumerable<RoomWaypoint> waypoints);
     void UnregisterRoomWaypoints(RoomManager room);
 
-    void BuildAllNeighbors();
+    void BuildAllNeighbors(bool includeUnavailable = false);
 
     RoomWaypoint GetLeastUsedFreeWorkPoint(RoomWaypoint exclude = null);
     RoomWaypoint GetWorkOrRestPoint(RoomWaypoint exclude = null);

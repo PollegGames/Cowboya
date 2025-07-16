@@ -19,7 +19,7 @@ public class AxisNeighborConnector : INeighborConnector
         this.filter = filter ?? (_ => true);
     }
 
-    public void Connect(IEnumerable<RoomWaypoint> allWaypoints)
+    public void Connect(IEnumerable<RoomWaypoint> allWaypoints, bool includeUnavailable = false)
     {
         var waypoints = allWaypoints.Where(filter).ToList();
 
@@ -42,7 +42,7 @@ public class AxisNeighborConnector : INeighborConnector
             {
                 var current = sorted[i];
                 var next = sorted[i + 1];
-                if (current.IsAvailable && next.IsAvailable)
+                if (includeUnavailable || (current.IsAvailable && next.IsAvailable))
                 {
                     if (!current.Neighbors.Contains(next)) current.Neighbors.Add(next);
                     if (bidirection == Bidirection.Both && !next.Neighbors.Contains(current))

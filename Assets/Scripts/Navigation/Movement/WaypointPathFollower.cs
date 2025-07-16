@@ -97,9 +97,12 @@ public class WaypointPathFollower : IRobotNavigationListener
         return within;
     }
 
-    public void SetDestination(RoomWaypoint target)
+    public void SetDestination(RoomWaypoint target, bool includeUnavailable = false)
     {
-        RoomWaypoint start = GetClosestWaypoint(target);
+        if (includeUnavailable && waypointQueries is IWaypointService svc)
+            svc.BuildAllNeighbors(true);
+
+        RoomWaypoint start = GetClosestWaypoint(target, includeUnavailable);
 
         if (start == target)
         {
@@ -132,11 +135,12 @@ public class WaypointPathFollower : IRobotNavigationListener
         Debug.Log($"Path to {blockedWaypoint.name} is blocked. Recalculating...");
     }
 
-    public RoomWaypoint GetClosestWaypoint(RoomWaypoint exclude = null)
+    public RoomWaypoint GetClosestWaypoint(RoomWaypoint exclude = null, bool includeUnavailable = false)
     {
         var agentY = body.position.y;
 
-        var candidates = waypointQueries.GetActiveWaypoints()
+        var source = includeUnavailable ? waypointQueries.GetAllWaypoints() : waypointQueries.GetActiveWaypoints();
+        var candidates = source
             .Where(wp => Mathf.Abs(wp.WorldPos.y - agentY) < 5f && wp != exclude)
             .OrderBy(wp => Vector2.Distance(body.position, wp.WorldPos))
             .ToList();

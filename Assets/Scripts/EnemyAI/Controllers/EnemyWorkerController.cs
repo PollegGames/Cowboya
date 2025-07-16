@@ -77,8 +77,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     }
 
 
-    public void SetDestination(RoomWaypoint target) =>
-        pathFollower.SetDestination(target);
+    public void SetDestination(RoomWaypoint target, bool includeUnavailable = false) =>
+        pathFollower.SetDestination(target, includeUnavailable);
 
     public bool HasArrivedAtDestination() => pathFollower.HasArrived;
 
