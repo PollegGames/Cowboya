@@ -23,7 +23,7 @@ public class GoPowerOnMachineState : EnemyState
             return;
         }
         targetPoint = waypointService.GetClosestWaypoint(targetMachine.transform.position);
-        enemy.SetDestination(targetPoint);
+        enemy.SetDestination(targetPoint, includeUnavailable: true);
     }
 
     public override void UpdateState()

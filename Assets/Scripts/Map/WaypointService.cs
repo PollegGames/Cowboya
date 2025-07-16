@@ -62,6 +62,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
     #endregion
 
     #region Queries & Pathfinding
+    public List<RoomWaypoint> GetAllWaypoints() => registry.GetAllWaypoints();
     public List<RoomWaypoint> GetActiveWaypoints() => registry.GetActiveWaypoints();
     public List<RoomWaypoint> GetAllWaypoints() => registry.GetAllWaypoints();
     public List<RoomWaypoint> FindWorldPath(RoomWaypoint start, RoomWaypoint end) => pathFinder.FindWorldPath(start, end);
@@ -89,7 +90,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
         ClosestWaypointToPlayer = GetClosestWaypoint(playerPosition);
     }
     public List<RoomWaypoint> GetActiveWaypointsList() => GetActiveWaypoints(); // alias
-    public void BuildAllNeighbors() => pathFinder.BuildAllNeighbors();
+    public void BuildAllNeighbors(bool includeUnavailable = false) => pathFinder.BuildAllNeighbors(includeUnavailable);
     public RoomWaypoint ClosestWaypointToPlayer { get; private set; }
     #endregion
 

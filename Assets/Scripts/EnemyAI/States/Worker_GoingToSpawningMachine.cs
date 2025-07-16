@@ -28,8 +28,8 @@ public class Worker_GoingToSpawningMachine : WorkerState
             return;
         }
 
-        targetPoint = waypointService.GetClosestInactiveWaypoint(reservedMachine.transform.position);
-        enemy.SetDestination(targetPoint);
+        targetPoint = waypointService.GetClosestWaypoint(reservedMachine.transform.position);
+        enemy.SetDestination(targetPoint, includeUnavailable: true);
         hasArrived = false;
     }
 
