@@ -15,6 +15,6 @@ public class SceneInitiatorTests
     [Test]
     public void Start_InitializesScene()
     {
-        Assert.DoesNotThrow(() => _initiator.Construct(null, null, null, null, null, null, null, null, null, null, null));
+        Assert.DoesNotThrow(() => _initiator.Construct(null, null, null, null, null, null, null, null, null, null));
     }
 }

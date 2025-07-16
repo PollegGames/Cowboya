@@ -26,7 +26,6 @@ public class SceneInitiator : GameInitiator
         MapManager mapManager,
         IWaypointService waypointService,
         IRobotRespawnService respawnService,
-        RunMapConfigSO mapConfig,
         VictorySetup victorySetup,
         ISaveService saveService)
     {
@@ -38,9 +37,17 @@ public class SceneInitiator : GameInitiator
         this.mapManager = mapManager;
         this.waypointService = waypointService;
         this.respawnService = respawnService;
-        this.mapConfig = mapConfig;
         this.victorySetup = victorySetup;
         this.saveService = saveService;
+
+        if (RunProgressManager.Instance != null)
+        {
+            this.mapConfig = RunProgressManager.Instance.CurrentConfig;
+        }
+        else
+        {
+            Debug.LogError("RunProgressManager instance not found.");
+        }
 
         InitializeSceneSpecificObjects();
     }
@@ -57,7 +64,14 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeFactory()
     {
-        mapManager.BuildFromConfig(mapConfig);
+        if (mapConfig != null)
+        {
+            mapManager.BuildFromConfig(mapConfig);
+        }
+        else
+        {
+            Debug.LogError("SceneInitiator: Map config is null.");
+        }
         factoryManager.Initialize(mapManager, waypointService, victorySetup, enemiesSpawner);
         Debug.Log("FactoryManager initialized.");
     }
@@ -81,9 +95,12 @@ public class SceneInitiator : GameInitiator
     private void InitializeEnemies()
     {
         enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager );
-        enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
-        enemiesSpawner?.CreateWorkersSpawner(mapConfig.blockedCount);
-        enemiesSpawner?.CreateEnemies(mapConfig.enemiesCount);
+        if (mapConfig != null)
+        {
+            enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
+            enemiesSpawner?.CreateWorkersSpawner(mapConfig.blockedCount);
+            enemiesSpawner?.CreateEnemies(mapConfig.enemiesCount);
+        }
         enemiesSpawner?.SpreadEnemies();
     }
 
@@ -100,8 +117,11 @@ public class SceneInitiator : GameInitiator
     {
         if (victorySetup != null)
         {
-            victorySetup.robotsSavedTarget = mapConfig.workersCount;
-            victorySetup.robotsKilledTarget = mapConfig.enemiesCount;
+            if (mapConfig != null)
+            {
+                victorySetup.robotsSavedTarget = mapConfig.workersCount;
+                victorySetup.robotsKilledTarget = mapConfig.enemiesCount;
+            }
             victorySetup.currentSaved = 0;
             victorySetup.currentKilled = 0;
         }
