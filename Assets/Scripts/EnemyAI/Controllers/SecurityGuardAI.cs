@@ -29,12 +29,20 @@ public class SecurityGuardAI : MonoBehaviour
         securityManager?.UnregisterGuard(this);
     }
 
-    public void ReactivateMachine(FactoryMachine machine)
+    public void ReactivateFactoryMachine(FactoryMachine machine)
     {
         if (controller == null || stateMachine == null || waypointService == null)
             return;
         var returnPoint = controller.memory.LastVisitedPoint;
-        stateMachine.ChangeState(new Enemy_ReactivateMachine(
+        stateMachine.ChangeState(new Enemy_ReactivateFactoryMachine(
+            controller, stateMachine, waypointService, machine, returnPoint));
+    }
+    public void ReactivateRestingMachine(RestingMachine machine)
+    {
+        if (controller == null || stateMachine == null || waypointService == null)
+            return;
+        var returnPoint = controller.memory.LastVisitedPoint;
+        stateMachine.ChangeState(new Enemy_ReactiveRestingMachine(
             controller, stateMachine, waypointService, machine, returnPoint));
     }
 }

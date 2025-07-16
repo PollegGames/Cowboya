@@ -52,6 +52,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     {
         if (factoryAlarmStatus != null)
         {
+            factoryAlarmStatus.CurrentAlarmState = AlarmState.Normal;
             lastAlarmState = factoryAlarmStatus.CurrentAlarmState;
         }
         else

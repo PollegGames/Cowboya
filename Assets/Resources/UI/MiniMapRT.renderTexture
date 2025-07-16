@@ -35,5 +35,5 @@ RenderTexture:
     m_WrapV: 1
     m_WrapW: 1
   m_Dimension: 2
-  m_VolumeDepth: 1
+  m_VolumeDepth: 100
   m_ShadowSamplingMode: 2

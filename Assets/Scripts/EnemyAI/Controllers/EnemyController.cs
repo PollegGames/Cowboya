@@ -119,7 +119,7 @@ public class EnemyController : PhysicsBaseAgentController
 
     public void Die()
     {
-
+        bodyJointLimiter.enabled = false;
         var jointBreaker = GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();
         SceneController.instance.RobotKilled();

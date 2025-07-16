@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
@@ -9,6 +10,7 @@ public class RestingMachine : BaseMachine
     private MeshRenderer meshRenderer;
     private EnemyWorkerController currentWorker;
 
+    public event Action<RestingMachine, bool> OnMachineStateChanged;
     protected override void Awake()
     {
         base.Awake();
@@ -27,6 +29,8 @@ public class RestingMachine : BaseMachine
     {
         base.PowerOn();
         ApplyMaterial();
+        OnMachineStateChanged?.Invoke(this, true);
+        SendWorkerToRest(currentWorker);
     }
 
     public override void PowerOff()
@@ -35,6 +39,7 @@ public class RestingMachine : BaseMachine
         SendCurrentWorkerToWork();
         base.PowerOff();
         ApplyMaterial();
+        OnMachineStateChanged?.Invoke(this, false);
     }
 
     public override void AttachRobot(GameObject robot)
@@ -78,6 +83,5 @@ public class RestingMachine : BaseMachine
     private void SendCurrentWorkerToWork()
     {
         SendWorkerToWork(currentWorker);
-        currentWorker = null;
     }
 }

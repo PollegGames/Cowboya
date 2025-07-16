@@ -27,6 +27,7 @@ public class FactoryMachine : BaseMachine
     {
         base.PowerOn();
         ApplyMaterial();
+        SendWorkerToWork(currentWorker);
         OnMachineStateChanged?.Invoke(this, true);
     }
 
@@ -120,7 +121,6 @@ public class FactoryMachine : BaseMachine
     private void SendCurrentWorkerToRest()
     {
         SendWorkerToRest(currentWorker);
-        currentWorker = null;
     }
 
     public override void ReleaseRobot()

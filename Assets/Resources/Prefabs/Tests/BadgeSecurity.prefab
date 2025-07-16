@@ -120,7 +120,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -151,7 +151,7 @@ Rigidbody2D:
   m_Mass: 0.2
   m_LinearDamping: 2
   m_AngularDamping: 2
-  m_GravityScale: 3
+  m_GravityScale: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -182,4 +182,4 @@ DistanceJoint2D:
   m_ConnectedAnchor: {x: 0, y: 0}
   m_AutoConfigureDistance: 0
   m_Distance: 0.5
-  m_MaxDistanceOnly: 0
+  m_MaxDistanceOnly: 1

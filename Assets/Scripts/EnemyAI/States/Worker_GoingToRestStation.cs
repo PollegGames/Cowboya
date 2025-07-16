@@ -10,7 +10,8 @@ public class Worker_GoingToRestStation : WorkerState
 {
     private RoomWaypoint targetPoint;
     private bool hasArrived;
-
+    private float readyStartTime;      // moment où on est passé en ReadyToRest
+    private const float MaxReadyDuration = 2f;
     public Worker_GoingToRestStation(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,
                                     IWaypointService waypointService)
@@ -41,18 +42,29 @@ public class Worker_GoingToRestStation : WorkerState
 
     public override void UpdateState()
     {
-        if (hasArrived) return;
-
-        if (enemy.HasArrivedAtDestination())
+        if (!hasArrived)
         {
-            hasArrived = true;
-            enemy.SetMovement(0f);
-            enemy.SetVerticalMovement(0f);
+            if (enemy.HasArrivedAtDestination())
+            {
+                hasArrived = true;
+                enemy.SetMovement(0f);
+                enemy.SetVerticalMovement(0f);
 
-            enemy.memory.SetLastVisitedPoint(targetPoint);
-            enemy.workerState = WorkerStatus.ReadyToRest;
-            stateMachine.ChangeState(new Worker_Resting(enemy, stateMachine, waypointService));
-
+                enemy.memory.SetLastVisitedPoint(targetPoint);
+                waypointService.ReleasePOI(targetPoint);
+                
+                enemy.workerState = WorkerStatus.ReadyToRest;
+                readyStartTime = Time.time;
+            }
+            return;
+        }
+        // arrivé et en ReadyToWork : on vérifie le timer
+        if (enemy.workerState == WorkerStatus.ReadyToWork &&
+            Time.time - readyStartTime >= MaxReadyDuration)
+        {
+            // passer à l'état aller se reposer
+            stateMachine.ChangeState(new Worker_GoingToRestStation(
+                enemy, stateMachine, waypointService));
         }
     }
 

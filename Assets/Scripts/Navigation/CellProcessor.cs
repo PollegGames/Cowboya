@@ -35,9 +35,11 @@ public abstract class CellProcessor : ICellProcessor
         switch (dir)
         {
             case DoorDirection.Left:
+                cell.cellProperties.HasLeftDoor = true;
                 cell.cellProperties.HasLeftDoorLocked = true;
                 break;
             case DoorDirection.Right:
+                cell.cellProperties.HasRightDoor = true;
                 cell.cellProperties.HasRightDoorLocked = true;
                 break;
             default:

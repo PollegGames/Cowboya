@@ -4,8 +4,8 @@ public class Enemy_Follower : EnemyState
 {
     private readonly FactoryAlarmStatus factoryAlarmStatus;
 
-    // Rayon max dans lequel on considère qu'on peut « suivre » avant d'attaquer
-    private readonly float followRadius = 2f;
+    // Rayon max dans lequel on considère qu'on peut aller en mode attaque
+    private readonly float followRadius = 8f;
 
     public Enemy_Follower(
         EnemyController enemy,
@@ -22,16 +22,17 @@ public class Enemy_Follower : EnemyState
     public override void EnterState()
     {
         enemy.EnemyStatus = EnemyStatus.Following;
+        enemy.memory.RememberPlayerPosition(factoryAlarmStatus.LastPlayerPosition);
     }
 
     public override void UpdateState()
     {
         // 1) On récupère la position la plus récente du joueur
-        Vector3 playerPos = factoryAlarmStatus.LastPlayerPosition;
+        enemy.memory.RememberPlayerPosition(factoryAlarmStatus.LastPlayerPosition);
 
         // 2) Si le joueur est trop loin, on passe en attaque
-        float distanceToPlayer = Vector3.Distance(enemy.transform.position, playerPos);
-        if (distanceToPlayer > followRadius)
+        float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.memory.LastKnownPlayerPosition);
+        if (distanceToPlayer < followRadius)
         {
             stateMachine.ChangeState(
                 new Enemy_AttackPlayer(enemy, stateMachine, waypointService, this)
@@ -40,7 +41,7 @@ public class Enemy_Follower : EnemyState
         }
 
         // 3) On cherche le waypoint le plus proche du joueur
-        var targetWp = waypointService.GetClosestWaypoint(playerPos);
+        var targetWp = waypointService.GetClosestWaypoint(enemy.memory.LastKnownPlayerPosition, includeUnavailable: true);
         if (targetWp != null)
         {
             // Pas de waypoint trouvé : fonce directement sur la position

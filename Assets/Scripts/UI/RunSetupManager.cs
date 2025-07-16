@@ -30,7 +30,8 @@ public class RunSetupManager : MonoBehaviour
     private MapManager mapManagerInstance;
     [SerializeField] private WaypointService waypointServicePrefab;
 
-    [SerializeField] private IEnemiesSpawner enemiesSpawner;
+    [SerializeField] private EnemiesSpawner enemiesSpawnerPrefab;
+     private IEnemiesSpawner enemiesSpawner;
     private WaypointService waypointServiceInstance;
 
     // =============== Références internes UI
@@ -327,6 +328,7 @@ public class RunSetupManager : MonoBehaviour
         var roomProcessor = mapManagerInstance.gameObject.AddComponent<RoomProcessor>();
         mapManagerInstance.Construct(gridBuilder, roomRenderer, roomProcessor);
         waypointServiceInstance = Instantiate(waypointServicePrefab);
+        var enemiesSpawner = Instantiate(enemiesSpawnerPrefab);
         enemiesSpawner.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager);
         
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);

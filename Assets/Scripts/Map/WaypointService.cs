@@ -64,12 +64,12 @@ public class WaypointService : MonoBehaviour, IWaypointService
     #region Queries & Pathfinding
     public List<RoomWaypoint> GetAllWaypoints() => registry.GetAllWaypoints();
     public List<RoomWaypoint> GetActiveWaypoints() => registry.GetActiveWaypoints();
-    public List<RoomWaypoint> GetAllWaypoints() => registry.GetAllWaypoints();
     public List<RoomWaypoint> FindWorldPath(RoomWaypoint start, RoomWaypoint end) => pathFinder.FindWorldPath(start, end);
-    public RoomWaypoint GetClosestWaypoint(Vector2 position)
-        => GetActiveWaypoints().OrderBy(wp => Vector2.Distance(wp.WorldPos, position)).FirstOrDefault();
-    public RoomWaypoint GetClosestInactiveWaypoint(Vector2 position)
-        => GetAllWaypoints().OrderBy(wp => Vector2.Distance(wp.WorldPos, position)).FirstOrDefault();
+    public RoomWaypoint GetClosestWaypoint(Vector2 position, bool includeUnavailable = false)
+    {
+        var source = includeUnavailable ? GetAllWaypoints() : GetActiveWaypoints();
+        return source.OrderBy(wp => Vector2.Distance(wp.WorldPos, position)).FirstOrDefault();
+    }
     public RoomWaypoint GetEndPoint()
     {
         var ep = GetActiveWaypoints()
@@ -197,8 +197,8 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
         return null;
     }
-    
-     public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null)
+
+    public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null)
     {
         var secs = registry.GetActiveWaypoints()
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.POI
@@ -226,42 +226,33 @@ public class WaypointService : MonoBehaviour, IWaypointService
     {
         var allWaypoints = registry.GetActiveWaypoints();
         var restPoints = allWaypoints
-            .Where(wp =>
-                wp != null
-             && wp.parentRoom != null
-             && wp.parentRoom.roomProperties.usageType == UsageType.POI
-             && wp.type == WaypointType.Rest)
+            .Where(wp => wp != null
+                && wp.parentRoom != null
+                && wp.parentRoom.roomProperties.usageType == UsageType.POI
+                && wp.type == WaypointType.Rest
+                && wp.parentRoom.restingMachinesInRoom
+            .Any(m => m.IsOn))
+            .Where(wp => wp != exclude)
             .ToList();
 
-        // Next, only those with at least one active RestingMachine
-        var withMachines = restPoints
-            .Where(wp =>
+        if (restPoints.Any())
+        {
+            var unreserved = restPoints
+                .Where(wp => !reservedWaypoints.Contains(wp))
+                .ToList();
+            if (unreserved.Any())
             {
-                var machines = wp.parentRoom.restingMachinesInRoom;
-                if (machines == null) return false;                    // guard null list
-                return machines.Any(m => m != null && m.IsOn);        // guard null elements
-            })
-            .Where(wp => wp != exclude)                              // still respect exclude
-            .ToList();
-        if (withMachines.Any())
-        {
-            var chosen = withMachines.First();
-            reservedWaypoints.Add(chosen);
-            Debug.Log($"[WaypointReservation] Assigned REST POINT '{chosen.WorldPos}' (with machines)");
-            return chosen;
+                var chosen = unreserved.First();
+                reservedWaypoints.Add(chosen);
+                return chosen;
+            }
+            else
+            {
+                return restPoints.FirstOrDefault();
+            }
         }
 
-        // Try purely waypoint‐based first (no machine check)
-        var unreserved = restPoints
-            .Where(wp => !reservedWaypoints.Contains(wp) && wp != exclude)
-            .ToList();
-        if (unreserved.Any())
-        {
-            var chosen = unreserved.First();
-            reservedWaypoints.Add(chosen);
-            Debug.Log($"[WaypointReservation] Assigned REST POINT '{chosen.WorldPos}' (pure list)");
-            return chosen;
-        }
+      
 
         return null;
     }
@@ -276,7 +267,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
         if (!secs.Any())
         {
             var restPoint = GetFirstRestPoint();
-            if(restPoint == null)
+            if (restPoint == null)
             {
                 Debug.LogWarning("[WaypointService] No free security points or rest points available.");
                 return null;

@@ -127,12 +127,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         robotState.Stats = enemyRobotFactory.CreateRobot();
         robotState.Stats.RobotName = "Follower Guard";
         follower.SetActive(false);
-        Debug.Log($"Follower guard created.");
 
         // 3) NOW it’s in the world at the correct spot — initialize its AI
         var ec = follower.GetComponent<EnemyController>();
         ec.Initialize(waypointService, waypointService, respawnService);
 
+        Debug.Log($"Follower guard created.");
         return follower;
     }
 

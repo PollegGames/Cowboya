@@ -22,4 +22,4 @@ MonoBehaviour:
   gameUIViewModelPrefab: {fileID: 7317822581930453079, guid: 5a8f0b8511669f44fa106314ede53f67, type: 3}
   victorySetupPrefab: {fileID: 11400000, guid: 71f325ff527d30649a5443ec4acf43a7, type: 2}
   saveServicePrefab: {fileID: 8639871701414128267, guid: 21ef7e4e5e1583347918aa524ea63ead, type: 3}
-  mapConfig: {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
+  mapConfig: {fileID: 11400000, guid: 220ec21f1b0240946830eebd3a0ff311, type: 2}

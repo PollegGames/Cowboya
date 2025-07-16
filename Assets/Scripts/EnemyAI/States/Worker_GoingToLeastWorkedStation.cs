@@ -11,7 +11,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
     private RoomWaypoint targetPoint;
     private bool hasArrived;
     private float readyStartTime;      // moment où on est passé en ReadyToWork
-    private const float MaxReadyDuration = 20f; // 20 secondes
+    private const float MaxReadyDuration = 2f;
     public Worker_GoingToLeastWorkedStation(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,
                                     IWaypointService waypointService)
@@ -52,7 +52,6 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
 
                 enemy.workerState = WorkerStatus.ReadyToWork;
                 readyStartTime = Time.time; // démarrer le timer
-                Debug.Log($"[GoingToLeastWorkedStation] Arrived at {targetPoint.name}. Changing state to ReadyToWork.");
             }
 
             return;
@@ -62,8 +61,6 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
         if (enemy.workerState == WorkerStatus.ReadyToWork &&
             Time.time - readyStartTime >= MaxReadyDuration)
         {
-            Debug.Log($"[GoingToLeastWorkedStation] ReadyToWork for {MaxReadyDuration}s. Going to rest machine.");
-
             // passer à l'état aller se reposer
             stateMachine.ChangeState(new Worker_GoingToRestStation(
                 enemy, stateMachine, waypointService));

@@ -7,7 +7,6 @@ using UnityEngine;
 public class Worker_GoingToSpawningMachine : WorkerState
 {
     private RoomWaypoint targetPoint;
-    private SpawningMachine reservedMachine;
     private bool hasArrived;
 
     public Worker_GoingToSpawningMachine(EnemyWorkerController enemy,
@@ -20,15 +19,7 @@ public class Worker_GoingToSpawningMachine : WorkerState
     public override void EnterState()
     {
         enemy.workerState = WorkerStatus.GoingToSpawningMachine;
-        reservedMachine = StationReservationService.Instance?.ReserveStation(RobotRole.WorkerSpawner) as SpawningMachine;
-        if (reservedMachine == null)
-        {
-            Debug.LogWarning("[GoingToSpawningMachine] No spawning machine available.");
-            stateMachine.ChangeState(new Worker_Idle(enemy, stateMachine, waypointService));
-            return;
-        }
-
-        targetPoint = waypointService.GetClosestWaypoint(reservedMachine.transform.position);
+        targetPoint = waypointService.GetClosestWaypoint(enemy.memory.LastVisitedPoint.WorldPos, includeUnavailable: true);
         enemy.SetDestination(targetPoint, includeUnavailable: true);
         hasArrived = false;
     }
@@ -44,7 +35,6 @@ public class Worker_GoingToSpawningMachine : WorkerState
             enemy.SetVerticalMovement(0f);
             enemy.memory.SetLastVisitedPoint(targetPoint);
 
-            reservedMachine.AttachRobot(enemy.gameObject);
             enemy.workerState = WorkerStatus.ReadyToSpawnFollowers;
         }
     }

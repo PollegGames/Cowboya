@@ -44,7 +44,12 @@ public class SpawningMachine : BaseMachine
         StopSpawning();
     }
 
-    public void Initialize(IEnemiesSpawner enemiesSpawner)
+    private void Update()
+    {
+        if (factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted)
+            TryStartSpawning();
+    }
+    public void InitializeSpawner(IEnemiesSpawner enemiesSpawner)
     {
         if (enemiesSpawner == null)
         {
@@ -171,8 +176,8 @@ public class SpawningMachine : BaseMachine
             return;
 
         GameObject enemyGO = enemiesSpawner.CreateAngGetFollowerGuard();
-        var spawnPos = transform.position;
-        var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos);
+        var spawnPos = trigger.transform.position;
+        var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
         enemyGO.transform.position = lastVisitedPoint.WorldPos;
         var ec = enemyGO.GetComponent<EnemyController>();
         if (ec != null)

@@ -51,9 +51,8 @@ MonoBehaviour:
   rayColor: {r: 1, g: 0, b: 0, a: 1}
   rotationSpeed: 360
   spriteAngleOffset: 180
-  triggerZone: {fileID: 7000292710715730747}
-  secondaryTriggerZone: {fileID: 6753659178783873517}
-  reportRescueToFactory: 0
+  playerFollowTriggerZone: {fileID: 7000292710715730747}
+  detectAggresionZone: {fileID: 6753659178783873517}
   cameraHead: {fileID: 701763814248407488}
   roomManager: {fileID: 0}
 --- !u!1 &2881270406138088480

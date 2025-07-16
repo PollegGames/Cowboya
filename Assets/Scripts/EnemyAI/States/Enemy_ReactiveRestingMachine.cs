@@ -3,18 +3,18 @@ using UnityEngine;
 /// <summary>
 /// Moves the guard to a disabled machine and reactivates it when close enough.
 /// </summary>
-public class Enemy_ReactivateFactoryMachine : EnemyState
+public class Enemy_ReactiveRestingMachine : EnemyState
 {
-    private readonly FactoryMachine targetMachine;
+    private readonly RestingMachine targetMachine;
     private RoomWaypoint targetPoint;
     private readonly RoomWaypoint returnPoint;
     private bool hasArrived;
 
-    public Enemy_ReactivateFactoryMachine(
+    public Enemy_ReactiveRestingMachine(
         EnemyController enemy,
         EnemyStateMachine machine,
         IWaypointService waypointService,
-        FactoryMachine machineToActivate,
+        RestingMachine machineToActivate,
         RoomWaypoint returnPoint)
         : base(enemy, machine, waypointService)
     {

@@ -29,7 +29,7 @@ public abstract class BaseMachine : MonoBehaviour
             trigger = GetComponentInChildren<BoxCollider2D>();
     }
 
-    public void Initialize(IWaypointService service)
+    public void InitializeWaypointService(IWaypointService service)
     {
         waypointService = service;
     }

@@ -85,6 +85,7 @@
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerSlot.cs" />
     <Compile Include="Assets\Scripts\Navigation\EdgeCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
+    <Compile Include="Assets\Scripts\Machines\RestingSlot.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWorkerStateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyStateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToStartRoom.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Assets\Scripts\Robots\Attack.cs" />
     <Compile Include="Assets\Scripts\Navigation\BlockedCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Map\AlarmFlasher.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactiveRestingMachine.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridRenderer.cs" />
     <Compile Include="Assets\Scripts\Robots\IgnoreCollision.cs" />
     <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SecurityCamera : MonoBehaviour
@@ -9,15 +10,11 @@ public class SecurityCamera : MonoBehaviour
 
     [Header("Zone Detection")]
     public PositionTriggerZone playerFollowTriggerZone;
-    public PositionTriggerZone rescueEnemyZone;
-
-    [Header("Rescue Settings")]
-    public bool reportRescueToFactory = false;
+    public PositionTriggerZone detectAggresionZone;
 
     [Header("References (Auto-assigned)")]
     [SerializeField]
     private Transform cameraHead;
-
     private Transform player;
     private bool isFollowing;
     private Transform targetToFollow;
@@ -25,6 +22,9 @@ public class SecurityCamera : MonoBehaviour
     [Header("Room & Player References")]
     public RoomManager roomManager;
 
+
+    private List<IRobotMemory> enemiesInZone = new List<IRobotMemory>();
+    private HashSet<IRobotMemory> alarmedMemories = new HashSet<IRobotMemory>();
     private void Awake()
     {
         if (cameraHead == null && transform.childCount > 0)
@@ -42,9 +42,9 @@ public class SecurityCamera : MonoBehaviour
             playerFollowTriggerZone.onExit.AddListener(OnPlayerExitZone);
         }
 
-        if (rescueEnemyZone != null)
+        if (detectAggresionZone != null)
         {
-            rescueEnemyZone.onEnter.AddListener(OnSecondaryZoneEnter);
+            detectAggresionZone.onEnter.AddListener(OnSecondaryZoneEnter);
         }
     }
 
@@ -52,6 +52,8 @@ public class SecurityCamera : MonoBehaviour
     {
         if (isFollowing && targetToFollow != null && cameraHead != null)
             RotateHeadTowardsTarget();
+        if (enemiesInZone.Count > 0)
+            CheckEnemiesAttackedInZone();
     }
 
     private void RotateHeadTowardsTarget()
@@ -105,6 +107,9 @@ public class SecurityCamera : MonoBehaviour
             var ec = enemyCollider.GetComponentInParent<EnemyController>();
             if (ec != null)
             {
+                var mem = ec.GetComponent<IRobotMemory>();
+                if (mem != null && !enemiesInZone.Contains(mem))
+                    enemiesInZone.Add(mem);
                 var memory = ec.memory;
                 if (memory != null && memory.WasRecentlyAttacked)
                 {
@@ -113,11 +118,21 @@ public class SecurityCamera : MonoBehaviour
                     factoryAlarm.LastPlayerPosition = memory.LastKnownPlayerPosition;
                 }
             }
+        }
+    }
 
-            // 4) (Optional) your existing rescue-report logic
-            if (reportRescueToFactory)
+    private void CheckEnemiesAttackedInZone()
+    {
+        var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
+        if (factoryAlarm == null || factoryAlarm.CurrentAlarmState == AlarmState.Wanted) return;
+
+        foreach (var mem in enemiesInZone)
+        {
+            if (mem.WasRecentlyAttacked && !alarmedMemories.Contains(mem))
             {
-                SceneController.instance.RobotSaved();
+                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
+                alarmedMemories.Add(mem);
+                break;  // only trigger once per frame
             }
         }
     }
@@ -130,9 +145,9 @@ public class SecurityCamera : MonoBehaviour
             playerFollowTriggerZone.onExit.RemoveListener(OnPlayerExitZone);
         }
 
-        if (rescueEnemyZone != null)
+        if (detectAggresionZone != null)
         {
-            rescueEnemyZone.onEnter.RemoveListener(OnSecondaryZoneEnter);
+            detectAggresionZone.onEnter.RemoveListener(OnSecondaryZoneEnter);
         }
     }
 
