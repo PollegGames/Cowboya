@@ -40,6 +40,12 @@ public class GrabSystem : MonoBehaviour
             else
                 Release(rightHand, ref rightHeld);
         }
+
+        if (leftHeld != null)
+            leftHeld.OnAttract(leftHand.transform.position);
+
+        if (rightHeld != null)
+            rightHeld.OnAttract(rightHand.transform.position);
     }
 
     private void TryGrab(GrabHandAttractor hand, ref IGrabbable held)
