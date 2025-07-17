@@ -14,6 +14,7 @@ public class SceneInitiator : GameInitiator
     private HUDMiniMap hudMiniMap;
     private VictorySetup victorySetup;
     private ISaveService saveService;
+    private HUDMiniMap hudMiniMap;
 
     private SceneController sceneController;
 
@@ -37,7 +38,9 @@ public class SceneInitiator : GameInitiator
         this.respawnService = respawnService;
         this.victorySetup = victorySetup;
         this.saveService = saveService;
-        this.hudMiniMap = gameUIViewModel != null ? gameUIViewModel.HUDMiniMap : null;
+        this.hudMiniMap = gameUIViewModel.GetComponent<HUDMiniMap>();
+        if (this.hudMiniMap == null)
+            this.hudMiniMap = gameUIViewModel.gameObject.AddComponent<HUDMiniMap>();
 
         if (RunProgressManager.Instance != null)
         {
@@ -63,6 +66,7 @@ public class SceneInitiator : GameInitiator
         InitializePlayer();
         InitializeEnemies();
         InitializeVictorySetup();
+        InitializeMiniMap();
     }
 
     private void InitializeFactory()
@@ -133,6 +137,15 @@ public class SceneInitiator : GameInitiator
         else
         {
             Debug.LogWarning("VictorySetup is not assigned.");
+        }
+    }
+
+    private void InitializeMiniMap()
+    {
+        if (hudMiniMap != null)
+        {
+            hudMiniMap.Initialize(mapManager, factoryManager, waypointService, gameUIViewModel.miniMapPreview);
+            gameUIViewModel.SetMiniMapTexture(hudMiniMap.MiniMapTexture);
         }
     }
 }
