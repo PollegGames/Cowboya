@@ -45,6 +45,10 @@
                     </Bindings>
                 </EnergyBar>
             </engine:VisualElement>
+            <engine:VisualElement class="minibackground">
+                <engine:VisualElement name="preview" class="grid-preview"
+                                      style="height: 142px; width: 250px; margin-top: 0;" />
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement style="flex-grow: 1;" />
     </engine:VisualElement>
