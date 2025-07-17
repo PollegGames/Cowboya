@@ -27,6 +27,8 @@ public class EnemyController : PhysicsBaseAgentController
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
     public EnemyStatus EnemyStatus { get; set; } = EnemyStatus.Idle;
 
+    [SerializeField] private SecurityBadgePickup initialBadge;
+
     protected override void Awake()
     {
         base.Awake();
@@ -65,11 +67,6 @@ public class EnemyController : PhysicsBaseAgentController
     public void SetFollowerState(FactoryAlarmStatus factoryAlarmStatus)
     {
         stateMachine.ChangeState(new Enemy_Follower(this, stateMachine, (IWaypointService)waypointQueries, factoryAlarmStatus));
-    }
-
-    public void SetState(EnemyState newState)
-    {
-        stateMachine.ChangeState(newState);
     }
 
     private void Update()
@@ -123,6 +120,7 @@ public class EnemyController : PhysicsBaseAgentController
         var jointBreaker = GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();
         SceneController.instance.RobotKilled();
+        DetachHeldBadges();
         StartCoroutine(DieRoutine());
     }
 
@@ -130,6 +128,18 @@ public class EnemyController : PhysicsBaseAgentController
     {
         yield return new WaitForSeconds(10f);
         Destroy(gameObject);
+    }
+
+    private void DetachHeldBadges()
+    {
+        var joint = initialBadge.GetComponent<DistanceJoint2D>();
+        if (joint != null)
+        {
+            joint.enabled = false;
+            joint.connectedBody = null;
+        }
+
+        initialBadge.OnRelease(Vector2.down);
     }
 
     private void UpdateBalance(bool enabledBalance)

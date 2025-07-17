@@ -30,14 +30,14 @@
                     </engine:IntegerField>
                 </engine:VisualElement>
             </engine:VisualElement>
-            <engine:VisualElement class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 53px; margin-left: 0;">
-                <HealthBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar">
+            <engine:VisualElement class="bars-container horizontal-layout" style="width: 388px; justify-content: center; margin-bottom: 0; height: 81px; margin-left: 0; align-items: stretch; align-self: auto; align-content: flex-start;">
+                <HealthBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar" style="margin-right: 57px;">
                     <Bindings>
                         <engine:DataBinding property="currentHealth" data-source-path="robotBehaviour.RobotInfo.CurrentHealth" binding-mode="ToTarget" />
                         <engine:DataBinding property="maxHealth" data-source-path="robotBehaviour.RobotInfo.MaxHealth" binding-mode="ToTarget" />
                     </Bindings>
                 </HealthBar>
-                 <engine:Label name="healthValueLabel" text="0" class="health-value-label" />
+                <engine:Label name="healthValueLabel" text="0" class="health-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute;" />
                 <EnergyBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar">
                     <Bindings>
                         <engine:DataBinding property="currentEnergy" data-source-path="robotBehaviour.RobotInfo.CurrentEnergy" binding-mode="ToTarget" />

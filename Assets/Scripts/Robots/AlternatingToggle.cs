@@ -36,7 +36,7 @@ public class AlternatingToggle : MonoBehaviour
 
     private void Update()
     {
-        bool holding = Input.GetMouseButton(0);
+        bool holding = Input.GetMouseButton(1);
 
         if (holding && !isToggling && robotBehaviour != null)
         {
@@ -87,7 +87,7 @@ public class AlternatingToggle : MonoBehaviour
         }
 
         // While holding, keep following the toggleTarget
-        while (Input.GetMouseButton(0))
+        while (Input.GetMouseButton(1))
         {
             armTarget.position = toggleTarget.position;
             yield return null;

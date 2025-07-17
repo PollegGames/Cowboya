@@ -137,18 +137,23 @@ public class DoorController : MonoBehaviour
             return;
         }
 
+        if (securityEntitiesInside > 0)
+        {
+            OpenDoor();
+            UpdateStatusPanel();
+            return;
+        }
+
         bool shouldLock = (isAlarmActive && alarmLocksDoor)
             || (!isAlarmActive && normalRequiresBadge);
 
         if (shouldLock)
         {
-            // Locked state: under no conditions do we open
             CloseDoor();
         }
         else
         {
-            // Unlocked: open if there’s *any* entity
-            if (entitiesInside > 0 || securityEntitiesInside > 0)
+            if (entitiesInside > 0)
                 OpenDoor();
             else
                 CloseDoor();
@@ -156,7 +161,6 @@ public class DoorController : MonoBehaviour
 
         UpdateStatusPanel();
     }
-
 
     private Coroutine slidingCoroutine;
     private void OpenDoor()

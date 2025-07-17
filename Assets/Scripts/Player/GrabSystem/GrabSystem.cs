@@ -25,26 +25,34 @@ public class GrabSystem : MonoBehaviour
     {
         if (input == null) return;
 
-        if (input.LeftGrabPressed)
+        // LEFT HAND
+        if (input.LeftGrabDown)
         {
             if (leftHeld == null)
                 TryGrab(leftHand, ref leftHeld);
-            else
+        }
+        else if (input.LeftGrabUp)
+        {
+            if (leftHeld != null)
                 Release(leftHand, ref leftHeld);
         }
 
-        if (input.RightGrabPressed)
+        if (leftHeld != null && input.LeftGrabHeld)
+            leftHeld.OnAttract(leftHand.transform.position);
+
+        // RIGHT HAND (same pattern)
+        if (input.RightGrabDown)
         {
             if (rightHeld == null)
                 TryGrab(rightHand, ref rightHeld);
-            else
+        }
+        else if (input.RightGrabUp)
+        {
+            if (rightHeld != null)
                 Release(rightHand, ref rightHeld);
         }
 
-        if (leftHeld != null)
-            leftHeld.OnAttract(leftHand.transform.position);
-
-        if (rightHeld != null)
+        if (rightHeld != null && input.RightGrabHeld)
             rightHeld.OnAttract(rightHand.transform.position);
     }
 

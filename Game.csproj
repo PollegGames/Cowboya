@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\Game\LoadRunSetupScene.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IMover.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointRegistry.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\GrabHandAttractor.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\RestState.cs" />
     <Compile Include="Assets\Scripts\Map\SecuritySystem.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Spawning.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IFactoryManager.cs" />
     <Compile Include="Assets\Scripts\Setup\ShowLoadingScreenDisposable.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\LeverHandle.cs" />
     <Compile Include="Assets\Scripts\Setup\SaveData.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\SkewSprite.cs" />
     <Compile Include="Assets\Scripts\Game\SceneController.cs" />
@@ -138,6 +140,7 @@
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshByVertexColor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\EnemyState.cs" />
     <Compile Include="Assets\Scripts\Interfaces\ICellProcessor.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\IGrabbable.cs" />
     <Compile Include="Assets\Scripts\Player\Core\PlayerSpawner.cs" />
     <Compile Include="Assets\Scripts\UI\HealthBar.cs" />
     <Compile Include="Assets\Scripts\Game\TeleportToFactoryEntrance.cs" />
@@ -164,6 +167,7 @@
     <Compile Include="Assets\Scripts\FactoryCore\LiftShaftController.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\PlayerTemplate.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\RoomManager.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\HoldButton.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateMachine.cs" />
     <Compile Include="Assets\Scripts\Machines\MachineSecurityManager.cs" />
     <Compile Include="Assets\Scripts\Setup\SceneBootstrapConfigSO.cs" />
@@ -174,6 +178,7 @@
     <Compile Include="Assets\Scripts\Navigation\Movement\WaypointPathFollower.cs" />
     <Compile Include="Assets\Scripts\UI\LocalizedButton.cs" />
     <Compile Include="Assets\Scripts\Game\BulletScript.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\GrabSystem.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotFactory.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointNotifier.cs" />
     <Compile Include="Assets\Scripts\Navigation\CellProcessor.cs" />
@@ -199,11 +204,13 @@
     <Compile Include="Assets\Scripts\Machines\MachineWorkerManager.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerMovementController.cs" />
     <Compile Include="Assets\Scripts\Machines\ToggleBox.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\PickupBox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\PhysicsBaseAgentController.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IEnemyStateMachine.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMesh.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotMemory.cs" />
     <Compile Include="Assets\Scripts\Robots\HealthBot.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\SecurityBadgePickup.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\AllyRobotFactory.cs" />
     <Compile Include="Assets\Scripts\Setup\GameInitiator.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointService.cs" />
@@ -254,17 +261,6 @@
     <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IEnemiesSpawner.cs" />
-    <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToSpawningMachine.cs" />
-    <Compile Include="Assets\Scripts\Game\RunProgressManager.cs" />
-    <Compile Include="Assets\Scripts\Game\LevelEndTrigger.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\IGrabbable.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\SecurityBadgePickup.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\PickupBox.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\HoldButton.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\LeverHandle.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\GrabHandAttractor.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\GrabSystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\Game.asmdef" />
