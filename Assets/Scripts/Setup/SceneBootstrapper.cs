@@ -30,6 +30,7 @@ public class SceneBootstrapper : MonoBehaviour
         mapManager.Construct(gridBuilder, roomRenderer, roomProcessor);
         var waypointService = Instantiate(config.waypointServicePrefab);
         var respawnService = Instantiate(config.respawnServicePrefab);
+        var badgeSpawner = Instantiate(config.badgeSpawnerPrefab);
         if (SceneController.instance == null)
         {
             Instantiate(config.sceneControllerPrefab);
