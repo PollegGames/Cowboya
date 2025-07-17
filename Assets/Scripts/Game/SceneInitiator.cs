@@ -11,7 +11,6 @@ public class SceneInitiator : GameInitiator
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
     private RunMapConfigSO mapConfig;
-    private HUDMiniMap hudMiniMap;
     private VictorySetup victorySetup;
     private ISaveService saveService;
     private SceneController sceneController;
@@ -36,10 +35,7 @@ public class SceneInitiator : GameInitiator
         this.respawnService = respawnService;
         this.victorySetup = victorySetup;
         this.saveService = saveService;
-        this.hudMiniMap = gameUIViewModel.GetComponent<HUDMiniMap>();
-        if (this.hudMiniMap == null)
-            this.hudMiniMap = gameUIViewModel.gameObject.AddComponent<HUDMiniMap>();
-
+       
         if (RunProgressManager.Instance != null)
         {
             this.mapConfig = RunProgressManager.Instance.CurrentConfig;
@@ -56,10 +52,6 @@ public class SceneInitiator : GameInitiator
     {
         InitializeSharedObjects();
         InitializeFactory();
-        if (hudMiniMap != null)
-        {
-            hudMiniMap.Setup(mapManager, waypointService, respawnService);
-        }
         InitializeSceneController();
         InitializePlayer();
         InitializeEnemies();
@@ -100,7 +92,7 @@ public class SceneInitiator : GameInitiator
     private void InitializeEnemies()
     {
         enemiesSpawner?.SetDropContainer(mapManager.transform);
-        enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager );
+        enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager);
         if (mapConfig != null)
         {
             enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
@@ -113,7 +105,7 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeSceneController()
     {
-        if ( SceneController.instance != null)
+        if (SceneController.instance != null)
         {
             sceneController = SceneController.instance;
             sceneController.Initialize(factoryManager);
@@ -140,10 +132,9 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeMiniMap()
     {
-        if (hudMiniMap != null)
+        if (gameUIViewModel != null && mapManager != null)
         {
-            hudMiniMap.Initialize(mapManager, factoryManager, waypointService, gameUIViewModel.miniMapPreview);
-            gameUIViewModel.SetMiniMapTexture(hudMiniMap.MiniMapTexture);
+            gameUIViewModel.SetMiniMapTexture(mapManager);
         }
     }
 }

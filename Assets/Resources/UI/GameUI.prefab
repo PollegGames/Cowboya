@@ -66,7 +66,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
-  victorySetup: {fileID: 11400000, guid: 71f325ff527d30649a5443ec4acf43a7, type: 2}
+  miniMapPreviewPrefab: {fileID: 3342523019363970719, guid: 07d87633fe6d9da4889d1a434dbad7ae, type: 3}
+  miniMapRT: {fileID: 8400000, guid: 3ec24fa63371daf4ca2932b49657c1ac, type: 2}
 --- !u!82 &4601125565637381064
 AudioSource:
   m_ObjectHideFlags: 0

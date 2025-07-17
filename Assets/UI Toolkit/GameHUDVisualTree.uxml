@@ -30,15 +30,17 @@
                     </engine:IntegerField>
                 </engine:VisualElement>
             </engine:VisualElement>
-            <engine:VisualElement class="bars-container horizontal-layout" style="width: 388px; justify-content: center; margin-bottom: 0; height: 81px; margin-left: 0; align-items: stretch; align-self: auto; align-content: flex-start;">
+            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 211px; justify-content: flex-end; margin-bottom: 0; height: 81px; margin-left: 0; align-items: flex-start; align-self: auto; align-content: flex-start;">
                 <HealthBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar" style="margin-right: 57px;">
                     <Bindings>
                         <engine:DataBinding property="currentHealth" data-source-path="robotBehaviour.RobotInfo.CurrentHealth" binding-mode="ToTarget" />
                         <engine:DataBinding property="maxHealth" data-source-path="robotBehaviour.RobotInfo.MaxHealth" binding-mode="ToTarget" />
                     </Bindings>
                 </HealthBar>
-                <engine:Label name="healthValueLabel" text="0" class="health-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute;" />
-                <EnergyBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar">
+                <engine:Label name="healthValueLabel" text="0" class="health-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute; margin-left: 2px;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 186px; justify-content: flex-end; margin-bottom: 0; height: 81px; margin-left: 0; align-items: flex-start; align-self: auto; align-content: flex-start;">
+                <EnergyBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar" style="margin-right: 45px;">
                     <Bindings>
                         <engine:DataBinding property="currentEnergy" data-source-path="robotBehaviour.RobotInfo.CurrentEnergy" binding-mode="ToTarget" />
                         <engine:DataBinding property="maxEnergy" data-source-path="robotBehaviour.RobotInfo.MaxEnergy" binding-mode="ToTarget" />
@@ -46,16 +48,9 @@
                 </EnergyBar>
                 <engine:Label name="energyValueLabel" text="0" class="energy-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute;" />
             </engine:VisualElement>
-            <engine:VisualElement class="minibackground">
-                <engine:VisualElement name="preview" class="grid-preview"
-                                      style="height: 142px; width: 250px; margin-top: 0;" />
-            </engine:VisualElement>
-        </engine:VisualElement>
-        <engine:VisualElement class="minibackground" style="width: 200px; height: 200px;">
-            <engine:VisualElement name="preview" class="grid-preview" style="width: 192px; height: 192px;" />
         </engine:VisualElement>
         <engine:VisualElement style="flex-grow: 1; align-items: flex-start; justify-content: flex-end;">
-            <engine:VisualElement name="preview" class="grid-preview" style="height: 142px; width: 250px; margin-top: 0;" />
+            <engine:VisualElement name="miniMapPreview" class="grid-preview" style="height: 134px; width: 442px; margin-top: 0;" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

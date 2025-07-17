@@ -48,3 +48,12 @@
     -unity-text-align: middle-center;
     pointer-events: none;
 }
+
+/* Numeric label displayed over the health bar */
+.energy-value-label {
+    color: white;
+    position: absolute;
+    width: 40px;
+    -unity-text-align: middle-center;
+    pointer-events: none;
+}
