@@ -7,12 +7,14 @@ using UnityEngine.UIElements;
 public class GameUIViewModel : MonoBehaviour
 {
     public VisualElement ui;
+    public VisualElement miniMapPreview { get; private set; }
     private RobotStateController robotBehaviour;
     [SerializeField] private RunMapConfigSO config;
 
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
+        miniMapPreview = ui.Q<VisualElement>("preview");
     }
 
     public void SetPlayer(RobotStateController robot)
@@ -43,7 +45,6 @@ public class GameUIViewModel : MonoBehaviour
         if (robotBehaviour != null && robotBehaviour.Stats != null)
         {
             float currentEnergy = robotBehaviour.Stats.CurrentEnergy;
-            // Debug.Log("currentEnergy of PlayerStats: " + currentEnergy);
             ui.Q<EnergyBar>().currentEnergy = currentEnergy; // Assuming EnergyBar is a VisualElement
             ui.Q<EnergyBar>().MarkDirtyRepaint();
         }
@@ -60,6 +61,12 @@ public class GameUIViewModel : MonoBehaviour
         }
     }
 
-
-
+    public void SetMiniMapTexture(RenderTexture rt)
+    {
+        if (miniMapPreview != null && rt != null)
+        {
+            miniMapPreview.style.backgroundImage = new StyleBackground(rt);
+            miniMapPreview.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+        }
+    }
 }

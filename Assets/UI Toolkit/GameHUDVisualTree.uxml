@@ -50,6 +50,8 @@
                                       style="height: 142px; width: 250px; margin-top: 0;" />
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:VisualElement style="flex-grow: 1;" />
+        <engine:VisualElement class="minibackground" style="width: 200px; height: 200px;">
+            <engine:VisualElement name="preview" class="grid-preview" style="width: 192px; height: 192px;" />
+        </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
