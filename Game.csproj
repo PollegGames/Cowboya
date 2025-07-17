@@ -126,6 +126,7 @@
     <Compile Include="Assets\Scripts\Game\SceneController.cs" />
     <Compile Include="Assets\Scripts\Robots\DamageFeedback.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointQueries.cs" />
+    <Compile Include="Assets\Scripts\UI\MessageSystem\GameMessages.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathFinder.cs" />
     <Compile Include="Assets\Scripts\Robots\BodyBalance.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\WorkerStateMachine.cs" />
@@ -183,15 +184,18 @@
     <Compile Include="Assets\Scripts\RobotFactory\RobotFactory.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointNotifier.cs" />
     <Compile Include="Assets\Scripts\Navigation\CellProcessor.cs" />
+    <Compile Include="Assets\Scripts\UI\MessageSystem\MessageService.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshZSkew.cs" />
     <Compile Include="Assets\Scripts\Machines\SecuritySlot.cs" />
     <Compile Include="Assets\Scripts\Machines\FactoryMachine.cs" />
     <Compile Include="Assets\Scripts\Robots\Attack.cs" />
+    <Compile Include="Assets\Scripts\UI\MessageSystem\GameMessage.cs" />
     <Compile Include="Assets\Scripts\Navigation\BlockedCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Map\AlarmFlasher.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactiveRestingMachine.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridRenderer.cs" />
     <Compile Include="Assets\Scripts\Robots\IgnoreCollision.cs" />
+    <Compile Include="Assets\Scripts\UI\MessageSystem\MessageSpeaker.cs" />
     <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />
     <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
