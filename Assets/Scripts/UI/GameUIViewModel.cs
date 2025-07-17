@@ -10,11 +10,15 @@ public class GameUIViewModel : MonoBehaviour
     public VisualElement miniMapPreview { get; private set; }
     private RobotStateController robotBehaviour;
     [SerializeField] private RunMapConfigSO config;
+    private HUDMiniMap hudMiniMap;
+
+    public HUDMiniMap HUDMiniMap => hudMiniMap;
 
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
-        miniMapPreview = ui.Q<VisualElement>("preview");
+
+        hudMiniMap = GetComponentInChildren<HUDMiniMap>(true);
     }
 
     public void SetPlayer(RobotStateController robot)

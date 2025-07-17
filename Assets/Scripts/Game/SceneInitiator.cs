@@ -11,6 +11,7 @@ public class SceneInitiator : GameInitiator
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
     private RunMapConfigSO mapConfig;
+    private HUDMiniMap hudMiniMap;
     private VictorySetup victorySetup;
     private ISaveService saveService;
     private HUDMiniMap hudMiniMap;
@@ -57,6 +58,10 @@ public class SceneInitiator : GameInitiator
     {
         InitializeSharedObjects();
         InitializeFactory();
+        if (hudMiniMap != null)
+        {
+            hudMiniMap.Setup(mapManager, waypointService, respawnService);
+        }
         InitializeSceneController();
         InitializePlayer();
         InitializeEnemies();

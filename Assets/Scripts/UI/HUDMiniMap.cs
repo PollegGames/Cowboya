@@ -1,17 +1,19 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class HUDMiniMap : MonoBehaviour
 {
-    [SerializeField] private string miniMapPrefabPath = "Prefabs/Map/MiniMapCamera";
-    [SerializeField] private RenderTexture miniMapRT;
+    private MapManager mapManager;
+    private IWaypointService waypointService;
+    private IRobotRespawnService respawnService;
 
-    public RenderTexture MiniMapTexture => miniMapRT;
-
-    private Camera miniMapCamera;
-    private GameObject miniMapCameraInstance;
+    /// <summary>
+    /// Initialize the minimap with references to map and services.
+    /// </summary>
+    public void Setup(MapManager mapManager, IWaypointService waypointService, IRobotRespawnService respawnService)
+    {
+        this.mapManager = mapManager;
+        this.waypointService = waypointService;
+        this.respawnService = respawnService;
 
     private MapManager mapManager;
     private IFactoryManager factoryManager;
@@ -127,5 +129,6 @@ public class HUDMiniMap : MonoBehaviour
     {
         PositionCamera();
         // Camera renders automatically to RenderTexture
+
     }
 }
