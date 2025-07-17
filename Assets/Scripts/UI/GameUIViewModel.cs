@@ -46,6 +46,7 @@ public class GameUIViewModel : MonoBehaviour
             // Debug.Log("currentEnergy of PlayerStats: " + currentEnergy);
             ui.Q<EnergyBar>().currentEnergy = currentEnergy; // Assuming EnergyBar is a VisualElement
             ui.Q<EnergyBar>().MarkDirtyRepaint();
+            ui.Q<Label>("energyValueLabel").text = Mathf.RoundToInt(currentEnergy).ToString();
         }
     }
 

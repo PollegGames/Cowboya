@@ -8,7 +8,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private Transform enemiesParent;
-    [SerializeField] private Transform dropContainer;
+    private Transform dropContainer;
     // Expose enemies count via public property
     private MapManager mapManager;
     private IWaypointService waypointService;
@@ -81,7 +81,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         }
         Debug.Log($"{enemiesToSpawn} enemies created.");
     }
-
     public void CreateBoss()
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
@@ -136,7 +135,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         }
         Debug.Log($"{workersToSpawn} workers created.");
     }
-
     public GameObject CreateAngGetFollowerGuard()
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
@@ -158,10 +156,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         Debug.Log($"Follower guard created.");
         return follower;
     }
-
     public void SpreadEnemies()
     {
-
         //workers
         foreach (var worker in spawnedWorkers)
         {

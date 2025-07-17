@@ -100,6 +100,7 @@
     <Compile Include="Assets\Scripts\Navigation\RunMapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPlayerSpawner.cs" />
     <Compile Include="Assets\Scripts\Navigation\Cell.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\IDropHost.cs" />
     <Compile Include="Assets\Scripts\Robots\BodyJointLimiter.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyController.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToSpawningMachine.cs" />
@@ -261,7 +262,6 @@
     <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IEnemiesSpawner.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\IDropHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\Game.asmdef" />

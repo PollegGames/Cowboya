@@ -44,8 +44,11 @@
                         <engine:DataBinding property="maxEnergy" data-source-path="robotBehaviour.RobotInfo.MaxEnergy" binding-mode="ToTarget" />
                     </Bindings>
                 </EnergyBar>
+                <engine:Label name="energyValueLabel" text="0" class="energy-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute;" />
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:VisualElement style="flex-grow: 1;" />
+        <engine:VisualElement style="flex-grow: 1; align-items: flex-start; justify-content: flex-end;">
+            <engine:VisualElement name="preview" class="grid-preview" style="height: 142px; width: 250px; margin-top: 0;" />
+        </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
