@@ -29,6 +29,8 @@ public class EnemyController : PhysicsBaseAgentController
 
     [SerializeField] private SecurityBadgePickup initialBadge;
 
+    private Transform dropContainer;
+
     protected override void Awake()
     {
         base.Awake();
@@ -48,7 +50,11 @@ public class EnemyController : PhysicsBaseAgentController
 
     }
 
-    public void Initialize(IWaypointQueries waypointQueries, IWaypointNotifier waypointNotifier, IRobotRespawnService respawnService)
+    public void Initialize(
+        IWaypointQueries waypointQueries,
+        IWaypointNotifier waypointNotifier,
+        IRobotRespawnService respawnService,
+        Transform dropContainer)
     {
         this.waypointQueries = waypointQueries;
         this.waypointNotifier = waypointNotifier;
@@ -57,6 +63,7 @@ public class EnemyController : PhysicsBaseAgentController
         pathFollower.OnStuck += () => memory.OnBossStuck(this);
         waypointNotifier.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
+        this.dropContainer = dropContainer;
     }
 
     public void SetSecurityGuardState()
@@ -132,6 +139,8 @@ public class EnemyController : PhysicsBaseAgentController
 
     private void DetachHeldBadges()
     {
+        if (initialBadge == null) return;
+
         var joint = initialBadge.GetComponent<DistanceJoint2D>();
         if (joint != null)
         {
@@ -140,6 +149,9 @@ public class EnemyController : PhysicsBaseAgentController
         }
 
         initialBadge.OnRelease(Vector2.down);
+
+        if (dropContainer != null)
+            initialBadge.transform.SetParent(dropContainer, true);
     }
 
     private void UpdateBalance(bool enabledBalance)

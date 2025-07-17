@@ -2,12 +2,13 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
+public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 {
     [SerializeField] private GameObject workerPrefab;
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private Transform enemiesParent;
+    [SerializeField] private Transform dropContainer;
     // Expose enemies count via public property
     private MapManager mapManager;
     private IWaypointService waypointService;
@@ -18,6 +19,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     private List<GameObject> spawnedWorkerSpawners = new List<GameObject>();
     private GameObject boosInstance;
     private GameUIViewModel gameUIViewModel;
+
+    public Transform DropContainer => dropContainer;
 
     public void Initialize(
         MapManager mapManager,
@@ -107,7 +110,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         // Activate and initialise the boss AI
         boosInstance.SetActive(true);
         var ec = boosInstance.GetComponent<EnemyController>();
-        ec.Initialize(waypointService, waypointService, respawnService);
+        ec.Initialize(waypointService, waypointService, respawnService, dropContainer);
         ec.SetSecurityGuardState();
         if (endPoint != null)
             ec.memory.SetLastVisitedPoint(endPoint);
@@ -150,7 +153,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
 
         // 3) NOW it’s in the world at the correct spot — initialize its AI
         var ec = follower.GetComponent<EnemyController>();
-        ec.Initialize(waypointService, waypointService, respawnService);
+        ec.Initialize(waypointService, waypointService, respawnService, dropContainer);
 
         Debug.Log($"Follower guard created.");
         return follower;
@@ -207,7 +210,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = enemy.GetComponent<EnemyController>();
-            ec.Initialize(waypointService, waypointService, respawnService);
+            ec.Initialize(waypointService, waypointService, respawnService, dropContainer);
             ec.SetSecurityGuardState();
             ec.memory.SetLastVisitedPoint(spawnPos);
             var guardAI = enemy.GetComponent<ReactiveMachineAI>();
@@ -228,7 +231,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = boosInstance.GetComponent<EnemyController>();
-            ec.Initialize(waypointService, waypointService, respawnService);
+            ec.Initialize(waypointService, waypointService, respawnService, dropContainer);
             ec.SetSecurityGuardState();
             ec.memory.SetLastVisitedPoint(spawnPos);
 
