@@ -6,20 +6,39 @@ public class GrabSystem : MonoBehaviour
     public GrabHandAttractor rightHand;
     public float throwStrength = 5f;
 
+    [SerializeField] private MonoBehaviour inputSource;
+    private IPlayerInput input;
+
     private IGrabbable leftHeld;
     private IGrabbable rightHeld;
 
+    private void Awake()
+    {
+        input = inputSource as IPlayerInput;
+        if (input == null)
+        {
+            Debug.LogError("GrabSystem: inputSource does not implement IPlayerInput");
+        }
+    }
+
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (input == null) return;
+
+        if (input.LeftGrabPressed)
         {
-            TryGrab(leftHand, ref leftHeld);
-            TryGrab(rightHand, ref rightHeld);
+            if (leftHeld == null)
+                TryGrab(leftHand, ref leftHeld);
+            else
+                Release(leftHand, ref leftHeld);
         }
-        if (Input.GetKeyDown(KeyCode.Q))
+
+        if (input.RightGrabPressed)
         {
-            Release(leftHand, ref leftHeld);
-            Release(rightHand, ref rightHeld);
+            if (rightHeld == null)
+                TryGrab(rightHand, ref rightHeld);
+            else
+                Release(rightHand, ref rightHeld);
         }
     }
 
