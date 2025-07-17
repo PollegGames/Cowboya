@@ -3,11 +3,17 @@ using UnityEngine.Events;
 
 public class LeverHandle : MonoBehaviour, IGrabbable
 {
-    public float activationDistance = 1f;
+    [Header("Path Settings")]
+    public Transform startPoint;
+    public Transform endPoint;
+    [Range(0f, 1f)]
+    public float activationThreshold = 0.9f;
+
+    [Header("Events")]
     public UnityEvent OnActivated;
 
-    private bool isGrabbed;
-    private Vector2 grabStart;
+    private bool _isGrabbed;
+    private float _currentT;
 
     public bool CanBeGrabbed()
     {
@@ -16,23 +22,35 @@ public class LeverHandle : MonoBehaviour, IGrabbable
 
     public void OnGrab(Transform grabParent)
     {
-        isGrabbed = true;
-        grabStart = transform.position;
+        _isGrabbed = true;
+        UpdatePosition(grabParent.position);
     }
 
     public void OnRelease(Vector2 throwForce)
     {
-        isGrabbed = false;
+        _isGrabbed = false;
+        if (_currentT >= activationThreshold)
+            OnActivated?.Invoke();
     }
 
     public void OnAttract(Vector2 attractPoint)
     {
-        if (!isGrabbed) return;
-        float dist = Vector2.Distance(grabStart, attractPoint);
-        if (dist >= activationDistance)
-        {
-            OnActivated?.Invoke();
-            isGrabbed = false;
-        }
+        if (!_isGrabbed) return;
+        UpdatePosition(attractPoint);
+    }
+
+    private void UpdatePosition(Vector2 target)
+    {
+        if (startPoint == null || endPoint == null) return;
+
+        Vector2 start = startPoint.position;
+        Vector2 end = endPoint.position;
+        Vector2 dir = end - start;
+        float len = dir.magnitude;
+        if (len <= 0.0001f) return;
+
+        float t = Vector2.Dot(target - start, dir.normalized) / len;
+        _currentT = Mathf.Clamp01(t);
+        transform.position = start + dir * _currentT;
     }
 }
