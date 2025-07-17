@@ -27,7 +27,7 @@ public class EnemyController : PhysicsBaseAgentController
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
     public EnemyStatus EnemyStatus { get; set; } = EnemyStatus.Idle;
 
-    [SerializeField] private SecurityBadgePickup initialBadge;
+    private SecurityBadgePickup initialBadge;
 
     private Transform dropContainer;
 
@@ -54,7 +54,8 @@ public class EnemyController : PhysicsBaseAgentController
         IWaypointQueries waypointQueries,
         IWaypointNotifier waypointNotifier,
         IRobotRespawnService respawnService,
-        Transform dropContainer)
+        Transform dropContainer,
+        SecurityBadgeSpawner securityBadgeSpawner)
     {
         this.waypointQueries = waypointQueries;
         this.waypointNotifier = waypointNotifier;
@@ -65,11 +66,11 @@ public class EnemyController : PhysicsBaseAgentController
         memory.SetRespawnService(respawnService);
         this.dropContainer = dropContainer;
 
-        if (SecurityBadgeSpawner.Instance != null)
+        if (securityBadgeSpawner)
         {
             if (initialBadge != null)
                 Destroy(initialBadge.gameObject);
-            initialBadge = SecurityBadgeSpawner.Instance.SpawnBadge(transform);
+            initialBadge = securityBadgeSpawner.SpawnBadge(transform);
         }
     }
 

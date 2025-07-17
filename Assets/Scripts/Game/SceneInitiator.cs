@@ -14,6 +14,7 @@ public class SceneInitiator : GameInitiator
     private VictorySetup victorySetup;
     private ISaveService saveService;
     private SceneController sceneController;
+    private SecurityBadgeSpawner securityBadgeSpawner;
 
     public void Construct(
         IFactoryManager factoryManager,
@@ -24,7 +25,8 @@ public class SceneInitiator : GameInitiator
         IWaypointService waypointService,
         IRobotRespawnService respawnService,
         VictorySetup victorySetup,
-        ISaveService saveService)
+        ISaveService saveService,
+        SecurityBadgeSpawner securityBadgeSpawner)
     {
         this.factoryManager = factoryManager;
         this.gameUIViewModel = gameUIViewModel;
@@ -35,7 +37,8 @@ public class SceneInitiator : GameInitiator
         this.respawnService = respawnService;
         this.victorySetup = victorySetup;
         this.saveService = saveService;
-       
+        this.securityBadgeSpawner = securityBadgeSpawner;
+
         if (RunProgressManager.Instance != null)
         {
             this.mapConfig = RunProgressManager.Instance.CurrentConfig;
@@ -92,7 +95,13 @@ public class SceneInitiator : GameInitiator
     private void InitializeEnemies()
     {
         enemiesSpawner?.SetDropContainer(mapManager.transform);
-        enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager);
+        enemiesSpawner?.Initialize(
+            mapManager,
+             waypointService,
+             gameUIViewModel,
+             respawnService,
+             factoryManager.SecurityManager,
+             securityBadgeSpawner);
         if (mapConfig != null)
         {
             enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
