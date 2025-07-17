@@ -22,6 +22,11 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     public Transform DropContainer => dropContainer;
 
+    public void SetDropContainer(Transform container)
+    {
+        dropContainer = container;
+    }
+
     public void Initialize(
         MapManager mapManager,
         IWaypointService waypointService,

@@ -91,6 +91,7 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeEnemies()
     {
+        enemiesSpawner?.SetDropContainer(factoryManager.transform);
         enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager );
         if (mapConfig != null)
         {
