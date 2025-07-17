@@ -67,6 +67,17 @@ public class SecurityCamera : MonoBehaviour
             goal,
             rotationSpeed * Time.deltaTime
         );
+        UpdateWantedPlayerPosition();
+    }
+
+    private void UpdateWantedPlayerPosition()
+    {
+        var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
+        if (factoryAlarm != null && factoryAlarm.CurrentAlarmState != AlarmState.Normal)
+        {
+            Vector2 playerPos = player.transform.position;
+            roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
+        }
     }
 
     private void OnPlayerEnterZone(Collider2D playerCollider)

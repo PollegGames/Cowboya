@@ -28,7 +28,6 @@ public class Enemy_Idle : EnemyState
         if (enemy.memory.LastKnownPlayerPosition != Vector3.zero && enemy.memory.WasRecentlyAttacked)
         {
             stateMachine.ChangeState(new Enemy_AttackPlayer(enemy, stateMachine, waypointService, this));
-            return;
         }
         if (originPoint == null && enemy.memory.LastVisitedPoint != null)
         {

@@ -42,6 +42,7 @@ public class Enemy_GoToEndCell : EnemyState
 
     public override void UpdateState()
     {
+        // Priorité : passer en attaque si le joueur est connu et qu'on a été attaqué
         if (enemy.memory.LastKnownPlayerPosition != Vector3.zero && enemy.memory.WasRecentlyAttacked)
         {
             stateMachine.ChangeState(new Enemy_AttackPlayer(enemy, stateMachine, waypointService, this));

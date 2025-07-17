@@ -4,7 +4,6 @@ using UnityEngine;
 public class SceneInitiator : GameInitiator
 {
     private IFactoryManager factoryManager;
-    private GameObject sceneControllerPrefab;
     private GameUIViewModel gameUIViewModel;
     private IPlayerSpawner playerInitiator;
     private IEnemiesSpawner enemiesSpawner;
@@ -15,11 +14,10 @@ public class SceneInitiator : GameInitiator
     private VictorySetup victorySetup;
     private ISaveService saveService;
 
-     private SceneController sceneController;
+    private SceneController sceneController;
 
     public void Construct(
         IFactoryManager factoryManager,
-        GameObject sceneControllerPrefab,
         GameUIViewModel gameUIViewModel,
         IPlayerSpawner playerInitiator,
         IEnemiesSpawner enemiesSpawner,
@@ -30,7 +28,6 @@ public class SceneInitiator : GameInitiator
         ISaveService saveService)
     {
         this.factoryManager = factoryManager;
-        this.sceneControllerPrefab = sceneControllerPrefab;
         this.gameUIViewModel = gameUIViewModel;
         this.playerInitiator = playerInitiator;
         this.enemiesSpawner = enemiesSpawner;
@@ -107,9 +104,9 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeSceneController()
     {
-        if ( sceneControllerPrefab != null)
+        if ( SceneController.instance != null)
         {
-            sceneController = sceneControllerPrefab.GetComponent<SceneController>();
+            sceneController = SceneController.instance;
             sceneController.Initialize(factoryManager);
         }
     }

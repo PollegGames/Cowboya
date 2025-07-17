@@ -19,7 +19,7 @@ public class Worker_GoingToSpawningMachine : WorkerState
     public override void EnterState()
     {
         enemy.workerState = WorkerStatus.GoingToSpawningMachine;
-        targetPoint = waypointService.GetClosestWaypoint(enemy.memory.LastVisitedPoint.WorldPos, includeUnavailable: true);
+        targetPoint = waypointService.GetBlockedRoomSecuritySpawning(enemy.memory.LastVisitedPoint);
         enemy.SetDestination(targetPoint, includeUnavailable: true);
         hasArrived = false;
     }

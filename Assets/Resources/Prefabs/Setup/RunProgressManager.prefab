@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1563975135193573205
+--- !u!1 &2440062823552566091
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,41 +8,44 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8529864937149679564}
-  - component: {fileID: 3424472248316250871}
+  - component: {fileID: 8524071025136738400}
+  - component: {fileID: 1307107713316042782}
   m_Layer: 0
-  m_Name: EnemiesSpawner
+  m_Name: RunProgressManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8529864937149679564
+--- !u!4 &8524071025136738400
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1563975135193573205}
+  m_GameObject: {fileID: 2440062823552566091}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 157.2165, y: 125.47161, z: -24.968712}
+  m_LocalPosition: {x: 101.35625, y: 7.7389216, z: -100.0593}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3424472248316250871
+--- !u!114 &1307107713316042782
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1563975135193573205}
+  m_GameObject: {fileID: 2440062823552566091}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5cdbaae1338bf11449a917b22038cab8, type: 3}
+  m_Script: {fileID: 11500000, guid: 1595bbe33125e584399ddc52ae2be134, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyPrefab: {fileID: 0}
-  _player: {fileID: 0}
+  mapConfigs:
+  - {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
+  - {fileID: 11400000, guid: 220ec21f1b0240946830eebd3a0ff311, type: 2}
+  - {fileID: 11400000, guid: 220ec21f1b0240946830eebd3a0ff311, type: 2}
+  runSceneName: MapGeneration

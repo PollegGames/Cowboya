@@ -68,26 +68,22 @@ public class DoorController : MonoBehaviour
         StartCoroutine(SafetyCheckRoutine());
     }
 
-
     private IEnumerator SafetyCheckRoutine()
     {
         while (true)
         {
             yield return new WaitForSeconds(safetyCheckInterval);
 
-            if (isWall) continue; // Don't do anything if it's a wall
+            if (isWall)
+            {
+                CloseDoor(forceClose: true);
+                continue;
+            }
 
-            if (entitiesInside > 0 || securityEntitiesInside > 0)
-            {
-                OpenDoor();
-            }
-            else
-            {
-                CloseDoor();
-            }
+            // Re-use your centralized logic
+            EvaluateDoorState();
         }
     }
-
     private void OnDestroy()
     {
         if (roomManager != null)
@@ -142,27 +138,25 @@ public class DoorController : MonoBehaviour
         }
 
         bool shouldLock = (isAlarmActive && alarmLocksDoor)
-            || (!isAlarmActive && normalRequiresBadge)
-            || (securityEntitiesInside > 0);
+            || (!isAlarmActive && normalRequiresBadge);
 
         if (shouldLock)
         {
+            // Locked state: under no conditions do we open
             CloseDoor();
         }
         else
         {
+            // Unlocked: open if there’s *any* entity
             if (entitiesInside > 0 || securityEntitiesInside > 0)
-            {
                 OpenDoor();
-            }
             else
-            {
                 CloseDoor();
-            }
         }
 
         UpdateStatusPanel();
     }
+
 
     private Coroutine slidingCoroutine;
     private void OpenDoor()

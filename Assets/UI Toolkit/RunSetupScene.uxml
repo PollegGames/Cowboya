@@ -31,16 +31,16 @@
             <engine:TextField name="seed-field" label="SEED" style="font-size: 24px; width: 387px;" />
             <engine:Toggle name="random-seed-toggle" label="RANDOMIZE" style="-unity-font-style: italic; font-size: 16px;" />
             <engine:VisualElement class="int-field-with-buttons">
-                <engine:Label text="ENEMY COUNT" class="int-label" style="width: 210px;" />
+                <engine:Label text="WORKERS COUNT" class="int-label" style="width: 210px;" />
+                <engine:Button name="worker-minus-button" text="−" class="int-button" />
+                <engine:IntegerField name="worker-count-field" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="worker-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label text="ENEMIES COUNT" class="int-label" style="width: 206px;" />
                 <engine:Button name="enemy-minus-button" text="−" class="int-button" />
                 <engine:IntegerField name="enemy-count-field" style="font-size: 24px; width: 100px;" />
                 <engine:Button name="enemy-plus-button" text="+" class="int-button" />
-            </engine:VisualElement>
-            <engine:VisualElement class="int-field-with-buttons">
-                <engine:Label text="BOSS COUNT" class="int-label" style="width: 206px;" />
-                <engine:Button name="boss-minus-button" text="−" class="int-button" />
-                <engine:IntegerField name="boss-count-field" style="font-size: 24px; width: 100px;" />
-                <engine:Button name="boss-plus-button" text="+" class="int-button" />
             </engine:VisualElement>
             <engine:Button name="validate-button" text="GENERATE PREVIEW GRID" class="validate-button" style="font-size: 24px;" />
             <engine:VisualElement class="separator" style="width: 319px; align-self: center;" />

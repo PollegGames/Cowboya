@@ -31,7 +31,7 @@ public class RunSetupManager : MonoBehaviour
     [SerializeField] private WaypointService waypointServicePrefab;
 
     [SerializeField] private EnemiesSpawner enemiesSpawnerPrefab;
-     private IEnemiesSpawner enemiesSpawner;
+    private IEnemiesSpawner enemiesSpawnerInstance;
     private WaypointService waypointServiceInstance;
 
     // =============== Références internes UI
@@ -41,8 +41,8 @@ public class RunSetupManager : MonoBehaviour
                          heightField,
                          poiField,
                          blockedField,
-                         enemyCountField,
-                         bossCountField;
+                         workersCountField,
+                         enemyCountField;
     private TextField seedField;
     private Toggle randomSeedToggle;
     private Button validateButton, runButton;
@@ -76,19 +76,19 @@ public class RunSetupManager : MonoBehaviour
         var blockedMinusButton = root.Q<Button>("blocked-minus-button");
         var blockedPlusButton = root.Q<Button>("blocked-plus-button");
 
+        var workerMinusButton = root.Q<Button>("worker-minus-button");
+        var workerPlusButton = root.Q<Button>("worker-plus-button");
+
         var enemyMinusButton = root.Q<Button>("enemy-minus-button");
         var enemyPlusButton = root.Q<Button>("enemy-plus-button");
-
-        var bossMinusButton = root.Q<Button>("boss-minus-button");
-        var bossPlusButton = root.Q<Button>("boss-plus-button");
 
         // Récupère toutes les références
         widthField = root.Q<IntegerField>("width-field");
         heightField = root.Q<IntegerField>("height-field");
         poiField = root.Q<IntegerField>("poi-field");
         blockedField = root.Q<IntegerField>("blocked-field");
+        workersCountField = root.Q<IntegerField>("worker-count-field");
         enemyCountField = root.Q<IntegerField>("enemy-count-field");
-        bossCountField = root.Q<IntegerField>("boss-count-field");
         seedField = root.Q<TextField>("seed-field");
         randomSeedToggle = root.Q<Toggle>("random-seed-toggle");
         validateButton = root.Q<Button>("validate-button");
@@ -116,11 +116,11 @@ public class RunSetupManager : MonoBehaviour
         blockedMinusButton.clicked += () => ChangeFieldValue(blockedField, -1, 0, ClampPoiAndBlocked);
         blockedPlusButton.clicked += () => ChangeFieldValue(blockedField, +1, 0, ClampPoiAndBlocked);
 
+        workerMinusButton.clicked += () => ChangeFieldValue(workersCountField, -1, 0);
+        workerPlusButton.clicked += () => ChangeFieldValue(workersCountField, +1);
+
         enemyMinusButton.clicked += () => ChangeFieldValue(enemyCountField, -1, 0);
         enemyPlusButton.clicked += () => ChangeFieldValue(enemyCountField, +1);
-
-        bossMinusButton.clicked += () => ChangeFieldValue(bossCountField, -1, 0);
-        bossPlusButton.clicked += () => ChangeFieldValue(bossCountField, +1);
         validateButton.clicked += Validate;
         runButton.clicked += StartRun;
         randomSeedToggle.RegisterValueChangedCallback(e => seedField.SetEnabled(!e.newValue));
@@ -135,8 +135,8 @@ public class RunSetupManager : MonoBehaviour
             heightField.value = config.gridHeight;
             poiField.value = config.poiCount;
             blockedField.value = config.blockedCount;
-            enemyCountField.value = config.workersCount;
-            bossCountField.value = config.enemiesCount;
+            workersCountField.value = config.workersCount;
+            enemyCountField.value = config.enemiesCount;
             seedField.value = config.seed;
 
             // Initialiser “Cells Available” à la valeur correcte
@@ -248,8 +248,8 @@ public class RunSetupManager : MonoBehaviour
         blockedField.value = blocked;
 
         // Lecture et garde-fous pour le reste
+        int workers = Mathf.Max(0, workersCountField.value);
         int enemies = Mathf.Max(0, enemyCountField.value);
-        int boss = Mathf.Max(0, bossCountField.value);
 
         // Vérifications supplémentaires
         bool isValid = true;
@@ -264,7 +264,7 @@ public class RunSetupManager : MonoBehaviour
         void Mark(VisualElement f, bool ok) => f.style.borderBottomColor = ok ? Color.clear : Color.red;
         Mark(poiField, poi + blocked <= cellsAvailable);
         Mark(blockedField, poi + blocked <= cellsAvailable);
-        Mark(enemyCountField, enemies <= emptyCells);
+        Mark(workersCountField, workers <= emptyCells);
 
         if (!isValid)
         {
@@ -278,8 +278,8 @@ public class RunSetupManager : MonoBehaviour
         config.gridHeight = h;
         config.poiCount = poi;
         config.blockedCount = blocked;
-        config.workersCount = enemies;
-        config.enemiesCount = boss;
+        config.workersCount = workers;
+        config.enemiesCount = enemies;
         config.seed = randomSeedToggle.value
                                 ? Random.Range(0, 999999).ToString()
                                 : seedField.value;
@@ -328,9 +328,9 @@ public class RunSetupManager : MonoBehaviour
         var roomProcessor = mapManagerInstance.gameObject.AddComponent<RoomProcessor>();
         mapManagerInstance.Construct(gridBuilder, roomRenderer, roomProcessor);
         waypointServiceInstance = Instantiate(waypointServicePrefab);
-        var enemiesSpawner = Instantiate(enemiesSpawnerPrefab);
-        enemiesSpawner.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager);
-        
+        enemiesSpawnerInstance = Instantiate(enemiesSpawnerPrefab);
+        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager);
+
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 
         // 1) Génère la grille       
@@ -338,7 +338,7 @@ public class RunSetupManager : MonoBehaviour
             mapManagerInstance.BuildFromConfig(config);
         if (factoryManagerInstance != null)
         {
-            factoryManagerInstance.Initialize(mapManagerInstance, waypointServiceInstance, victorySetup, enemiesSpawner);
+            factoryManagerInstance.Initialize(mapManagerInstance, waypointServiceInstance, victorySetup, enemiesSpawnerInstance);
         }
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
@@ -389,6 +389,10 @@ public class RunSetupManager : MonoBehaviour
             Destroy(miniMapPreviewInstance);
             miniMapPreviewInstance = null;
         }
+        if (enemiesSpawnerInstance != null)
+        {
+            enemiesSpawnerInstance = null;
+        }
     }
 
     private IEnumerator CaptureRTToUI()
@@ -412,8 +416,9 @@ public class RunSetupManager : MonoBehaviour
     // =====================================================================
     // LAUNCH RUN
     // =====================================================================
+    private string runSceneName = "MapGeneration";
     private void StartRun()
     {
-        SceneManager.LoadScene("MapGeneration");
+        SceneController.instance.LoadScene(runSceneName);
     }
 }

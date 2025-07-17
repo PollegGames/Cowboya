@@ -83,13 +83,13 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
-        var boss = Instantiate(
+        boosInstance = Instantiate(
             bossPrefab,
             Vector3.zero,
             Quaternion.identity,
             enemiesParent);
 
-        var robotState = boosInstance.GetComponent<RobotStateController>();
+        var robotState = this.boosInstance.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
         robotState.Stats.RobotName = "BOSS 1";
 
@@ -97,7 +97,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         RoomWaypoint endPoint = waypointService.GetEndPoint();
         if (endPoint != null)
         {
-            boss.transform.position = endPoint.WorldPos;
+            boosInstance.transform.position = endPoint.WorldPos;
         }
         else
         {
@@ -105,8 +105,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         }
 
         // Activate and initialise the boss AI
-        boss.SetActive(true);
-        var ec = boss.GetComponent<EnemyController>();
+        boosInstance.SetActive(true);
+        var ec = boosInstance.GetComponent<EnemyController>();
         ec.Initialize(waypointService, waypointService, respawnService);
         ec.SetSecurityGuardState();
         if (endPoint != null)
@@ -210,7 +210,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
             ec.Initialize(waypointService, waypointService, respawnService);
             ec.SetSecurityGuardState();
             ec.memory.SetLastVisitedPoint(spawnPos);
-            var guardAI = enemy.GetComponent<SecurityGuardAI>();
+            var guardAI = enemy.GetComponent<ReactiveMachineAI>();
             guardAI?.Initialize(waypointService, securityManager);
 
             // release the reservation so the point can be reused later
@@ -266,7 +266,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner
         // 4) Initialize its AI (waypoint service, etc.)
         var ec = enemyGO.GetComponent<EnemyWorkerController>();
         ec.Initialize(waypointService, waypointService, respawnService);
-        var guardAI = enemyGO.GetComponent<SecurityGuardAI>();
+        var guardAI = enemyGO.GetComponent<ReactiveMachineAI>();
         guardAI?.Initialize(waypointService, securityManager);
 
         // 5) Keep track of it

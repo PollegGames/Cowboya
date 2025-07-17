@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\RestState.cs" />
     <Compile Include="Assets\Scripts\Map\SecuritySystem.cs" />
+    <Compile Include="Assets\Scripts\Game\LevelEndVictoryTrigger.cs" />
     <Compile Include="Assets\Scripts\Map\AxisNeighborConnector.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\WorkState.cs" />
     <Compile Include="Assets\Scripts\Game\SceneInitiator.cs" />
@@ -79,13 +80,13 @@
     <Compile Include="Assets\Scripts\Map\CameraController.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\HeadTargetController.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\LiftController.cs" />
-    <Compile Include="Assets\Scripts\Game\EndVictoryLoad.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRoomRenderer.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathSolver.cs" />
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerSlot.cs" />
     <Compile Include="Assets\Scripts\Navigation\EdgeCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
     <Compile Include="Assets\Scripts\Machines\RestingSlot.cs" />
+    <Compile Include="Assets\Scripts\Game\RunProgressManager.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWorkerStateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyStateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToStartRoom.cs" />
@@ -154,7 +155,6 @@
     <Compile Include="Assets\Scripts\Managers\VictorySetup.cs" />
     <Compile Include="Assets\Scripts\Robots\LegJointLimiter.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyPunchAttack.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\SecurityGuardAI.cs" />
     <Compile Include="Assets\Scripts\UI\GameUIViewModel.cs" />
     <Compile Include="Assets\Scripts\UI\EnergyBar.cs" />
     <Compile Include="Assets\Scripts\Map\FactoryAlarmStatus.cs" />
@@ -189,6 +189,7 @@
     <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />
     <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
+    <Compile Include="Assets\Scripts\Game\LevelEndTrigger.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Follower.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\IPlayerInput.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotTemplate.cs" />
@@ -213,6 +214,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToRestStation.cs" />
     <Compile Include="Assets\Scripts\Map\DoorDirection.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Saved.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Controllers\ReactiveMachineAI.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPOIReservationService.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />
@@ -229,7 +231,6 @@
     <Compile Include="Assets\Scripts\Interfaces\IRoomProcessor.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackType.cs" />
     <Compile Include="Assets\Scripts\Map\RoomWaypoint.cs" />
-    <Compile Include="Assets\Scripts\Game\FactorySetupLoader.cs" />
     <Compile Include="Assets\Scripts\Setup\LoadingScreen.cs" />
     <Compile Include="Assets\Scripts\UI\StartMenuUI.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\PlayerRobotFactory.cs" />
@@ -253,10 +254,6 @@
     <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IEnemiesSpawner.cs" />
-    <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToSpawningMachine.cs" />
-    <Compile Include="Assets\Scripts\Game\RunProgressManager.cs" />
-    <Compile Include="Assets\Scripts\Game\LevelEndTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\Game.asmdef" />

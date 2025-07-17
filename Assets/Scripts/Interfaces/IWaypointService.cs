@@ -13,6 +13,7 @@ public interface IWaypointService : IWaypointNotifier, IWaypointQueries
     RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null);
     RoomWaypoint GetFirstFreeSecurityPoint();
     RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null);
+    RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null);
     RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null);
     void ReleasePOI(RoomWaypoint poi);
     FactoryMachine ReserveFreeMachine(RoomManager room, EnemyWorkerController worker);

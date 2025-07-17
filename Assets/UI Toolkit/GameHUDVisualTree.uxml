@@ -37,6 +37,7 @@
                         <engine:DataBinding property="maxHealth" data-source-path="robotBehaviour.RobotInfo.MaxHealth" binding-mode="ToTarget" />
                     </Bindings>
                 </HealthBar>
+                 <engine:Label name="healthValueLabel" text="0" class="health-value-label" />
                 <EnergyBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar">
                     <Bindings>
                         <engine:DataBinding property="currentEnergy" data-source-path="robotBehaviour.RobotInfo.CurrentEnergy" binding-mode="ToTarget" />

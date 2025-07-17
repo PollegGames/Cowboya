@@ -31,17 +31,23 @@ public class RunProgressManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+    //load first level
+    public void LoadFirstLevel()
+    {
+        currentLevelIndex = 0;
+        SceneController.instance.LoadScene(runSceneName);
+    }
 
     public void LoadNextLevel()
     {
         if (mapConfigs == null || mapConfigs.Count == 0) return;
         currentLevelIndex = Mathf.Clamp(currentLevelIndex + 1, 0, mapConfigs.Count - 1);
-        SceneManager.LoadScene(runSceneName);
+        SceneController.instance.LoadScene(runSceneName);
     }
 
     public void RestartRun()
     {
         currentLevelIndex = 0;
-        SceneManager.LoadScene(runSceneName);
+        SceneController.instance.LoadScene(runSceneName);
     }
 }

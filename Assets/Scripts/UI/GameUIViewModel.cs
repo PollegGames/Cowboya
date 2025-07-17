@@ -56,6 +56,7 @@ public class GameUIViewModel : MonoBehaviour
             float currentHealth = robotBehaviour.Stats.CurrentHealth;
             ui.Q<HealthBar>().currentHealth = currentHealth; // Assuming HealthBar is a VisualElement
             ui.Q<HealthBar>().MarkDirtyRepaint();
+            ui.Q<Label>("healthValueLabel").text = Mathf.RoundToInt(currentHealth).ToString();
         }
     }
 

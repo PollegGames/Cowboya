@@ -21,6 +21,7 @@ public class SceneController : MonoBehaviour
     public void Initialize(IFactoryManager factoryManager)
     {
         this.factoryManager = factoryManager;
+        Debug.Log("SceneController initialized with factory manager.");
     }
 
     public void LoadScene(string sceneName)

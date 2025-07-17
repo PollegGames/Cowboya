@@ -4,7 +4,7 @@ using UnityEngine;
 /// Component specific to security guards to react to machine shutdown events.
 /// </summary>
 [RequireComponent(typeof(EnemyController))]
-public class SecurityGuardAI : MonoBehaviour
+public class ReactiveMachineAI : MonoBehaviour
 {
     private EnemyController controller;
     private EnemyStateMachine stateMachine;

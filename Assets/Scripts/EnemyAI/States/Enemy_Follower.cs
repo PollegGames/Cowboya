@@ -22,16 +22,14 @@ public class Enemy_Follower : EnemyState
     public override void EnterState()
     {
         enemy.EnemyStatus = EnemyStatus.Following;
-        enemy.memory.RememberPlayerPosition(factoryAlarmStatus.LastPlayerPosition);
     }
 
     public override void UpdateState()
     {
-        // 1) On récupère la position la plus récente du joueur
-        enemy.memory.RememberPlayerPosition(factoryAlarmStatus.LastPlayerPosition);
-
+        // 1) On cherche le waypoint le plus proche du joueur
+        var targetWp = waypointService.ClosestWaypointToPlayer;
         // 2) Si le joueur est trop loin, on passe en attaque
-        float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.memory.LastKnownPlayerPosition);
+        float distanceToPlayer = Vector3.Distance(enemy.transform.position, targetWp.WorldPos);
         if (distanceToPlayer < followRadius)
         {
             stateMachine.ChangeState(
@@ -40,17 +38,7 @@ public class Enemy_Follower : EnemyState
             return;
         }
 
-        // 3) On cherche le waypoint le plus proche du joueur
-        var targetWp = waypointService.GetClosestWaypoint(enemy.memory.LastKnownPlayerPosition, includeUnavailable: true);
-        if (targetWp != null)
-        {
-            // Pas de waypoint trouvé : fonce directement sur la position
-            enemy.SetDestination(targetWp);
-        }
-        else
-        {
-            // todo ???
-        }
+        enemy.SetDestination(targetWp);
     }
 
     public override void ExitState()

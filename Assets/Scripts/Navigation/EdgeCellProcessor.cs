@@ -12,14 +12,19 @@ public class EdgeCellProcessor : CellProcessor
             Vector2 pos = kvp.Key;
             Cell roomCell = kvp.Value;
 
-            if (pos.x == 0) BlockDoor(roomCell, DoorDirection.Left);
-            if (pos.x == width - 1)
+            if (roomCell.cellProperties.usageType != UsageType.End)
             {
-                BlockDoor(roomCell, DoorDirection.Right);
-                // Debug.Log($"Locked right door at {pos}");
+                if (pos.x == 0) BlockDoor(roomCell, DoorDirection.Left);
+                if (pos.x == width - 1)
+                {
+                    BlockDoor(roomCell, DoorDirection.Right);
+                    // Debug.Log($"Locked right door at {pos}");
+                }
+                if (pos.y == 0) BlockLift(roomCell, LiftDirection.Down);
+                if (pos.y == height - 1) BlockLift(roomCell, LiftDirection.Up);
             }
-            if (pos.y == 0) BlockLift(roomCell, LiftDirection.Down);
-            if (pos.y == height - 1) BlockLift(roomCell, LiftDirection.Up);
+
+
         }
     }
 }

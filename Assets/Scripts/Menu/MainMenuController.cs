@@ -9,11 +9,16 @@ public class MainMenuController : MonoBehaviour
     private Button _playButton;
     private Button _exitButton;
     private AudioSource _audioSource;
+    [SerializeField] private RunProgressManager runProgressManagerPrefab;
 
     private void Awake()
     {
         _menuRoot = GetComponent<UIDocument>().rootVisualElement;
         _audioSource = GetComponent<AudioSource>();
+        if (RunProgressManager.Instance == null && runProgressManagerPrefab != null)
+        {
+            Instantiate(runProgressManagerPrefab);
+        }
     }
 
     private void OnEnable()
@@ -40,7 +45,7 @@ public class MainMenuController : MonoBehaviour
     private void OnPlayClicked(ClickEvent evt)
     {
         _audioSource?.Play();
-        SceneController.instance.LoadScene("RunSetupScene");
+        runProgressManagerPrefab.LoadFirstLevel();
     }
 
     private void OnExitClicked(ClickEvent evt)

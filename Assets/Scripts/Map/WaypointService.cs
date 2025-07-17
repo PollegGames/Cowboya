@@ -173,11 +173,36 @@ public class WaypointService : MonoBehaviour, IWaypointService
     }
 
     //Get the center point of a blocked room
-    public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null)
+    public RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null)
     {
         var blockedRooms = registry.GetAllWaypoints()
             .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Blocked
                 && wp.type == WaypointType.Security
+                && wp != exclude
+                && !reservedWaypoints.Contains(wp))
+            .ToList();
+
+        if (blockedRooms.Any())
+        {
+            var best = blockedRooms
+                .OrderBy(wp => workSpawnersUsageCounts.TryGetValue(wp, out var c) ? c : 0)
+                .First();
+            workSpawnersUsageCounts[best] = workSpawnersUsageCounts.TryGetValue(best, out var count)
+                ? count + 1
+                : 1;
+            reservedWaypoints.Add(best);
+            Debug.Log($"[WaypointReservation] Assigned BLOCKED ROOM CENTER '{best.WorldPos}' (count={workSpawnersUsageCounts[best]}).");
+            return best;
+        }
+
+        return null;
+    }
+
+    public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null)
+    {
+        var blockedRooms = registry.GetAllWaypoints()
+            .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Blocked
+                && wp.type == WaypointType.Center
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp))
             .ToList();
@@ -252,7 +277,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
             }
         }
 
-      
+
 
         return null;
     }

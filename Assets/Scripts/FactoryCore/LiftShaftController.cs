@@ -46,7 +46,7 @@ public class LiftShaftController : MonoBehaviour
 
     private void OnAlarmChanged(AlarmState state)
     {
-        bool lockLifts = (state == AlarmState.Wanted || state == AlarmState.Lockdown);
+        bool lockLifts = state == AlarmState.Lockdown;
 
         foreach (LiftController lift in controlledLifts)
         {

@@ -24,6 +24,11 @@ public class Enemy_ReactiveRestingMachine : EnemyState
 
     public override void EnterState()
     {
+         // Priorité : passer en attaque si le joueur est connu et qu'on a été attaqué
+        if (enemy.memory.LastKnownPlayerPosition != Vector3.zero && enemy.memory.WasRecentlyAttacked)
+        {
+            stateMachine.ChangeState(new Enemy_AttackPlayer(enemy, stateMachine, waypointService, this));
+        }
         enemy.EnemyStatus = EnemyStatus.ReactivatingMachine;
         Debug.Log($"Entering ReactivateMachine state for {targetMachine.name}");
         hasArrived = false;

@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Enemy_AttackPlayer : EnemyState
 {
-    private Vector3 playerTransform;
     private float stopDistance = 1.5f;
     private readonly EnemyState previousState;
 
@@ -14,7 +13,6 @@ public class Enemy_AttackPlayer : EnemyState
         : base(enemy, machine, waypointService)
     {
         this.previousState = previousState;
-        playerTransform = enemy.memory.LastKnownPlayerPosition;
     }
 
     public override void EnterState()
@@ -25,7 +23,7 @@ public class Enemy_AttackPlayer : EnemyState
     public override void UpdateState()
     {
         // Always get the latest player position
-        playerTransform = enemy.memory.LastKnownPlayerPosition;
+        var playerTransform = enemy.memory.LastKnownPlayerPosition;
 
         if (playerTransform == Vector3.zero)
         {

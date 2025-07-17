@@ -2496,7 +2496,7 @@ MonoBehaviour:
   offset: {x: 0, y: 0}
   detectionLayer:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 2048
   onEnter:
     m_PersistentCalls:
       m_Calls:

@@ -30,7 +30,10 @@ public class SceneBootstrapper : MonoBehaviour
         mapManager.Construct(gridBuilder, roomRenderer, roomProcessor);
         var waypointService = Instantiate(config.waypointServicePrefab);
         var respawnService = Instantiate(config.respawnServicePrefab);
-        var sceneController = Instantiate(config.sceneControllerPrefab);
+        if (SceneController.instance == null)
+        {
+            Instantiate(config.sceneControllerPrefab);
+        }
         var viewModel = Instantiate(config.gameUIViewModelPrefab);
         var saveService = Instantiate(config.saveServicePrefab);
 
@@ -39,7 +42,6 @@ public class SceneBootstrapper : MonoBehaviour
         {
             initiator.Construct(
                 factory,
-                sceneController.gameObject,
                 viewModel,
                 playerSpawner,
                 enemiesSpawner,

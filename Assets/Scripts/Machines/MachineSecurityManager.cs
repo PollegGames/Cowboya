@@ -11,7 +11,7 @@ public class MachineSecurityManager : MonoBehaviour
     [SerializeField] private StationReservationService reservationService;
     private readonly List<FactoryMachine> factoryMachines = new();
     private readonly List<RestingMachine> restingMachines = new();
-    private readonly List<SecurityGuardAI> guards = new();
+    private readonly List<ReactiveMachineAI> guards = new();
 
     /// <summary>
     /// Fired whenever a registered machine is switched off.
@@ -36,7 +36,7 @@ public class MachineSecurityManager : MonoBehaviour
         reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
         machine.OnMachineStateChanged += HandleRestingMachineStateChanged;
     }
-    public void RegisterGuard(SecurityGuardAI guard)
+    public void RegisterGuard(ReactiveMachineAI guard)
     {
         if (guard == null || guards.Contains(guard))
             return;
@@ -44,7 +44,7 @@ public class MachineSecurityManager : MonoBehaviour
         guards.Add(guard);
     }
 
-    public void UnregisterGuard(SecurityGuardAI guard)
+    public void UnregisterGuard(ReactiveMachineAI guard)
     {
         if (guard == null)
             return;
@@ -75,7 +75,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (machine == null || guards.Count == 0)
             return;
 
-        SecurityGuardAI best = null;
+        ReactiveMachineAI best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
         foreach (var guard in guards)
@@ -97,7 +97,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (machine == null || guards.Count == 0)
             return;
 
-        SecurityGuardAI best = null;
+        ReactiveMachineAI best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
         foreach (var guard in guards)

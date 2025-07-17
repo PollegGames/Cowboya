@@ -32,7 +32,7 @@ public class StartMenuUI : MonoBehaviour
         root.Add(background);
 
         // Play Button
-        var playButton = new Button(() => SceneManager.LoadScene(sceneToLoad))
+        var playButton = new Button(() => SceneController.instance.LoadScene(sceneToLoad))
         {
             text = "Play",
             style =
