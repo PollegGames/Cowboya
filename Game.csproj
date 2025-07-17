@@ -138,6 +138,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotMemory.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotRespawnService.cs" />
     <Compile Include="Assets\Scripts\Services\StationReservationService.cs" />
+    <Compile Include="Assets\Scripts\Services\SecurityBadgeSpawner.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshByVertexColor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\EnemyState.cs" />
     <Compile Include="Assets\Scripts\Interfaces\ICellProcessor.cs" />
