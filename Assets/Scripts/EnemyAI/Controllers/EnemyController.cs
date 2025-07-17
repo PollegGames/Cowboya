@@ -64,6 +64,13 @@ public class EnemyController : PhysicsBaseAgentController
         waypointNotifier.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
         this.dropContainer = dropContainer;
+
+        if (SecurityBadgeSpawner.Instance != null)
+        {
+            if (initialBadge != null)
+                Destroy(initialBadge.gameObject);
+            initialBadge = SecurityBadgeSpawner.Instance.SpawnBadge(transform);
+        }
     }
 
     public void SetSecurityGuardState()

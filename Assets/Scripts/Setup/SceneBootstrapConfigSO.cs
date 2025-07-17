@@ -9,6 +9,7 @@ public class SceneBootstrapConfigSO : ScriptableObject
     public MapManager mapManagerPrefab;
     public WaypointService waypointServicePrefab;
     public RobotRespawnService respawnServicePrefab;
+    public SecurityBadgeSpawner badgeSpawnerPrefab;
     public SceneController sceneControllerPrefab;
     public GameUIViewModel gameUIViewModelPrefab;
     public VictorySetup victorySetupPrefab;
