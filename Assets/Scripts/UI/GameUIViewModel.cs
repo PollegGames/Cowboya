@@ -22,6 +22,13 @@ public class GameUIViewModel : MonoBehaviour
 
         previewVE = ui.Q<VisualElement>("miniMapPreview");
 
+        var service = MessageService.Instance;
+        if (service == null)
+        {
+            service = gameObject.AddComponent<MessageService>();
+        }
+        service.Initialize(ui);
+
         // hudMiniMap = GetComponentInChildren<HUDMiniMap>(true);
     }
 

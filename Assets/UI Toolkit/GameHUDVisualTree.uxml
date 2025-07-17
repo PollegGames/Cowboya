@@ -52,5 +52,6 @@
         <engine:VisualElement style="flex-grow: 1; align-items: flex-start; justify-content: flex-end;">
             <engine:VisualElement name="miniMapPreview" class="grid-preview" style="height: 134px; width: 442px; margin-top: 0;" />
         </engine:VisualElement>
+        <engine:Label name="GameMessageLabel" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background-color: rgba(0,0,0,0.6); color: white; padding: 5px; unity-font-style: bold; display: none;" />
     </engine:VisualElement>
 </engine:UXML>
