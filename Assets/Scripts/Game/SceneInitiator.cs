@@ -11,6 +11,7 @@ public class SceneInitiator : GameInitiator
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
     private RunMapConfigSO mapConfig;
+    private HUDMiniMap hudMiniMap;
     private VictorySetup victorySetup;
     private ISaveService saveService;
 
@@ -36,6 +37,7 @@ public class SceneInitiator : GameInitiator
         this.respawnService = respawnService;
         this.victorySetup = victorySetup;
         this.saveService = saveService;
+        this.hudMiniMap = gameUIViewModel != null ? gameUIViewModel.HUDMiniMap : null;
 
         if (RunProgressManager.Instance != null)
         {
@@ -53,6 +55,10 @@ public class SceneInitiator : GameInitiator
     {
         InitializeSharedObjects();
         InitializeFactory();
+        if (hudMiniMap != null)
+        {
+            hudMiniMap.Setup(mapManager, waypointService, respawnService);
+        }
         InitializeSceneController();
         InitializePlayer();
         InitializeEnemies();
