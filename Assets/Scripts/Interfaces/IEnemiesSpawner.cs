@@ -8,6 +8,7 @@ public interface IEnemiesSpawner
         GameUIViewModel viewModel,
         IRobotRespawnService respawnService,
         MachineSecurityManager securityManager);
+    void SetDropContainer(Transform container);
     void CreateWorkers(int workersToSpawn);
     void CreateEnemies(int enemiesToSpawn);
     void CreateBoss();
