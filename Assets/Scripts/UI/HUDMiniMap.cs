@@ -1,4 +1,6 @@
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class HUDMiniMap : MonoBehaviour
 {
@@ -14,12 +16,17 @@ public class HUDMiniMap : MonoBehaviour
         this.mapManager = mapManager;
         this.waypointService = waypointService;
         this.respawnService = respawnService;
-
-    private MapManager mapManager;
+    }
     private IFactoryManager factoryManager;
-    private IWaypointService waypointService;
     private VisualElement previewElement;
 
+    [SerializeField] private string miniMapPrefabPath = "Prefabs/Map/MiniMapCamera";
+    [SerializeField] private RenderTexture miniMapRT;
+
+    public RenderTexture MiniMapTexture => miniMapRT;
+
+    private Camera miniMapCamera;
+    private GameObject miniMapCameraInstance;
     public void Initialize(MapManager mapManager, IFactoryManager factoryManager, IWaypointService waypointService, VisualElement preview)
     {
         this.mapManager = mapManager;

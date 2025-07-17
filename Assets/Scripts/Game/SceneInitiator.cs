@@ -14,8 +14,6 @@ public class SceneInitiator : GameInitiator
     private HUDMiniMap hudMiniMap;
     private VictorySetup victorySetup;
     private ISaveService saveService;
-    private HUDMiniMap hudMiniMap;
-
     private SceneController sceneController;
 
     public void Construct(
@@ -101,7 +99,7 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeEnemies()
     {
-        enemiesSpawner?.SetDropContainer(factoryManager.transform);
+        enemiesSpawner?.SetDropContainer(mapManager.transform);
         enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager );
         if (mapConfig != null)
         {

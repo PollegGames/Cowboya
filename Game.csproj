@@ -260,6 +260,7 @@
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingPunchAttack.cs" />
     <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
+    <Compile Include="Assets\Scripts\UI\HUDMiniMap.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IEnemiesSpawner.cs" />
   </ItemGroup>
