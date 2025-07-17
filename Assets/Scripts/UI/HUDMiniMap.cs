@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -65,8 +66,7 @@ public class HUDMiniMap : MonoBehaviour
 
         if (previewElement != null && miniMapRT != null)
         {
-            previewElement.style.backgroundImage = new StyleBackground(miniMapRT);
-            previewElement.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            StartCoroutine(CaptureRTToUI());
         }
     }
 
@@ -137,5 +137,24 @@ public class HUDMiniMap : MonoBehaviour
         PositionCamera();
         // Camera renders automatically to RenderTexture
 
+    }
+
+    private IEnumerator CaptureRTToUI()
+    {
+        yield return new WaitForEndOfFrame();
+
+        var tex = new Texture2D(miniMapRT.width, miniMapRT.height, TextureFormat.RGBA32, false)
+        {
+            filterMode = FilterMode.Point
+        };
+
+        var prev = RenderTexture.active;
+        RenderTexture.active = miniMapRT;
+        tex.ReadPixels(new Rect(0, 0, miniMapRT.width, miniMapRT.height), 0, 0);
+        tex.Apply();
+        RenderTexture.active = prev;
+
+        previewElement.style.backgroundImage = new StyleBackground(tex);
+        previewElement.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
     }
 }

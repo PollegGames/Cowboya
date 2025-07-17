@@ -18,6 +18,8 @@ public class GameUIViewModel : MonoBehaviour
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
 
+        miniMapPreview = ui.Q<VisualElement>("preview");
+
         hudMiniMap = GetComponentInChildren<HUDMiniMap>(true);
     }
 
@@ -68,10 +70,21 @@ public class GameUIViewModel : MonoBehaviour
 
     public void SetMiniMapTexture(RenderTexture rt)
     {
-        if (miniMapPreview != null && rt != null)
+        if (miniMapPreview == null || rt == null)
+            return;
+
+        var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false)
         {
-            miniMapPreview.style.backgroundImage = new StyleBackground(rt);
-            miniMapPreview.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
-        }
+            filterMode = FilterMode.Point
+        };
+
+        var prev = RenderTexture.active;
+        RenderTexture.active = rt;
+        tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+        tex.Apply();
+        RenderTexture.active = prev;
+
+        miniMapPreview.style.backgroundImage = new StyleBackground(tex);
+        miniMapPreview.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
     }
 }
