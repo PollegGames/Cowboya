@@ -252,6 +252,13 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToSpawningMachine.cs" />
     <Compile Include="Assets\Scripts\Game\RunProgressManager.cs" />
     <Compile Include="Assets\Scripts\Game\LevelEndTrigger.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\IGrabbable.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\SecurityBadgePickup.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\PickupBox.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\HoldButton.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\LeverHandle.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\GrabHandAttractor.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\GrabSystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\Game.asmdef" />
