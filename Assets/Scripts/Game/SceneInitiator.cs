@@ -11,8 +11,10 @@ public class SceneInitiator : GameInitiator
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
     private RunMapConfigSO mapConfig;
+    private HUDMiniMap hudMiniMap;
     private VictorySetup victorySetup;
     private ISaveService saveService;
+    private HUDMiniMap hudMiniMap;
 
     private SceneController sceneController;
 
@@ -36,6 +38,9 @@ public class SceneInitiator : GameInitiator
         this.respawnService = respawnService;
         this.victorySetup = victorySetup;
         this.saveService = saveService;
+        this.hudMiniMap = gameUIViewModel.GetComponent<HUDMiniMap>();
+        if (this.hudMiniMap == null)
+            this.hudMiniMap = gameUIViewModel.gameObject.AddComponent<HUDMiniMap>();
 
         if (RunProgressManager.Instance != null)
         {
@@ -53,10 +58,15 @@ public class SceneInitiator : GameInitiator
     {
         InitializeSharedObjects();
         InitializeFactory();
+        if (hudMiniMap != null)
+        {
+            hudMiniMap.Setup(mapManager, waypointService, respawnService);
+        }
         InitializeSceneController();
         InitializePlayer();
         InitializeEnemies();
         InitializeVictorySetup();
+        InitializeMiniMap();
     }
 
     private void InitializeFactory()
@@ -91,6 +101,7 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeEnemies()
     {
+        enemiesSpawner?.SetDropContainer(factoryManager.transform);
         enemiesSpawner?.Initialize(mapManager, waypointService, gameUIViewModel, respawnService, factoryManager.SecurityManager );
         if (mapConfig != null)
         {
@@ -126,6 +137,15 @@ public class SceneInitiator : GameInitiator
         else
         {
             Debug.LogWarning("VictorySetup is not assigned.");
+        }
+    }
+
+    private void InitializeMiniMap()
+    {
+        if (hudMiniMap != null)
+        {
+            hudMiniMap.Initialize(mapManager, factoryManager, waypointService, gameUIViewModel.miniMapPreview);
+            gameUIViewModel.SetMiniMapTexture(hudMiniMap.MiniMapTexture);
         }
     }
 }
