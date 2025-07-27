@@ -31,6 +31,10 @@ public class GameUIViewModel : MonoBehaviour
 
         // hudMiniMap = GetComponentInChildren<HUDMiniMap>(true);
     }
+    private void Start()
+    {
+        MessageService.Instance?.ShowMessage(GameMessages.System.Start);
+    }
 
     public void SetPlayer(RobotStateController robot)
     {

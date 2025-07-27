@@ -37,4 +37,11 @@ public static class GameMessages
         public static GameMessage WorkstationFound => new("A workstation... could be useful.", MessageSpeaker.Player);
         public static GameMessage RestZone => new("Looks like a rest zone for the bots.", MessageSpeaker.Player);
     }
+
+    public static class System
+    {
+        public static GameMessage Start => new("Boot sequence complete. Good luck.", MessageSpeaker.Narrator);
+        public static GameMessage GameOver => new("System failure. Run terminated.", MessageSpeaker.Narrator);
+        public static GameMessage Victory => new("Mission accomplished.", MessageSpeaker.Narrator);
+    }
 }
