@@ -28,5 +28,6 @@ public enum AlarmState
 {
     Normal,
     Wanted,
+    Revolt,
     Lockdown
 }

@@ -26,6 +26,7 @@ public class DoorController : MonoBehaviour
     public Material blockedMaterial;
 
     private bool isAlarmActive = false;
+    private bool isRevolt = false;
     private bool isOpen = false;
     private bool isAnimating = false;
 
@@ -106,6 +107,7 @@ public class DoorController : MonoBehaviour
     private void OnRoomAlarmChanged(AlarmState state)
     {
         isAlarmActive = (state == AlarmState.Wanted || state == AlarmState.Lockdown);
+        isRevolt = state == AlarmState.Revolt;
         EvaluateDoorState();
     }
 
@@ -135,6 +137,12 @@ public class DoorController : MonoBehaviour
     }
     public void EvaluateDoorState()
     {
+        if (isRevolt)
+        {
+            OpenDoor();
+            UpdateStatusPanel();
+            return;
+        }
         if (isWall)
         {
             CloseDoor(forceClose: true);

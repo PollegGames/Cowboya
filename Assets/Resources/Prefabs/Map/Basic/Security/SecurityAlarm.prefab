@@ -27,7 +27,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 4.92482, y: 1.6709542, z: -1.6926308}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.0000002, z: 1.0000002}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1784686871567928546}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderer: {fileID: 5525516191983193979}
   flashSpeed: 2
-  factoryAlarmStatus: {fileID: 11400000, guid: ce6d93aba8639b74f8e3f0b7ef4b3919, type: 2}
+  roomManager: {fileID: 0}
 --- !u!1001 &702065579116641287
 PrefabInstance:
   m_ObjectHideFlags: 0

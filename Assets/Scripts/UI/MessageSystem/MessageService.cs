@@ -24,7 +24,7 @@ public class MessageService : MonoBehaviour
         messageLabel = root.Q<Label>("GameMessageLabel");
     }
 
-    public void ShowMessage(GameMessage message, float duration = 3f)
+    public void ShowMessage(GameMessage message, float duration = 5f)
     {
         if (messageLabel == null) return;
 

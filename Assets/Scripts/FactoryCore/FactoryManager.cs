@@ -85,6 +85,10 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         victorySetup.currentSaved++;
         Debug.Log("Robot SAVED");
         // Optionally: Check for victory condition here
+        if (victorySetup.currentSaved >= victorySetup.robotsSavedTarget)
+        {
+            factoryAlarmStatus.CurrentAlarmState = AlarmState.Revolt;
+        }
     }
 
     public void OnRobotKilled()

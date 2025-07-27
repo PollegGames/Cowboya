@@ -47,6 +47,9 @@ public class GameUIViewModel : MonoBehaviour
             robotInfo.OnEnergyChanged += UpdateEnergyBar;
             robotInfo.OnHealthChanged += UpdateHealthBar;
 
+            // Listen for player state changes
+            robotBehaviour.OnStateChanged += HandleRobotStateChange;
+
             // Initial UI update
             UpdateEnergyBar();
             UpdateHealthBar();
@@ -59,6 +62,13 @@ public class GameUIViewModel : MonoBehaviour
         }
     }
 
+    private void HandleRobotStateChange(RobotState newState)
+    {
+        if (newState == RobotState.Dead)
+        {
+            MessageService.Instance?.ShowMessage(GameMessages.System.GameOver);
+        }
+    }
     private void UpdateEnergyBar()
     {
         if (robotBehaviour != null && robotBehaviour.Stats != null)
@@ -109,6 +119,14 @@ public class GameUIViewModel : MonoBehaviour
         // 3) Capture en Texture2D via Coroutine
         StartCoroutine(CaptureRTToUI());
     }
+    private void OnDestroy()
+    {
+        if (robotBehaviour != null)
+        {
+            robotBehaviour.OnStateChanged -= HandleRobotStateChange;
+        }
+    }
+
 
     private IEnumerator CaptureRTToUI()
     {
