@@ -106,7 +106,17 @@ public class WaypointPathFollower : IRobotNavigationListener
 
         if (start == target)
         {
-            Debug.LogError($"Already at destination {target.name}, no pathfinding needed.");
+            Debug.LogWarning($"Already at destination {target.name}, no pathfinding needed.");
+            return;
+        }
+        if (start == null)
+        {
+            Debug.LogWarning("Start is null, no pathfinding");
+            return;
+        }
+        if (target == null)
+        {
+            Debug.LogWarning("Start is null, no pathfinding");
             return;
         }
 

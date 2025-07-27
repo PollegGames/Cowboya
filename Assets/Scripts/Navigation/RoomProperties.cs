@@ -12,6 +12,8 @@ public class RoomProperties : MonoBehaviour
     public bool HasLiftDown { get; set; }
     public bool HasRightDoorLocked { get; set; } 
     public bool HasLeftDoorLocked { get; set; }
+    public bool IsVictoryDoorLeft { get; set; } = false;
+    public bool IsVictoryDoorRight { get; set; } = false;
     public UsageType usageType;
     public POIType poiType;
 

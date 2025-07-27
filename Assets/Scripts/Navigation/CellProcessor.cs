@@ -48,6 +48,21 @@ public abstract class CellProcessor : ICellProcessor
         }
     }
 
+    protected void MarkVictoryDoorIfOnEdge(Cell cell)
+    {
+        Vector2Int pos = cell.cellProperties.GridPosition;
+
+        if (pos.x == 0)
+        {
+            cell.cellProperties.IsVictoryDoorLeft = true;
+        }
+
+        if (pos.x == width - 1)
+        {
+            cell.cellProperties.IsVictoryDoorRight = true;
+        }
+    }
+
     protected void BlockLift(Cell cell, LiftDirection dir)
     {
         switch (dir)

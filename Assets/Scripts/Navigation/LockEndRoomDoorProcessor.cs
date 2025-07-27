@@ -17,7 +17,7 @@ public class LockEndRoomDoorProcessor : CellProcessor
                 LockDoor(cell, DoorDirection.Left);
                 LockDoor(cell, DoorDirection.Right);
             }
-            
+
             // Check right neighbor
             Vector2 rightPos = new Vector2(pos.x + 1, pos.y);
             if (cellDataGrid.TryGetValue(rightPos, out Cell rightCell))
@@ -37,6 +37,8 @@ public class LockEndRoomDoorProcessor : CellProcessor
                     LockDoor(cell, DoorDirection.Left);
                 }
             }
+            // Mark the door as a victory door if this End room is at the map edge
+            MarkVictoryDoorIfOnEdge(cell);
         }
     }
 }

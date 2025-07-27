@@ -40,6 +40,9 @@ public class DoorController : MonoBehaviour
     [Header("Door Settings")]
     public float safetyCheckInterval = 5f;
 
+    [Header("Victory")]
+    public bool isVictoryDoor = false;
+
     private void Start()
     {
         if (roomManager != null)
@@ -48,11 +51,13 @@ public class DoorController : MonoBehaviour
             {
                 isWall = !roomManager.roomProperties.HasLeftDoor;
                 normalRequiresBadge = roomManager.roomProperties.HasLeftDoorLocked;
+                isVictoryDoor = roomManager.roomProperties.IsVictoryDoorLeft;
             }
             else if (moveDirection == Vector2.right)
             {
                 isWall = !roomManager.roomProperties.HasRightDoor;
                 normalRequiresBadge = roomManager.roomProperties.HasRightDoorLocked;
+                isVictoryDoor = roomManager.roomProperties.IsVictoryDoorRight;
             }
         }
         CachePanelPositions();

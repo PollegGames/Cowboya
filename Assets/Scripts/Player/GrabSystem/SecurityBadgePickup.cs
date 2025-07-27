@@ -1,28 +1,40 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(SpringJoint2D))]
 public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 {
     [Header("Throw settings")]
     public float throwStrength = 5f;
 
+    [Header("Spring Joint Settings")]
+    [Tooltip("How springy the joint is.")]
+    [SerializeField] private float frequency = 5f;
+    [Tooltip("How much the joint resists oscillation.")]
+    [SerializeField] private float dampingRatio = 0.8f;
+    [Tooltip("Rest length of the spring.")]
+    [SerializeField] private float restDistance = 0f;
+
     Rigidbody2D rb;
-    TargetJoint2D joint;
+    SpringJoint2D spring;
     bool attached = false;
 
     void Awake()
     {
-        rb    = GetComponent<Rigidbody2D>();
-        joint = GetComponent<TargetJoint2D>();
+        rb     = GetComponent<Rigidbody2D>();
+        spring = GetComponent<SpringJoint2D>();
 
         // Start disabled — only enable when grabbed
-        joint.enabled = false;
+        spring.enabled = false;
 
-        // Tweak as you like in Inspector:
-        joint.frequency       = 5f;   // springiness
-        joint.dampingRatio    = 0.8f; // how “snappy” it is
-        joint.maxForce        = 1000f;
-        joint.autoConfigureTarget = false;
+        // Configure spring behavior
+        spring.autoConfigureDistance = false;
+        spring.distance              = restDistance;
+        spring.frequency             = frequency;
+        spring.dampingRatio          = dampingRatio;
+        // Note: SpringJoint2D has no maxForce setting
+
+        // If we attach to a world point (no Rigidbody), we will use connectedAnchor
+        spring.connectedBody = null;
     }
 
     public bool CanBeGrabbed()
@@ -33,38 +45,43 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     public void OnGrab(Transform grabParent)
     {
         attached = true;
-
-        // Make sure physics is on
         rb.simulated = true;
 
-        // Connect the joint to the hand’s rigidbody (if any)
+        // Try to hook up to the hand's Rigidbody2D
         var handRb = grabParent.GetComponentInParent<Rigidbody2D>();
         if (handRb != null)
-            joint.connectedBody = handRb;
+        {
+            spring.connectedBody = handRb;
+        }
         else
-            joint.connectedBody = null;
+        {
+            spring.connectedBody   = null;
+            // anchor at current position so it doesn't snap
+            spring.connectedAnchor = transform.position;
+        }
 
-        // Enable the joint; set its initial target to current position
-        joint.enabled        = true;
-        joint.target         = transform.position;
+        spring.distance = restDistance;
+        spring.enabled  = true;
     }
 
     public void OnAttract(Vector2 attractPoint)
     {
-        // Each frame you hold, update the joint’s target
-        if (attached && joint.enabled)
-            joint.target = attractPoint;
+        // Update world‐anchor if we're not tied to an actual Rigidbody2D
+        if (attached && spring.enabled && spring.connectedBody == null)
+        {
+            spring.connectedAnchor = attractPoint;
+        }
     }
 
     public void OnRelease(Vector2 throwForce)
     {
         attached = false;
 
-        // Turn off the joint
-        joint.enabled        = false;
-        joint.connectedBody  = null;
+        // Turn off the spring
+        spring.enabled        = false;
+        spring.connectedBody  = null;
 
-        // Give it some velocity so it flies off
-        rb.AddForce(throwForce, ForceMode2D.Impulse);
+        // // Give it some velocity so it flies off
+        // rb.AddForce(throwForce * throwStrength, ForceMode2D.Impulse);
     }
 }

@@ -70,7 +70,7 @@ public class EnemyController : PhysicsBaseAgentController
         {
             if (initialBadge != null)
                 Destroy(initialBadge.gameObject);
-            initialBadge = securityBadgeSpawner.SpawnBadge(transform);
+            initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
         }
     }
 
@@ -149,14 +149,7 @@ public class EnemyController : PhysicsBaseAgentController
     {
         if (initialBadge == null) return;
 
-        var joint = initialBadge.GetComponent<DistanceJoint2D>();
-        if (joint != null)
-        {
-            joint.enabled = false;
-            joint.connectedBody = null;
-        }
-
-        initialBadge.OnRelease(Vector2.down);
+        initialBadge.OnRelease(Vector2.zero);
 
         if (dropContainer != null)
             initialBadge.transform.SetParent(dropContainer, true);

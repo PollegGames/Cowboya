@@ -1,0 +1,95 @@
+using NUnit.Framework;
+using UnityEngine;
+using System.Reflection;
+
+public class GrabSystemTests
+{
+    private class DummyInput : MonoBehaviour, IPlayerInput
+    {
+        public Vector2 Movement => Vector2.zero;
+        public bool JumpPressed => false;
+        public bool PrimaryAttack => false;
+
+        public bool LeftGrabDown => throw new System.NotImplementedException();
+
+        public bool LeftGrabHeld => throw new System.NotImplementedException();
+
+        public bool LeftGrabUp => throw new System.NotImplementedException();
+
+        public bool RightGrabDown => throw new System.NotImplementedException();
+
+        public bool RightGrabHeld => throw new System.NotImplementedException();
+
+        public bool RightGrabUp => throw new System.NotImplementedException();
+
+        public bool LeftGrabPressed;
+        public bool RightGrabPressed;
+    }
+
+    private class DummyGrabbable : MonoBehaviour, IGrabbable
+    {
+        public bool grabbed;
+        public bool released;
+        public Vector2 releasedForce;
+        public bool CanBeGrabbed() => true;
+        public void OnGrab(Transform grabParent)
+        {
+            grabbed = true;
+            transform.SetParent(grabParent);
+        }
+        public void OnRelease(Vector2 throwForce)
+        {
+            released = true;
+            releasedForce = throwForce;
+            transform.SetParent(null);
+        }
+        public void OnAttract(Vector2 attractPoint) {}
+    }
+
+    [Test]
+    public void GrabSystem_GrabAndReleaseObject()
+    {
+        // setup hand
+        var handObj = new GameObject("hand");
+        var attractor = handObj.AddComponent<GrabHandAttractor>();
+        attractor.detectionRadius = 1f;
+        int layer = 8;
+        attractor.detectionLayer = 1 << layer;
+
+        // object to grab
+        var obj = new GameObject("grab");
+        obj.layer = layer;
+        obj.AddComponent<CircleCollider2D>();
+        var grab = obj.AddComponent<DummyGrabbable>();
+        obj.transform.position = handObj.transform.position;
+
+        // grab system
+        var systemObj = new GameObject("system");
+        var system = systemObj.AddComponent<GrabSystem>();
+        system.leftHand = attractor;
+        system.throwStrength = 2f;
+        var inputObj = new GameObject("input");
+        var input = inputObj.AddComponent<DummyInput>();
+        typeof(GrabSystem).GetField("inputSource", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(system, input);
+        typeof(GrabSystem).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(system, null);
+
+        var leftHeldField = typeof(GrabSystem).GetField("leftHeld", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // grab
+        input.LeftGrabPressed = true;
+        // system.Update();
+        input.LeftGrabPressed = false;
+        // system.Update();
+
+        Assert.IsTrue(grab.grabbed);
+        Assert.AreEqual(grab, leftHeldField.GetValue(system));
+
+        // release
+        input.LeftGrabPressed = true;
+        // system.Update();
+
+        Assert.IsTrue(grab.released);
+        Assert.AreEqual(Vector2.right * system.throwStrength, grab.releasedForce);
+        Assert.IsNull(leftHeldField.GetValue(system));
+    }
+}

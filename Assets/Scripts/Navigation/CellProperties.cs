@@ -10,6 +10,8 @@ public class CellProperties
     public bool HasRightDoor { get; set; } = true;
     public bool HasLeftDoorLocked { get; set; } = false;
     public bool HasRightDoorLocked { get; set; } = false;
+    public bool IsVictoryDoorLeft { get; set; } = false;
+    public bool IsVictoryDoorRight { get; set; } = false;
     public bool HasLiftUpBlocked { get; set; } = false;
     public bool HasLiftDownBlocked { get; set; } = false;
     public UsageType usageType;

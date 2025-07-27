@@ -63,6 +63,8 @@ public class GridManager
                 roomProps.HasRightDoor = cell.cellProperties.HasRightDoor;
                 roomProps.HasLeftDoorLocked = cell.cellProperties.HasLeftDoorLocked;
                 roomProps.HasRightDoorLocked = cell.cellProperties.HasRightDoorLocked;
+                roomProps.IsVictoryDoorLeft = cell.cellProperties.IsVictoryDoorLeft;
+                roomProps.IsVictoryDoorRight = cell.cellProperties.IsVictoryDoorRight;
                 roomProps.HasLiftUp = cell.cellProperties.HasLiftUpBlocked;
                 roomProps.HasLiftDown = cell.cellProperties.HasLiftDownBlocked;
                 roomProps.GridPosition = cell.cellProperties.GridPosition;

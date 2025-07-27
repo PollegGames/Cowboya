@@ -87,7 +87,14 @@ public class WaypointService : MonoBehaviour, IWaypointService
     }
     public void UpdateClosestWaypointToPlayer(Vector2 playerPosition)
     {
-        ClosestWaypointToPlayer = GetClosestWaypoint(playerPosition);
+        if (playerPosition != null)
+        {
+            var point = GetClosestWaypoint(playerPosition);
+            if (point != null)
+            {
+                ClosestWaypointToPlayer = point;
+            }
+        }
     }
     public List<RoomWaypoint> GetActiveWaypointsList() => GetActiveWaypoints(); // alias
     public void BuildAllNeighbors(bool includeUnavailable = false) => pathFinder.BuildAllNeighbors(includeUnavailable);

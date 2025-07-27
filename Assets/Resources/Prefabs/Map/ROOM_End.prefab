@@ -3425,11 +3425,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 397362385763922421, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: m_VersionIndex
-      value: 17316
+      value: 17322
       objectReference: {fileID: 0}
     - target: {fileID: 1169528240822341814, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: m_VersionIndex
-      value: 17091
+      value: 17097
       objectReference: {fileID: 0}
     - target: {fileID: 1602069322536624324, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3481,7 +3481,7 @@ PrefabInstance:
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 4536504392865045297, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: alarmLocksDoor
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4536504392865045297, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: perimeterBlocked
@@ -3505,7 +3505,7 @@ PrefabInstance:
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 9098314284956102251, guid: 087a3d4561f0c8a4bb6df59aa5a402e4, type: 3}
       propertyPath: m_VersionIndex
-      value: 17328
+      value: 17334
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3823,7 +3823,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1551552126566190617, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: m_VersionIndex
-      value: 17073
+      value: 17079
       objectReference: {fileID: 0}
     - target: {fileID: 4183952749486616820, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: roomManager
@@ -3831,7 +3831,7 @@ PrefabInstance:
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 4183952749486616820, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: alarmLocksDoor
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4183952749486616820, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: moveDirection.x
@@ -3899,11 +3899,11 @@ PrefabInstance:
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 6046182831874952323, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: m_VersionIndex
-      value: 17343
+      value: 17349
       objectReference: {fileID: 0}
     - target: {fileID: 7319420028028133442, guid: 635d5949b77ba1f4d8c8b4276a9b7388, type: 3}
       propertyPath: m_VersionIndex
-      value: 17346
+      value: 17352
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3936,7 +3936,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 706902999064495847, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 22.36
+      value: 22.71
       objectReference: {fileID: 0}
     - target: {fileID: 706902999064495847, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3982,6 +3982,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Load RunSetupGrid Right
       objectReference: {fileID: 0}
+    - target: {fileID: 3567117641040124081, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
+      propertyPath: m_Size.y
+      value: 0.56929195
+      objectReference: {fileID: 0}
+    - target: {fileID: 3567117641040124081, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.004020676
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4006,7 +4014,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 706902999064495847, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -23.84
+      value: -24.84
       objectReference: {fileID: 0}
     - target: {fileID: 706902999064495847, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4014,7 +4022,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 706902999064495847, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.14
+      value: -3.07
       objectReference: {fileID: 0}
     - target: {fileID: 706902999064495847, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4059,6 +4067,14 @@ PrefabInstance:
     - target: {fileID: 2782571302028958996, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3567117641040124081, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
+      propertyPath: m_Size.y
+      value: 0.58157754
+      objectReference: {fileID: 0}
+    - target: {fileID: 3567117641040124081, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.0021221787
       objectReference: {fileID: 0}
     - target: {fileID: 3567117641040124081, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_SpriteTilingProperty.pivot.y

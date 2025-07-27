@@ -330,7 +330,7 @@ public class RunSetupManager : MonoBehaviour
         waypointServiceInstance = Instantiate(waypointServicePrefab);
         enemiesSpawnerInstance = Instantiate(enemiesSpawnerPrefab);
         enemiesSpawnerInstance.SetDropContainer(factoryManagerInstance.transform);
-        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager,null);
+        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager, null);
 
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 
@@ -417,9 +417,15 @@ public class RunSetupManager : MonoBehaviour
     // =====================================================================
     // LAUNCH RUN
     // =====================================================================
+
+    [SerializeField] private RunProgressManager runProgressManagerPrefab;
     private string runSceneName = "MapGeneration";
     private void StartRun()
     {
-        SceneController.instance.LoadScene(runSceneName);
+        if (RunProgressManager.Instance == null && runProgressManagerPrefab != null)
+        {
+            Instantiate(runProgressManagerPrefab);
+        }
+        RunProgressManager.Instance.LoadStressTestLevel();
     }
 }
