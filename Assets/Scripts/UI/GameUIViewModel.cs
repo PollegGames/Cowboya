@@ -33,7 +33,17 @@ public class GameUIViewModel : MonoBehaviour
     }
     private void Start()
     {
-        MessageService.Instance?.ShowMessage(GameMessages.System.Start);
+        var startMessage = GameMessages.System.Start;
+        string levelPrefix = string.Empty;
+
+        if (RunProgressManager.Instance != null)
+        {
+            int index = RunProgressManager.Instance.CurrentLevelIndex;
+            levelPrefix = index == 0 ? "Tutorial - Level 0: " : $"Level {index}: ";
+        }
+
+        var msg = new GameMessage(levelPrefix + startMessage.Text, startMessage.Speaker);
+        MessageService.Instance?.ShowMessage(msg);
     }
 
     public void SetPlayer(RobotStateController robot)
