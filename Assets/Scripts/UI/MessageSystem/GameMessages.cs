@@ -7,6 +7,15 @@ public static class GameMessages
         public static GameMessage FirstAttack => new("Try your punch on the test robot.", MessageSpeaker.DrHex);
     }
 
+    public static class Tutorial
+    {
+        public static GameMessage Attack => new("Left click to attack enemies.", MessageSpeaker.Narrator);
+        public static GameMessage Interact => new("Right click to interact with objects and robots.", MessageSpeaker.Narrator);
+        public static GameMessage SaveRobots => new("Save robots — saving all of them opens all the doors.", MessageSpeaker.Narrator);
+        public static GameMessage Badges => new("Defeat security robots — they drop badges that unlock restricted doors.", MessageSpeaker.Narrator);
+        public static GameMessage NextLevel => new("Enter the final door in the last room to reach the next level.", MessageSpeaker.Narrator);
+    }
+
     public static class Room
     {
         public static GameMessage EnterNeutralRoom => new("This is a neutral room. Watch the robots.", MessageSpeaker.Player);
