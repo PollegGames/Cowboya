@@ -1,5 +1,10 @@
 using System.IO;
 using UnityEngine;
+
+// When running in WebGL builds, file writes occur in memory and are synced to
+// IndexedDB. The accompanying index.html enables
+// config.autoSyncPersistentDataPath for automatic persistence. If saving fails
+// on WebGL, consider falling back to PlayerPrefs or another storage solution.
 public class PlayerSaveService : MonoBehaviour, ISaveService
 {
     [SerializeField] private PlayerTemplate runtimePlayerData; // Assign in the Inspector
@@ -29,6 +34,7 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
 
         var json = JsonUtility.ToJson(CurrentSaveData);
         File.WriteAllText(saveFilePath, json);
+        // In WebGL builds the write happens in memory and is synced to IndexedDB.
         Debug.Log("Game saved at " + saveFilePath);
     }
 
@@ -43,7 +49,9 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
         }
         else
         {
-            // Initialize a new save data if no file exists
+            // Initialize a new save data if no file exists. On WebGL this may
+            // happen when the IndexedDB storage is empty. PlayerPrefs can be
+            // used as a fallback if file operations fail.
             CurrentSaveData = new SaveData();
             SaveGame();
             Debug.Log("New save data created and saved.");
