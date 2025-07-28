@@ -26,9 +26,9 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
             CurrentSaveData = new SaveData(); // Ensure CurrentSaveData is not null before saving
         }
         RobotStateController robotBehaviour = runtimePlayerData.RobotGameObjectPrefab.GetComponent<RobotStateController>();
-        CurrentSaveData.MaxHealth = robotBehaviour.Stats.MaxHealth;
-        CurrentSaveData.MaxEnergy = robotBehaviour.Stats.MaxEnergy;
-        CurrentSaveData.AttackEnergyCost = robotBehaviour.Stats.AttackEnergyCost;
+        // CurrentSaveData.MaxHealth = robotBehaviour.Stats.MaxHealth;
+        // CurrentSaveData.MaxEnergy = robotBehaviour.Stats.MaxEnergy;
+        // CurrentSaveData.AttackEnergyCost = robotBehaviour.Stats.AttackEnergyCost;
         // CurrentSaveData.experience = runtimePlayerData.experience;
         // Map other fields as needed
 

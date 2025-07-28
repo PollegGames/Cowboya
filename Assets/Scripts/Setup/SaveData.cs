@@ -5,11 +5,11 @@ using UnityEngine;
 public class SaveData
 {
     [field: SerializeField] public string SaveName { get; set; }
-    [field: SerializeField] public float MaxHealth = 1f;
-    [field: SerializeField] public float CurrentHealth = 1f;
-    [field: SerializeField] public float MaxEnergy { get; set; } = 1f;
-    [field: SerializeField] public float EnergyRechargeRate { get; set; } = 1f;
-    [field: SerializeField] public float AttackEnergyCost { get; set; } = 10f;
+    [field: SerializeField] public float MaxHealth = 100f;
+    [field: SerializeField] public float CurrentHealth = 100f;
+    [field: SerializeField] public float MaxEnergy { get; set; } = 100f;
+    [field: SerializeField] public float EnergyRechargeRate { get; set; } = 5f;
+    [field: SerializeField] public float AttackEnergyCost { get; set; } = 5f;
     [field: SerializeField] public List<string> UnlockedAttacks { get; set; }
     [field: SerializeField] public List<string> AttackOrder { get; set; } // Customizable order of attacks
     [field: SerializeField] public int Gears { get; set; } = 0;// Total gears stored at the camp

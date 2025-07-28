@@ -7,9 +7,9 @@ public class PlayerRobotFactory : RobotFactory
 {
     public PlayerRobotFactory()
     {
-        health = 1;
-        energy = 1;
-        energyAttackCost=20;
+        health = 100;
+        energy = 100;
+        energyAttackCost=5;
         morality = 0;
     }
 

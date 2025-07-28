@@ -158,8 +158,8 @@
     <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SkinningModule\IMGUI\GUIWrapper.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SpriteLib\SpriteResolverInspector.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SkinningModule\DefaultPoseScope.cs" />
-    <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SpriteLib\SpriteLibrarySourceAsset\SpriteLibrarySourceAssetImporter.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SkinningModule\Selection\ISelection.cs" />
+    <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SpriteLib\SpriteLibrarySourceAsset\SpriteLibrarySourceAssetImporter.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SpriteLib\SpriteLibraryAssetDragAndDrop.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SkinningModule\IMGUI\SpriteMeshView.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation\Editor\SkinningModule\MeshTool\MeshToolWrapper.cs" />

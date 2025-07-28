@@ -70,8 +70,8 @@
     <Compile Include="Assets\Shapes2D\Editor\MenuItems.cs" />
     <Compile Include="Assets\Editor\TestingPlaceholders\SquareMover.cs" />
     <Compile Include="Assets\Editor\TestingPlaceholders\SquareMovementData.cs" />
-    <Compile Include="Assets\Editor\UnitTests\CellProcessorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\GrabSystemTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\CellProcessorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\FactoryManagerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\PickupBoxTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\ICellProcessorTests.cs" />
