@@ -33,3 +33,11 @@ unity -runTests -testPlatform EditMode -projectPath "$(pwd)" -quit
 ```
 
 The command will return a non‑zero exit code if any tests fail.
+
+### WebGL Persistent Data
+
+Saved files in WebGL builds reside in the browser's IndexedDB storage. The
+`PUBLISH_WEB/index.html` template sets `config.autoSyncPersistentDataPath = true`
+so writes to `Application.persistentDataPath` are automatically synchronized.
+If browser file operations fail, consider using `PlayerPrefs` or a custom
+JavaScript plugin.
