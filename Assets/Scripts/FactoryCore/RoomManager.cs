@@ -11,6 +11,8 @@ public class RoomManager : MonoBehaviour
     public RoomProperties roomProperties;
 
     public event Action<AlarmState> OnRoomAlarmChanged;
+    public event Action<RoomManager> PlayerEntered;
+    public event Action<RoomManager> PlayerExited;
 
     [Header("Zone Detection")]
     public PositionTriggerZone triggerZone;
@@ -113,12 +115,12 @@ public class RoomManager : MonoBehaviour
 
     public void OnPlayerEnterRoom(Collider2D playerCollider)
     {
-        // Debug.Log($"{playerCollider.name} RoomManager: ENTER this room.");
+        PlayerEntered?.Invoke(this);
     }
 
     public void OnPlayerExitRoom()
     {
-        // Debug.Log($"{gameObject.name} RoomManager: EXIT this room.");
+        PlayerExited?.Invoke(this);
     }
 
     public Bounds GetRoomBounds()

@@ -53,5 +53,10 @@ public class SceneBootstrapper : MonoBehaviour
                 badgeSpawner
             );
         }
+
+        if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 0)
+        {
+            new GameObject("TutorialManager").AddComponent<TutorialManager>();
+        }
     }
 }
