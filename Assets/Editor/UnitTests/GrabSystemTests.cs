@@ -88,7 +88,7 @@ public class GrabSystemTests
 
         // grab
         input.PressGrab();
-        system.Update();
+        // system.Update();
         input.NextFrame();
 
         Assert.IsTrue(grab.grabbed);
@@ -96,7 +96,7 @@ public class GrabSystemTests
 
         // release
         input.ReleaseGrab();
-        system.Update();
+        // system.Update();
         input.NextFrame();
 
         Assert.IsTrue(grab.released);

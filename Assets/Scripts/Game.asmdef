@@ -5,7 +5,9 @@
         "UnityEngine",
         "UnityEngine.CoreModule",
         "Unity.Mathematics",
-        "Unity.Cinemachine"
+        "Unity.Cinemachine",
+        "Unity.InputSystem",
+        "UpdateManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
