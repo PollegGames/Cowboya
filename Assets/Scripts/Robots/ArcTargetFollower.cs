@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ArcTargetFollower : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class ArcTargetFollower : MonoBehaviour
             return;
 
         // 1. Get the mouse position
-        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         mouseWorld.z = 0f;
 
         // 2. Calcul direction → position sur le cercle

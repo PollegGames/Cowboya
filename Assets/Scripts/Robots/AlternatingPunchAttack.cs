@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class AlternatingPunchAttack : MonoBehaviour
 {
@@ -26,31 +27,36 @@ public class AlternatingPunchAttack : MonoBehaviour
 
 
     private bool isPunching = false;
+    private InputSystem_Actions controls;
 
     private RobotStateController robotBehaviour;
 
     private void Awake()
     {
         robotBehaviour = GetComponent<RobotStateController>();
+        controls = new InputSystem_Actions();
+        controls.Player.Attack.started += OnAttackStarted;
     }
 
-    private void Update()
+    private void OnEnable() => controls.Enable();
+    private void OnDisable() => controls.Disable();
+
+    private void OnAttackStarted(InputAction.CallbackContext ctx)
     {
-        if (Input.GetMouseButtonDown(0) && !isPunching && robotBehaviour != null)
-        {
-            bool facingRight = arcTargetFollower.IsFacingRight;
+        if (isPunching || robotBehaviour == null) return;
 
-            // Choix du bras selon la direction
-            Transform armTarget = facingRight ? rightArmTarget : leftArmTarget;
-            AttackHitbox hitbox = facingRight ? rightArmHitbox : leftArmHitbox;
-            float damageCost = hitbox.DamageCost;
+        bool facingRight = arcTargetFollower.IsFacingRight;
 
-            // Consume energy
-            robotBehaviour.PerformAttackbyEnergy(damageCost);
+        // Choix du bras selon la direction
+        Transform armTarget = facingRight ? rightArmTarget : leftArmTarget;
+        AttackHitbox hitbox = facingRight ? rightArmHitbox : leftArmHitbox;
+        float damageCost = hitbox.DamageCost;
 
-            // Lance la coroutine
-            StartCoroutine(PunchSequence(armTarget, hitbox, facingRight));
-        }
+        // Consume energy
+        robotBehaviour.PerformAttackbyEnergy(damageCost);
+
+        // Lance la coroutine
+        StartCoroutine(PunchSequence(armTarget, hitbox, facingRight));
     }
 
     private IEnumerator PunchSequence(Transform armTarget, AttackHitbox hitbox, bool facingRight)

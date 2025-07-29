@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class RobotLocomotionController : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class RobotLocomotionController : MonoBehaviour
     public event Action OnJumpStarted;
     public event Action OnJumpEnded;
     private RobotStateController robotBehaviour;
+    private InputSystem_Actions controls;
 
     [SerializeField] private float energyCostPerStep = 1f;
     [SerializeField] private float energyCostPerJump = 3f;
@@ -31,7 +33,12 @@ public class RobotLocomotionController : MonoBehaviour
         robotBehaviour = GetComponent<RobotStateController>();
         if (robotBehaviour == null)
             Debug.LogError("RobotLocomotionController: PlayerStateController not found.");
+
+        controls = new InputSystem_Actions();
     }
+
+    private void OnEnable() => controls.Enable();
+    private void OnDisable() => controls.Disable();
 
     #region Movement
 
@@ -161,7 +168,7 @@ public class RobotLocomotionController : MonoBehaviour
         isJumping = false;
         StopWalking();
 
-        float input = Input.GetAxisRaw("Horizontal");
+        float input = controls.Player.Move.ReadValue<Vector2>().x;
         if (Mathf.Abs(input) > 0.2f)
             HandleMovement(input);
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class HeadTargetController : MonoBehaviour
 {
@@ -15,6 +16,15 @@ public class HeadTargetController : MonoBehaviour
     public float bendSpeed = 5f;
 
     private float currentBend = 0f;
+    private InputSystem_Actions controls;
+
+    private void Awake()
+    {
+        controls = new InputSystem_Actions();
+    }
+
+    private void OnEnable() => controls.Enable();
+    private void OnDisable() => controls.Disable();
 
     private void LateUpdate()
     {
@@ -26,7 +36,7 @@ public class HeadTargetController : MonoBehaviour
         mirroredOffsetX = Mathf.Clamp(mirroredOffsetX, -maxMirrorOffset, maxMirrorOffset);
 
         // 2. Movement direction → bend offset (which way to lean)
-        float input = Input.GetAxisRaw("Horizontal");
+        float input = controls.Player.Move.ReadValue<Vector2>().x;
         float targetBend = Mathf.Clamp(input, -1f, 1f) * maxBendOffset;
 
         // Smooth interpolation to avoid jerks
