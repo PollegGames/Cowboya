@@ -63,7 +63,16 @@ public class GrabSystem : MonoBehaviour
         if (obj != null && obj.CanBeGrabbed())
         {
             obj.OnGrab(hand.transform);
-            held = obj;
+
+            // Badges attach to the player's body and should not remain in hand
+            if (obj is SecurityBadgePickup)
+            {
+                held = null;
+            }
+            else
+            {
+                held = obj;
+            }
         }
     }
 

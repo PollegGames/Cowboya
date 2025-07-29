@@ -150,6 +150,9 @@ public class PlayerMovementController : MonoBehaviour
 
     public void Die()
     {
+        // Drop any badge the player is carrying
+        SecurityBadgePickup.DropPlayerBadge();
+
         var jointBreaker = GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();
     }
