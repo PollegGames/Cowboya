@@ -12,13 +12,13 @@ public class PickupBoxTests
         var box = obj.AddComponent<PickupBox>();
 
         box.OnGrab(hand);
-        Assert.IsTrue(rb.isKinematic);
+        Assert.AreEqual(RigidbodyType2D.Kinematic, rb.bodyType);
         Assert.AreEqual(hand, obj.transform.parent);
 
         Vector2 force = new Vector2(3f, 2f);
         box.OnRelease(force);
 
-        Assert.IsFalse(rb.isKinematic);
+        Assert.AreEqual(RigidbodyType2D.Dynamic, rb.bodyType);
         Assert.AreEqual(force, rb.linearVelocity);
         Assert.IsNull(obj.transform.parent);
     }
