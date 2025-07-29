@@ -58,7 +58,7 @@ public class RobotStateController : MonoBehaviour
     }
     public void ConsumeEnergy(float amount)
     {
-        energyBot.RechargingEnergy(-amount); // Recharge logique gérée dans EnergyBot
+        energyBot.RechargingEnergy(-amount); // Logical recharge handled in EnergyBot
     }
 
     public void PerformAttack(AttackType attackType)

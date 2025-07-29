@@ -1,13 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// Exemple d'implémentation d'un état simple : Idle (stationnaire) avec un rayon limite
-/// pour éviter les boucles infinies.
+/// Example implementation of a simple Idle state with a radius limit
+/// to prevent infinite loops.
 /// </summary>
 public class Enemy_Idle : EnemyState
 {
     private bool hasArrived;
-    private readonly float idleRadius = 2f;// Rayon d'indulgence
+    private readonly float idleRadius = 2f; // grace radius
     private RoomWaypoint originPoint;
 
     public Enemy_Idle(EnemyController enemy, EnemyStateMachine machine, IWaypointService waypointService)
@@ -24,7 +24,7 @@ public class Enemy_Idle : EnemyState
 
     public override void UpdateState()
     {
-        // Priorité : passer en attaque si le joueur est connu et qu'on a été attaqué
+        // Priority: switch to attack if the player is known and we've been hit
         if (enemy.memory.LastKnownPlayerPosition != Vector3.zero && enemy.memory.WasRecentlyAttacked)
         {
             stateMachine.ChangeState(new Enemy_AttackPlayer(enemy, stateMachine, waypointService, this));
@@ -32,21 +32,21 @@ public class Enemy_Idle : EnemyState
         if (originPoint == null && enemy.memory.LastVisitedPoint != null)
         {
             originPoint = enemy.memory.LastVisitedPoint;
-            // On fixe la destination au dernier point visité
+            // Set the destination to the last visited point
             enemy.SetDestination(originPoint);
 
         }
 
         if (hasArrived) return;
 
-        // Vérifie si l'ennemi est arrivé à destination
+        // Check if the enemy reached the destination
         if (enemy.HasArrivedAtDestination())
         {
             hasArrived = true;
             enemy.SetMovement(0f);
             enemy.SetVerticalMovement(0f);
 
-            // Si l'ennemi s'est trop éloigné du point d'origine, on réinitialise l'état Idle
+            // If the enemy moved too far from the origin point, reset Idle state
             float distFromOrigin = Vector3.Distance(enemy.transform.position, originPoint.WorldPos);
             if (distFromOrigin > idleRadius)
             {

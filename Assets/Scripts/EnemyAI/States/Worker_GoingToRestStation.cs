@@ -10,7 +10,7 @@ public class Worker_GoingToRestStation : WorkerState
 {
     private RoomWaypoint targetPoint;
     private bool hasArrived;
-    private float readyStartTime;      // moment où on est passé en ReadyToRest
+    private float readyStartTime;      // time when we entered ReadyToRest
     private const float MaxReadyDuration = 2f;
     public Worker_GoingToRestStation(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,
@@ -58,11 +58,11 @@ public class Worker_GoingToRestStation : WorkerState
             }
             return;
         }
-        // arrivé et en ReadyToWork : on vérifie le timer
+        // Once arrived and in ReadyToWork we check the timer
         if (enemy.workerState == WorkerStatus.ReadyToWork &&
             Time.time - readyStartTime >= MaxReadyDuration)
         {
-            // passer à l'état aller se reposer
+            // switch to the state that goes to rest
             stateMachine.ChangeState(new Worker_GoingToRestStation(
                 enemy, stateMachine, waypointService));
         }

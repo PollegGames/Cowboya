@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Stocke les informations mémorisées par l'ennemi, comme la dernière position connue du joueur, les agressions subies, etc.
+/// Stores information remembered by the enemy such as the last known player position and received attacks.
 /// </summary>
 public class RobotMemory : MonoBehaviour, IRobotMemory
 {
@@ -18,7 +18,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
 
     private void Update()
     {
-        // Mise à jour automatique des timers
+        // Automatically update timers
         if (LastKnownPlayerPosition != Vector3.zero)
             TimeSincePlayerLastSeen += Time.deltaTime;
 
@@ -79,9 +79,9 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
     }
 
     /// <summary>
-    /// Met à jour la dernière position connue du joueur.
+    /// Updates the last known player position.
     /// </summary>
-    /// <param name="playerPosition">Position du joueur détecté.</param>
+    /// <param name="playerPosition">Detected player position.</param>
     public void RememberPlayerPosition(Vector3 playerPosition)
     {
         LastKnownPlayerPosition = playerPosition;
@@ -89,7 +89,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
     }
 
     /// <summary>
-    /// Efface la mémoire de la position du joueur.
+    /// Clears the memory of the player's position.
     /// </summary>
     public void ClearPlayerPosition()
     {
@@ -98,7 +98,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
     }
 
     /// <summary>
-    /// Enregistre que l'ennemi vient de subir une agression.
+    /// Records that the enemy has just been attacked.
     /// </summary>
     public void RegisterAttack()
     {
@@ -107,7 +107,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
     }
 
     /// <summary>
-    /// Réinitialise l'état d'agression après une certaine période.
+    /// Resets the aggression state after a certain period.
     /// </summary>
     public void ResetAttackMemory()
     {

@@ -10,7 +10,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
 {
     private RoomWaypoint targetPoint;
     private bool hasArrived;
-    private float readyStartTime;      // moment où on est passé en ReadyToWork
+    private float readyStartTime;      // time when we entered ReadyToWork
     private const float MaxReadyDuration = 2f;
     public Worker_GoingToLeastWorkedStation(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,
@@ -37,7 +37,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
 
     public override void UpdateState()
     {
-        // si pas encore arrivé, on vérifie l’arrivée
+        // If not yet arrived, check arrival
         if (!hasArrived)
         {
             if (enemy.HasArrivedAtDestination())
@@ -46,22 +46,22 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
                 enemy.SetMovement(0f);
                 enemy.SetVerticalMovement(0f);
 
-                // mémoriser le POI et le libérer
+                // remember the POI and release it
                 enemy.memory.SetLastVisitedPoint(targetPoint);
                 waypointService.ReleasePOI(targetPoint);
 
                 enemy.workerState = WorkerStatus.ReadyToWork;
-                readyStartTime = Time.time; // démarrer le timer
+                readyStartTime = Time.time; // start the timer
             }
 
             return;
         }
 
-        // arrivé et en ReadyToWork : on vérifie le timer
+        // When arrived and in ReadyToWork: check the timer
         if (enemy.workerState == WorkerStatus.ReadyToWork &&
             Time.time - readyStartTime >= MaxReadyDuration)
         {
-            // passer à l'état aller se reposer
+            // switch to the state that goes to rest
             stateMachine.ChangeState(new Worker_GoingToRestStation(
                 enemy, stateMachine, waypointService));
         }

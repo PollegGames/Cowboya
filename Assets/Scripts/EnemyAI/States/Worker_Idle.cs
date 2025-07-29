@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Exemple d'implémentation d'un état simple : Idle (stationnaire).
+/// Example implementation of a simple state: Idle (standing still).
 /// </summary>
 public class Worker_Idle : WorkerState
 {

@@ -5,8 +5,8 @@ using System.Collections;
 
 
 /// <summary>
-/// Gère la scène RunSetupScene : saisie des paramètres, validation, prévisualisation
-/// et lancement du run.
+/// Manages the RunSetupScene: collects parameters, validates them, shows a
+/// preview and launches the run.
 /// </summary>
 public class RunSetupManager : MonoBehaviour
 {
@@ -14,12 +14,12 @@ public class RunSetupManager : MonoBehaviour
     [Header("UI Toolkit")]
     [SerializeField] private UIDocument uiDocument;
 
-    [Header("Preview 3D réel")]
+    [Header("Actual 3D Preview")]
     [SerializeField] private GameObject miniMapPreviewPrefab; // prefab (MiniMapCamera + MapManager, etc.)
     private GameObject miniMapPreviewInstance;                 // instance runtime
     [SerializeField] private RenderTexture miniMapRT;
 
-    [Header("Config SO (persistant)")]
+    [Header("Config SO (persistent)")]
     [SerializeField] private RunMapConfigSO config;
     [SerializeField] private VictorySetup victorySetup;
 
@@ -34,7 +34,7 @@ public class RunSetupManager : MonoBehaviour
     private IEnemiesSpawner enemiesSpawnerInstance;
     private WaypointService waypointServiceInstance;
 
-    // =============== Références internes UI
+    // =============== Internal UI references
     private VisualElement root;
     private VisualElement previewVE;      // <VisualElement name="preview">
     private IntegerField widthField,
@@ -82,7 +82,7 @@ public class RunSetupManager : MonoBehaviour
         var enemyMinusButton = root.Q<Button>("enemy-minus-button");
         var enemyPlusButton = root.Q<Button>("enemy-plus-button");
 
-        // Récupère toutes les références
+        // Grab all UI references
         widthField = root.Q<IntegerField>("width-field");
         heightField = root.Q<IntegerField>("height-field");
         poiField = root.Q<IntegerField>("poi-field");
@@ -128,7 +128,7 @@ public class RunSetupManager : MonoBehaviour
         runButton.SetEnabled(false);
         statusLabel.text = "Waiting for validation…";
 
-        // Si config existante, pré-remplissage
+        // Pre-fill if a configuration already exists
         if (config != null)
         {
             widthField.value = config.gridWidth;
@@ -139,7 +139,7 @@ public class RunSetupManager : MonoBehaviour
             enemyCountField.value = config.enemiesCount;
             seedField.value = config.seed;
 
-            // Initialiser “Cells Available” à la valeur correcte
+            // Initialize "Cells Available" with the correct value
             UpdateCellsAndConstraints();
         }
     }
@@ -152,12 +152,12 @@ public class RunSetupManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Recalcule “Cells Available” à chaque changement de width/height,
-    /// puis plafonne automatiquement poiField et blockedField.
+    /// Recomputes "Cells Available" whenever width or height changes,
+    /// then automatically clamps poiField and blockedField.
     /// </summary>
     private void UpdateCellsAndConstraints()
     {
-        // 1) Récupérer width & height et calculer cellsAvailable = (w*h)/2 - 2
+        // 1) Read width & height and compute cellsAvailable = (w*h)/2 - 2
         int w = Mathf.Max(2, widthField.value);
         int h = Mathf.Max(2, heightField.value);
         int totalCells = w * h;
@@ -165,10 +165,10 @@ public class RunSetupManager : MonoBehaviour
         int cellsAvailable = totalCells - 4;
         if (cellsAvailable < 0) cellsAvailable = 0;
 
-        // 2) Mettre à jour le label
+        // 2) Update the label
         cellsAvailableLabel.text = $"Cells Available: {cellsAvailable}";
 
-        // 3) Plafonner poi & blocked selon ce nouveau cellsAvailable
+        // 3) Clamp poi & blocked according to the new cellsAvailable
         int poi = Mathf.Max(1, poiField.value);
         int blocked = Mathf.Max(0, blockedField.value);
 
@@ -176,40 +176,40 @@ public class RunSetupManager : MonoBehaviour
         int maxPoi = cellsAvailable - blocked;
         if (poi > maxPoi) poi = maxPoi;
 
-        // blocked ≤ cellsAvailable - poi (après ajustement de poi)
+        // blocked ≤ cellsAvailable - poi (after adjusting poi)
         int maxBlocked = cellsAvailable - poi;
         if (blocked > maxBlocked) blocked = maxBlocked;
 
-        // 4) Réassigner dans l’UI (pour forcer la correction visuelle)
+        // 4) Reassign in the UI (forces visual correction)
         poiField.value = poi;
         blockedField.value = blocked;
     }
 
     /// <summary>
-    /// Méthode appelée quand l’utilisateur modifie poiField ou blockedField à la main :
-    /// on s’assure que poi ≤ cellsAvailable - blocked et blocked ≤ cellsAvailable - poi.
+    /// Called when the user manually edits poiField or blockedField.
+    /// Ensures poi ≤ cellsAvailable - blocked and blocked ≤ cellsAvailable - poi.
     /// </summary>
     private void ClampPoiAndBlocked()
     {
-        // Récupérer current cellsAvailable depuis le label (ou recalculer)
+        // Retrieve current cellsAvailable from the label (or recompute)
         int w = Mathf.Max(2, widthField.value);
         int h = Mathf.Max(2, heightField.value);
         int totalCells = w * h;
         int cellsAvailable = totalCells - 4;
         if (cellsAvailable < 0) cellsAvailable = 0;
 
-        // Lecture actuelle de poi & blocked
+        // Current values of poi and blocked
         int poi = Mathf.Max(1, poiField.value);
         int blocked = Mathf.Max(0, blockedField.value);
 
-        // Appliquer les mêmes contraintes
+        // Apply the same constraints
         int maxPoi = cellsAvailable - blocked;
         if (poi > maxPoi) poi = maxPoi;
 
         int maxBlocked = cellsAvailable - poi;
         if (blocked > maxBlocked) blocked = maxBlocked;
 
-        // Réinjecter
+        // Write back
         poiField.value = poi;
         blockedField.value = blocked;
     }
@@ -219,23 +219,23 @@ public class RunSetupManager : MonoBehaviour
     // =====================================================================
     private void Validate()
     {
-        // 1) Lecture + garde-fous
+        // 1) Read values with safety checks
         int w = Mathf.Max(2, widthField.value);
         int h = Mathf.Max(2, heightField.value);
         int totalCells = w * h;
 
-        // Calcul “cellsAvailable” : moitié des cellules totales – 2 (start + end)
+        // Compute "cellsAvailable": total cells minus 4 (start + end)
         int cellsAvailable = totalCells - 4;
         if (cellsAvailable < 0) cellsAvailable = 0;
 
-        // Met à jour le label
+        // Update the label
         cellsAvailableLabel.text = $"Cells Available: {cellsAvailable}";
 
-        // Lecture initiale des champs POI / Blocked
+        // Initial read of the POI / Blocked fields
         int poi = Mathf.Max(1, poiField.value);
         int blocked = Mathf.Max(0, blockedField.value);
 
-        // On contraint automatiquement :
+        // Apply automatic constraints:
         //  - poi ≤ cellsAvailable - blocked
         int maxPoi = cellsAvailable - blocked;
         if (poi > maxPoi) poi = maxPoi;
@@ -243,21 +243,21 @@ public class RunSetupManager : MonoBehaviour
         int maxBlocked = cellsAvailable - poi;
         if (blocked > maxBlocked) blocked = maxBlocked;
 
-        // On réaffecte dans l’UI (pour corriger d’éventuels dépassements)
+        // Reassign in the UI (fix possible overflow)
         poiField.value = poi;
         blockedField.value = blocked;
 
-        // Lecture et garde-fous pour le reste
+        // Read and clamp the remaining fields
         int workers = Mathf.Max(0, workersCountField.value);
         int enemies = Mathf.Max(0, enemyCountField.value);
 
-        // Vérifications supplémentaires
+        // Additional validation
         bool isValid = true;
 
-        // 2) S’assurer que poi + blocked ne dépassent pas cellsAvailable
+        // 2) Ensure poi + blocked do not exceed cellsAvailable
         if (poi + blocked > cellsAvailable) isValid = false;
 
-        // 3) S’assurer que le nb d’ennemis ≤ (cellsAvailable - poi - blocked)
+        // 3) Ensure enemy count ≤ (cellsAvailable - poi - blocked)
         int emptyCells = cellsAvailable - poi - blocked;
 
         // Highlight si erreur
@@ -284,10 +284,10 @@ public class RunSetupManager : MonoBehaviour
                                 ? Random.Range(0, 999999).ToString()
                                 : seedField.value;
 
-        // Ré-affecte le seed (en cas de random)
+        // Write back the seed (when using random)
         seedField.value = config.seed;
 
-        // 5) Prévisualisation réelle
+        // 5) Create the real preview
         ShowRealPreview();
 
         if (miniMapPreviewInstance == null)
@@ -303,7 +303,8 @@ public class RunSetupManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Met à jour le texte du Label “Cells Available” en fonction des champs width/height/poi/blocked actuels.
+    /// Updates the "Cells Available" label based on the current width,
+    /// height, poi and blocked values.
     /// </summary>
     private void UpdateCellsAvailableLabel()
     {
@@ -316,7 +317,7 @@ public class RunSetupManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Instancie le prefab de preview (MapManager + MiniMapCamera) et alimente la RT.
+    /// Instantiates the preview prefab (MapManager + MiniMapCamera) and feeds the render texture.
     /// </summary>
     private void ShowRealPreview()
     {
@@ -334,7 +335,7 @@ public class RunSetupManager : MonoBehaviour
 
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 
-        // 1) Génère la grille       
+        // 1) Build the grid
         if (mapManagerInstance != null)
             mapManagerInstance.BuildFromConfig(config);
         if (factoryManagerInstance != null)
@@ -344,7 +345,7 @@ public class RunSetupManager : MonoBehaviour
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
 
-        // 2) Cadre la caméra
+        // 2) Frame the camera
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
         {
@@ -364,7 +365,7 @@ public class RunSetupManager : MonoBehaviour
             // cam.targetTexture = miniMapRT;
         }
 
-        // 3) Capture en Texture2D via Coroutine
+        // 3) Capture to Texture2D via coroutine
         StartCoroutine(CaptureRTToUI());
     }
 

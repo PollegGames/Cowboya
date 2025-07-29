@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Classe de base pour le déplacement horizontal et vertical.
-/// Utilisée par le joueur, les ennemis et les alliés.
+/// Base class for horizontal and vertical movement.
+/// Used by the player, enemies and allies.
 /// </summary>
 public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
 {
@@ -52,7 +52,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     }
 
     /// <summary>
-    /// Définit la direction de mouvement horizontal.
+    /// Sets the horizontal movement direction.
     /// </summary>
     public virtual void SetMovement(float direction)
     {
@@ -61,7 +61,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     }
 
     /// <summary>
-    /// Définit la direction du mouvement vertical.
+    /// Sets the vertical movement direction.
     /// </summary>
     public virtual void SetVerticalMovement(float direction)
     {
@@ -69,7 +69,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     }
 
     /// <summary>
-    /// Gère le déplacement physique horizontal 
+    /// Handles horizontal physical movement
     /// </summary>
     protected virtual void Move()
     {
@@ -83,7 +83,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     }
 
     /// <summary>
-    /// Gère le déplacement physique vertical.
+    /// Handles vertical physical movement.
     /// </summary>
     protected virtual void MoveVertical()
     {

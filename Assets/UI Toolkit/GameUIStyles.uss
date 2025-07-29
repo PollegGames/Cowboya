@@ -1,4 +1,4 @@
-/* 1. Layout général */
+/* 1. General layout */
 .horizontal-layout {
     flex-direction: row;
 }
@@ -6,7 +6,7 @@
     flex-direction: column;
 }
 
-/* 2. Conteneur des barres (centré en haut) */
+/* 2. Bars container (top centered) */
 .bars-container {
     height: auto;
 }
@@ -18,25 +18,25 @@
     background-color: #2A2A2A;
     border: 2px solid #555555;
     border-radius: 6px;
-    margin: 0 6px;      /* un peu de marge horizontale entre les deux */
+    margin: 0 6px;      /* some horizontal spacing */
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
 
-/* 4. Style pour la mini-map (fond + bordure autour) */
+/* 4. Style for the mini-map background and border */
 .minibackground {
-    background-color: #1F1F1F;  /* gris foncé pour séparer du reste */
-    border: 1px solid #444444;  /* bordure discrète */
+    background-color: #1F1F1F;  /* dark gray to separate from the rest */
+    border: 1px solid #444444;  /* subtle border */
     border-radius: 4px;
-    padding: 4px;               /* léger padding autour de la grille */
-    /* align-self: flex-start est géré dans le UXML */
+    padding: 4px;               /* small padding around the grid */
+    /* align-self: flex-start handled in the UXML */
 }
 
-/* 5. Zone de preview (mini-map elle-même) */
+/* 5. Preview area (the mini-map itself) */
 .grid-preview {
-    background-color: #000000;  /* noir pour la texture */
-    border: 1px solid #666666;  /* légère bordure grise */
+    background-color: #000000;  /* black for the texture */
+    border: 1px solid #666666;  /* light gray border */
     border-radius: 2px;
 }
 

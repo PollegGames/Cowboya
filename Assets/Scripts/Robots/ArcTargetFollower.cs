@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ArcTargetFollower : MonoBehaviour
 {
-    public Transform circleCenter; // généralement le torse du joueur
+    public Transform circleCenter; // usually the player's torso
     public float radius = 2f;
 
     private Camera mainCamera;
@@ -20,7 +20,7 @@ public class ArcTargetFollower : MonoBehaviour
         if (circleCenter == null || mainCamera == null)
             return;
 
-        // 1. Récupère la position de la souris
+        // 1. Get the mouse position
         Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
 
@@ -33,7 +33,7 @@ public class ArcTargetFollower : MonoBehaviour
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        // 4. Détermine si la cible est à gauche ou à droite du joueur
+        // 4. Determine if the target is to the left or right of the player
         isFacingRight = transform.position.x <= circleCenter.position.x;
     }
 }

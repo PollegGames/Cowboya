@@ -1,109 +1,109 @@
-### Documentation du Jeu : Rogue-lite de Robots Comique
+### Game Documentation: Comedic Robot Rogue-lite
 
 ---
 
-### 1. **Résumé Général du Concept du Jeu**
+### 1. **Overall Game Concept**
 
-**Genre** : Rogue-lite en 2D  
-**Thème** : Monde de robots avec une touche comique et humoristique  
-**Objectifs du Joueur** :  
-   - Naviguer entre le camp de base et une usine de robots pour progresser.
-   - Collecter des ressources, débloquer des attaques, et gérer la moralité pour influencer le style de jeu.
-   - Avancer en complétant des runs dans l'usine, en affrontant des ennemis et boss.
-
----
-
-### 2. **Système de Combat et Progression du Joueur**
-
-#### **Attaques de Base et Combos**
-   - **Attaques initiales** : Coup de poing, coup de pied, tir de pistolet.
-   - **Création de combos** : Les attaques peuvent être réorganisées via le botaniste pour créer des combos personnalisés, influençant la manière dont le joueur engage les ennemis.
-
-#### **Énergie et Santé**
-   - **Énergie** : Se recharge automatiquement avec le temps. Si elle tombe à zéro, le robot passe en mode ragdoll.
-   - **Santé** : Peut être augmentée temporairement avec des boosters, mais la capacité maximale de santé est améliorée de façon permanente au camp de base.
-
-#### **Boosters Temporaires et Améliorations Permanentes**
-   - **Boosters Temporaires** : Des objets comme des puces ou boissons temporaires augmentent la santé et l’énergie pendant la run.
-   - **Améliorations Permanentes** : Les upgrades de santé maximale, de capacité d’énergie, et de vitesse de recharge sont appliquées de façon permanente dans le camp de base.
+**Genre**: 2D rogue-lite
+**Theme**: A robot world with a humorous tone
+**Player Goals**:
+   - Travel between the base camp and the robot factory to progress.
+   - Collect resources, unlock attacks and manage morality to influence your play style.
+   - Advance through factory runs by fighting enemies and bosses.
 
 ---
 
-### 3. **Éléments de Progression et Ressources**
+### 2. **Combat System and Player Progression**
 
-#### **Engrenages et Ressources Spéciales**
-   - **Engrenages** : Collectés en tuant des ennemis ou en accomplissant des objectifs. Ils sont envoyés au camp via des stations de déploiement pour un stockage permanent.
-   - **Ressources Spéciales** : Objets rares utilisés pour des améliorations spécifiques. Elles fonctionnent comme les engrenages et sont envoyées au camp pour être sauvegardées de manière permanente.
+#### **Basic Attacks and Combos**
+   - **Starting attacks**: Punch, kick and pistol shot.
+   - **Combo creation**: Attacks can be rearranged via the botanist to create custom combos, affecting how you engage enemies.
 
-#### **Système de Moralité**
-   - **Jauge de Moralité** : Réinitialisée à chaque run, elle influe sur le comportement des ennemis et l’apparence des attaques (gentilles ou méchantes).
-   - **Effets** : Modifie les attaques et interactions, et influence l’accès à certaines améliorations via le shérif.
+#### **Energy and Health**
+   - **Energy**: Automatically recharges over time. If it reaches zero the robot falls into ragdoll mode.
+   - **Health**: Can be temporarily boosted with boosters, while maximum health is permanently improved at camp.
 
----
-
-### 4. **Structure et Fonctionnement du Camp de Base**
-
-#### **Alliés et Leurs Rôles**
-   - **Botaniste** : Permet de réorganiser les attaques pour former des combos.
-   - **Shérif** : Modifie les attaques selon l’alignement moral (gentilles ou méchantes).
-   - **Mécanicien** : Permet d’obtenir de nouvelles attaques ou d’en retirer de l’inventaire.
-
-#### **Interface et Gestion de l’Inventaire**
-   - **Inventaire des Attaques** : Gestion de l'ordre et amélioration des attaques via les alliés.
-   - **Stations de Déploiement** : Placées dans la map, elles permettent d'envoyer les engrenages et ressources au camp de base pour les sécuriser.
+#### **Temporary Boosters and Permanent Upgrades**
+   - **Temporary Boosters**: Items like chips or drinks temporarily increase health and energy during a run.
+   - **Permanent Upgrades**: Increases to max health, energy capacity and recharge speed are applied permanently at camp.
 
 ---
 
-### 5. **Ennemis et Boss**
+### 3. **Progression Elements and Resources**
 
-#### **Types d’Ennemis**
-   - **Robot Balayeuse** : Se déplace de manière incontrôlable vers le joueur, essayant de le faire glisser.
-   - **Tondeuse de Bureau** : Charge frénétiquement vers le joueur, criant des phrases absurdes.
-   - **Drone Paparazzi** : Flash le joueur, le ralentissant brièvement.
-   
-   *Autres idées d'ennemis avec des comportements comiques similaires.*
+#### **Gears and Special Resources**
+   - **Gears**: Collected by defeating enemies or completing objectives. They are sent back to camp via deployment stations for permanent storage.
+   - **Special Resources**: Rare items used for specific upgrades. They behave like gears and are saved permanently when sent back to camp.
 
-#### **Mini-Bosses et Boss Final**
-   - **L’Instructeur de Danse** : Ennemis avec des attaques en rythme, vulnérable lors de ses pauses de danse.
-   - **Directeur Farfelu (Boss Final)** : Dirige l’usine, utilise des gadgets et lance des instructions absurdes en combat.
+#### **Morality System**
+   - **Morality Gauge**: Reset each run, affecting enemy behaviour and the look of attacks (nice or mean).
+   - **Effects**: Changes attacks and interactions and influences access to some upgrades via the sheriff.
 
 ---
 
-### 6. **Déblocage de Nouveaux Personnages**
+### 4. **Structure and Function of the Base Camp**
 
-#### **Système de Collection de Pièces de Robots**
-   - Des parties de robots peuvent être collectées durant les runs, permettant de débloquer de nouveaux personnages jouables avec des styles et attaques uniques.
+#### **Allies and Their Roles**
+   - **Botanist**: Allows you to rearrange attacks to form combos.
+   - **Sheriff**: Modifies attacks according to moral alignment (good or evil).
+   - **Mechanic**: Lets you obtain new attacks or remove some from the inventory.
 
-#### **Personnages Supplémentaires**
-   - **Exemples** : NinjaBot, avec des attaques de style furtif, ou TankBot, avec une santé élevée et des attaques puissantes.
-
----
-
-### 7. **Système de Sauvegarde et Chargement**
-
-#### **Éléments à Sauvegarder et Charger**
-   - **Player Stats** : Max Health, Max Energy, Unlocked Attacks, Attack Order.
-   - **Inventory** : Total Gears, Special Resources, Collected Robot Parts.
-   - **CharacterProgress** : Unlocked Characters, Moral Alignment Influences.
-   - **CampBaseConfig** : Purchased Upgrades, Deployment Station Capacity, Ally Interaction Levels.
-   - **GameSettings** : Audio, Screen mode, Last Chosen Character.
-
-#### **Fonctionnement du Chargement**
-   - **Depuis le Menu** : Quand le joueur appuie sur "Play", la sauvegarde est chargée, et le joueur est envoyé au camp de base pour débuter une nouvelle run.
+#### **Interface and Inventory Management**
+   - **Attack Inventory**: Manage order and improvements of attacks via allies.
+   - **Deployment Stations**: Placed around the map, they send gears and resources back to camp for safekeeping.
 
 ---
 
-### Diagrammes et Schémas Logiques (à envisager pour la documentation visuelle)
+### 5. **Enemies and Bosses**
 
-1. **Diagramme de Progression de Run** : Visualiser comment le joueur collecte des ressources, envoie des engrenages, et retourne au camp pour appliquer des améliorations.
-2. **Schéma des Interactions au Camp de Base** : Présenter les rôles du botaniste, shérif et mécanicien, et leurs fonctions de gestion des attaques et moralité.
-3. **Organigramme des Déblocages** : Schéma montrant la progression des améliorations permanentes, des boosters et des personnages déblocables.
-4. **Organigramme de Sauvegarde et Chargement** : Détailler comment chaque catégorie est sauvegardée et chargée au début d'une session.
+#### **Enemy Types**
+   - **Sweeper Robot**: Moves uncontrollably toward the player, trying to sweep them up.
+   - **Office Mower**: Charges frantically at the player, shouting absurd phrases.
+   - **Paparazzi Drone**: Flashes the player, slowing them briefly.
+
+   *Other enemy ideas with similarly comedic behaviours.*
+
+#### **Mini-Bosses and Final Boss**
+   - **Dance Instructor**: Enemies with rhythm-based attacks, vulnerable during dance breaks.
+   - **Eccentric Director (Final Boss)**: Runs the factory, uses gadgets and shouts ridiculous instructions during battle.
+
+---
+
+### 6. **Unlocking New Characters**
+
+#### **Robot Part Collection System**
+   - Robot parts can be gathered during runs, allowing new playable characters with unique styles and attacks to be unlocked.
+
+#### **Additional Characters**
+   - **Examples**: NinjaBot with stealth-style attacks, or TankBot with high health and powerful blows.
+
+---
+
+### 7. **Save and Load System**
+
+#### **Data to Save and Load**
+   - **Player Stats**: Max Health, Max Energy, Unlocked Attacks, Attack Order.
+   - **Inventory**: Total Gears, Special Resources, Collected Robot Parts.
+   - **CharacterProgress**: Unlocked Characters, Morality influences.
+   - **CampBaseConfig**: Purchased Upgrades, Deployment Station Capacity, Ally interaction levels.
+   - **GameSettings**: Audio, Screen mode, Last chosen character.
+
+#### **How Loading Works**
+   - **From the Menu**: When the player hits "Play", the save file is loaded and the player is sent to camp to start a new run.
+
+---
+
+### Diagrams and Flow Charts (to consider for visual documentation)
+
+1. **Run Progress Diagram**: Shows how the player collects resources, sends gears, and returns to camp to apply upgrades.
+2. **Base Camp Interaction Diagram**: Describes the roles of botanist, sheriff and mechanic, and how they manage attacks and morality.
+3. **Unlock Chart**: Shows progression of permanent upgrades, boosters and unlockable characters.
+4. **Save and Load Flow**: Details how each category is saved and loaded at the start of a session.
 
 ---
 
 ### Conclusion
 
-Ce document rassemble l’ensemble des concepts et fonctionnalités nécessaires pour ton jeu de rogue-lite. Les détails clés, comme les systèmes d’inventaire, moralité, et progression du joueur, sont documentés de manière à faciliter le développement. Tu peux maintenant utiliser cette documentation comme guide pour implémenter chaque élément et t’assurer que le jeu reste fidèle à la vision initiale. 
+This document gathers all the concepts and features needed for your rogue-lite. Key details such as inventory systems, morality and player progression are documented to ease development. Use it as a guide to implement each element and keep the game true to the original vision.
 
-N’hésite pas à enrichir cette documentation avec des schémas visuels pour une vue d’ensemble encore plus complète !
+Feel free to enrich it with visual diagrams for an even more complete overview!

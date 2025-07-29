@@ -23,13 +23,13 @@ public class AttackHitbox : MonoBehaviour
 
         RobotStateController target = other.GetComponentInParent<RobotStateController>();
         if (target == null || target == attacker)
-            return; // Ne touche pas soi-même ou objet sans PlayerStateController
+            return; // Ignore self or objects without PlayerStateController
 
 
-        // Applique les dégâts
+        // Apply damage
         target.Health.TakeDamage(damage);
 
-        // Applique la poussée physique
+        // Apply physical push
         Rigidbody2D rb = other.attachedRigidbody;
         if (rb != null)
         {

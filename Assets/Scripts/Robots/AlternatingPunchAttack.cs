@@ -45,7 +45,7 @@ public class AlternatingPunchAttack : MonoBehaviour
             AttackHitbox hitbox = facingRight ? rightArmHitbox : leftArmHitbox;
             float damageCost = hitbox.DamageCost;
 
-            // Consomme l’énergie
+            // Consume energy
             robotBehaviour.PerformAttackbyEnergy(damageCost);
 
             // Lance la coroutine
@@ -60,7 +60,7 @@ public class AlternatingPunchAttack : MonoBehaviour
         Vector3 start = armTarget.position;
         Vector3 end = punchTarget.position;
 
-        // Point de contrôle de l'arc
+        // Arc control point
         Transform controlPoint = facingRight ? arcControlRight : arcControlLeft;
         Vector3 control = controlPoint != null ? controlPoint.position : (start + end) / 2 + Vector3.up * 0.5f;
 
