@@ -9,7 +9,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     public PositionTriggerZone detectZone;
     public PositionTriggerZone attackZone;
     [Header("References")]
-    public Transform circleCenter; // généralement le torse du joueur
+    public Transform circleCenter; // typically the player's torso
     public float radius = 2f;
 
     private Camera mainCamera;
@@ -46,7 +46,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     private void OnPlayerEnterDetectZone(Collider2D collider)
     {
-        // Assurez-vous que le collider est le joueur
+        // Make sure the collider is the player
         if (collider.CompareTag("Player"))
         {
             var playerControl = collider.transform.root.GetComponent<PlayerMovementController>();
@@ -60,7 +60,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     private void OnPlayerExitDetectZone()
     {
-        // Réinitialiser la position de la cible si le joueur quitte la zone
+        // Reset the target position if the player leaves the zone
         playerBodyReferencePosition = Vector3.zero;
         memory.ClearPlayerPosition();
     }
@@ -68,7 +68,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     private void OnPlayerEnterAttackZone(Collider2D collider)
     {
-        // Assurez-vous que le collider est le joueur
+        // Make sure the collider is the player
         if (collider.CompareTag("Player"))
         {
             OnPlayerDetectInAttackZoneChanged?.Invoke(true);
@@ -87,7 +87,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
         if (playerBodyReferencePosition != Vector3.zero)
         {
-            // 1.Mettre à jour la mémoire de la position du joueur
+            // 1. Update the memory with the player's position
             memory.RememberPlayerPosition(playerBodyReferencePosition);
             // 2. Calcul direction → position sur le cercle
             Vector3 direction = (playerBodyReferencePosition - circleCenter.position).normalized;
@@ -98,7 +98,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-            // 4. Détermine si la cible est à gauche ou à droite du joueur
+            // 4. Determine if the target is to the left or right of the player
             isFacingRight = transform.position.x <= circleCenter.position.x;
         }
 

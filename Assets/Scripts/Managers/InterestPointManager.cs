@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// Gère les points d'intérêt dans une salle selon l'état de l'ennemi (travail, repos, fuite).
+/// Manages interest points in a room depending on the enemy state (work, rest, flee).
 /// </summary>
 public class InterestPointManager : MonoBehaviour
 {
@@ -15,7 +15,7 @@ public class InterestPointManager : MonoBehaviour
     private readonly HashSet<Transform> occupiedPoints = new HashSet<Transform>();
 
     /// <summary>
-    /// Retourne un point d'intérêt libre selon le type demandé.
+    /// Returns a free interest point of the requested type.
     /// </summary>
     public Transform GetAvailablePoint(InterestPointType type)
     {
@@ -32,7 +32,7 @@ public class InterestPointManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Libère un point d'intérêt une fois quitté.
+    /// Releases an interest point when it is left.
     /// </summary>
     public void ReleasePoint(Transform point)
     {

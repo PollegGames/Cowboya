@@ -1,5 +1,5 @@
 /// <summary>
-/// Classe abstraite de base pour tous les états spécifiques de l'ennemi.
+/// Base abstract class for all specific enemy states.
 /// </summary>
 public abstract class WorkerState
 {

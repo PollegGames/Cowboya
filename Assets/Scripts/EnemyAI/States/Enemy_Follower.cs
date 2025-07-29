@@ -4,7 +4,7 @@ public class Enemy_Follower : EnemyState
 {
     private readonly FactoryAlarmStatus factoryAlarmStatus;
 
-    // Rayon max dans lequel on considère qu'on peut aller en mode attaque
+    // Max radius within which the enemy can enter attack mode
     private readonly float followRadius = 8f;
 
     public Enemy_Follower(
@@ -26,9 +26,9 @@ public class Enemy_Follower : EnemyState
 
     public override void UpdateState()
     {
-        // 1) On cherche le waypoint le plus proche du joueur
+        // 1) Find the waypoint closest to the player
         var targetWp = waypointService.ClosestWaypointToPlayer;
-        // 2) Si le joueur est trop loin, on passe en attaque
+        // 2) If the player is close enough, switch to attack
         float distanceToPlayer = Vector3.Distance(enemy.transform.position, targetWp.WorldPos);
         if (distanceToPlayer < followRadius)
         {
@@ -43,6 +43,6 @@ public class Enemy_Follower : EnemyState
 
     public override void ExitState()
     {
-        // Rien à nettoyer ici
+        // Nothing to clean up here
     }
 }

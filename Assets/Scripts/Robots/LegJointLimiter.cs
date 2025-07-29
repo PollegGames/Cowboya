@@ -10,13 +10,13 @@ public class LegJointLimiter : MonoBehaviour
     {
         if (goingRight)
         {
-            // Vers la droite : -90 à +90 pour les deux jambes
+            // Facing right: -180 to 0 for both legs
             SetJointLimits(rightLegJoint, -180f, 0);
             SetJointLimits(leftLegJoint, -180f, 0);
         }
         else
         {
-            // Vers la gauche : 0 à 180 pour les deux jambes
+            // Facing left: 0 to 180 for both legs
             SetJointLimits(rightLegJoint, 0f, 180);
             SetJointLimits(leftLegJoint, 0f, 180);
         }

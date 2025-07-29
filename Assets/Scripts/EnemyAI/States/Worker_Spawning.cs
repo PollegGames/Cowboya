@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Exemple d'implémentation d'un état simple : Work (stationnaire).
+/// Example implementation of a simple state: Work (stationary).
 /// </summary>
 public class Worker_Spawning : WorkerState
 {
@@ -24,6 +24,6 @@ public class Worker_Spawning : WorkerState
 
     public override void ExitState()
     {
-        // Nettoyage éventuel à la sortie de l'état
+        // Optional cleanup when leaving the state
     }
 }

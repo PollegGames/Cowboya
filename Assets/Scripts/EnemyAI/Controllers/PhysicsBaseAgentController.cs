@@ -38,7 +38,7 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
 
     
     /// <summary>
-    /// Définit la direction du mouvement vertical.
+    /// Sets the vertical movement direction.
     /// </summary>
     public virtual void SetVerticalMovement(float direction)
     {

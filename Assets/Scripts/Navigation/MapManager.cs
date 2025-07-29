@@ -13,7 +13,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] public int cellWidth = 47;
     [SerializeField] public int cellHeight = 11;
 
-    [SerializeField] private RunMapConfigSO mapConfig; // peut être injecté via BuildFromConfig
+    [SerializeField] private RunMapConfigSO mapConfig; // can be injected via BuildFromConfig
 
     [Header("Cell Prefabs Mapping")]
     [SerializeField] private GameObject blockedPrefab;
@@ -55,7 +55,7 @@ public class MapManager : MonoBehaviour
         wallCount = cfg.blockedCount;
         pointsOfInterestCount = cfg.poiCount;
 
-        // Init le Random pour avoir toujours la même carte avec la même seed
+        // Initialize Random so the same seed always yields the same map
         UnityEngine.Random.InitState(cfg.seed.GetHashCode());
     }
 
@@ -68,11 +68,11 @@ public class MapManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Public API appelée par RunSetupManager pour injecter la config sans recharger la scène.
+    /// Public API used by RunSetupManager to inject the config without reloading the scene.
     /// </summary>
     public void BuildFromConfig(RunMapConfigSO cfg)
     {
-        // Détruit l'ancienne grille visuelle si elle existe
+        // Destroy the old visual grid if it exists
         if (roomInstances != null)
         {
             foreach (var go in roomInstances.Values)
@@ -80,14 +80,14 @@ public class MapManager : MonoBehaviour
             roomInstances = null;
         }
 
-        // Copie les valeurs
-        mapConfig = cfg; // garde une référence
+        // Copy the values
+        mapConfig = cfg; // keep a reference
         ApplyConfig(cfg);
 
     }
 
     /// <summary>
-    /// Initialise la grille logique + rendue. Idem à ton ancienne méthode.
+    /// Initializes the logical grid and rendering. Same as your previous method.
     /// </summary>
     public void InitializeGrid()
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Machine à états finis (FSM) pour gérer les différents comportements d'un ennemi.
+/// Finite state machine (FSM) that controls the various enemy behaviours.
 /// </summary>
 public class EnemyStateMachine : MonoBehaviour, IEnemyStateMachine
 {
@@ -14,9 +14,9 @@ public class EnemyStateMachine : MonoBehaviour, IEnemyStateMachine
     }
 
     /// <summary>
-    /// Permet de changer l'état actuel de l'ennemi.
+    /// Changes the enemy's current state.
     /// </summary>
-    /// <param name="newState">Le nouvel état à activer.</param>
+    /// <param name="newState">The new state to activate.</param>
     public void ChangeState(EnemyState newState)
     {
         currentState?.ExitState();

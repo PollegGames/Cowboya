@@ -20,16 +20,16 @@ public class HeadTargetController : MonoBehaviour
     {
         if (!hips || !head || !locomotion) return;
 
-        // 1. Miroir par rapport à la position de la tête
+        // 1. Mirror relative to the head position
         float headOffsetX = head.position.x - hips.position.x;
         float mirroredOffsetX = -headOffsetX;
         mirroredOffsetX = Mathf.Clamp(mirroredOffsetX, -maxMirrorOffset, maxMirrorOffset);
 
-        // 2. Direction du mouvement → offset de torsion (vers où il se penche)
+        // 2. Movement direction → bend offset (which way to lean)
         float input = Input.GetAxisRaw("Horizontal");
         float targetBend = Mathf.Clamp(input, -1f, 1f) * maxBendOffset;
 
-        // Interpolation fluide pour éviter les à-coups
+        // Smooth interpolation to avoid jerks
         currentBend = Mathf.Lerp(currentBend, targetBend, bendSpeed * Time.deltaTime);
 
         // 3. Position finale
