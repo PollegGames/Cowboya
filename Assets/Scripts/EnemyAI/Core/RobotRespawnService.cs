@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Service used by enemies to respawn new robots via the <see cref="EnemiesSpawner"/>.
+/// Offers methods to spawn either workers or bosses.
+/// </summary>
 public class RobotRespawnService : MonoBehaviour, IRobotRespawnService
 {
     private EnemiesSpawner spawner;

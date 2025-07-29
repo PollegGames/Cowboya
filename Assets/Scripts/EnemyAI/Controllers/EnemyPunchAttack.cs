@@ -1,6 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Handles the punching animation for enemies. Uses configured arm targets and
+/// hitboxes to strike the player when they enter the attack zone.
+/// </summary>
 public class EnemyPunchAttack : MonoBehaviour
 {
     [SerializeField] private FollowPlayerTriggerHandler targetToFollow; // assigned via inspector

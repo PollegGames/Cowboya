@@ -2,6 +2,11 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(EnemyStateMachine), typeof(RobotMemory))]
+/// <summary>
+/// Controls enemy behaviour and state transitions. Initializes path following
+/// and badge spawning services and provides APIs to change state or assign
+/// destinations.
+/// </summary>
 public class EnemyController : PhysicsBaseAgentController
 {
     [SerializeField] private EnemyStateMachine stateMachine;

@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Creates security badge pickups and attaches them to a specified parent with
+/// spring joint physics.
+/// </summary>
 public class SecurityBadgeSpawner : MonoBehaviour
 {
     [SerializeField] private SecurityBadgePickup badgePrefab;
