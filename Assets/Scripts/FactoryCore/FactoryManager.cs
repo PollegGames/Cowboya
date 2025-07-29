@@ -3,6 +3,10 @@ using System;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
+/// <summary>
+/// Coordinates initialization of the factory map and machines. Tracks alarm
+/// state changes and exposes events when the factory enters a new alarm level.
+/// </summary>
 public class FactoryManager : MonoBehaviour, IFactoryManager
 {
     [SerializeField] public FactoryAlarmStatus factoryAlarmStatus;

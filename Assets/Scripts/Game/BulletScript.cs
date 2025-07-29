@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Simple projectile that launches toward the mouse position and destroys
+/// itself after a short lifetime.
+/// </summary>
 public class BulletScript : MonoBehaviour
 {
     private Vector3 mousePos;

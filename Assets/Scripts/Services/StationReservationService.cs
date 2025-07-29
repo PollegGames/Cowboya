@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Manages which machines are available for workers. Raises events when a
+/// machine is powered on, off or freed so robots can reserve stations.
+/// </summary>
 public class StationReservationService : MonoBehaviour
 {
     public static StationReservationService Instance { get; private set; }
