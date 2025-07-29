@@ -97,13 +97,50 @@ public class MapManager : MonoBehaviour
             return;
         }
 
-        BootSystems();
+        Dictionary<Vector2, Cell> cellDataGrid = null;
+        bool validPath = false;
+        const int maxAttempts = 20;
+        int attempts = 0;
 
-        var cellDataGrid = gridBuilder.BuildGrid(
-            gridWidth,
-            gridHeight,
-            wallCount,
-            pointsOfInterestCount);
+        while (!validPath && attempts < maxAttempts)
+        {
+            cellDataGrid = gridBuilder.BuildGrid(
+                gridWidth,
+                gridHeight,
+                wallCount,
+                pointsOfInterestCount);
+
+            var start = Vector2.zero;
+            var end = Vector2.zero;
+            bool hasStart = false, hasEnd = false;
+
+            foreach (var kvp in cellDataGrid)
+            {
+                if (kvp.Value.cellProperties.usageType == UsageType.Start)
+                {
+                    start = kvp.Key;
+                    hasStart = true;
+                }
+                else if (kvp.Value.cellProperties.usageType == UsageType.End)
+                {
+                    end = kvp.Key;
+                    hasEnd = true;
+                }
+            }
+
+            if (hasStart && hasEnd)
+            {
+                var path = new List<Cell>();
+                validPath = new PathFinder().FindPath(cellDataGrid, start, end, path);
+            }
+
+            attempts++;
+        }
+
+        if (!validPath)
+            Debug.LogWarning($"Could not generate a valid path between start and end after {maxAttempts} attempts.");
+
+        BootSystems();
 
         roomProcessor.ProcessRooms(cellDataGrid, gridWidth, gridHeight);
 
