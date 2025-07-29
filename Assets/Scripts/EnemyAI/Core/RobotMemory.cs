@@ -53,8 +53,8 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
             Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
         }
 
-        // Finally, destroy the stuck enemy’s GameObject:
-        Destroy(controller.gameObject);
+        // Finally, return the stuck enemy to the pool:
+        ObjectPool.Instance.Release(controller.gameObject);
     }
 
     /// <summary>
@@ -74,8 +74,8 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
             Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
         }
 
-        // Finally, destroy the stuck enemy’s GameObject:
-        Destroy(controller.gameObject);
+        // Finally, return the stuck boss to the pool:
+        ObjectPool.Instance.Release(controller.gameObject);
     }
 
     /// <summary>

@@ -56,10 +56,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         spawnedWorkers.Clear();
         for (int i = 0; i < workersToSpawn; i++)
         {
-            var worker = Instantiate(workerPrefab,
-                Vector3.zero,
-                Quaternion.identity,
-                enemiesParent);
+            var worker = ObjectPool.Instance.Get(workerPrefab, enemiesParent);
             var robotState = worker.GetComponent<RobotStateController>();
             robotState.Stats = workerRobotFactory.CreateRobot();
             robotState.Stats.RobotName = $"Worker {i + 1}";
@@ -76,10 +73,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         spawnedEnemies.Clear();
         for (int i = 0; i < enemiesToSpawn; i++)
         {
-            var enemy = Instantiate(enemyPrefab,
-                Vector3.zero,
-                Quaternion.identity,
-                enemiesParent);
+            var enemy = ObjectPool.Instance.Get(enemyPrefab, enemiesParent);
 
             var robotState = enemy.GetComponent<RobotStateController>();
             robotState.Stats = enemyRobotFactory.CreateRobot();
@@ -93,11 +87,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
-        boosInstance = Instantiate(
-            bossPrefab,
-            Vector3.zero,
-            Quaternion.identity,
-            enemiesParent);
+        boosInstance = ObjectPool.Instance.Get(bossPrefab, enemiesParent);
 
         var robotState = this.boosInstance.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
@@ -249,8 +239,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     /// </summary>
     public void SpawnEnemyAtRandom()
     {
-        // 1) Create a fresh GameObject (no pooling; pure new instance).
-        GameObject workerGO = Instantiate(workerPrefab, Vector3.zero, Quaternion.identity, enemiesParent);
+        // 1) Grab a worker from the pool.
+        GameObject workerGO = ObjectPool.Instance.Get(workerPrefab, enemiesParent);
         SpawnInstanceAtRandom(workerGO);
     }
     public void SpawnBossAtRandom()
