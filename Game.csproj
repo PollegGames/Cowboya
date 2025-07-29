@@ -259,6 +259,7 @@
     <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToMachine.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\FactoryManager.cs" />
     <Compile Include="Assets\Scripts\Robots\GroundChecker.cs" />
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />

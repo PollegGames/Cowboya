@@ -22,18 +22,21 @@ public class MachineWorkerManager : MonoBehaviour
         machines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.Worker);
         machine.OnMachineStateChanged += HandleMachineStateChanged;
+        machine.OnMachineTurningOff += HandleMachineTurningOff;
     }
     private void HandleMachineStateChanged(FactoryMachine machine, bool isOn)
     {
         if (isOn)
             OnMachineTurnedOn(machine);
-        else
-            OnMachineTurnedOff(machine);
     }
 
-    private void OnMachineTurnedOff(FactoryMachine machine)
+    private void HandleMachineTurningOff(FactoryMachine machine, EnemyWorkerController worker)
     {
-        var worker = machine.CurrentWorker;
+        OnMachineTurnedOff(machine, worker);
+    }
+
+    private void OnMachineTurnedOff(FactoryMachine machine, EnemyWorkerController worker)
+    {
         if (worker == null)
             return;
 
@@ -52,8 +55,7 @@ public class MachineWorkerManager : MonoBehaviour
             {
                 var worker = pair.Key;
                 waitingWorkers.Remove(worker);
-                // Pseudocode: tell worker to resume work on this machine
-                AssignToFirstFreePointAvailable(worker);
+                machine.SendWorkerBackToWork(worker);
             }
         }
     }

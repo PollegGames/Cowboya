@@ -10,6 +10,7 @@ public class SpawningMachine : BaseMachine
     private MeshRenderer meshRenderer;
 
     public event Action<SpawningMachine, bool> OnMachineStateChanged;
+    public event Action<SpawningMachine, EnemyWorkerController> OnMachineTurningOff;
 
     [Header("Spawning Settings")]
     [SerializeField] private float spawnInterval = 30f;
@@ -74,9 +75,11 @@ public class SpawningMachine : BaseMachine
 
         StopSpawning();
         SendWorkerToStart(currentWorker);
+        OnMachineTurningOff?.Invoke(this, currentWorker);
         base.PowerOff();
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, false);
+        currentWorker = null;
     }
 
 
@@ -141,6 +144,7 @@ public class SpawningMachine : BaseMachine
         SendWorkerToStart(currentWorker);
         isOccupied = false;
         base.ReleaseRobot();
+        currentWorker = null;
     }
 
     private void TryStartSpawning()
