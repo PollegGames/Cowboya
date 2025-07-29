@@ -22,6 +22,7 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
         controls = new InputSystem_Actions();
 
         controls.Player.Move.performed += ctx => Movement = ctx.ReadValue<Vector2>();
+        controls.Player.Move.canceled += ctx => Movement = Vector2.zero;
         controls.Player.Jump.started += ctx => JumpPressed = true;
         controls.Player.Jump.canceled += ctx => JumpPressed = false;
         controls.Player.Attack.started += ctx => PrimaryAttack = true;
