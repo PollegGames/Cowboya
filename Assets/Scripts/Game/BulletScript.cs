@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Simple projectile that launches toward the mouse position and destroys
@@ -17,7 +18,7 @@ public class BulletScript : MonoBehaviour
     {
         mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         rb = GetComponent<Rigidbody2D>();
-        mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        mousePos = mainCam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         Vector3 direction = mousePos - transform.position;
         Vector3 rotation = transform.position - mousePos;
 

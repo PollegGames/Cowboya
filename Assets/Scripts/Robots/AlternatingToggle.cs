@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class AlternatingToggle : MonoBehaviour
@@ -28,17 +29,23 @@ public class AlternatingToggle : MonoBehaviour
     private bool isToggling = false;
     private Coroutine toggleRoutine;
     private RobotStateController robotBehaviour;
+    private InputSystem_Actions controls;
+    private bool interactHeld;
 
     private void Awake()
     {
         robotBehaviour = GetComponent<RobotStateController>();
+        controls = new InputSystem_Actions();
+        controls.Player.Interact.started += _ => interactHeld = true;
+        controls.Player.Interact.canceled += _ => interactHeld = false;
     }
+
+    private void OnEnable() => controls.Enable();
+    private void OnDisable() => controls.Disable();
 
     private void Update()
     {
-        bool holding = Input.GetMouseButton(1);
-
-        if (holding && !isToggling && robotBehaviour != null)
+        if (interactHeld && !isToggling && robotBehaviour != null)
         {
             bool facingRight = arcTargetFollower.IsFacingRight;
             Transform armTarget = facingRight ? rightArmTarget : leftArmTarget;
@@ -50,7 +57,7 @@ public class AlternatingToggle : MonoBehaviour
             toggleRoutine = StartCoroutine(ToggleHoldSequence(armTarget, toggleBox, facingRight));
         }
 
-        if (!holding && isToggling)
+        if (!interactHeld && isToggling)
         {
             if (toggleRoutine != null)
                 StopCoroutine(toggleRoutine);
@@ -87,7 +94,7 @@ public class AlternatingToggle : MonoBehaviour
         }
 
         // While holding, keep following the toggleTarget
-        while (Input.GetMouseButton(1))
+        while (interactHeld)
         {
             armTarget.position = toggleTarget.position;
             yield return null;
