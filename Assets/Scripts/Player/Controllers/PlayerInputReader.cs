@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerInputReader : MonoBehaviour, IPlayerInput
 {
@@ -14,20 +15,36 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
     public bool RightGrabHeld { get; private set; }
     public bool RightGrabUp   { get; private set; }
 
-    void Update()
+    private InputSystem_Actions controls;
+
+    private void Awake()
     {
-        Movement      = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        JumpPressed   = Input.GetButton("Jump");
-        PrimaryAttack = Input.GetMouseButton(0);
+        controls = new InputSystem_Actions();
 
-        // Left grab on RMB:
-        LeftGrabDown  = Input.GetMouseButtonDown(1);
-        LeftGrabHeld  = Input.GetMouseButton   (1);
-        LeftGrabUp    = Input.GetMouseButtonUp  (1);
+        controls.Player.Move.performed += ctx => Movement = ctx.ReadValue<Vector2>();
+        controls.Player.Jump.started += ctx => JumpPressed = true;
+        controls.Player.Jump.canceled += ctx => JumpPressed = false;
+        controls.Player.Attack.started += ctx => PrimaryAttack = true;
+        controls.Player.Attack.canceled += ctx => PrimaryAttack = false;
 
-        // Right grab—if you really want the same button, map it too.
-        RightGrabDown = LeftGrabDown;
-        RightGrabHeld = LeftGrabHeld;
-        RightGrabUp   = LeftGrabUp;
+        controls.Player.Interact.started += ctx =>
+        {
+            LeftGrabDown = RightGrabDown = true;
+            LeftGrabHeld = RightGrabHeld = true;
+        };
+        controls.Player.Interact.canceled += ctx =>
+        {
+            LeftGrabHeld = RightGrabHeld = false;
+            LeftGrabUp = RightGrabUp = true;
+        };
+    }
+
+    private void OnEnable() => controls.Enable();
+    private void OnDisable() => controls.Disable();
+
+    private void LateUpdate()
+    {
+        LeftGrabDown = RightGrabDown = false;
+        LeftGrabUp = RightGrabUp = false;
     }
 }

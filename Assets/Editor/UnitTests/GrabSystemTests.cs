@@ -10,20 +10,31 @@ public class GrabSystemTests
         public bool JumpPressed => false;
         public bool PrimaryAttack => false;
 
-        public bool LeftGrabDown => throw new System.NotImplementedException();
+        public bool LeftGrabDown  { get; private set; }
+        public bool LeftGrabHeld  { get; private set; }
+        public bool LeftGrabUp    { get; private set; }
 
-        public bool LeftGrabHeld => throw new System.NotImplementedException();
+        public bool RightGrabDown => LeftGrabDown;
+        public bool RightGrabHeld => LeftGrabHeld;
+        public bool RightGrabUp   => LeftGrabUp;
 
-        public bool LeftGrabUp => throw new System.NotImplementedException();
+        public void PressGrab()
+        {
+            LeftGrabDown = true;
+            LeftGrabHeld = true;
+        }
 
-        public bool RightGrabDown => throw new System.NotImplementedException();
+        public void ReleaseGrab()
+        {
+            LeftGrabHeld = false;
+            LeftGrabUp = true;
+        }
 
-        public bool RightGrabHeld => throw new System.NotImplementedException();
-
-        public bool RightGrabUp => throw new System.NotImplementedException();
-
-        public bool LeftGrabPressed;
-        public bool RightGrabPressed;
+        public void NextFrame()
+        {
+            LeftGrabDown = false;
+            LeftGrabUp = false;
+        }
     }
 
     private class DummyGrabbable : MonoBehaviour, IGrabbable
@@ -76,17 +87,17 @@ public class GrabSystemTests
         var leftHeldField = typeof(GrabSystem).GetField("leftHeld", BindingFlags.NonPublic | BindingFlags.Instance);
 
         // grab
-        input.LeftGrabPressed = true;
-        // system.Update();
-        input.LeftGrabPressed = false;
-        // system.Update();
+        input.PressGrab();
+        system.Update();
+        input.NextFrame();
 
         Assert.IsTrue(grab.grabbed);
         Assert.AreEqual(grab, leftHeldField.GetValue(system));
 
         // release
-        input.LeftGrabPressed = true;
-        // system.Update();
+        input.ReleaseGrab();
+        system.Update();
+        input.NextFrame();
 
         Assert.IsTrue(grab.released);
         Assert.AreEqual(Vector2.right * system.throwStrength, grab.releasedForce);
