@@ -142,7 +142,7 @@ public class EnemyController : PhysicsBaseAgentController
     private IEnumerator DieRoutine()
     {
         yield return new WaitForSeconds(10f);
-        Destroy(gameObject);
+        ObjectPool.Instance.Release(gameObject);
     }
 
     private void DetachHeldBadges()

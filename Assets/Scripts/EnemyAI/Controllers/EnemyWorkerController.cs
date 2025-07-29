@@ -114,7 +114,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     private IEnumerator DieRoutine()
     {
         yield return new WaitForSeconds(5f);
-        Destroy(gameObject);
+        ObjectPool.Instance.Release(gameObject);
     }
 
     private void DisableAnimator()
