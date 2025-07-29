@@ -12,6 +12,7 @@ public class FactoryMachine : BaseMachine
     private MeshRenderer meshRenderer;
 
     public event Action<FactoryMachine, bool> OnMachineStateChanged;
+    public event Action<FactoryMachine, EnemyWorkerController> OnMachineTurningOff;
     private EnemyWorkerController currentWorker;
 
     public bool HasWorker => currentWorker != null;
@@ -35,9 +36,11 @@ public class FactoryMachine : BaseMachine
     {
         if (!isOn) return;
         SendCurrentWorkerToRest();
+        OnMachineTurningOff?.Invoke(this, currentWorker);
         base.PowerOff();
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, false);
+        currentWorker = null;
     }
 
     private void ApplyMaterial()
@@ -115,6 +118,13 @@ public class FactoryMachine : BaseMachine
             new Worker_IsWork(worker, worker.stateMachine, worker.waypointService));
     }
 
+    public void SendWorkerBackToWork(EnemyWorkerController worker)
+    {
+        if (worker == null) return;
+        worker.stateMachine.ChangeState(
+            new Worker_GoingToMachine(worker, worker.stateMachine, worker.waypointService, this));
+    }
+
     /// <summary>
     /// Sends the currently assigned worker to the rest station and clears the reference.
     /// </summary>
@@ -128,5 +138,6 @@ public class FactoryMachine : BaseMachine
         SendCurrentWorkerToRest();
         isOccupied = false;
         base.ReleaseRobot();
+        currentWorker = null;
     }
 }

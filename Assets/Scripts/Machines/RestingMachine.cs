@@ -11,6 +11,7 @@ public class RestingMachine : BaseMachine
     private EnemyWorkerController currentWorker;
 
     public event Action<RestingMachine, bool> OnMachineStateChanged;
+    public event Action<RestingMachine, EnemyWorkerController> OnMachineTurningOff;
     protected override void Awake()
     {
         base.Awake();
@@ -37,9 +38,11 @@ public class RestingMachine : BaseMachine
     {
         if (!isOn) return;
         SendCurrentWorkerToWork();
+        OnMachineTurningOff?.Invoke(this, currentWorker);
         base.PowerOff();
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, false);
+        currentWorker = null;
     }
 
     public override void AttachRobot(GameObject robot)
@@ -64,6 +67,7 @@ public class RestingMachine : BaseMachine
         SendCurrentWorkerToWork();
         isOccupied = false;
         base.ReleaseRobot();
+        currentWorker = null;
     }
 
     private void SendWorkerToRest(EnemyWorkerController worker)
