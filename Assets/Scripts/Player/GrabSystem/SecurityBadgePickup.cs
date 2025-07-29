@@ -18,6 +18,10 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     SpringJoint2D spring;
     bool attached = false;
 
+    // Tracks the badge currently held by the player
+    public static SecurityBadgePickup PlayerHeldBadge { get; private set; }
+    bool heldByPlayer = false;
+
     void Awake()
     {
         rb     = GetComponent<Rigidbody2D>();
@@ -39,29 +43,57 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     public bool CanBeGrabbed()
     {
+        if (PlayerHeldBadge != null && PlayerHeldBadge != this)
+            return false;
         return !attached;
     }
 
     public void OnGrab(Transform grabParent)
     {
+        // Prevent grabbing a second badge once one is already attached
+        if (PlayerHeldBadge != null && PlayerHeldBadge != this)
+            return;
+
         attached = true;
         rb.simulated = true;
 
-        // Try to hook up to the hand's Rigidbody2D
-        var handRb = grabParent.GetComponentInParent<Rigidbody2D>();
-        if (handRb != null)
+        var player = grabParent.GetComponentInParent<PlayerMovementController>();
+        if (player != null)
         {
-            spring.connectedBody = handRb;
+            // Attach directly to the player's hips
+            var hip = player.BodyReference;
+            if (hip != null)
+            {
+                spring.connectedBody = hip;
+                transform.SetParent(hip.transform, true);
+                PlayerHeldBadge = this;
+                heldByPlayer = true;
+
+                // Disable or destroy all other badges in the scene
+                foreach (var badge in FindObjectsOfType<SecurityBadgePickup>())
+                {
+                    if (badge != this)
+                        Destroy(badge.gameObject);
+                }
+            }
         }
         else
         {
-            spring.connectedBody   = null;
-            // anchor at current position so it doesn't snap
-            spring.connectedAnchor = transform.position;
+            // Fallback: attach to whatever grabbed us
+            var handRb = grabParent.GetComponentInParent<Rigidbody2D>();
+            if (handRb != null)
+            {
+                spring.connectedBody = handRb;
+            }
+            else
+            {
+                spring.connectedBody = null;
+                spring.connectedAnchor = transform.position;
+            }
         }
 
         spring.distance = restDistance;
-        spring.enabled  = true;
+        spring.enabled = true;
     }
 
     public void OnAttract(Vector2 attractPoint)
@@ -81,7 +113,28 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         spring.enabled        = false;
         spring.connectedBody  = null;
 
+        if (heldByPlayer)
+        {
+            heldByPlayer = false;
+            if (PlayerHeldBadge == this)
+                PlayerHeldBadge = null;
+        }
+
         // // Give it some velocity so it flies off
         // rb.AddForce(throwForce * throwStrength, ForceMode2D.Impulse);
+    }
+
+    private void OnDestroy()
+    {
+        if (PlayerHeldBadge == this)
+            PlayerHeldBadge = null;
+    }
+
+    public static void DropPlayerBadge()
+    {
+        if (PlayerHeldBadge != null)
+        {
+            PlayerHeldBadge.OnRelease(Vector2.zero);
+        }
     }
 }
