@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3184788421547398316}
   - component: {fileID: 6206929599146606855}
   - component: {fileID: 5280327772437951530}
-  - component: {fileID: 216962211457872828}
+  - component: {fileID: 7876967260955353992}
   m_Layer: 11
   m_Name: BadgeSecurity
   m_TagString: BadgeSecurity
@@ -179,25 +179,24 @@ MonoBehaviour:
   throwStrength: 5
   frequency: 5
   dampingRatio: 0.8
-  restDistance: 0
---- !u!231 &216962211457872828
-SpringJoint2D:
+  maxForce: 1000
+--- !u!257 &7876967260955353992
+TargetJoint2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934608487537832627}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
-  m_EnableCollision: 0
+  m_EnableCollision: 1
   m_ConnectedRigidBody: {fileID: 0}
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_BreakAction: 3
-  m_AutoConfigureConnectedAnchor: 0
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0, y: 0}
-  m_AutoConfigureDistance: 1
-  m_Distance: 6.3930893
-  m_DampingRatio: 0
-  m_Frequency: 1
+  m_Target: {x: 6.3415685, y: 0.81}
+  m_AutoConfigureTarget: 0
+  m_MaxForce: 10000
+  m_DampingRatio: 1
+  m_Frequency: 5

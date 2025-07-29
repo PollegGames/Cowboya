@@ -40,13 +40,17 @@ public class SecurityBadgeSpawner : MonoBehaviour
             return badge;
         }
 
-        // 3) Add and configure a TargetJoint2D on the badge
-        var joint = badge.gameObject.AddComponent<TargetJoint2D>();
-        joint.autoConfigureTarget = false;
-        joint.target = parent.position;
-        joint.frequency = frequency;          // spring strength
-        joint.dampingRatio = dampingRatio;    // damping
-        joint.maxForce = maxForce;
+        // // 3) Ensure the badge has a TargetJoint2D. If the prefab already
+        // // includes one (likely via RequireComponent on SecurityBadgePickup)
+        // // reuse it instead of adding a duplicate.
+        // var joint = badge.GetComponent<TargetJoint2D>();
+        // if (joint == null)
+        //     joint = badge.gameObject.AddComponent<TargetJoint2D>();
+        // joint.autoConfigureTarget = false;
+        // joint.target = parent.position;
+        // joint.frequency = frequency;          // spring strength
+        // joint.dampingRatio = dampingRatio;    // damping
+        // joint.maxForce = maxForce;
 
         // Make the badge follow the parent transform
         badge.SetFollowTarget(parent);

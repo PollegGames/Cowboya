@@ -25,7 +25,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     void Awake()
     {
-        rb    = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         joint = GetComponent<TargetJoint2D>();
 
         // Start disabled — only enable when grabbed
@@ -33,20 +33,40 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
         // Configure joint behavior
         joint.autoConfigureTarget = false;
-        joint.target             = rb.position;
-        joint.frequency          = frequency;
-        joint.dampingRatio       = dampingRatio;
-        joint.maxForce           = maxForce;
+        joint.target = rb.position;
+        joint.frequency = frequency;
+        joint.dampingRatio = dampingRatio;
+        joint.maxForce = maxForce;
+    }
+
+    void FixedUpdate()
+    {
+        if (joint.enabled && followTarget != null)
+        {
+            joint.target = followTarget.position;
+        }
     }
 
     public void SetFollowTarget(Transform target)
     {
         followTarget = target;
-        if (followTarget != null)
+        // Ensure we have a joint reference. This can be null if the badge
+        // prefab didn't include a TargetJoint2D and the component was added
+        // after Awake ran.
+        if (joint == null)
+            joint = GetComponent<TargetJoint2D>();
+
+        if (joint != null)
         {
-            joint.target = followTarget.position;
+            if (followTarget != null)
+                joint.target = followTarget.position;
+
+            joint.enabled = true;
         }
-        joint.enabled = true;
+        else
+        {
+            Debug.LogWarning($"{nameof(SecurityBadgePickup)} on {name} is missing a {nameof(TargetJoint2D)} component.");
+        }
     }
 
     public bool CanBeGrabbed()
@@ -105,8 +125,8 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         attached = false;
 
         // Turn off the joint
-        joint.enabled  = false;
-        followTarget   = null;
+        joint.enabled = false;
+        followTarget = null;
 
         if (heldByPlayer)
         {
