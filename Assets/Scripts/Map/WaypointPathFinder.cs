@@ -23,13 +23,19 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
 
     public List<RoomWaypoint> FindWorldPath(RoomWaypoint start, RoomWaypoint end)
     {
+        if (start == null || end == null)
+        {
+            Debug.LogWarning("FindWorldPath called with a null waypoint.");
+            return new List<RoomWaypoint>();
+        }
+
         var queue = new Queue<RoomWaypoint>();
         var cameFrom = new Dictionary<RoomWaypoint, RoomWaypoint>();
         var visited = new HashSet<RoomWaypoint>();
 
         queue.Enqueue(start);
         visited.Add(start);
-        cameFrom[start] = null; //TODO ArgumentNullException: Value cannot be null.
+        cameFrom[start] = null;
 
         while (queue.Count > 0)
         {
