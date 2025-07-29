@@ -1,21 +1,22 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(SpringJoint2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
 public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 {
     [Header("Throw settings")]
     public float throwStrength = 5f;
 
-    [Header("Spring Joint Settings")]
-    [Tooltip("How springy the joint is.")]
+    [Header("Target Joint Settings")]
+    [Tooltip("How springy the joint movement is.")]
     [SerializeField] private float frequency = 5f;
     [Tooltip("How much the joint resists oscillation.")]
     [SerializeField] private float dampingRatio = 0.8f;
-    [Tooltip("Rest length of the spring.")]
-    [SerializeField] private float restDistance = 0f;
+    [Tooltip("Maximum force the joint can apply.")]
+    [SerializeField] private float maxForce = 1000f;
 
     Rigidbody2D rb;
-    SpringJoint2D spring;
+    TargetJoint2D joint;
+    Transform followTarget;
     bool attached = false;
 
     // Tracks the badge currently held by the player
@@ -24,21 +25,28 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     void Awake()
     {
-        rb     = GetComponent<Rigidbody2D>();
-        spring = GetComponent<SpringJoint2D>();
+        rb    = GetComponent<Rigidbody2D>();
+        joint = GetComponent<TargetJoint2D>();
 
         // Start disabled — only enable when grabbed
-        spring.enabled = false;
+        joint.enabled = false;
 
-        // Configure spring behavior
-        spring.autoConfigureDistance = false;
-        spring.distance              = restDistance;
-        spring.frequency             = frequency;
-        spring.dampingRatio          = dampingRatio;
-        // Note: SpringJoint2D has no maxForce setting
+        // Configure joint behavior
+        joint.autoConfigureTarget = false;
+        joint.target             = rb.position;
+        joint.frequency          = frequency;
+        joint.dampingRatio       = dampingRatio;
+        joint.maxForce           = maxForce;
+    }
 
-        // If we attach to a world point (no Rigidbody), we will use connectedAnchor
-        spring.connectedBody = null;
+    public void SetFollowTarget(Transform target)
+    {
+        followTarget = target;
+        if (followTarget != null)
+        {
+            joint.target = followTarget.position;
+        }
+        joint.enabled = true;
     }
 
     public bool CanBeGrabbed()
@@ -64,10 +72,9 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
             var hip = player.BodyReference;
             if (hip != null)
             {
-                spring.connectedBody = hip;
-                transform.SetParent(hip.transform, true);
                 PlayerHeldBadge = this;
                 heldByPlayer = true;
+                SetFollowTarget(hip.transform);
 
                 // Disable or destroy all other badges in the scene
                 foreach (var badge in FindObjectsOfType<SecurityBadgePickup>())
@@ -79,29 +86,17 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         }
         else
         {
-            // Fallback: attach to whatever grabbed us
-            var handRb = grabParent.GetComponentInParent<Rigidbody2D>();
-            if (handRb != null)
-            {
-                spring.connectedBody = handRb;
-            }
-            else
-            {
-                spring.connectedBody = null;
-                spring.connectedAnchor = transform.position;
-            }
+            // Fallback: follow whatever grabbed us
+            SetFollowTarget(grabParent);
         }
 
-        spring.distance = restDistance;
-        spring.enabled = true;
     }
 
     public void OnAttract(Vector2 attractPoint)
     {
-        // Update world‐anchor if we're not tied to an actual Rigidbody2D
-        if (attached && spring.enabled && spring.connectedBody == null)
+        if (attached && joint.enabled && followTarget == null)
         {
-            spring.connectedAnchor = attractPoint;
+            joint.target = attractPoint;
         }
     }
 
@@ -109,9 +104,9 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     {
         attached = false;
 
-        // Turn off the spring
-        spring.enabled        = false;
-        spring.connectedBody  = null;
+        // Turn off the joint
+        joint.enabled  = false;
+        followTarget   = null;
 
         if (heldByPlayer)
         {

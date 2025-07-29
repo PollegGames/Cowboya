@@ -14,17 +14,15 @@ public class SecurityBadgePickupTests
         Assert.IsTrue(badge.CanBeGrabbed());
         badge.OnGrab(hand);
 
-        Assert.IsFalse(rb.simulated);
-        Assert.AreEqual(Vector2.zero, rb.linearVelocity);
-        Assert.AreEqual(hand, obj.transform.parent);
+        var joint = obj.GetComponent<TargetJoint2D>();
+        Assert.IsTrue(joint.enabled);
+        Assert.AreEqual((Vector2)hand.position, joint.target);
         Assert.IsFalse(badge.CanBeGrabbed());
 
         Vector2 throwForce = new Vector2(2f, 1f);
         badge.OnRelease(throwForce);
 
-        Assert.IsTrue(rb.simulated);
-        Assert.AreEqual(throwForce, rb.linearVelocity);
-        Assert.IsNull(obj.transform.parent);
+        Assert.IsFalse(joint.enabled);
         Assert.IsTrue(badge.CanBeGrabbed());
     }
 }

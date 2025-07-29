@@ -2,13 +2,13 @@ using UnityEngine;
 
 /// <summary>
 /// Creates security badge pickups and attaches them to a specified parent with
-/// spring joint physics.
+/// target joint physics.
 /// </summary>
 public class SecurityBadgeSpawner : MonoBehaviour
 {
     [SerializeField] private SecurityBadgePickup badgePrefab;
 
-    [Header("Spring Joint Settings")]
+    [Header("Target Joint Settings")]
     [Tooltip("How springy the joint is.")]
     [SerializeField] private float frequency = 5f;
     [Tooltip("How much the joint resists oscillation.")]
@@ -32,7 +32,7 @@ public class SecurityBadgeSpawner : MonoBehaviour
             parent
         );
 
-        // 2) Ensure both badge and parent have Rigidbody2D
+        // 2) Ensure the badge has a Rigidbody2D
         var badgeRb = badge.GetComponent<Rigidbody2D>();
         if (badgeRb == null)
         {
@@ -40,24 +40,16 @@ public class SecurityBadgeSpawner : MonoBehaviour
             return badge;
         }
 
-        var parentRb = parent.GetComponent<Rigidbody2D>();
-        if (parentRb == null)
-        {
-            Debug.LogError($"SecurityBadgeSpawner: Parent '{parent.name}' has no Rigidbody2D.");
-            return badge;
-        }
+        // 3) Add and configure a TargetJoint2D on the badge
+        var joint = badge.gameObject.AddComponent<TargetJoint2D>();
+        joint.autoConfigureTarget = false;
+        joint.target = parent.position;
+        joint.frequency = frequency;          // spring strength
+        joint.dampingRatio = dampingRatio;    // damping
+        joint.maxForce = maxForce;
 
-        // 3) Add and configure a SpringJoint2D on the badge
-        var spring = badge.gameObject.AddComponent<SpringJoint2D>();
-        spring.connectedBody = parentRb;
-        spring.autoConfigureDistance = false;
-        spring.distance = 0f;                  // keep them exactly together
-        spring.frequency = frequency;          // spring strength
-        spring.dampingRatio = dampingRatio;    // damping
-        spring.enableCollision = false;        // badge won't collide back into parent
-
-        // Unfortunately SpringJoint2D has no maxForce setting,
-        // so if you need that you could clamp badgeRb.velocity in Update()
+        // Make the badge follow the parent transform
+        badge.SetFollowTarget(parent);
 
         return badge;
     }
