@@ -8,6 +8,8 @@ public class MessageService : MonoBehaviour
     private Label messageLabel;
     private VisualElement root;
 
+    public bool IsNotDisplaying => messageLabel.style.display == DisplayStyle.None;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

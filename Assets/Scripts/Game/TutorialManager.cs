@@ -18,9 +18,9 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 0)
+        if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 1)
         {
-            var rooms = FindObjectsOfType<RoomManager>();
+            var rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
             foreach (var room in rooms)
             {
                 room.PlayerEntered += HandlePlayerEnteredRoom;
@@ -35,9 +35,7 @@ public class TutorialManager : MonoBehaviour
 
     private void HandlePlayerEnteredRoom(RoomManager room)
     {
-        if (!visitedRooms.Add(room)) return;
-
-        if (currentIndex < messages.Count)
+        if (currentIndex < messages.Count && MessageService.Instance.IsNotDisplaying)
         {
             MessageService.Instance?.ShowMessage(messages[currentIndex]);
             currentIndex++;

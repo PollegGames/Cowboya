@@ -3938,7 +3938,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.76
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3981,16 +3981,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 3567484892239371285, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3567484892239371285, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_VersionIndex
-      value: 35180
+      value: 35183
       objectReference: {fileID: 0}
     - target: {fileID: 4030321230458249140, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 4699350797691524229, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4699350797691524229, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_VersionIndex
-      value: 30921
+      value: 30924
       objectReference: {fileID: 0}
     - target: {fileID: 5141881466450859812, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: roomManager

@@ -39,7 +39,8 @@ public class GameUIViewModel : MonoBehaviour
         if (RunProgressManager.Instance != null)
         {
             int index = RunProgressManager.Instance.CurrentLevelIndex;
-            levelPrefix = index == 0 ? "Tutorial - Level 0: " : $"Level {index}: ";
+            var realLevel = index - 1;
+            levelPrefix = index == 1 ? "Level Tutorial. " : $"Level {realLevel}: ";
         }
 
         var msg = new GameMessage(levelPrefix + startMessage.Text, startMessage.Speaker);

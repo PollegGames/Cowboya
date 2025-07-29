@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\Navigation\EdgeCellProcessor.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
     <Compile Include="Assets\Scripts\Machines\RestingSlot.cs" />
+    <Compile Include="Assets\Scripts\Game\TutorialManager.cs" />
     <Compile Include="Assets\Scripts\Game\RunProgressManager.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWorkerStateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyStateMachine.cs" />
@@ -95,7 +96,6 @@
     <Compile Include="Assets\Scripts\Navigation\PriorityQueue.cs" />
     <Compile Include="Assets\Scripts\Map\WaypointService.cs" />
     <Compile Include="Assets\Scripts\Game\TargetAim.cs" />
-    <Compile Include="Assets\Scripts\Game\TutorialManager.cs" />
     <Compile Include="Assets\Scripts\Robots\EnergyBot.cs" />
     <Compile Include="Assets\Scripts\Navigation\RunMapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPlayerSpawner.cs" />

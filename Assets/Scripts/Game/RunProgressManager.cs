@@ -14,7 +14,6 @@ public class RunProgressManager : MonoBehaviour
     private int currentLevelIndex = 1;
 
     public int CurrentLevelIndex => currentLevelIndex;
-    public int LevelCount => mapConfigs != null ? mapConfigs.Count : 0;
 
     public RunMapConfigSO CurrentConfig
     {

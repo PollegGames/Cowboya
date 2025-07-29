@@ -54,7 +54,7 @@ public class SceneBootstrapper : MonoBehaviour
             );
         }
 
-        if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 0)
+        if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 1)
         {
             new GameObject("TutorialManager").AddComponent<TutorialManager>();
         }
