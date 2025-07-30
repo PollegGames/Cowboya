@@ -11,6 +11,7 @@ public class MachineSecurityManager : MonoBehaviour
     [SerializeField] private StationReservationService reservationService;
     private readonly List<FactoryMachine> factoryMachines = new();
     private readonly List<RestingMachine> restingMachines = new();
+    private readonly List<SecurityMachine> securityMachines = new();
     private readonly List<ReactiveMachineAI> guards = new();
 
     /// <summary>
@@ -18,6 +19,7 @@ public class MachineSecurityManager : MonoBehaviour
     /// </summary>
     public event Action<FactoryMachine> OnFactoryMachineTurnedOff;
     public event Action<RestingMachine> OnRestingMachineTurnedOff;
+    public event Action<SecurityMachine> OnSecurityMachineTurnedOff;
 
     public void RegisterFactoryMachine(FactoryMachine machine)
     {
@@ -35,6 +37,15 @@ public class MachineSecurityManager : MonoBehaviour
         restingMachines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
         machine.OnMachineStateChanged += HandleRestingMachineStateChanged;
+    }
+
+    public void RegisterSecurityMachine(SecurityMachine machine)
+    {
+        if (machine == null || securityMachines.Contains(machine))
+            return;
+        securityMachines.Add(machine);
+        reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
+        machine.OnMachineStateChanged += HandleSecurityMachineStateChanged;
     }
     public void RegisterGuard(ReactiveMachineAI guard)
     {
@@ -69,6 +80,14 @@ public class MachineSecurityManager : MonoBehaviour
         }
     }
 
+    private void HandleSecurityMachineStateChanged(SecurityMachine machine, bool isOn)
+    {
+        if (!isOn)
+        {
+            OnSecurityMachineTurnedOff?.Invoke(machine);
+        }
+    }
+
     private void DispatchGuardForFactoryMachine(FactoryMachine machine)
     {
         Debug.Log($"Dispatching guard for machine: {machine.name}");
@@ -81,6 +100,9 @@ public class MachineSecurityManager : MonoBehaviour
         foreach (var guard in guards)
         {
             if (guard == null) continue;
+            var controller = guard.GetComponent<EnemyController>();
+            if (controller == null || controller.EnemyStatus != EnemyStatus.CheckingSecurity)
+                continue;
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
             {
@@ -103,6 +125,9 @@ public class MachineSecurityManager : MonoBehaviour
         foreach (var guard in guards)
         {
             if (guard == null) continue;
+            var controller = guard.GetComponent<EnemyController>();
+            if (controller == null || controller.EnemyStatus != EnemyStatus.CheckingSecurity)
+                continue;
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
             {
