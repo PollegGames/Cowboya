@@ -19,6 +19,9 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     Transform followTarget;
     bool attached = false;
 
+    // Flag to ensure stolen logic only runs once
+    bool wasStolen = false;
+
     // Tracks the badge currently held by the player
     public static SecurityBadgePickup PlayerHeldBadge { get; private set; }
     bool heldByPlayer = false;
@@ -82,10 +85,25 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         if (PlayerHeldBadge != null && PlayerHeldBadge != this)
             return;
 
+        var player = grabParent.GetComponentInParent<PlayerMovementController>();
+
+        // Detect if we're stealing from an enemy
+        if (!wasStolen && transform.parent != null)
+        {
+            var enemy = transform.parent.GetComponentInParent<EnemyController>();
+            if (enemy != null)
+            {
+                var stateController = enemy.GetComponent<RobotStateController>();
+                if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
+                {
+                    enemy.OnBadgeStolen(player.gameObject);
+                    wasStolen = true;
+                }
+            }
+        }
+
         attached = true;
         rb.simulated = true;
-
-        var player = grabParent.GetComponentInParent<PlayerMovementController>();
         if (player != null)
         {
             // Attach directly to the player's hips

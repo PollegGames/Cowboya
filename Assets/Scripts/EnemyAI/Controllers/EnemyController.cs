@@ -160,6 +160,11 @@ public class EnemyController : PhysicsBaseAgentController
             initialBadge.transform.SetParent(dropContainer, true);
     }
 
+    public void OnBadgeStolen(GameObject player)
+    {
+        Debug.Log($"{name} badge stolen by {player.name}");
+    }
+
     private void UpdateBalance(bool enabledBalance)
     {
         var bodyBalance = GetComponent<BodyBalance>();
