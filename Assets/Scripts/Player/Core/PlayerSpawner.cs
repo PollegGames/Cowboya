@@ -31,6 +31,10 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
             Quaternion.identity
         );
 
+        var locomotion = playerInstance.GetComponent<RobotLocomotionController>();
+        if (locomotion != null)
+            locomotion.isPlayerControlled = true;
+
         // Setup behaviour and save-data info
         playerRobotBehaviour = playerTemplate.InitializePlayerStateController(playerInstance);
         playerRobotInfo = playerTemplate.InitializePlayerStats(saveService.CurrentSaveData);
