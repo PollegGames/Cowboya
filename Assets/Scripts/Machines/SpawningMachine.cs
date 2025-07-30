@@ -24,6 +24,7 @@ public class SpawningMachine : BaseMachine
     public EnemyWorkerController CurrentWorker => currentWorker;
 
     private IEnemiesSpawner enemiesSpawner;
+    private MachineSecurityManager securityManager;
     protected override void Awake()
     {
         base.Awake();
@@ -42,6 +43,9 @@ public class SpawningMachine : BaseMachine
         if (factoryAlarmStatus != null)
             factoryAlarmStatus.OnAlarmStateChanged -= HandleAlarmChanged;
 
+        if (securityManager != null)
+            securityManager.OnSecurityMachineTurnedOff -= HandleSecurityMachineTurnedOff;
+
         StopSpawning();
     }
 
@@ -59,6 +63,13 @@ public class SpawningMachine : BaseMachine
         }
 
         this.enemiesSpawner = enemiesSpawner;
+    }
+
+    public void InitializeSecurityManager(MachineSecurityManager manager)
+    {
+        securityManager = manager;
+        if (securityManager != null)
+            securityManager.OnSecurityMachineTurnedOff += HandleSecurityMachineTurnedOff;
     }
 
     public override void PowerOn()
@@ -193,5 +204,27 @@ public class SpawningMachine : BaseMachine
         // 2) turn it on
         enemyGO.SetActive(true);
         Debug.Log("[SpawningMachine] Enemy spawned and sent to Follower state.");
+    }
+
+    private void HandleSecurityMachineTurnedOff(SecurityMachine machine)
+    {
+        if (!isOn || enemiesSpawner == null)
+            return;
+
+        GameObject guardGO = enemiesSpawner.CreateAngGetFollowerGuard();
+        var spawnPos = trigger.transform.position;
+        var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
+        guardGO.transform.position = lastVisitedPoint.WorldPos;
+        var ec = guardGO.GetComponent<EnemyController>();
+        if (ec != null)
+        {
+            ec.SetSecurityGuardState();
+            ec.memory.SetLastVisitedPoint(lastVisitedPoint);
+            var guardAI = guardGO.GetComponent<ReactiveMachineAI>();
+            guardAI?.Initialize(waypointService, securityManager);
+            guardAI?.ReactivateSecurityMachine(machine);
+        }
+
+        guardGO.SetActive(true);
     }
 }

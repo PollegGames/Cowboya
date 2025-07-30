@@ -45,7 +45,7 @@ public class Enemy_ReturnToSecurityPost : EnemyState
             enemy.SetMovement(0f);
             enemy.SetVerticalMovement(0f);
             enemy.memory.SetLastVisitedPoint(targetPoint);
-            stateMachine.ChangeState(new Enemy_Idle(enemy, stateMachine, waypointService));
+            stateMachine.ChangeState(new Enemy_CheckingSecurity(enemy, stateMachine, waypointService));
         }
     }
 

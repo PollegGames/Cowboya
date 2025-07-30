@@ -60,6 +60,7 @@ public class RoomManager : MonoBehaviour
         {
             spawningMachine.InitializeWaypointService(waypointService);
             spawningMachine.InitializeSpawner(enemiesSpawner);
+            spawningMachine.InitializeSecurityManager(machineSecurityManager);
             spawningWorkerManager?.RegisterMachine(spawningMachine);
         }
 
@@ -67,6 +68,12 @@ public class RoomManager : MonoBehaviour
         {
             restingMachine.InitializeWaypointService(waypointService);
             machineSecurityManager?.RegisterRestingMachine(restingMachine);
+        }
+
+        foreach (var securityMachine in securityMachinesInRoom)
+        {
+            securityMachine.InitializeWaypointService(waypointService);
+            machineSecurityManager?.RegisterSecurityMachine(securityMachine);
         }
     }
 

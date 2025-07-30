@@ -45,5 +45,14 @@ public class ReactiveMachineAI : MonoBehaviour
         stateMachine.ChangeState(new Enemy_ReactiveRestingMachine(
             controller, stateMachine, waypointService, machine, returnPoint));
     }
+
+    public void ReactivateSecurityMachine(SecurityMachine machine)
+    {
+        if (controller == null || stateMachine == null || waypointService == null)
+            return;
+        var returnPoint = controller.memory.LastVisitedPoint;
+        stateMachine.ChangeState(new Enemy_ReactivateSecurityMachine(
+            controller, stateMachine, waypointService, machine, returnPoint));
+    }
 }
 

@@ -10,6 +10,11 @@ public class SecurityMachine : BaseMachine
     private MeshRenderer meshRenderer;
     private EnemyController currentGuard;
 
+    public EnemyController CurrentGuard => currentGuard;
+
+    public event Action<SecurityMachine, bool> OnMachineStateChanged;
+    public event Action<SecurityMachine, EnemyController> OnMachineTurningOff;
+
     protected override void Awake()
     {
         base.Awake();
@@ -27,14 +32,18 @@ public class SecurityMachine : BaseMachine
     {
         base.PowerOn();
         ApplyMaterial();
+        OnMachineStateChanged?.Invoke(this, true);
     }
 
     public override void PowerOff()
     {
         if (!isOn) return;
         SendCurrentGuardToRest();
+        OnMachineTurningOff?.Invoke(this, currentGuard);
         base.PowerOff();
         ApplyMaterial();
+        OnMachineStateChanged?.Invoke(this, false);
+        currentGuard = null;
     }
 
     public override void AttachRobot(GameObject robot)
@@ -65,14 +74,14 @@ public class SecurityMachine : BaseMachine
     {
         if (guard == null) return;
         var sm = guard.GetComponent<EnemyStateMachine>();
-        sm?.ChangeState(new Enemy_SecurityGuardRest(guard, sm, waypointService));
+        sm?.ChangeState(new Enemy_GoingToRest(guard, sm, waypointService));
     }
 
     private void SetGuardToSecurityPost(EnemyController guard)
     {
         if (guard == null) return;
         var sm = guard.GetComponent<EnemyStateMachine>();
-        sm?.ChangeState(new Enemy_Idle(guard, sm, waypointService));
+        sm?.ChangeState(new Enemy_CheckingSecurity(guard, sm, waypointService));
     }
 
     private void SendCurrentGuardToRest()
