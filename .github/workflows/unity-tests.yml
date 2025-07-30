@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: game-ci/unity-test-runner@v4
+    - name: Run Unity Tests
+      uses: game-ci/unity-test-runner@v4
       with:
         unityVersion: 2023.2.0f1
         testMode: editmode
