@@ -30,10 +30,13 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         this.mapManager = mapManager;
         this.waypointService = waypointService;
         this.victorySetup = victorySetup;
+
+        // Reset the alarm to a known state before any room logic or AI is created
+        SetupFactoryState();
+
         mapManager.InitializeGrid();
         mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager, spawningWorkerManager, enemiesSpawner);
         waypointService.BuildAllNeighbors(includeUnavailable: true);
-        SetupFactoryState();
     }
 
 
