@@ -21,6 +21,7 @@ public class RobotLocomotionController : MonoBehaviour
     public event Action OnJumpEnded;
     private RobotStateController robotBehaviour;
     private InputSystem_Actions controls;
+    [SerializeField] public bool isPlayerControlled = false;
 
     [SerializeField] private float energyCostPerStep = 1f;
     [SerializeField] private float energyCostPerJump = 3f;
@@ -34,11 +35,23 @@ public class RobotLocomotionController : MonoBehaviour
         if (robotBehaviour == null)
             Debug.LogError("RobotLocomotionController: PlayerStateController not found.");
 
-        controls = new InputSystem_Actions();
+        if (isPlayerControlled)
+        {
+            controls = new InputSystem_Actions();
+        }
     }
 
-    private void OnEnable() => controls.Enable();
-    private void OnDisable() => controls.Disable();
+    private void OnEnable()
+    {
+        if (isPlayerControlled && controls != null)
+            controls.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (isPlayerControlled && controls != null)
+            controls.Disable();
+    }
 
     #region Movement
 
@@ -168,9 +181,12 @@ public class RobotLocomotionController : MonoBehaviour
         isJumping = false;
         StopWalking();
 
-        float input = controls.Player.Move.ReadValue<Vector2>().x;
-        if (Mathf.Abs(input) > 0.2f)
-            HandleMovement(input);
+        if (isPlayerControlled && controls != null)
+        {
+            float input = controls.Player.Move.ReadValue<Vector2>().x;
+            if (Mathf.Abs(input) > 0.2f)
+                HandleMovement(input);
+        }
 
         OnJumpEnded?.Invoke();
     }

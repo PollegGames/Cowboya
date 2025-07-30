@@ -57,6 +57,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         for (int i = 0; i < workersToSpawn; i++)
         {
             var worker = ObjectPool.Instance.Get(workerPrefab, enemiesParent);
+            var locomotion = worker.GetComponent<RobotLocomotionController>();
+            if (locomotion != null)
+                locomotion.isPlayerControlled = false;
             var robotState = worker.GetComponent<RobotStateController>();
             robotState.Stats = workerRobotFactory.CreateRobot();
             robotState.Stats.RobotName = $"Worker {i + 1}";
@@ -74,6 +77,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         for (int i = 0; i < enemiesToSpawn; i++)
         {
             var enemy = ObjectPool.Instance.Get(enemyPrefab, enemiesParent);
+            var locomotion = enemy.GetComponent<RobotLocomotionController>();
+            if (locomotion != null)
+                locomotion.isPlayerControlled = false;
 
             var robotState = enemy.GetComponent<RobotStateController>();
             robotState.Stats = enemyRobotFactory.CreateRobot();
@@ -88,6 +94,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
         boosInstance = ObjectPool.Instance.Get(bossPrefab, enemiesParent);
+        var bossLocomotion = boosInstance.GetComponent<RobotLocomotionController>();
+        if (bossLocomotion != null)
+            bossLocomotion.isPlayerControlled = false;
 
         var robotState = this.boosInstance.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
@@ -125,6 +134,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 Vector3.zero,
                 Quaternion.identity,
                 enemiesParent);
+            var workerLocomotion = worker.GetComponent<RobotLocomotionController>();
+            if (workerLocomotion != null)
+                workerLocomotion.isPlayerControlled = false;
             var robotState = worker.GetComponent<RobotStateController>();
             robotState.Stats = workerRobotFactory.CreateRobot();
             robotState.Stats.RobotName = $"WorkerSpawner {i + 1}";
@@ -141,6 +153,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 Vector3.zero,
                 Quaternion.identity,
                 enemiesParent);
+        var followerLocomotion = follower.GetComponent<RobotLocomotionController>();
+        if (followerLocomotion != null)
+            followerLocomotion.isPlayerControlled = false;
 
         var robotState = follower.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
@@ -163,6 +178,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 Vector3.zero,
                 Quaternion.identity,
                 enemiesParent);
+        var guardLocomotion = guard.GetComponent<RobotLocomotionController>();
+        if (guardLocomotion != null)
+            guardLocomotion.isPlayerControlled = false;
 
         var robotState = guard.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
@@ -263,12 +281,19 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     {
         // 1) Grab a worker from the pool.
         GameObject workerGO = ObjectPool.Instance.Get(workerPrefab, enemiesParent);
+        var locomotion = workerGO.GetComponent<RobotLocomotionController>();
+        if (locomotion != null)
+            locomotion.isPlayerControlled = false;
         SpawnInstanceAtRandom(workerGO);
     }
     public void SpawnBossAtRandom()
     {
         // 1) Create a fresh GameObject (no pooling; pure new instance).
         GameObject enemyGO = Instantiate(workerPrefab, Vector3.zero, Quaternion.identity, enemiesParent);
+
+        var loco = enemyGO.GetComponent<RobotLocomotionController>();
+        if (loco != null)
+            loco.isPlayerControlled = false;
 
         SpawnInstanceAtRandom(enemyGO);
     }
