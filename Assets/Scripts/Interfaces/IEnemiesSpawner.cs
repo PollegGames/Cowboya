@@ -14,6 +14,7 @@ public interface IEnemiesSpawner
     void CreateEnemies(int enemiesToSpawn);
     void CreateBoss();
     GameObject CreateAngGetFollowerGuard();
+    GameObject CreateAngGetSecurityGuard();
     void CreateWorkersSpawner(int workersToSpawn);
     void SpreadEnemies();
     void SpawnEnemyAtRandom();

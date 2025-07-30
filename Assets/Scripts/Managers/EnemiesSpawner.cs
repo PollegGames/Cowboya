@@ -154,6 +154,28 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         Debug.Log($"Follower guard created.");
         return follower;
     }
+
+    public GameObject CreateAngGetSecurityGuard()
+    {
+        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
+
+        var guard = Instantiate(enemyPrefab,
+                Vector3.zero,
+                Quaternion.identity,
+                enemiesParent);
+
+        var robotState = guard.GetComponent<RobotStateController>();
+        robotState.Stats = enemyRobotFactory.CreateRobot();
+        robotState.Stats.RobotName = "Security Guard";
+        guard.SetActive(false);
+
+        // 3) NOW it’s in the world at the correct spot — initialize its AI
+        var ec = guard.GetComponent<EnemyController>();
+        ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner);
+
+        Debug.Log($"Security guard created.");
+        return guard;
+    }
     public void SpreadEnemies()
     {
         //workers
