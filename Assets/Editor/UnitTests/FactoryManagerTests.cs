@@ -101,6 +101,7 @@ public class FactoryManagerTests
         public void CreateEnemies(int enemiesToSpawn) { }
         public void CreateBoss() { }
         public GameObject CreateAngGetFollowerGuard() => null;
+        public GameObject CreateAngGetSecurityGuard() => null;
         public void CreateWorkersSpawner(int workersToSpawn) { }
         public void SpreadEnemies() { }
         public void SpawnEnemyAtRandom() { }
