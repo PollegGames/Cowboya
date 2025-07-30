@@ -29,6 +29,8 @@ public class EnemyController : PhysicsBaseAgentController
 
     [SerializeField] private EnemyPunchAttack punchAttack;
 
+    private FactoryAlarmStatus alarmStatus;
+
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
     public EnemyStatus EnemyStatus { get; set; } = EnemyStatus.Idle;
 
@@ -86,7 +88,8 @@ public class EnemyController : PhysicsBaseAgentController
 
     public void SetFollowerState(FactoryAlarmStatus factoryAlarmStatus)
     {
-        stateMachine.ChangeState(new Enemy_Follower(this, stateMachine, (IWaypointService)waypointQueries, factoryAlarmStatus));
+        alarmStatus = factoryAlarmStatus;
+        stateMachine.ChangeState(new Enemy_Follower(this, stateMachine, (IWaypointService)waypointQueries, alarmStatus));
     }
 
     private void Update()
