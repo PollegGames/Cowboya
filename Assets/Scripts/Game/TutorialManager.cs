@@ -20,7 +20,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 1)
         {
-            var rooms = FindObjectsOfType<RoomManager>();
+            var rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
             foreach (var room in rooms)
             {
                 room.PlayerEntered += HandlePlayerEnteredRoom;
@@ -32,6 +32,7 @@ public class TutorialManager : MonoBehaviour
             enabled = false;
         }
     }
+
 
     private void HandlePlayerEnteredRoom(RoomManager room)
     {

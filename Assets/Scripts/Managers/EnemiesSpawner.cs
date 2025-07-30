@@ -16,6 +16,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     private MachineSecurityManager securityManager;
     private List<GameObject> spawnedWorkers = new List<GameObject>();
     private List<GameObject> spawnedEnemies = new List<GameObject>();
+    private List<GameObject> spawnedFollowers = new List<GameObject>();
     private List<GameObject> spawnedWorkerSpawners = new List<GameObject>();
     private GameObject boosInstance;
     private GameUIViewModel gameUIViewModel;
@@ -112,15 +113,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         {
             Debug.LogWarning("[EnemiesSpawner] No end room found for boss spawn.");
         }
-
-        // Activate and initialise the boss AI
-        boosInstance.SetActive(true);
-        var ec = boosInstance.GetComponent<EnemyController>();
-        ec.Initialize(waypointService, waypointService, respawnService, dropContainer,securityBadgeSpawner);
-        ec.SetSecurityGuardState();
-        if (endPoint != null)
-            ec.memory.SetLastVisitedPoint(endPoint);
-
+     
         Debug.Log("Boss created.");
     }
 
@@ -145,32 +138,40 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         }
         Debug.Log($"{workersToSpawn} workers created.");
     }
-    public GameObject CreateAngGetFollowerGuard()
+
+    public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus)
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
-        var follower = Instantiate(bossPrefab,
-                Vector3.zero,
-                Quaternion.identity,
-                enemiesParent);
-        var followerLocomotion = follower.GetComponent<RobotLocomotionController>();
-        if (followerLocomotion != null)
-            followerLocomotion.isPlayerControlled = false;
+        spawnedFollowers.Clear();
+
+        var follower = ObjectPool.Instance.Get(enemyPrefab, enemiesParent);
+        var locomotion = follower.GetComponent<RobotLocomotionController>();
+        if (locomotion != null)
+            locomotion.isPlayerControlled = false;
 
         var robotState = follower.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
-        robotState.Stats.RobotName = "Follower Guard";
+        robotState.Stats.RobotName = $"Followers 0{spawnedFollowers.Count + 1}";
         follower.SetActive(false);
+        spawnedFollowers.Add(follower);
+
+        Debug.Log($"Follower guard created.");
+        // 1)  apply a real spawn position
+        follower.transform.position = spawnPos.WorldPos;
+        // 2) turn it on
+        follower.SetActive(true);
 
         // 3) NOW it’s in the world at the correct spot — initialize its AI
         var ec = follower.GetComponent<EnemyController>();
-        ec.Initialize(waypointService, waypointService, respawnService, dropContainer,securityBadgeSpawner);
+        ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner);
+        ec.SetFollowerState(factoryAlarmStatus);
 
-        Debug.Log($"Follower guard created.");
-        return follower;
+        ec.memory.SetLastVisitedPoint(spawnPos);
+        Debug.Log($"Worker spread to {spawnPos.WorldPos} and initialized");
     }
 
-    public GameObject CreateAngGetSecurityGuard()
+    public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine)
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
@@ -191,8 +192,13 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var ec = guard.GetComponent<EnemyController>();
         ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner);
 
+        ec.SetSecurityGuardState();
+        ec.memory.SetLastVisitedPoint(spawnPos);
+        var guardAI = guard.GetComponent<ReactiveMachineAI>();
+        guardAI?.Initialize(waypointService, securityManager);
+        guardAI?.ReactivateSecurityMachine(machine);
+
         Debug.Log($"Security guard created.");
-        return guard;
     }
     public void SpreadEnemies()
     {
@@ -244,8 +250,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = enemy.GetComponent<EnemyController>();
-            ec.Initialize(waypointService, waypointService, respawnService, dropContainer,securityBadgeSpawner);
-            ec.SetSecurityGuardState();
+            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner);
             ec.memory.SetLastVisitedPoint(spawnPos);
             var guardAI = enemy.GetComponent<ReactiveMachineAI>();
             guardAI?.Initialize(waypointService, securityManager);
@@ -253,6 +258,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             // release the reservation so the point can be reused later
             waypointService.ReleasePOI(spawnPos);
 
+            ec.SetSecurityGuardState();
             Debug.Log($"Enemy spread to {spawnPos} and initialized");
         }
 
@@ -265,8 +271,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
             // 3) NOW it’s in the world at the correct spot — initialize its AI
             var ec = boosInstance.GetComponent<EnemyController>();
-            ec.Initialize(waypointService, waypointService, respawnService, dropContainer,securityBadgeSpawner);
-            ec.SetSecurityGuardState();
+            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner);
+            ec.SetBossState();
             ec.memory.SetLastVisitedPoint(spawnPos);
 
             Debug.Log($"Boss spread to {spawnPos} and initialized");
@@ -297,7 +303,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
         SpawnInstanceAtRandom(enemyGO);
     }
-
     public void SpawnInstanceAtRandom(GameObject enemyGO)
     {
         // 2) Pick a random empty position

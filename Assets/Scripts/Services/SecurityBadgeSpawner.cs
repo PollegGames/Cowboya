@@ -8,14 +8,6 @@ public class SecurityBadgeSpawner : MonoBehaviour
 {
     [SerializeField] private SecurityBadgePickup badgePrefab;
 
-    [Header("Target Joint Settings")]
-    [Tooltip("How springy the joint is.")]
-    [SerializeField] private float frequency = 5f;
-    [Tooltip("How much the joint resists oscillation.")]
-    [SerializeField] private float dampingRatio = 0.8f;
-    [Tooltip("Maximum force the joint can apply.")]
-    [SerializeField] private float maxForce = 1000f;
-
     public SecurityBadgePickup SpawnBadge(Transform parent)
     {
         if (badgePrefab == null)

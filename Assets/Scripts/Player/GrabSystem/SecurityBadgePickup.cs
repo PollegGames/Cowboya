@@ -115,7 +115,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
                 SetFollowTarget(hip.transform);
 
                 // Disable or destroy all other badges in the scene
-                foreach (var badge in FindObjectsOfType<SecurityBadgePickup>())
+                foreach (var badge in FindObjectsByType<SecurityBadgePickup>(FindObjectsSortMode.None))
                 {
                     if (badge != this)
                         Destroy(badge.gameObject);

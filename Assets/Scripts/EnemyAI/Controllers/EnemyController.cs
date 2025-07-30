@@ -53,8 +53,6 @@ public class EnemyController : PhysicsBaseAgentController
             robotBehaviour = GetComponent<RobotStateController>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
-        stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, null));
-
     }
 
     public void Initialize(
@@ -82,6 +80,11 @@ public class EnemyController : PhysicsBaseAgentController
     }
 
     public void SetSecurityGuardState()
+    {
+        stateMachine.ChangeState(new Enemy_ReturnToSecurityPost(this, stateMachine, (IWaypointService)waypointQueries, null));
+    }
+
+    public void SetBossState()
     {
         stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }

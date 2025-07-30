@@ -100,8 +100,8 @@ public class FactoryManagerTests
         public void CreateWorkers(int workersToSpawn) { }
         public void CreateEnemies(int enemiesToSpawn) { }
         public void CreateBoss() { }
-        public GameObject CreateAngGetFollowerGuard() => null;
-        public GameObject CreateAngGetSecurityGuard() => null;
+        public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus) {}
+        public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine) {}
         public void CreateWorkersSpawner(int workersToSpawn) { }
         public void SpreadEnemies() { }
         public void SpawnEnemyAtRandom() { }

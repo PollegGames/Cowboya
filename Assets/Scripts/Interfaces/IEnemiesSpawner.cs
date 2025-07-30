@@ -13,8 +13,8 @@ public interface IEnemiesSpawner
     void CreateWorkers(int workersToSpawn);
     void CreateEnemies(int enemiesToSpawn);
     void CreateBoss();
-    GameObject CreateAngGetFollowerGuard();
-    GameObject CreateAngGetSecurityGuard();
+    void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus);
+    void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine);
     void CreateWorkersSpawner(int workersToSpawn);
     void SpreadEnemies();
     void SpawnEnemyAtRandom();

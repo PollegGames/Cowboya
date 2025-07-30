@@ -180,29 +180,19 @@ public class SpawningMachine : BaseMachine
     {
         while (true)
         {
-            SpawnEnemy();
+            SpawnFollower();
             yield return new WaitForSeconds(spawnInterval);
         }
     }
 
-    private void SpawnEnemy()
+    private void SpawnFollower()
     {
         if (!isOn || factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted)
             return;
-
-        GameObject enemyGO = enemiesSpawner.CreateAngGetFollowerGuard();
         var spawnPos = trigger.transform.position;
         var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
-        enemyGO.transform.position = lastVisitedPoint.WorldPos;
-        var ec = enemyGO.GetComponent<EnemyController>();
-        if (ec != null)
-        {
-            ec.SetFollowerState(factoryAlarmStatus);
-            ec.memory.SetLastVisitedPoint(lastVisitedPoint);
-        }
+        enemiesSpawner.CreateAndSpawnFollowerGuard(lastVisitedPoint, factoryAlarmStatus);
 
-        // 2) turn it on
-        enemyGO.SetActive(true);
         Debug.Log("[SpawningMachine] Enemy spawned and sent to Follower state.");
     }
 
@@ -211,20 +201,9 @@ public class SpawningMachine : BaseMachine
         if (!isOn || enemiesSpawner == null)
             return;
 
-        GameObject guardGO = enemiesSpawner.CreateAngGetFollowerGuard();
         var spawnPos = trigger.transform.position;
         var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
-        guardGO.transform.position = lastVisitedPoint.WorldPos;
-        var ec = guardGO.GetComponent<EnemyController>();
-        if (ec != null)
-        {
-            ec.SetSecurityGuardState();
-            ec.memory.SetLastVisitedPoint(lastVisitedPoint);
-            var guardAI = guardGO.GetComponent<ReactiveMachineAI>();
-            guardAI?.Initialize(waypointService, securityManager);
-            guardAI?.ReactivateSecurityMachine(machine);
-        }
+        enemiesSpawner.CreateAndSpawnSecurityGuard(lastVisitedPoint, machine);
 
-        guardGO.SetActive(true);
     }
 }

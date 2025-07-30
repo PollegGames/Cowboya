@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\RestState.cs" />
     <Compile Include="Assets\Scripts\Map\SecuritySystem.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateFactoryMachine.cs" />
     <Compile Include="Assets\Scripts\Game\LevelEndVictoryTrigger.cs" />
     <Compile Include="Assets\Scripts\Map\AxisNeighborConnector.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\WorkState.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_GoToEndCell.cs" />
     <Compile Include="Assets\Scripts\Map\LiftDirection.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPathFinder.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_GoingToRest.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\WorkerState.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReturnToSecurityPost.cs" />
     <Compile Include="Assets\Scripts\Machines\RestingMachine.cs" />
@@ -170,7 +172,6 @@
     <Compile Include="Assets\Scripts\RobotFactory\PlayerTemplate.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\RoomManager.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\HoldButton.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateMachine.cs" />
     <Compile Include="Assets\Scripts\Machines\MachineSecurityManager.cs" />
     <Compile Include="Assets\Scripts\Setup\SceneBootstrapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\ISaveService.cs" />
@@ -262,7 +263,9 @@
     <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_CheckingSecurity.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\FactoryManager.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateSecurityMachine.cs" />
     <Compile Include="Assets\Scripts\Robots\GroundChecker.cs" />
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingPunchAttack.cs" />
