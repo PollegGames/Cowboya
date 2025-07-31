@@ -124,6 +124,7 @@ float2 distance_to_path(float2 pos) {
     // you can't do variable-length loops in webgl (or es2 technically I think), 
     // hence the constant...so we have to iterate through MAX_SEGMENTS rather than 
     // _NumSegments which is the number of vertices actually in our poly
+    UNITY_LOOP
     for (int i = 0; i < MAX_SEGMENTS; i++) {
         // loop_over is 1 when we're past the number of sides in the poly
         float loop_over = when_ge(i, _NumSegments);
