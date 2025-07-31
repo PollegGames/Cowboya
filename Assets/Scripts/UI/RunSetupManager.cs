@@ -411,7 +411,7 @@ public class RunSetupManager : MonoBehaviour
         RenderTexture.active = prev;
 
         previewVE.style.backgroundImage = new StyleBackground(tex);
-        previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+        previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover);
         BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
     }
 

@@ -154,7 +154,7 @@ public class GameUIViewModel : MonoBehaviour
         if (previewVE != null)
         {
             previewVE.style.backgroundImage = new StyleBackground(tex);
-            previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover);
         }
         else
         {
