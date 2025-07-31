@@ -29,6 +29,7 @@ float get_closest_distance(float2 pos, float2 radii) {
     // you can't do variable-length loops in webgl (or es2 technically I think), 
     // hence the constant...so we have to iterate through MAX_VERTS rather than 
     // _NumVerts which is the number of vertices actually in our poly
+    UNITY_LOOP
     for (int i = 0; i < MAX_VERTS; i++) {
         // loop_over is 1 when we're past the number of sides in the poly
         float loop_over = when_ge(i, _NumVerts);
@@ -57,7 +58,8 @@ float get_closest_distance(float2 pos, float2 radii) {
         // if (i == _NumVerts - 1)
         //     break;
     }
-    return closest_distance * when_eq(nodes % 2, 1) + -1 * when_neq(nodes % 2, 1);
+    int parity = nodes & 1;
+    return closest_distance * when_eq(parity, 1) + -1 * when_neq(parity, 1);
 }
 
 // tells you which side of the line p1->p2 pos is
