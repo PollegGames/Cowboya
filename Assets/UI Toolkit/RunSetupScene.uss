@@ -10,7 +10,8 @@
 
 .setup-container {
     background-color: rgb(30, 30, 30);
-    border: 1px solid rgb(58, 58, 58);
+    border-width: 1px;
+    border-color: rgb(58, 58, 58);
     border-radius: 8px;
     padding: 20px;
     align-items: flex-start;
@@ -22,14 +23,15 @@
     flex-grow: 1;
     min-height: 300px;
     background-color: rgb(42, 42, 42);
-    border: 1px solid rgb(58, 58, 58);
+    border-width: 1px;
+    border-color: rgb(58, 58, 58);
     border-radius: 6px;
 }
 
 .section-title {
     color: rgb(255, 255, 255);
     font-size: 16px;
-    font-weight: bold;
+    -unity-font-style: bold;
     margin-bottom: 12px;
     align-items: flex-start;
     flex-direction: column;
@@ -40,7 +42,7 @@
 .subsection-title {
     color: rgb(204, 204, 204);
     font-size: 13px;
-    font-weight: bold;
+    -unity-font-style: bold;
     margin-bottom: 6px;
 }
 
@@ -56,7 +58,7 @@
     background-color: rgb(183, 167, 27);
     color: rgb(0, 0, 0);
     border-radius: 4px;
-    border: none;
+    border-width: 0px;
     align-self: stretch;
 }
 
@@ -66,7 +68,7 @@
     background-color: rgb(50, 137, 57);
     color: rgb(255, 255, 255);
     border-radius: 4px;
-    border: none;
+    border-width: 0px;
     align-self: stretch;
 }
 
@@ -95,12 +97,13 @@
     flex-direction: row;
     align-items: center;
     margin-bottom: 8px;
-    gap: 6px;
+    padding-left: 3px;
+    padding-right: 3px;
 }
 
 .int-label {
     width: 110px;
     font-size: 20px;
     color: white;
-    text-align: right;
+    -unity-text-align: middle-right;
 }
