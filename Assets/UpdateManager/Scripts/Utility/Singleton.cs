@@ -25,7 +25,7 @@ namespace JoostenProductions {
                 lock (objectLock) {
                     if(instance != null) return instance;
 
-                    instance = (T)FindObjectOfType(instanceType);
+                    instance = (T)FindFirstObjectByType(instanceType);
 
                     if(instance != null) return instance;
 
