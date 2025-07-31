@@ -420,7 +420,6 @@ public class RunSetupManager : MonoBehaviour
     // =====================================================================
 
     [SerializeField] private RunProgressManager runProgressManagerPrefab;
-    private string runSceneName = "MapGeneration";
     private void StartRun()
     {
         if (RunProgressManager.Instance == null && runProgressManagerPrefab != null)
