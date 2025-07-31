@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 
 public class TeleportToFactoryEntrance : MonoBehaviour
 {
@@ -7,7 +7,7 @@ public class TeleportToFactoryEntrance : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            SceneController.instance.LoadScene("FactoryEntrance");
+            SceneController.instance.LoadScene("MapGeneration");
         }
     }
 }

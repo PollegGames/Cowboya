@@ -8,15 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MenuScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 0
-    path: Assets/Scenes/BaseCampScene.unity
-    guid: f07f53990dcae9842adf843a8453f1e0
-  - enabled: 0
-    path: Assets/Scenes/FactoryEntrance.unity
-    guid: e94c900727e1e2742b7ccc3189baff2d
-  - enabled: 0
-    path: Assets/Scenes/Laboratory.unity
-    guid: 94ca5bb851d256e4ab2e562f42f95bcb
   - enabled: 1
     path: Assets/Scenes/SetupSandbox.unity
     guid: 413c3c93b7f36bd4b9e4edd20a65c383
