@@ -10,6 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 9061588516511059660}
   - component: {fileID: 5113994695770173855}
+  - component: {fileID: 6258465891312467843}
+  - component: {fileID: 6258465891312467844}
+  - component: {fileID: 6258465891312467845}
+  - component: {fileID: 6258465891312467846}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -42,5 +46,72 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c572e48d2bdbd504bb569078ed516361, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!95 &6258465891312467843
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4614694437722500152}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bede971bef0587541a92944c1fed2317, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage:
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6258465891312467844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4614694437722500152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53c1985955a5fb94e9d3fda7246cce67, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  leftLegPole: {fileID: 0}
+  rightLegPole: {fileID: 0}
+  leftArmPole: {fileID: 0}
+  rightArmPole: {fileID: 0}
+--- !u!114 &6258465891312467845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4614694437722500152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fcdf7d50ffe16449b37f6ab3d1ab120, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  leftLegJoint: {fileID: 0}
+  rightLegJoint: {fileID: 0}
+--- !u!114 &6258465891312467846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4614694437722500152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9de721227f09846b344e43b3ee8733, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bodyJoint: {fileID: 0}
+  torsoJoint: {fileID: 0}
+  lowTorsoJoint: {fileID: 0}

@@ -7,10 +7,16 @@ using System.Collections;
 /// and badge spawning services and provides APIs to change state or assign
 /// destinations.
 /// </summary>
-public class EnemyController : PhysicsBaseAgentController
+public class EnemyController : AnimatorBaseAgentController
 {
     [SerializeField] private EnemyStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
+
+    [SerializeField] private FacingController facing;
+    [SerializeField] private LegJointLimiter legJointLimiter;
+    [SerializeField] private BodyJointLimiter bodyJointLimiter;
+
+    private bool flipped = false;
 
     private IEnemyStateMachine stateMachineInterface;
     public IRobotMemory memory { get; private set; }
@@ -51,6 +57,15 @@ public class EnemyController : PhysicsBaseAgentController
 
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();
+
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
+        if (facing == null)
+            facing = GetComponent<FacingController>();
+        if (legJointLimiter == null)
+            legJointLimiter = GetComponent<LegJointLimiter>();
+        if (bodyJointLimiter == null)
+            bodyJointLimiter = GetComponent<BodyJointLimiter>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
     }
@@ -95,8 +110,10 @@ public class EnemyController : PhysicsBaseAgentController
         stateMachine.ChangeState(new Enemy_Follower(this, stateMachine, (IWaypointService)waypointQueries, alarmStatus));
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
+        TryFlip(direction);
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
     }
@@ -142,7 +159,8 @@ public class EnemyController : PhysicsBaseAgentController
 
     public void Die()
     {
-        bodyJointLimiter.enabled = false;
+        if (bodyJointLimiter != null)
+            bodyJointLimiter.enabled = false;
         var jointBreaker = GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();
         SceneController.instance.RobotKilled();
@@ -169,6 +187,29 @@ public class EnemyController : PhysicsBaseAgentController
     public void OnBadgeStolen(GameObject player)
     {
         Debug.Log($"{name} badge stolen by {player.name}");
+    }
+
+    private void TryFlip(float input)
+    {
+        if (Mathf.Abs(input) > 0.1f)
+        {
+            bool movingLeft = input < 0f;
+            if (movingLeft != flipped)
+            {
+                flipped = movingLeft;
+                ApplyFacingDirection();
+            }
+        }
+    }
+
+    private void ApplyFacingDirection()
+    {
+        if (facing != null)
+            facing.SetLegFacing(!flipped);
+        if (legJointLimiter != null)
+            legJointLimiter.SetLegRotationLimits(flipped);
+        if (bodyJointLimiter != null)
+            bodyJointLimiter.SetBodyRotationLimits(flipped);
     }
 
     private void UpdateBalance(bool enabledBalance)
