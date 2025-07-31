@@ -14,7 +14,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
     display: flex;
 }
 
@@ -27,6 +26,8 @@
     border-radius: 10px;
     unity-font-style: bold;
     unity-text-align: middle-center;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .menu-button:hover {

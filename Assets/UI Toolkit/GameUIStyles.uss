@@ -16,7 +16,8 @@
     width: 120px;
     height: 28px;
     background-color: #2A2A2A;
-    border: 2px solid #555555;
+    border-width: 2px;
+    border-color: #555555;
     border-radius: 6px;
     margin: 0 6px;      /* some horizontal spacing */
     justify-content: center;
@@ -27,7 +28,8 @@
 /* 4. Style for the mini-map background and border */
 .minibackground {
     background-color: #1F1F1F;  /* dark gray to separate from the rest */
-    border: 1px solid #444444;  /* subtle border */
+    border-width: 1px;  /* subtle border */
+    border-color: #444444;
     border-radius: 4px;
     padding: 4px;               /* small padding around the grid */
     /* align-self: flex-start handled in the UXML */
@@ -36,7 +38,8 @@
 /* 5. Preview area (the mini-map itself) */
 .grid-preview {
     background-color: #000000;  /* black for the texture */
-    border: 1px solid #666666;  /* light gray border */
+    border-width: 1px;  /* light gray border */
+    border-color: #666666;
     border-radius: 2px;
 }
 
@@ -46,7 +49,7 @@
     position: absolute;
     width: 40px;
     -unity-text-align: middle-center;
-    pointer-events: none;
+    -unity-user-interaction: none;
 }
 
 /* Numeric label displayed over the health bar */
@@ -55,5 +58,5 @@
     position: absolute;
     width: 40px;
     -unity-text-align: middle-center;
-    pointer-events: none;
+    -unity-user-interaction: none;
 }
