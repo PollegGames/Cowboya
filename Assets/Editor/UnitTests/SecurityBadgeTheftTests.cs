@@ -7,9 +7,9 @@ public class SecurityBadgeTheftTests
     private class DummyPlayerMovementController : PlayerMovementController
     {
         // Override lifecycle methods to avoid base behaviour
-        new void Awake() { }
-        new void OnEnable() { }
-        new void Update() { }
+        void Awake() { }
+        void OnEnable() { }
+        void Update() { }
     }
 
     [Test]
