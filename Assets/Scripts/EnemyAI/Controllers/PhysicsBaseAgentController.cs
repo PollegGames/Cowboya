@@ -24,6 +24,7 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
             facing = GetComponent<FacingController>();
         if (legJointLimiter == null)
             legJointLimiter = GetComponent<LegJointLimiter>();
+        Debug.Log("PhysicsBaseAgentController: Awake called, components initialized.");
     }
 
     /// <summary>

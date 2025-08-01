@@ -310,9 +310,9 @@ MonoBehaviour:
     RobotName: Worker
     MaxHealth: 10
     CurrentHealth: 10
-    MaxEnergy: 1
-    CurrentEnergy: 1
-    AttackEnergyCost: 1
+    MaxEnergy: 10
+    CurrentEnergy: 10
+    AttackEnergyCost: 5
   hips: {fileID: 9206399112436540778}
 --- !u!114 &38189445005439173
 MonoBehaviour:

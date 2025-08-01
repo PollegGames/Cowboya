@@ -4368,23 +4368,23 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4006891109274632479}
-  - component: {fileID: 4042755037694235606}
   - component: {fileID: 3419217242892964986}
   - component: {fileID: 1855771535115176190}
   - component: {fileID: 5398157975759058039}
+  - component: {fileID: 8974758250723312533}
+  - component: {fileID: 2143343018950225475}
   - component: {fileID: 1976096450392993643}
   - component: {fileID: 7891739421741480506}
   - component: {fileID: 7188059881045560196}
-  - component: {fileID: 8974758250723312533}
   - component: {fileID: 5478535489780654127}
   - component: {fileID: 4923068343172411815}
   - component: {fileID: 1510882133398777467}
   - component: {fileID: 1327797449943358064}
   - component: {fileID: 4652158946510775221}
-  - component: {fileID: 2143343018950225475}
   - component: {fileID: 1084963490228556486}
   - component: {fileID: 4282379396995134653}
   - component: {fileID: 4039218795842909479}
+  - component: {fileID: 8821255494166107071}
   m_Layer: 7
   m_Name: SecurityGuard
   m_TagString: Enemy
@@ -4412,28 +4412,6 @@ Transform:
   - {fileID: 4203278129183723823}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &4042755037694235606
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8465636778725824547}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bede971bef0587541a92944c1fed2317, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &3419217242892964986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4479,6 +4457,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rechargeRate: 2
   tickDelay: 1
+--- !u!114 &8974758250723312533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8465636778725824547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1ba8a2f18b0d3542bee04008ff45c99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftFoot: {fileID: 2869664709595005715}
+  rightFoot: {fileID: 4279841641114245177}
+  jumpUpDuration: 0.1
+  jumpDownDuration: 0.1
+  isPlayerControlled: 0
+  energyCostPerStep: 1
+  energyCostPerJump: 5
+  waitStep: 1
+--- !u!114 &2143343018950225475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8465636778725824547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff678e30577154a4285192a4ce34b30f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locomotion: {fileID: 8974758250723312533}
+  facing: {fileID: 5478535489780654127}
+  legJointLimiter: {fileID: 4923068343172411815}
+  bodyJointLimiter: {fileID: 4282379396995134653}
+  stateMachine: {fileID: 1327797449943358064}
+  memoryComponent: {fileID: 4652158946510775221}
+  bodyReference: {fileID: 995484738189706866}
+  robotBehaviour: {fileID: 7891739421741480506}
+  arrivalThresholdX: 0.5
+  arrivalThresholdY: 2
+  deadZoneX: 1
+  deadZoneY: 5
+  punchAttack: {fileID: 1084963490228556486}
+  updateLoop: 0
 --- !u!114 &1976096450392993643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4508,12 +4532,12 @@ MonoBehaviour:
   energyBot: {fileID: 5398157975759058039}
   healthBot: {fileID: 1976096450392993643}
   Stats:
-    RobotName: 
-    MaxHealth: 1
-    CurrentHealth: 1
-    MaxEnergy: 1
-    CurrentEnergy: 1
-    AttackEnergyCost: 1
+    RobotName: Guard
+    MaxHealth: 30
+    CurrentHealth: 30
+    MaxEnergy: 30
+    CurrentEnergy: 30
+    AttackEnergyCost: 5
   hips: {fileID: 3392093481179504074}
 --- !u!114 &7188059881045560196
 MonoBehaviour:
@@ -4529,26 +4553,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.2
---- !u!114 &8974758250723312533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8465636778725824547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1ba8a2f18b0d3542bee04008ff45c99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftFoot: {fileID: 2869664709595005715}
-  rightFoot: {fileID: 4279841641114245177}
-  jumpUpDuration: 0.1
-  jumpDownDuration: 0.1
-  isPlayerControlled: 0
-  energyCostPerStep: 1
-  energyCostPerJump: 5
-  waitStep: 1
 --- !u!114 &5478535489780654127
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4635,36 +4639,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 906126257589b3140b69badd1f7e1d9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2143343018950225475
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8465636778725824547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff678e30577154a4285192a4ce34b30f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  animator: {fileID: 4042755037694235606}
-  bodyReference: {fileID: 995484738189706866}
-  hipRb: {fileID: 3392093481179504074}
-  points: {fileID: 6231469173119804865}
-  poles: {fileID: 4014917731220276956}
-  stateMachine: {fileID: 1327797449943358064}
-  memoryComponent: {fileID: 4652158946510775221}
-  facing: {fileID: 5478535489780654127}
-  legJointLimiter: {fileID: 4923068343172411815}
-  bodyJointLimiter: {fileID: 4282379396995134653}
-  robotBehaviour: {fileID: 7891739421741480506}
-  arrivalThresholdX: 0.5
-  arrivalThresholdY: 2
-  deadZoneX: 1
-  deadZoneY: 5
-  punchAttack: {fileID: 1084963490228556486}
-  updateLoop: 0
 --- !u!114 &1084963490228556486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4718,6 +4692,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9181977428c5aaa4ea03ec4c8504121c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8821255494166107071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8465636778725824547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1ba8a2f18b0d3542bee04008ff45c99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftFoot: {fileID: 2869664709595005715}
+  rightFoot: {fileID: 4279841641114245177}
+  jumpUpDuration: 18
+  jumpDownDuration: 18
+  isPlayerControlled: 0
+  energyCostPerStep: 1
+  energyCostPerJump: 3
+  waitStep: 1
 --- !u!1 &8491232064010109857
 GameObject:
   m_ObjectHideFlags: 0

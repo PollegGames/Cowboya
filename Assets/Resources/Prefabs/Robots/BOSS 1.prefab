@@ -4485,12 +4485,12 @@ MonoBehaviour:
   energyBot: {fileID: 5398157975759058039}
   healthBot: {fileID: 1976096450392993643}
   Stats:
-    RobotName: 
-    MaxHealth: 1
-    CurrentHealth: 1
-    MaxEnergy: 1
-    CurrentEnergy: 1
-    AttackEnergyCost: 1
+    RobotName: Boss
+    MaxHealth: 50
+    CurrentHealth: 50
+    MaxEnergy: 50
+    CurrentEnergy: 50
+    AttackEnergyCost: 5
   hips: {fileID: 3392093481179504074}
 --- !u!114 &7188059881045560196
 MonoBehaviour:
@@ -4522,6 +4522,7 @@ MonoBehaviour:
   rightFoot: {fileID: 4279841641114245177}
   jumpUpDuration: 0.1
   jumpDownDuration: 0.1
+  isPlayerControlled: 0
   energyCostPerStep: 1
   energyCostPerJump: 5
   waitStep: 1
@@ -4629,12 +4630,12 @@ MonoBehaviour:
   bodyJointLimiter: {fileID: 4282379396995134653}
   stateMachine: {fileID: 1327797449943358064}
   memoryComponent: {fileID: 4652158946510775221}
+  bodyReference: {fileID: 995484738189706866}
   robotBehaviour: {fileID: 7891739421741480506}
   arrivalThresholdX: 0.5
   arrivalThresholdY: 2
   deadZoneX: 1
   deadZoneY: 5
-  bodyReference: {fileID: 995484738189706866}
   punchAttack: {fileID: 1084963490228556486}
   updateLoop: 0
 --- !u!114 &1084963490228556486
