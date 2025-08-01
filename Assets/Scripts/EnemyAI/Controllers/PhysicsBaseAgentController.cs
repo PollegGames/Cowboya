@@ -36,7 +36,7 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
         TryFlip(direction);
     }
 
-    
+
     /// <summary>
     /// Sets the vertical movement direction.
     /// </summary>
@@ -77,6 +77,7 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
         locomotion.SetFacingDirection(!flipped);       // true = facing right
         facing.SetLegFacing(!flipped);                 // true = facing right
         legJointLimiter.SetLegRotationLimits(flipped); // true = going left
-        bodyJointLimiter.SetBodyRotationLimits(flipped);
+        if (bodyJointLimiter != null)
+            bodyJointLimiter.SetBodyRotationLimits(flipped);
     }
 }

@@ -4368,6 +4368,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4006891109274632479}
+  - component: {fileID: 4042755037694235606}
   - component: {fileID: 3419217242892964986}
   - component: {fileID: 1855771535115176190}
   - component: {fileID: 5398157975759058039}
@@ -4411,6 +4412,28 @@ Transform:
   - {fileID: 4203278129183723823}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &4042755037694235606
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8465636778725824547}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bede971bef0587541a92944c1fed2317, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &3419217242892964986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4522,6 +4545,7 @@ MonoBehaviour:
   rightFoot: {fileID: 4279841641114245177}
   jumpUpDuration: 0.1
   jumpDownDuration: 0.1
+  isPlayerControlled: 0
   energyCostPerStep: 1
   energyCostPerJump: 5
   waitStep: 1
@@ -4623,18 +4647,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff678e30577154a4285192a4ce34b30f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  locomotion: {fileID: 8974758250723312533}
+  moveSpeed: 3
+  animator: {fileID: 4042755037694235606}
+  bodyReference: {fileID: 995484738189706866}
+  hipRb: {fileID: 3392093481179504074}
+  points: {fileID: 6231469173119804865}
+  poles: {fileID: 4014917731220276956}
+  stateMachine: {fileID: 1327797449943358064}
+  memoryComponent: {fileID: 4652158946510775221}
   facing: {fileID: 5478535489780654127}
   legJointLimiter: {fileID: 4923068343172411815}
   bodyJointLimiter: {fileID: 4282379396995134653}
-  stateMachine: {fileID: 1327797449943358064}
-  memoryComponent: {fileID: 4652158946510775221}
   robotBehaviour: {fileID: 7891739421741480506}
   arrivalThresholdX: 0.5
   arrivalThresholdY: 2
   deadZoneX: 1
   deadZoneY: 5
-  bodyReference: {fileID: 995484738189706866}
   punchAttack: {fileID: 1084963490228556486}
   updateLoop: 0
 --- !u!114 &1084963490228556486

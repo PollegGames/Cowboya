@@ -77,7 +77,8 @@ public class PlayerMovementController : MonoBehaviour
         locomotion.SetFacingDirection(!flipped);
         facing.SetLegFacing(!flipped);
         legJointLimiter.SetLegRotationLimits(flipped); // true = going left
-        bodyJointLimiter.SetBodyRotationLimits(flipped);
+        if (bodyJointLimiter != null)
+            bodyJointLimiter.SetBodyRotationLimits(flipped);
     }
 
     private void CalculateAndApplyBodyRotation()

@@ -47,8 +47,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
             facing = GetComponent<FacingController>();
         if (legJointLimiter == null)
             legJointLimiter = GetComponent<LegJointLimiter>();
-        if (bodyJointLimiter == null)
-            bodyJointLimiter = GetComponent<BodyJointLimiter>();
+        // if (bodyJointLimiter == null)
+        //     bodyJointLimiter = GetComponent<BodyJointLimiter>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
     }

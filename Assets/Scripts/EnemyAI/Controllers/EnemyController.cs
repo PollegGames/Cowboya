@@ -30,7 +30,6 @@ public class EnemyController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneX = 5f;
     [SerializeField] private float deadZoneY = 5f;
 
-    [SerializeField] private Transform bodyReference;
     public Transform BodyReference => bodyReference;
 
     [SerializeField] private EnemyPunchAttack punchAttack;
@@ -44,9 +43,8 @@ public class EnemyController : AnimatorBaseAgentController
 
     private Transform dropContainer;
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
         if (stateMachine == null)
             stateMachine = GetComponent<EnemyStateMachine>();
         stateMachineInterface = stateMachine;
