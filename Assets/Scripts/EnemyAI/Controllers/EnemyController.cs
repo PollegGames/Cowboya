@@ -7,16 +7,11 @@ using System.Collections;
 /// and badge spawning services and provides APIs to change state or assign
 /// destinations.
 /// </summary>
-public class EnemyController : AnimatorBaseAgentController
+public class EnemyController : PhysicsBaseAgentController
 {
     [SerializeField] private EnemyStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
-
-    [SerializeField] private FacingController facing;
-    [SerializeField] private LegJointLimiter legJointLimiter;
-    [SerializeField] private BodyJointLimiter bodyJointLimiter;
-
-    private bool flipped = false;
+    [SerializeField] private Transform bodyReference;
 
     private IEnemyStateMachine stateMachineInterface;
     public IRobotMemory memory { get; private set; }
@@ -43,8 +38,9 @@ public class EnemyController : AnimatorBaseAgentController
 
     private Transform dropContainer;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         if (stateMachine == null)
             stateMachine = GetComponent<EnemyStateMachine>();
         stateMachineInterface = stateMachine;
@@ -55,15 +51,6 @@ public class EnemyController : AnimatorBaseAgentController
 
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();
-
-        if (animator == null)
-            animator = GetComponentInChildren<Animator>();
-        if (facing == null)
-            facing = GetComponent<FacingController>();
-        if (legJointLimiter == null)
-            legJointLimiter = GetComponent<LegJointLimiter>();
-        if (bodyJointLimiter == null)
-            bodyJointLimiter = GetComponent<BodyJointLimiter>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
     }
@@ -108,10 +95,8 @@ public class EnemyController : AnimatorBaseAgentController
         stateMachine.ChangeState(new Enemy_Follower(this, stateMachine, (IWaypointService)waypointQueries, alarmStatus));
     }
 
-    protected override void Update()
+    private void Update()
     {
-        base.Update();
-        TryFlip(direction);
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
     }
@@ -185,29 +170,6 @@ public class EnemyController : AnimatorBaseAgentController
     public void OnBadgeStolen(GameObject player)
     {
         Debug.Log($"{name} badge stolen by {player.name}");
-    }
-
-    private void TryFlip(float input)
-    {
-        if (Mathf.Abs(input) > 0.1f)
-        {
-            bool movingLeft = input < 0f;
-            if (movingLeft != flipped)
-            {
-                flipped = movingLeft;
-                ApplyFacingDirection();
-            }
-        }
-    }
-
-    private void ApplyFacingDirection()
-    {
-        if (facing != null)
-            facing.SetLegFacing(!flipped);
-        if (legJointLimiter != null)
-            legJointLimiter.SetLegRotationLimits(flipped);
-        if (bodyJointLimiter != null)
-            bodyJointLimiter.SetBodyRotationLimits(flipped);
     }
 
     private void UpdateBalance(bool enabledBalance)
