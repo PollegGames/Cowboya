@@ -4376,7 +4376,6 @@ GameObject:
   - component: {fileID: 1976096450392993643}
   - component: {fileID: 7891739421741480506}
   - component: {fileID: 7188059881045560196}
-  - component: {fileID: 5478535489780654127}
   - component: {fileID: 4923068343172411815}
   - component: {fileID: 1510882133398777467}
   - component: {fileID: 1327797449943358064}
@@ -4490,7 +4489,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locomotion: {fileID: 8974758250723312533}
-  facing: {fileID: 5478535489780654127}
   legJointLimiter: {fileID: 4923068343172411815}
   bodyJointLimiter: {fileID: 4282379396995134653}
   stateMachine: {fileID: 1327797449943358064}
@@ -4553,22 +4551,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.2
---- !u!114 &5478535489780654127
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8465636778725824547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53c1985955a5fb94e9d3fda7246cce67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftLegPole: {fileID: 3402388566589530407}
-  rightLegPole: {fileID: 1834456982871538244}
-  leftArmPole: {fileID: 8586645231740715026}
-  rightArmPole: {fileID: 2473490206524818188}
 --- !u!114 &4923068343172411815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4595,26 +4577,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc99932fe549d64f9b583f5964335ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hingeJoints:
-  - {fileID: 266048238967456877}
-  - {fileID: 6184579575060252644}
-  - {fileID: 1990759541702478021}
-  - {fileID: 7666860303767856344}
-  - {fileID: 6054919508478058912}
-  - {fileID: 7064814038457939916}
-  - {fileID: 5773208471996699822}
-  - {fileID: 4472958890978182366}
-  - {fileID: 553861781250421296}
-  - {fileID: 3497312347630537695}
-  - {fileID: 5120231806531619291}
-  - {fileID: 1600711879991610248}
+  hingeJoints: []
   fixedJoints: []
-  ikSolvers:
-  - {fileID: 6592260153268661156}
-  - {fileID: 6695492996797371852}
-  - {fileID: 4758259135092769269}
-  - {fileID: 3395585018061290687}
-  - {fileID: 7165636470059981675}
+  ikSolvers: []
 --- !u!114 &1327797449943358064
 MonoBehaviour:
   m_ObjectHideFlags: 0

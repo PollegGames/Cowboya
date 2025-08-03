@@ -1,11 +1,10 @@
 using UnityEngine;
 
-[RequireComponent(typeof(RobotLocomotionController), typeof(FacingController))]
+[RequireComponent(typeof(RobotLocomotionController))]
 public class PlayerMovementController : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private RobotLocomotionController locomotion;
-    [SerializeField] private FacingController facing;
     [SerializeField] private BodyBalance bodyBalance;
     [SerializeField] private float forceUpward = 5f;
     [SerializeField] private float forceSide = 5f;
@@ -75,7 +74,6 @@ public class PlayerMovementController : MonoBehaviour
     private void ApplyFacingDirection()
     {
         locomotion.SetFacingDirection(!flipped);
-        facing.SetLegFacing(!flipped);
         legJointLimiter.SetLegRotationLimits(flipped); // true = going left
         if (bodyJointLimiter != null)
             bodyJointLimiter.SetBodyRotationLimits(flipped);
@@ -100,7 +98,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void HandleMovement()
     {
-        locomotion.HandleMovement(horizontalInput);
+        locomotion.HandleMovement(horizontalInput,flipped);
     }
 
     private void HandleJump()

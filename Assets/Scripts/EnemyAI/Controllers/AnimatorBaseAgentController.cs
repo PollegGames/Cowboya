@@ -25,12 +25,19 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     protected bool isVerticalMoving;
     protected float direction;         // Horizontal (-1, 0, 1)
     protected float verticalDirection; // Vertical   (-1, 0, 1)
+    [Header("Movement & Facing Modules")]
+    [SerializeField] protected LegJointLimiter legJointLimiter;
+    [SerializeField] protected BodyJointLimiter bodyJointLimiter;
+    protected virtual void Awake()
+    {
+        if (legJointLimiter == null)
+            legJointLimiter = GetComponent<LegJointLimiter>();
+        Debug.Log("AnimatorBaseAgentController: Awake called, components initialized.");
+    }
 
 
     protected virtual void Update()
     {
-        TryFlip(direction);
-
         if (isMoving)
         {
             Move();
@@ -96,8 +103,17 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
         hipRb.AddForce(force);
     }
 
-    private void TryFlip(float direction)
+    protected virtual void ApplyFacingDirection()
     {
+        if (legJointLimiter != null)
+            legJointLimiter.SetLegRotationLimits(flipped);
+        if (bodyJointLimiter != null)
+            bodyJointLimiter.SetBodyRotationLimits(flipped);
+    }
+
+    protected virtual void TryFlip(float direction)
+    {
+        ApplyFacingDirection();
         if ((direction > 0 && flipped) || (direction < 0 && !flipped))
         {
             flipped = !flipped;

@@ -2,13 +2,12 @@ using UnityEngine;
 
 /// <summary>
 /// Base class for agents (player, enemies, allies) that handles movement, facing, and jumping using physical components.
-/// Uses RobotLocomotionController, FacingController, and LegJointLimiter instead of Animator.
+/// Uses RobotLocomotionController, and LegJointLimiter instead of Animator.
 /// </summary>
 public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
 {
     [Header("Movement & Facing Modules")]
     [SerializeField] protected RobotLocomotionController locomotion;
-    [SerializeField] protected FacingController facing;
     [SerializeField] protected LegJointLimiter legJointLimiter;
     [SerializeField] protected BodyJointLimiter bodyJointLimiter;
 
@@ -20,8 +19,6 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
     {
         if (locomotion == null)
             locomotion = GetComponent<RobotLocomotionController>();
-        if (facing == null)
-            facing = GetComponent<FacingController>();
         if (legJointLimiter == null)
             legJointLimiter = GetComponent<LegJointLimiter>();
         Debug.Log("PhysicsBaseAgentController: Awake called, components initialized.");
@@ -33,8 +30,7 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
     public virtual void SetMovement(float input)
     {
         direction = Mathf.Clamp(input, -1f, 1f);
-        locomotion.HandleMovement(direction);
-        TryFlip(direction);
+        locomotion.HandleMovement(direction, flipped);
     }
 
 
@@ -76,7 +72,6 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
     protected virtual void ApplyFacingDirection()
     {
         locomotion.SetFacingDirection(!flipped);       // true = facing right
-        facing.SetLegFacing(!flipped);                 // true = facing right
         legJointLimiter.SetLegRotationLimits(flipped); // true = going left
         if (bodyJointLimiter != null)
             bodyJointLimiter.SetBodyRotationLimits(flipped);

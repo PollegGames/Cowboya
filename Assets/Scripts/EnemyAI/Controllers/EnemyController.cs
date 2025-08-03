@@ -97,6 +97,7 @@ public class EnemyController : PhysicsBaseAgentController
 
     private void Update()
     {
+        TryFlip(direction);
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
     }

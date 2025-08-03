@@ -15,7 +15,6 @@ public class RobotLocomotionController : MonoBehaviour
 
     private bool isWalking = false;
     private bool isJumping = false;
-    private bool flipped = false;
     private Coroutine walkRoutine;
     public event Action OnJumpStarted;
     public event Action OnJumpEnded;
@@ -26,8 +25,8 @@ public class RobotLocomotionController : MonoBehaviour
     [SerializeField] private float energyCostPerStep = 1f;
     [SerializeField] private float energyCostPerJump = 3f;
     [SerializeField] private bool waitStep = true;
-
-    private float timeout = 0.3f;
+    private bool _flipped = false;
+    [SerializeField] private float timeout = 0.5f;
 
     private void Awake()
     {
@@ -55,8 +54,9 @@ public class RobotLocomotionController : MonoBehaviour
 
     #region Movement
 
-    public void HandleMovement(float horizontalInput)
+    public void HandleMovement(float horizontalInput, bool flipped)
     {
+        _flipped = flipped;
         if (isJumping) return;
 
         bool walking = Mathf.Abs(horizontalInput) > 0.2f;
@@ -64,10 +64,10 @@ public class RobotLocomotionController : MonoBehaviour
         if (walking)
         {
             bool shouldFlip = horizontalInput < 0;
-            if (shouldFlip != flipped)
+            if (shouldFlip != _flipped)
             {
-                flipped = shouldFlip;
-                SetFacingDirection(!flipped);
+                _flipped = shouldFlip;
+                SetFacingDirection(!_flipped);
             }
 
             if (!isWalking)
@@ -86,8 +86,8 @@ public class RobotLocomotionController : MonoBehaviour
         isWalking = true;
         if (walkRoutine != null) StopCoroutine(walkRoutine);
 
-        var footA = flipped ? rightFoot : leftFoot;
-        var footB = flipped ? leftFoot : rightFoot;
+        var footA = _flipped ? rightFoot : leftFoot;
+        var footB = _flipped ? leftFoot : rightFoot;
 
         walkRoutine = StartCoroutine(StepChain(footA, footB));
     }
@@ -185,7 +185,7 @@ public class RobotLocomotionController : MonoBehaviour
         {
             float input = controls.Player.Move.ReadValue<Vector2>().x;
             if (Mathf.Abs(input) > 0.2f)
-                HandleMovement(input);
+                HandleMovement(input, _flipped);
         }
 
         OnJumpEnded?.Invoke();

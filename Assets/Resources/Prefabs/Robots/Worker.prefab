@@ -186,7 +186,6 @@ GameObject:
   - component: {fileID: 5579768388783519933}
   - component: {fileID: 574345331645963513}
   - component: {fileID: 6927027784846965603}
-  - component: {fileID: 8075334540534922483}
   m_Layer: 7
   m_Name: Worker
   m_TagString: Enemy
@@ -332,11 +331,10 @@ MonoBehaviour:
   hipRb: {fileID: 9206399112436540778}
   points: {fileID: 7353721863927515775}
   poles: {fileID: 5653714254752795455}
-  stateMachine: {fileID: 9201182588516880390}
-  memoryComponent: {fileID: 8505160515933744807}
-  facing: {fileID: 8075334540534922483}
   legJointLimiter: {fileID: 6927027784846965603}
   bodyJointLimiter: {fileID: 0}
+  stateMachine: {fileID: 9201182588516880390}
+  memoryComponent: {fileID: 8505160515933744807}
   robotBehaviour: {fileID: 340242974285803334}
   arrivalThresholdX: 0.5
   arrivalThresholdY: 2
@@ -426,22 +424,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftLegJoint: {fileID: 9206399113579118249}
   rightLegJoint: {fileID: 1967472705241727288}
---- !u!114 &8075334540534922483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113533570876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53c1985955a5fb94e9d3fda7246cce67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftLegPole: {fileID: 6315316417302259119}
-  rightLegPole: {fileID: 2641922349688283432}
-  leftArmPole: {fileID: 8433065265253862054}
-  rightArmPole: {fileID: 5777551822076249676}
 --- !u!1001 &446331177930903255
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2061,6 +2043,22 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 898971735516691478, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.84
+      objectReference: {fileID: 0}
+    - target: {fileID: 898971735516691478, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.819
+      objectReference: {fileID: 0}
+    - target: {fileID: 2980383424704344316, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 2980383424704344316, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.088
+      objectReference: {fileID: 0}
     - target: {fileID: 2985666383661602287, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -2076,6 +2074,14 @@ PrefabInstance:
     - target: {fileID: 3226042146515040407, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
       propertyPath: m_TagString
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3374617755894190879, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 3374617755894190879, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.755
       objectReference: {fileID: 0}
     - target: {fileID: 4710151194568287832, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
       propertyPath: m_Layer
@@ -2104,6 +2110,14 @@ PrefabInstance:
     - target: {fileID: 5692952428797924801, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
       propertyPath: m_TagString
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 6762278309144762264, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 6762278309144762264, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.105
       objectReference: {fileID: 0}
     - target: {fileID: 7234532659396648629, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
       propertyPath: m_Layer

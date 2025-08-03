@@ -5288,7 +5288,6 @@ GameObject:
   - component: {fileID: 340242974285803334}
   - component: {fileID: 8782515306010581955}
   - component: {fileID: 2461518573604142914}
-  - component: {fileID: 1460661287581662214}
   - component: {fileID: 6137078262802834594}
   - component: {fileID: 3067009131450268787}
   - component: {fileID: 8868752083473424728}
@@ -5435,25 +5434,10 @@ MonoBehaviour:
   rightFoot: {fileID: 7086515708544877790}
   jumpUpDuration: 0.1
   jumpDownDuration: 0.1
+  isPlayerControlled: 0
   energyCostPerStep: 1
   energyCostPerJump: 5
   waitStep: 1
---- !u!114 &1460661287581662214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113533570876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53c1985955a5fb94e9d3fda7246cce67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftLegPole: {fileID: 6315316417302259119}
-  rightLegPole: {fileID: 2641922349688283432}
-  leftArmPole: {fileID: 8433065265253862054}
-  rightArmPole: {fileID: 5777551822076249676}
 --- !u!114 &6137078262802834594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5467,7 +5451,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locomotion: {fileID: 2461518573604142914}
-  facing: {fileID: 1460661287581662214}
   bodyBalance: {fileID: 8274634689585369587}
   forceUpward: 200
   forceSide: 150
