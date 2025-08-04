@@ -92,7 +92,7 @@ public class SecurityCamera : MonoBehaviour
             var controller = roomManager.FactoryManager.playerInstance
                 .GetComponent<RobotStateController>();
             float morality = controller.Stats.Morality;
-            if (morality >= 10f)
+            if (morality <= -10f)
             {
                 var factoryAlarm = roomManager.FactoryManager.factoryAlarmStatus;
                 factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
