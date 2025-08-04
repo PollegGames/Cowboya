@@ -186,6 +186,7 @@ GameObject:
   - component: {fileID: 5579768388783519933}
   - component: {fileID: 574345331645963513}
   - component: {fileID: 6927027784846965603}
+  - component: {fileID: 2812764368535121390}
   m_Layer: 7
   m_Name: Worker
   m_TagString: Enemy
@@ -340,6 +341,7 @@ MonoBehaviour:
   arrivalThresholdY: 2
   deadZoneX: 1
   deadZoneY: 5
+  allyController: {fileID: 2812764368535121390}
   updateLoop: 0
 --- !u!114 &9201182588516880390
 MonoBehaviour:
@@ -2233,3 +2235,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 482515306807464926, guid: 5e0f120d833b85344af1ce7c845fbad9, type: 3}
   m_PrefabInstance: {fileID: 8750931863636473520}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2812764368535121390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e1429c14f0645339db44a757fbdebbe, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bodyReference: {fileID: 9206399112436540782}
+  arrivalThresholdX: 2
+  arrivalThresholdY: 2
+  deadZoneX: 5
+  deadZoneY: 5
+  updateLoop: 0

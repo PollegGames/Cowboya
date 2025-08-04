@@ -20,6 +20,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneY = 5f;
 
     [SerializeField] private LowMoralityPlayerTriggerHandler lowMoralityTriggerHandler;
+    [SerializeField] private AllyController allyController;
     private FactoryMachine currentMachine;
 
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
@@ -43,6 +44,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         robotBehaviour.OnStateChanged += HandleStateChange;
         if (lowMoralityTriggerHandler != null)
             lowMoralityTriggerHandler.OnLowMoralityPlayerDetected += HandleLowMoralityPlayerDetected;
+        if (allyController != null)
+            allyController.enabled = false;
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService, IRobotRespawnService respawnService)
@@ -60,6 +63,30 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     public void SetWorkerSpawnerState()
     {
         IsWorkerSpawner = true;
+    }
+
+    /// <summary>
+    /// Converts this worker from an enemy into an ally.
+    /// </summary>
+    public void ConvertToAlly()
+    {
+        enabled = false;
+        if (stateMachine != null)
+            stateMachine.enabled = false;
+        if (lowMoralityTriggerHandler != null)
+            lowMoralityTriggerHandler.enabled = false;
+        if (robotBehaviour != null)
+            robotBehaviour.enabled = false;
+        if (memoryComponent != null)
+            memoryComponent.enabled = false;
+        var punchAttack = GetComponent<EnemyPunchAttack>();
+        if (punchAttack != null)
+            punchAttack.enabled = false;
+        var followHandler = GetComponent<FollowPlayerTriggerHandler>();
+        if (followHandler != null)
+            followHandler.enabled = false;
+        allyController.Initialize(waypointService);
+        allyController.enabled = true;
     }
 
     protected override void Update()
