@@ -9,6 +9,7 @@ public class Worker_Saved : WorkerState
     {
         enemy.workerState = WorkerStatus.Saved;
         enemy.SetMovement(0f);
+        enemy.ConvertToAlly();
         SceneController.instance?.RobotSaved();
     }
 
