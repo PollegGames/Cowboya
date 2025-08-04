@@ -60,9 +60,12 @@ public class FactoryManagerTests
     {
         var vs = ScriptableObject.CreateInstance<VictorySetup>();
         typeof(FactoryManager).GetField("victorySetup", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_factoryManager, vs);
+        var stats = new RobotStats();
+        typeof(FactoryManager).GetField("playerStats", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_factoryManager, stats);
 
         _factoryManager.OnRobotSaved();
         Assert.AreEqual(1, vs.currentSaved);
+        Assert.AreEqual(1f, stats.Morality);
     }
 
     [Test]
@@ -70,9 +73,12 @@ public class FactoryManagerTests
     {
         var vs = ScriptableObject.CreateInstance<VictorySetup>();
         typeof(FactoryManager).GetField("victorySetup", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_factoryManager, vs);
+        var stats = new RobotStats();
+        typeof(FactoryManager).GetField("playerStats", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_factoryManager, stats);
 
         _factoryManager.OnRobotKilled();
         Assert.AreEqual(1, vs.currentKilled);
+        Assert.AreEqual(-1f, stats.Morality);
     }
 
     private class DummyGridBuilder : IGridBuilder

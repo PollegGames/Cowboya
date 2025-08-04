@@ -57,6 +57,7 @@ public class GameUIViewModel : MonoBehaviour
             // Subscribe to PlayerStats events
             robotInfo.OnEnergyChanged += UpdateEnergyBar;
             robotInfo.OnHealthChanged += UpdateHealthBar;
+            robotInfo.OnMoralityChanged += UpdateMoralityLabel;
 
             // Listen for player state changes
             robotBehaviour.OnStateChanged += HandleRobotStateChange;
@@ -64,6 +65,7 @@ public class GameUIViewModel : MonoBehaviour
             // Initial UI update
             UpdateEnergyBar();
             UpdateHealthBar();
+            UpdateMoralityLabel();
 
             Debug.Log("Health and energy bars bound to PlayerStateController.");
         }
@@ -78,6 +80,15 @@ public class GameUIViewModel : MonoBehaviour
         if (newState == RobotState.Dead)
         {
             MessageService.Instance?.ShowMessage(GameMessages.System.GameOver);
+        }
+    }
+
+    private void UpdateMoralityLabel()
+    {
+        if (robotBehaviour != null && robotBehaviour.Stats != null)
+        {
+            int currentMorality = Mathf.RoundToInt(robotBehaviour.Stats.Morality);
+            ui.Q<Label>("moralityLabel").text = $"Morality: {currentMorality}";
         }
     }
     private void UpdateEnergyBar()
@@ -135,6 +146,10 @@ public class GameUIViewModel : MonoBehaviour
         if (robotBehaviour != null)
         {
             robotBehaviour.OnStateChanged -= HandleRobotStateChange;
+            if (robotBehaviour.Stats != null)
+            {
+                robotBehaviour.Stats.OnMoralityChanged -= UpdateMoralityLabel;
+            }
         }
     }
 
