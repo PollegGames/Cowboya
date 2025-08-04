@@ -228,6 +228,7 @@
     <Compile Include="Assets\Scripts\Navigation\LockEndRoomDoorProcessor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToRestStation.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_FleePlayer.cs" />
     <Compile Include="Assets\Scripts\Map\DoorDirection.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Saved.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\ReactiveMachineAI.cs" />
@@ -262,6 +263,7 @@
     <Compile Include="Assets\Scripts\Services\SecurityBadgeSpawner.cs" />
     <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Controllers\LowMoralityPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_CheckingSecurity.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\FactoryManager.cs" />

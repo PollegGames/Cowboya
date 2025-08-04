@@ -19,6 +19,9 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneX = 5f;
     [SerializeField] private float deadZoneY = 5f;
 
+    [SerializeField] private LowMoralityPlayerTriggerHandler lowMoralityTriggerHandler;
+    private FactoryMachine currentMachine;
+
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
 
     public bool IsWorkerSpawner { get; private set; }
@@ -38,6 +41,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         animator = GetComponentInChildren<Animator>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
+        if (lowMoralityTriggerHandler != null)
+            lowMoralityTriggerHandler.OnLowMoralityPlayerDetected += HandleLowMoralityPlayerDetected;
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService, IRobotRespawnService respawnService)
@@ -82,6 +87,10 @@ public class EnemyWorkerController : AnimatorBaseAgentController
 
     public RoomWaypoint GetClosestWaypoint(RoomWaypoint exclude = null) =>
         pathFollower.GetClosestWaypoint(exclude);
+
+    public void SetCurrentMachine(FactoryMachine machine) => currentMachine = machine;
+
+    public void ClearCurrentMachine() => currentMachine = null;
 
     private void HandleStateChange(RobotState newState)
     {
@@ -134,6 +143,14 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         {
             bodyBalance.UpdateBalance(enabledBalance);
         }
+    }
+
+    private void HandleLowMoralityPlayerDetected(Transform player)
+    {
+        var previousState = stateMachine.enemyState;
+        var machine = currentMachine;
+        stateMachine.ChangeState(new Worker_FleePlayer(this, stateMachine, waypointService, previousState, player, machine));
+        currentMachine = null;
     }
 
     private void OnDrawGizmos()
