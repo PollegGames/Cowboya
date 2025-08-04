@@ -21,6 +21,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     private MapManager mapManager;
     private IWaypointService waypointService;
     private VictorySetup victorySetup;
+    private RobotStats playerStats;
 
     public GameObject playerInstance { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
@@ -85,12 +86,19 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         {
             Debug.LogError("FactoryManager: Player head transform is null.");
         }
+        var controller = playerInstance.GetComponent<RobotStateController>();
+        if (controller != null)
+        {
+            playerStats = controller.Stats;
+            controller.OnStateChanged += HandlePlayerStateChange;
+        }
     }
 
     public void OnRobotSaved()
     {
         victorySetup.currentSaved++;
         Debug.Log("Robot SAVED");
+        playerStats?.UpdateMorality(1f);
         // Optionally: Check for victory condition here
         if (victorySetup.currentSaved >= victorySetup.robotsSavedTarget)
         {
@@ -102,7 +110,16 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     {
         victorySetup.currentKilled++;
         Debug.Log("Robot KILLED");
+        playerStats?.UpdateMorality(-1f);
         // Optionally: Check for victory condition here
+    }
+
+    private void HandlePlayerStateChange(RobotState newState)
+    {
+        if (newState == RobotState.Dead)
+        {
+            playerStats?.ResetMorality();
+        }
     }
 
 }

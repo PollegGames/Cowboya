@@ -14,6 +14,7 @@ public class RobotStats
     public float AttackEnergyCost = 1f;
     public event Action OnHealthChanged;
     public event Action OnEnergyChanged;
+    public event Action OnMoralityChanged;
     public bool AbleToAttack => CurrentEnergy >= AttackEnergyCost;
     public float Morality { get; set; } = 0f;
     public List<Module> Modules { get; set; } = new List<Module>();
@@ -53,5 +54,15 @@ public class RobotStats
         OnHealthChanged?.Invoke();
     }
 
+    public void UpdateMorality(float delta)
+    {
+        Morality += delta;
+        OnMoralityChanged?.Invoke();
+    }
 
+    public void ResetMorality()
+    {
+        Morality = 0f;
+        OnMoralityChanged?.Invoke();
+    }
 }
