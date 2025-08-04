@@ -262,6 +262,7 @@
     <Compile Include="Assets\Scripts\Robots\FootStepper.cs" />
     <Compile Include="Assets\Scripts\Services\SecurityBadgeSpawner.cs" />
     <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
+    <Compile Include="Assets\Scripts\Ally\Controllers\FollowEnemyTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\LowMoralityPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />
