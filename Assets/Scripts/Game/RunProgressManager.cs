@@ -11,6 +11,13 @@ public class RunProgressManager : MonoBehaviour
     [SerializeField] private string runSandboxSceneName = "SetupSandbox";
     [SerializeField] private SceneController sceneControllerPrefab;
 
+    // Maximum allowed values for dynamically generated configurations
+    private const int MaxGridSize = 10;      // Maximum grid width/height
+    private const int MaxPoiCount = 20;      // Maximum number of points of interest
+    private const int MaxBlockedCount = 10;  // Maximum number of blocked cells
+    private const int MaxEnemiesCount = 20;  // Maximum number of enemies
+    private const int MaxWorkersCount = 40;  // Maximum number of workers
+
     private int currentLevelIndex = 1;
 
     public int CurrentLevelIndex => currentLevelIndex;
@@ -115,6 +122,14 @@ public class RunProgressManager : MonoBehaviour
 
         newConfig.workersCount += increment;
         newConfig.enemiesCount += increment;
+
+        // Clamp values to their respective maximums
+        newConfig.gridWidth = Mathf.Min(newConfig.gridWidth, MaxGridSize);
+        newConfig.gridHeight = Mathf.Min(newConfig.gridHeight, MaxGridSize);
+        newConfig.poiCount = Mathf.Min(newConfig.poiCount, MaxPoiCount);
+        newConfig.blockedCount = Mathf.Min(newConfig.blockedCount, MaxBlockedCount);
+        newConfig.enemiesCount = Mathf.Min(newConfig.enemiesCount, MaxEnemiesCount);
+        newConfig.workersCount = Mathf.Min(newConfig.workersCount, MaxWorkersCount);
 
         mapConfigs.Add(newConfig);
         return newConfig;
