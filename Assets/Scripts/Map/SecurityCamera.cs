@@ -89,6 +89,15 @@ public class SecurityCamera : MonoBehaviour
         {
             targetToFollow = player;
             isFollowing = true;
+            var controller = roomManager.FactoryManager.playerInstance
+                .GetComponent<RobotStateController>();
+            float morality = controller.Stats.Morality;
+            if (morality >= 10f)
+            {
+                var factoryAlarm = roomManager.FactoryManager.factoryAlarmStatus;
+                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
+                factoryAlarm.LastPlayerPosition = player.position;
+            }
 
             Vector2 playerPos = player.transform.position;
             roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
