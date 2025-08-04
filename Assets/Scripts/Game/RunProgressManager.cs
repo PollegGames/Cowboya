@@ -20,8 +20,17 @@ public class RunProgressManager : MonoBehaviour
         get
         {
             if (mapConfigs == null || mapConfigs.Count == 0) return null;
-            currentLevelIndex = Mathf.Clamp(currentLevelIndex, 0, mapConfigs.Count - 1);
-            return mapConfigs[currentLevelIndex];
+            RunMapConfigSO cfg;
+            if (currentLevelIndex >= mapConfigs.Count)
+            {
+                cfg = CreateDynamicConfig(currentLevelIndex);
+            }
+            else
+            {
+                cfg = mapConfigs[currentLevelIndex];
+            }
+            cfg.GenerateRandomSeed();
+            return cfg;
         }
     }
 
@@ -59,7 +68,7 @@ public class RunProgressManager : MonoBehaviour
     public void LoadNextLevel()
     {
         if (mapConfigs == null || mapConfigs.Count == 0) return;
-        currentLevelIndex = Mathf.Clamp(currentLevelIndex + 1, 0, mapConfigs.Count - 1);
+        currentLevelIndex++;
         SceneController.instance.LoadScene(runNormalSceneName);
     }
 
@@ -67,5 +76,47 @@ public class RunProgressManager : MonoBehaviour
     {
         currentLevelIndex = 1;
         SceneController.instance.LoadScene(runNormalSceneName);
+    }
+
+    private RunMapConfigSO CreateDynamicConfig(int levelIndex)
+    {
+        RunMapConfigSO baseConfig = mapConfigs[mapConfigs.Count - 1];
+        RunMapConfigSO newConfig = ScriptableObject.CreateInstance<RunMapConfigSO>();
+        newConfig.gridWidth = baseConfig.gridWidth;
+        newConfig.gridHeight = baseConfig.gridHeight;
+        newConfig.poiCount = baseConfig.poiCount;
+        newConfig.blockedCount = baseConfig.blockedCount;
+        newConfig.workersCount = baseConfig.workersCount;
+        newConfig.enemiesCount = baseConfig.enemiesCount;
+
+        if (Random.value > 0.5f)
+        {
+            newConfig.gridWidth += 1;
+        }
+        else
+        {
+            newConfig.gridHeight += 1;
+        }
+
+        int increment = 1;
+        if (levelIndex % 2 == 0 && levelIndex >= 4)
+        {
+            increment += 2;
+        }
+
+        if (Random.value > 0.5f)
+        {
+            newConfig.poiCount += increment;
+        }
+        else
+        {
+            newConfig.blockedCount += increment;
+        }
+
+        newConfig.workersCount += increment;
+        newConfig.enemiesCount += increment;
+
+        mapConfigs.Add(newConfig);
+        return newConfig;
     }
 }
