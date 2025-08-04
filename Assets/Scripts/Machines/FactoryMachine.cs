@@ -114,6 +114,7 @@ public class FactoryMachine : BaseMachine
     private void SetWorkerToWork(EnemyWorkerController worker)
     {
         if (worker == null) return;
+        worker.SetCurrentMachine(this);
         worker.stateMachine.ChangeState(
             new Worker_IsWork(worker, worker.stateMachine, worker.waypointService));
     }
