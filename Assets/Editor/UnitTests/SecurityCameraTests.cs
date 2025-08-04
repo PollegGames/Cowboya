@@ -35,7 +35,46 @@ public class SecurityCameraTests
     }
 
     [Test]
-    public void PlayerWithHighMoralityTriggersWantedState()
+    public void PlayerWithLowMoralityTriggersWantedState()
+    {
+        var cameraGO = new GameObject();
+        var camera = cameraGO.AddComponent<SecurityCamera>();
+
+        var roomGO = new GameObject();
+        var roomManager = roomGO.AddComponent<RoomManager>();
+        camera.roomManager = roomManager;
+
+        var factoryGO = new GameObject();
+        var factoryManager = factoryGO.AddComponent<FactoryManager>();
+        typeof(RoomManager).GetProperty("FactoryManager", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .SetValue(roomManager, factoryManager);
+
+        var alarmStatus = ScriptableObject.CreateInstance<FactoryAlarmStatus>();
+        factoryManager.factoryAlarmStatus = alarmStatus;
+
+        roomManager.waypointService = new DummyWaypointService();
+
+        var playerGO = new GameObject();
+        var headGO = new GameObject();
+        headGO.transform.position = new Vector3(5f, 0f, 0f);
+
+        var controller = playerGO.AddComponent<RobotStateController>();
+        controller.Stats = new RobotStats();
+        controller.Stats.Morality = -10f;
+
+        factoryManager.SetPlayerInstanceHead(playerGO, headGO.transform);
+
+        var collider = playerGO.AddComponent<BoxCollider2D>();
+
+        typeof(SecurityCamera).GetMethod("OnPlayerEnterZone", BindingFlags.NonPublic | BindingFlags.Instance)
+            .Invoke(camera, new object[] { collider });
+
+        Assert.AreEqual(AlarmState.Wanted, alarmStatus.CurrentAlarmState);
+        Assert.AreEqual(headGO.transform.position, alarmStatus.LastPlayerPosition);
+    }
+
+    [Test]
+    public void PlayerWithHighMoralityDoesNotTriggerWantedState()
     {
         var cameraGO = new GameObject();
         var camera = cameraGO.AddComponent<SecurityCamera>();
@@ -69,8 +108,7 @@ public class SecurityCameraTests
         typeof(SecurityCamera).GetMethod("OnPlayerEnterZone", BindingFlags.NonPublic | BindingFlags.Instance)
             .Invoke(camera, new object[] { collider });
 
-        Assert.AreEqual(AlarmState.Wanted, alarmStatus.CurrentAlarmState);
-        Assert.AreEqual(headGO.transform.position, alarmStatus.LastPlayerPosition);
+        Assert.AreEqual(AlarmState.Normal, alarmStatus.CurrentAlarmState);
     }
 }
 
