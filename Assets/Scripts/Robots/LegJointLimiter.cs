@@ -24,6 +24,8 @@ public class LegJointLimiter : MonoBehaviour
 
     private void SetJointLimits(HingeJoint2D joint, float lower, float upper)
     {
+        if (joint == null)
+            return;
         var limits = joint.limits;
         limits.min = lower;
         limits.max = upper;

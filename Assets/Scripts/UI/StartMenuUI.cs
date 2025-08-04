@@ -14,6 +14,7 @@ public class StartMenuUI : MonoBehaviour
         // Background
         var background = new VisualElement
         {
+            
             style =
             {
                 backgroundImage = new StyleBackground(backgroundSprite),

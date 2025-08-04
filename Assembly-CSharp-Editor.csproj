@@ -84,11 +84,13 @@
     <Compile Include="Assets\Editor\UnitTests\SceneInitiatorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\GrabHandAttractorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\GridFactoryTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\AllyBehaviorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\WaypointPathFinderTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\ObjectPoolTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\GridManagerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\WaypointServiceTests.cs" />
     <Compile Include="Assets\Shapes2D\Editor\CustomHandles.cs" />
+    <Compile Include="Assets\Editor\UnitTests\SecurityCameraTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\RoomWaypointTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\RoomManagerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityBadgeTheftTests.cs" />

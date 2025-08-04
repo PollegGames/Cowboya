@@ -160,6 +160,7 @@
     <Compile Include="Assets\Scripts\Machines\RestingMachine.cs" />
     <Compile Include="Assets\Scripts\Map\SecurityCamera.cs" />
     <Compile Include="Assets\Scripts\Managers\VictorySetup.cs" />
+    <Compile Include="Assets\Scripts\Ally\Controllers\AllyController.cs" />
     <Compile Include="Assets\Scripts\Robots\LegJointLimiter.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyPunchAttack.cs" />
     <Compile Include="Assets\Scripts\UI\GameUIViewModel.cs" />
@@ -170,8 +171,10 @@
     <Compile Include="Assets\Scripts\Map\WaypointRegistry.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\LiftShaftController.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\PlayerTemplate.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Controllers\LowMoralityPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\RoomManager.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\HoldButton.cs" />
+    <Compile Include="Assets\Scripts\Ally\Controllers\FollowEnemyTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\Machines\MachineSecurityManager.cs" />
     <Compile Include="Assets\Scripts\Setup\SceneBootstrapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\ISaveService.cs" />
@@ -227,8 +230,8 @@
     <Compile Include="Assets\Scripts\RobotFactory\RobotStateController.cs" />
     <Compile Include="Assets\Scripts\Navigation\LockEndRoomDoorProcessor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToMachine.cs" />
+    <Compile Include="Assets\Scripts\Ally\Controllers\AllyPunchAttack.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToRestStation.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_FleePlayer.cs" />
     <Compile Include="Assets\Scripts\Map\DoorDirection.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Saved.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\ReactiveMachineAI.cs" />
@@ -242,8 +245,10 @@
     <Compile Include="Assets\Scripts\Interfaces\IRobotNavigationListener.cs" />
     <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
     <Compile Include="Assets\Scripts\Robots\Module.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Worker_FleePlayer.cs" />
     <Compile Include="Assets\Scripts\Game\GameHUDEvents.cs" />
     <Compile Include="Assets\Scripts\Robots\IKController.cs" />
+    <Compile Include="Assets\Scripts\Ally\Controllers\AllyWorkerController.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRoomProcessor.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackType.cs" />
     <Compile Include="Assets\Scripts\Map\RoomWaypoint.cs" />
@@ -262,9 +267,7 @@
     <Compile Include="Assets\Scripts\Robots\FootStepper.cs" />
     <Compile Include="Assets\Scripts\Services\SecurityBadgeSpawner.cs" />
     <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
-    <Compile Include="Assets\Scripts\Ally\Controllers\FollowEnemyTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />
-    <Compile Include="Assets\Scripts\EnemyAI\Controllers\LowMoralityPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_CheckingSecurity.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\FactoryManager.cs" />

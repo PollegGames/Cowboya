@@ -413,6 +413,13 @@ public class RunSetupManager : MonoBehaviour
         previewVE.style.backgroundImage = new StyleBackground(tex);
         previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover);
         BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
+        previewVE.style.backgroundPositionX = center;
+        previewVE.style.backgroundPositionY = center;
+        float spacing = 5f;
+        previewVE.style.paddingRight = new StyleLength(spacing);
+        previewVE.style.paddingLeft = new StyleLength(spacing);
+        previewVE.style.marginRight = new StyleLength(spacing);
+        previewVE.style.marginLeft = new StyleLength(spacing);   
     }
 
     // =====================================================================

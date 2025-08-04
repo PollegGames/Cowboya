@@ -328,7 +328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1617637289307301190}
-  pole: {fileID: 2473490206524818188}
+  pole: {fileID: 8586645231740715026}
   chainLength: 2
   SetForce: 80
   delta: 0.25
@@ -2710,7 +2710,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 4216187590809520828}
   pole: {fileID: 0}
-  chainLength: 2
+  chainLength: 1
   SetForce: 100
   delta: 0.1
   iterations: 10
@@ -4476,6 +4476,7 @@ MonoBehaviour:
   energyCostPerStep: 1
   energyCostPerJump: 5
   waitStep: 1
+  timeout: 0.5
 --- !u!114 &2143343018950225475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4644,7 +4645,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bodyJoint: {fileID: 3497312347630537695}
   torsoJoint: {fileID: 5120231806531619291}
-  lowTorsoJoint: {fileID: 1600711879991610248}
 --- !u!114 &4039218795842909479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4677,6 +4677,7 @@ MonoBehaviour:
   energyCostPerStep: 1
   energyCostPerJump: 3
   waitStep: 1
+  timeout: 0.5
 --- !u!1 &8491232064010109857
 GameObject:
   m_ObjectHideFlags: 0
@@ -5284,7 +5285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 7808925488993355987}
-  pole: {fileID: 8586645231740715026}
+  pole: {fileID: 2473490206524818188}
   chainLength: 2
   SetForce: 80
   delta: 0.25
@@ -5334,7 +5335,7 @@ GameObject:
   - component: {fileID: 125494418219254266}
   - component: {fileID: 5074067372479899879}
   - component: {fileID: 2884222748700478116}
-  - component: {fileID: 1600711879991610248}
+  - component: {fileID: 1584063456800055839}
   m_Layer: 7
   m_Name: LowTorso
   m_TagString: Enemy
@@ -5485,8 +5486,8 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.48879752, y: 0.82249784}
   m_EdgeRadius: 0
---- !u!233 &1600711879991610248
-HingeJoint2D:
+--- !u!255 &1584063456800055839
+FixedJoint2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5500,17 +5501,10 @@ HingeJoint2D:
   m_BreakTorque: Infinity
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
-  m_Anchor: {x: 0, y: -0.34}
-  m_ConnectedAnchor: {x: 0.05458125, y: 0.15333308}
-  m_UseConnectedAnchor: 1
-  m_UseMotor: 0
-  m_Motor:
-    m_MotorSpeed: 0
-    m_MaximumMotorForce: 10000
-  m_UseLimits: 1
-  m_AngleLimits:
-    m_LowerAngle: -10
-    m_UpperAngle: 0
+  m_Anchor: {x: 0, y: -0.35}
+  m_ConnectedAnchor: {x: 0.05458125, y: 0.14347117}
+  m_DampingRatio: 0
+  m_Frequency: 0
 --- !u!1001 &818722744967917141
 PrefabInstance:
   m_ObjectHideFlags: 0

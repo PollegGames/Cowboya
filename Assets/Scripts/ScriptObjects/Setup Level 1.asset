@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47eeb42f1fd366642856156ffc865a5b, type: 3}
   m_Name: Setup Level 1
   m_EditorClassIdentifier: 
-  gridWidth: 3
+  gridWidth: 4
   gridHeight: 3
   poiCount: 3
   blockedCount: 1

@@ -170,12 +170,14 @@ public class GameUIViewModel : MonoBehaviour
         {
             previewVE.style.backgroundImage = new StyleBackground(tex);
             previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover);
+            BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
+            previewVE.style.backgroundPositionX = center;
+            previewVE.style.backgroundPositionY = center;
         }
         else
         {
             Debug.LogError("GameUIViewModel: previewVE is null.");
         }
-        BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
     }
 
 }

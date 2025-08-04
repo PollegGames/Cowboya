@@ -20,7 +20,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneY = 5f;
 
     [SerializeField] private LowMoralityPlayerTriggerHandler lowMoralityTriggerHandler;
-    [SerializeField] private AllyController allyController;
+    [SerializeField] private AllyWorkerController allyWorkerController;
     private FactoryMachine currentMachine;
 
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
@@ -44,8 +44,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         robotBehaviour.OnStateChanged += HandleStateChange;
         if (lowMoralityTriggerHandler != null)
             lowMoralityTriggerHandler.OnLowMoralityPlayerDetected += HandleLowMoralityPlayerDetected;
-        if (allyController != null)
-            allyController.enabled = false;
+        if (allyWorkerController != null)
+            allyWorkerController.enabled = false;
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService, IRobotRespawnService respawnService)
@@ -85,8 +85,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         var followHandler = GetComponent<FollowPlayerTriggerHandler>();
         if (followHandler != null)
             followHandler.enabled = false;
-        allyController.Initialize(waypointService);
-        allyController.enabled = true;
+        allyWorkerController.Initialize(waypointService);
+        allyWorkerController.enabled = true;
     }
 
     protected override void Update()

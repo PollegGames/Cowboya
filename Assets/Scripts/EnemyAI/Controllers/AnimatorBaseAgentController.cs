@@ -27,7 +27,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     protected float verticalDirection; // Vertical   (-1, 0, 1)
     [Header("Movement & Facing Modules")]
     [SerializeField] protected LegJointLimiter legJointLimiter;
-    [SerializeField] protected BodyJointLimiter bodyJointLimiter;
     protected virtual void Awake()
     {
         if (legJointLimiter == null)
@@ -107,8 +106,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     {
         if (legJointLimiter != null)
             legJointLimiter.SetLegRotationLimits(flipped);
-        if (bodyJointLimiter != null)
-            bodyJointLimiter.SetBodyRotationLimits(flipped);
     }
 
     protected virtual void TryFlip(float direction)

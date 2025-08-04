@@ -36,7 +36,6 @@ public class RunProgressManager : MonoBehaviour
             {
                 cfg = mapConfigs[currentLevelIndex];
             }
-            cfg.GenerateRandomSeed();
             return cfg;
         }
     }
@@ -96,6 +95,7 @@ public class RunProgressManager : MonoBehaviour
         newConfig.workersCount = baseConfig.workersCount;
         newConfig.enemiesCount = baseConfig.enemiesCount;
 
+        newConfig.GenerateRandomSeed();
         if (Random.value > 0.5f)
         {
             newConfig.gridWidth += 1;

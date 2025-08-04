@@ -4525,7 +4525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 9066642679708734232}
   pole: {fileID: 0}
-  chainLength: 2
+  chainLength: 1
   SetForce: 100
   delta: 0.1
   iterations: 10
@@ -4590,7 +4590,7 @@ GameObject:
   - component: {fileID: 9206399112919556915}
   - component: {fileID: 9206399112919556914}
   - component: {fileID: 9206399112919556917}
-  - component: {fileID: 8449701390147253327}
+  - component: {fileID: 8629067031134330845}
   m_Layer: 6
   m_Name: LowTorso
   m_TagString: Player
@@ -4741,8 +4741,8 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.48879752, y: 0.82249784}
   m_EdgeRadius: 0
---- !u!233 &8449701390147253327
-HingeJoint2D:
+--- !u!255 &8629067031134330845
+FixedJoint2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4756,17 +4756,10 @@ HingeJoint2D:
   m_BreakTorque: Infinity
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
-  m_Anchor: {x: 0, y: -0.34}
-  m_ConnectedAnchor: {x: -0.012001625, y: 0.17999998}
-  m_UseConnectedAnchor: 1
-  m_UseMotor: 0
-  m_Motor:
-    m_MotorSpeed: 0
-    m_MaximumMotorForce: 10000
-  m_UseLimits: 1
-  m_AngleLimits:
-    m_LowerAngle: -10
-    m_UpperAngle: 0
+  m_Anchor: {x: 0, y: -0.35}
+  m_ConnectedAnchor: {x: -0.012001625, y: 0.16999997}
+  m_DampingRatio: 0
+  m_Frequency: 0
 --- !u!1 &9206399113078833677
 GameObject:
   m_ObjectHideFlags: 0
@@ -5052,8 +5045,6 @@ GameObject:
   - component: {fileID: 9206399113523174608}
   - component: {fileID: 9206399113523174611}
   - component: {fileID: 119122012215267576}
-  - component: {fileID: 2765249697976913094}
-  - component: {fileID: 5025731827143171620}
   m_Layer: 6
   m_Name: Torso
   m_TagString: Player
@@ -5230,48 +5221,6 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: -10
     m_UpperAngle: 0
---- !u!231 &2765249697976913094
-SpringJoint2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113523174615}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_EnableCollision: 0
-  m_ConnectedRigidBody: {fileID: 9206399112436540778}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_BreakAction: 3
-  m_AutoConfigureConnectedAnchor: 0
-  m_Anchor: {x: -0.69060993, y: -0.29678416}
-  m_ConnectedAnchor: {x: -0.69061005, y: 0.14427029}
-  m_AutoConfigureDistance: 0
-  m_Distance: 0.4
-  m_DampingRatio: 0.3
-  m_Frequency: 1
---- !u!231 &5025731827143171620
-SpringJoint2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113523174615}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_EnableCollision: 0
-  m_ConnectedRigidBody: {fileID: 9206399112436540778}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_BreakAction: 3
-  m_AutoConfigureConnectedAnchor: 0
-  m_Anchor: {x: 0.6796949, y: -0.31327215}
-  m_ConnectedAnchor: {x: 0.6176338, y: 0.14014797}
-  m_AutoConfigureDistance: 0
-  m_Distance: 0.4
-  m_DampingRatio: 0.3
-  m_Frequency: 1
 --- !u!1 &9206399113533570876
 GameObject:
   m_ObjectHideFlags: 0
@@ -5438,6 +5387,7 @@ MonoBehaviour:
   energyCostPerStep: 1
   energyCostPerJump: 5
   waitStep: 1
+  timeout: 0.5
 --- !u!114 &6137078262802834594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5548,7 +5498,7 @@ MonoBehaviour:
   - {fileID: 9206399112233741188}
   - {fileID: 1008493805044246288}
   - {fileID: 119122012215267576}
-  - {fileID: 8449701390147253327}
+  - {fileID: 0}
   fixedJoints: []
   ikSolvers:
   - {fileID: 4623276914685148842}
@@ -5570,7 +5520,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bodyJoint: {fileID: 1008493805044246288}
   torsoJoint: {fileID: 119122012215267576}
-  lowTorsoJoint: {fileID: 8449701390147253327}
 --- !u!114 &9062504079035036979
 MonoBehaviour:
   m_ObjectHideFlags: 0
