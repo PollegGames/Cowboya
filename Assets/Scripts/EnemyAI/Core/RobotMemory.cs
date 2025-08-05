@@ -118,8 +118,10 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// </summary>
     public void OnReleaseToPool()
     {
-        ClearPlayerPosition();
-        ResetAttackMemory();
+        LastKnownPlayerPosition = Vector3.zero;
+        TimeSincePlayerLastSeen = 0f;
+        WasRecentlyAttacked = false;
+        TimeSinceLastAttack = 0f;
         LastVisitedPoint = null;
         respawnService = null;
     }
@@ -131,8 +133,9 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     {
         TimeSincePlayerLastSeen = 0f;
         TimeSinceLastAttack = 0f;
-
         if (respawnService == null)
+        {
             respawnService = GetComponent<IRobotRespawnService>();
+        }
     }
 }
