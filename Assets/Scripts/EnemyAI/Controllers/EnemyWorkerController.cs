@@ -1,8 +1,9 @@
 using UnityEngine;
+using System;
 using System.Collections;
 
 [RequireComponent(typeof(WorkerStateMachine), typeof(RobotMemory))]
-public class EnemyWorkerController : AnimatorBaseAgentController
+public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
 {
     [SerializeField] public WorkerStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
@@ -12,6 +13,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     public IWaypointService waypointService;
+    private Action stuckHandler;
 
     [SerializeField] private RobotStateController robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
@@ -52,12 +54,24 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     {
         this.waypointQueries = waypointQueries;
         this.waypointService = waypointService;
-        pathFollower = new WaypointPathFollower(bodyReference, this, waypointQueries,
-            arrivalThresholdX, arrivalThresholdY, deadZoneX, deadZoneY);
-        pathFollower.OnStuck += () => memory.OnStuck(this);
+        if (pathFollower == null)
+            SetupPathFollower();
         waypointService.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
+    }
+
+    private void SetupPathFollower()
+    {
+        pathFollower = new WaypointPathFollower(bodyReference, this, waypointQueries,
+            arrivalThresholdX, arrivalThresholdY, deadZoneX, deadZoneY);
+        stuckHandler = HandlePathFollowerStuck;
+        pathFollower.OnStuck += stuckHandler;
+    }
+
+    private void HandlePathFollowerStuck()
+    {
+        memory.OnStuck(this);
     }
 
     public void SetWorkerSpawnerState()
@@ -183,5 +197,25 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     private void OnDrawGizmos()
     {
         pathFollower?.DrawGizmos();
+    }
+
+    public void OnReleaseToPool()
+    {
+        if (pathFollower != null)
+        {
+            if (stuckHandler != null)
+                pathFollower.OnStuck -= stuckHandler;
+            waypointService?.Unsubscribe(pathFollower);
+            pathFollower = null;
+            stuckHandler = null;
+        }
+    }
+
+    public void OnAcquireFromPool()
+    {
+        if (pathFollower == null && waypointQueries != null)
+        {
+            SetupPathFollower();
+        }
     }
 }
