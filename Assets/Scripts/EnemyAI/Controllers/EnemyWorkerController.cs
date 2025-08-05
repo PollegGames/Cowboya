@@ -199,18 +199,23 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
         pathFollower?.DrawGizmos();
     }
 
+    /// <summary>
+    /// Cleans up listeners and references when returned to the pool.
+    /// </summary>
     public void OnReleaseToPool()
     {
         if (pathFollower != null)
         {
-            if (stuckHandler != null)
-                pathFollower.OnStuck -= stuckHandler;
+            pathFollower.OnStuck -= stuckHandler;
             waypointService?.Unsubscribe(pathFollower);
-            pathFollower = null;
-            stuckHandler = null;
         }
+        pathFollower = null;
+        stuckHandler = null;
     }
 
+    /// <summary>
+    /// Reinitializes state after the worker is pulled from the pool.
+    /// </summary>
     public void OnAcquireFromPool()
     {
         if (pathFollower == null && waypointQueries != null)

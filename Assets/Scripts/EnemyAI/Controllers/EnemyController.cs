@@ -202,18 +202,23 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         pathFollower?.DrawGizmos();
     }
 
+    /// <summary>
+    /// Cleans up listeners and releases references when returned to the pool.
+    /// </summary>
     public void OnReleaseToPool()
     {
         if (pathFollower != null)
         {
-            if (stuckHandler != null)
-                pathFollower.OnStuck -= stuckHandler;
+            pathFollower.OnStuck -= stuckHandler;
             waypointNotifier?.Unsubscribe(pathFollower);
-            pathFollower = null;
-            stuckHandler = null;
         }
+        pathFollower = null;
+        stuckHandler = null;
     }
 
+    /// <summary>
+    /// Reinitializes required fields after being pulled from the pool.
+    /// </summary>
     public void OnAcquireFromPool()
     {
         if (pathFollower == null && waypointQueries != null)
