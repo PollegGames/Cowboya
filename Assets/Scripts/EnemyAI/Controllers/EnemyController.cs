@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections;
 
 [RequireComponent(typeof(EnemyStateMachine), typeof(RobotMemory))]
@@ -7,7 +8,7 @@ using System.Collections;
 /// and badge spawning services and provides APIs to change state or assign
 /// destinations.
 /// </summary>
-public class EnemyController : PhysicsBaseAgentController
+public class EnemyController : PhysicsBaseAgentController, IPooledObject
 {
     [SerializeField] private EnemyStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
@@ -18,6 +19,7 @@ public class EnemyController : PhysicsBaseAgentController
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     private IWaypointNotifier waypointNotifier;
+    private Action stuckHandler;
 
     [SerializeField] private RobotStateController robotBehaviour;
     [SerializeField] private float arrivalThresholdX = 2f;
@@ -64,9 +66,8 @@ public class EnemyController : PhysicsBaseAgentController
     {
         this.waypointQueries = waypointQueries;
         this.waypointNotifier = waypointNotifier;
-        pathFollower = new WaypointPathFollower(bodyReference, this, waypointQueries,
-            arrivalThresholdX, arrivalThresholdY, deadZoneX, deadZoneY);
-        pathFollower.OnStuck += () => memory.OnBossStuck(this);
+        if (pathFollower == null)
+            SetupPathFollower();
         waypointNotifier.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
         this.dropContainer = dropContainer;
@@ -77,6 +78,19 @@ public class EnemyController : PhysicsBaseAgentController
                 Destroy(initialBadge.gameObject);
             initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
         }
+    }
+
+    private void SetupPathFollower()
+    {
+        pathFollower = new WaypointPathFollower(bodyReference, this, waypointQueries,
+            arrivalThresholdX, arrivalThresholdY, deadZoneX, deadZoneY);
+        stuckHandler = HandlePathFollowerStuck;
+        pathFollower.OnStuck += stuckHandler;
+    }
+
+    private void HandlePathFollowerStuck()
+    {
+        memory.OnBossStuck(this);
     }
 
     public void SetSecurityGuardState()
@@ -185,5 +199,25 @@ public class EnemyController : PhysicsBaseAgentController
     private void OnDrawGizmos()
     {
         pathFollower?.DrawGizmos();
+    }
+
+    public void OnReleaseToPool()
+    {
+        if (pathFollower != null)
+        {
+            if (stuckHandler != null)
+                pathFollower.OnStuck -= stuckHandler;
+            waypointNotifier?.Unsubscribe(pathFollower);
+            pathFollower = null;
+            stuckHandler = null;
+        }
+    }
+
+    public void OnAcquireFromPool()
+    {
+        if (pathFollower == null && waypointQueries != null)
+        {
+            SetupPathFollower();
+        }
     }
 }
