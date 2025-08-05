@@ -29,6 +29,10 @@ public class ObjectPool : SingletonBehaviour<ObjectPool>
         instanceToPrefab[obj] = prefab;
         obj.transform.SetParent(parent, false);
         obj.SetActive(false);
+
+        foreach (var pooled in obj.GetComponents<IPooledObject>())
+            pooled.OnAcquireFromPool();
+
         return obj;
     }
 
@@ -38,6 +42,10 @@ public class ObjectPool : SingletonBehaviour<ObjectPool>
     public void Release(GameObject obj)
     {
         if (obj == null) return;
+
+        foreach (var pooled in obj.GetComponents<IPooledObject>())
+            pooled.OnReleaseToPool();
+
         obj.SetActive(false);
         obj.transform.SetParent(transform, false);
 
