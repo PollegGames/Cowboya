@@ -4525,7 +4525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 9066642679708734232}
   pole: {fileID: 0}
-  chainLength: 1
+  chainLength: 2
   SetForce: 100
   delta: 0.1
   iterations: 10
@@ -4590,7 +4590,7 @@ GameObject:
   - component: {fileID: 9206399112919556915}
   - component: {fileID: 9206399112919556914}
   - component: {fileID: 9206399112919556917}
-  - component: {fileID: 8629067031134330845}
+  - component: {fileID: 2548657417317061371}
   m_Layer: 6
   m_Name: LowTorso
   m_TagString: Player
@@ -4741,8 +4741,8 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.48879752, y: 0.82249784}
   m_EdgeRadius: 0
---- !u!255 &8629067031134330845
-FixedJoint2D:
+--- !u!233 &2548657417317061371
+HingeJoint2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4758,8 +4758,15 @@ FixedJoint2D:
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.35}
   m_ConnectedAnchor: {x: -0.012001625, y: 0.16999997}
-  m_DampingRatio: 0
-  m_Frequency: 0
+  m_UseConnectedAnchor: 1
+  m_UseMotor: 0
+  m_Motor:
+    m_MotorSpeed: 0
+    m_MaximumMotorForce: 10000
+  m_UseLimits: 1
+  m_AngleLimits:
+    m_LowerAngle: -10
+    m_UpperAngle: 0
 --- !u!1 &9206399113078833677
 GameObject:
   m_ObjectHideFlags: 0
@@ -5520,6 +5527,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bodyJoint: {fileID: 1008493805044246288}
   torsoJoint: {fileID: 119122012215267576}
+  lowTorsoJoint: {fileID: 2548657417317061371}
 --- !u!114 &9062504079035036979
 MonoBehaviour:
   m_ObjectHideFlags: 0

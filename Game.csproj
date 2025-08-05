@@ -105,6 +105,7 @@
     <Compile Include="Assets\Scripts\Robots\BodyJointLimiter.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\EnemyController.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToSpawningMachine.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\PooledEnemy.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\WorkerCondition.cs" />
     <Compile Include="Assets\Scripts\Machines\SecurityMachine.cs" />
     <Compile Include="Assets\Scripts\Robots\ArcTargetFollower.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="Assets\Scripts\Setup\SceneBootstrapper.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\FacingController.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotStateController.cs" />
+    <Compile Include="Assets\Scripts\Managers\IPooledObject.cs" />
     <Compile Include="Assets\Scripts\Navigation\LockEndRoomDoorProcessor.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToMachine.cs" />
     <Compile Include="Assets\Scripts\Ally\Controllers\AllyPunchAttack.cs" />

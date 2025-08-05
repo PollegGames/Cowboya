@@ -40,12 +40,9 @@ public class JointBreaker : MonoBehaviour
                 owner = joint.gameObject,
                 type = joint.GetType(),
                 connectedBody = joint.connectedBody,
-                anchor = joint.anchor,
-                connectedAnchor = joint.connectedAnchor,
                 breakForce = joint.breakForce,
                 breakTorque = joint.breakTorque,
                 enableCollision = joint.enableCollision,
-                autoConfigure = joint.autoConfigureConnectedAnchor
             });
         }
     }
@@ -95,12 +92,9 @@ public class JointBreaker : MonoBehaviour
             if (joint == null)
                 continue;
             joint.connectedBody = info.connectedBody;
-            joint.anchor = info.anchor;
-            joint.connectedAnchor = info.connectedAnchor;
             joint.breakForce = info.breakForce;
             joint.breakTorque = info.breakTorque;
             joint.enableCollision = info.enableCollision;
-            joint.autoConfigureConnectedAnchor = info.autoConfigure;
         }
 
         hingeJoints.Clear();
