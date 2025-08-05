@@ -9,6 +9,8 @@ public class GameHUD_UI : MonoBehaviour
     private List<Button> _othersButtons = new List<Button>();
     private AudioSource _audioSource;
     private static GameHUD_UI _instance;
+
+    [SerializeField] private PauseMenuUI pauseMenuUI;
     private void Awake()
     {
         if (_instance != null)
@@ -19,22 +21,42 @@ public class GameHUD_UI : MonoBehaviour
 
         _instance = this;
         DontDestroyOnLoad(gameObject); // Keep this object across scenes
+
+        _document = GetComponent<UIDocument>();
+        if (_document == null)
+        {
+            _document = gameObject.AddComponent<UIDocument>();
+            var tree = Resources.Load<VisualTreeAsset>("UI/GameHUDVisualTree");
+            if (tree != null)
+            {
+                _document.visualTreeAsset = tree;
+            }
+        }
     }
     private void Start()
     {
-        var _document = GetComponent<UIDocument>().rootVisualElement;
+        var root = _document.rootVisualElement;
 
-        // Example HUD setup
-        // _button = _document.Q<Button>("pauseButton");
-        // _button.RegisterCallback<ClickEvent>(OnPauseButtonClick);
+        _button = root.Q<Button>("pauseButton");
+        if (_button != null)
+        {
+            _button.clicked += OnPauseButtonClick;
+            _button.style.display = DisplayStyle.Flex;
+        }
     }
 
-    private void OnPauseButtonClick(ClickEvent evt)
+    private void OnPauseButtonClick()
     {
-        Debug.Log("Pause Button Clicked!");
-        // Pause game logic
+        if (pauseMenuUI != null)
+        {
+            pauseMenuUI.Show();
+        }
     }
 
+    /// <summary>
+    /// Updates the health label in the HUD.
+    /// </summary>
+    /// <param name="health">Current player health.</param>
     public void UpdateHealth(int health)
     {
         var root = GetComponent<UIDocument>().rootVisualElement;

@@ -60,3 +60,9 @@
     -unity-text-align: middle-center;
     -unity-user-interaction: none;
 }
+
+.hud-pause-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
