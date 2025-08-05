@@ -74,9 +74,8 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
         if (securityBadgeSpawner)
         {
-            if (initialBadge != null)
-                Destroy(initialBadge.gameObject);
-            initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
+            if (initialBadge == null)
+                initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
         }
     }
 
@@ -180,6 +179,8 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
         if (dropContainer != null)
             initialBadge.transform.SetParent(dropContainer, true);
+
+        initialBadge = null;
     }
 
     public void OnBadgeStolen(GameObject player)
