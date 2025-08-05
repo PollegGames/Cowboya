@@ -47,14 +47,13 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
         // Return the stuck enemy to the pool before requesting a respawn.
         ObjectPool.Instance.Release(controller.gameObject);
 
-        if (respawnService != null)
-        {
-            respawnService.RespawnWorker();
-        }
-        else
+        if (respawnService == null)
         {
             Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
+            return;
         }
+
+        respawnService.RespawnWorker();
     }
 
     /// <summary>
@@ -68,14 +67,13 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
         // Return the stuck boss to the pool before requesting a respawn.
         ObjectPool.Instance.Release(controller.gameObject);
 
-        if (respawnService != null)
-        {
-            respawnService.RespawnBoss();
-        }
-        else
+        if (respawnService == null)
         {
             Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
+            return;
         }
+
+        respawnService.RespawnBoss();
     }
 
     /// <summary>
