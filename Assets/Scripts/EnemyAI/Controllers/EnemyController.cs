@@ -72,10 +72,9 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         memory.SetRespawnService(respawnService);
         this.dropContainer = dropContainer;
 
-        if (securityBadgeSpawner)
+        if (securityBadgeSpawner && initialBadge == null)
         {
-            if (initialBadge == null)
-                initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
+            initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
         }
     }
 
@@ -178,8 +177,9 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         initialBadge.OnRelease(Vector2.zero);
 
         if (dropContainer != null)
+        {
             initialBadge.transform.SetParent(dropContainer, true);
-
+        }
         initialBadge = null;
     }
 
