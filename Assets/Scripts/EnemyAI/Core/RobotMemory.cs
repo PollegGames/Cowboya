@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Stores information remembered by the enemy such as the last known player position and received attacks.
 /// </summary>
-public class RobotMemory : MonoBehaviour, IRobotMemory
+public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
 {
     [Header("Player Memory")]
     public Vector3 LastKnownPlayerPosition { get; private set; }
@@ -113,5 +113,28 @@ public class RobotMemory : MonoBehaviour, IRobotMemory
     {
         WasRecentlyAttacked = false;
         TimeSinceLastAttack = 0f;
+    }
+
+    /// <summary>
+    /// Called when the object is released back to the pool.
+    /// </summary>
+    public void OnReleaseToPool()
+    {
+        ClearPlayerPosition();
+        ResetAttackMemory();
+        LastVisitedPoint = null;
+        respawnService = null;
+    }
+
+    /// <summary>
+    /// Called when the object is taken from the pool.
+    /// </summary>
+    public void OnAcquireFromPool()
+    {
+        TimeSincePlayerLastSeen = 0f;
+        TimeSinceLastAttack = 0f;
+
+        if (respawnService == null)
+            respawnService = GetComponent<IRobotRespawnService>();
     }
 }
