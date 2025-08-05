@@ -205,6 +205,7 @@
     <Compile Include="Assets\Scripts\UI\MessageSystem\MessageSpeaker.cs" />
     <Compile Include="Assets\Scripts\Player\Data\PlayerSaveService.cs" />
     <Compile Include="Assets\Scripts\Navigation\UsageType.cs" />
+    <Compile Include="Assets\Scripts\UI\PauseController.CS" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Idle.cs" />
     <Compile Include="Assets\Scripts\Game\LevelEndTrigger.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Follower.cs" />
@@ -248,7 +249,6 @@
     <Compile Include="Assets\Scripts\Managers\InterestPointManager.cs" />
     <Compile Include="Assets\Scripts\Robots\Module.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_FleePlayer.cs" />
-    <Compile Include="Assets\Scripts\Game\GameHUDEvents.cs" />
     <Compile Include="Assets\Scripts\Robots\IKController.cs" />
     <Compile Include="Assets\Scripts\Ally\Controllers\AllyWorkerController.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRoomProcessor.cs" />
@@ -279,6 +279,7 @@
     <Compile Include="Assets\Scripts\Robots\AlternatingPunchAttack.cs" />
     <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
+    <Compile Include="Assets\Scripts\UI\PauseMenuUI.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IEnemiesSpawner.cs" />
   </ItemGroup>
   <ItemGroup>

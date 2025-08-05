@@ -16,6 +16,11 @@ public class GameUIViewModel : MonoBehaviour
     [SerializeField] private RenderTexture miniMapRT;
     private VisualElement previewVE;      // <VisualElement name="preview">
 
+    [Header("PAUSE MENU")]
+    [Tooltip("Drag your PauseMenuPrefab asset here")]
+    [SerializeField] private GameObject pauseMenuPrefab;
+
+    private PauseMenuUI _pauseMenuUI;  // runtime instance
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
@@ -29,7 +34,33 @@ public class GameUIViewModel : MonoBehaviour
         }
         service.Initialize(ui);
 
-        // hudMiniMap = GetComponentInChildren<HUDMiniMap>(true);
+          // 2) Instantiate the Pause‐Menu prefab under this GameObject
+        if (pauseMenuPrefab != null)
+        {
+            var go = Instantiate(pauseMenuPrefab, transform);
+            _pauseMenuUI = go.GetComponent<PauseMenuUI>();
+            if (_pauseMenuUI == null)
+                Debug.LogError("PauseMenuPrefab is missing a PauseMenuUI component!");
+
+            // ensure it starts hidden
+            _pauseMenuUI.Hide();
+        }
+        else
+        {
+            Debug.LogError("GameUIViewModel: pauseMenuPrefab not assigned in inspector!");
+        }
+
+        
+        // 3) Wire the pause button in your HUD to open it
+        var pauseButton = ui.Q<Button>("pauseButton");
+        if (pauseButton != null && _pauseMenuUI != null)
+        {
+            pauseButton.clicked += () => _pauseMenuUI.Show();
+        }
+        else if (pauseButton == null)
+        {
+            Debug.LogWarning("GameUIViewModel: pauseButton not found in UXML!");
+        }
     }
     private void Start()
     {

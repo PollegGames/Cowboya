@@ -52,10 +52,10 @@
         <engine:VisualElement style="flex-grow: 1; align-items: flex-start; justify-content: flex-end;">
             <engine:VisualElement name="miniMapPreview" class="grid-preview" style="height: 134px; width: 442px; margin-top: 0;" />
         </engine:VisualElement>
-<engine:VisualElement style="position: absolute; bottom: 10px; width: 100%; justify-content: center; align-items: center; display: flex;">
-        <engine:Label name="GameMessageLabel" style="background-color: rgba(0,0,0,0.6); color: white; padding: 5px; unity-font-style: bold; display: none;" />
-</engine:VisualElement>
+        <engine:VisualElement style="position: absolute; bottom: 10px; width: 100%; justify-content: center; align-items: center; display: flex;">
+            <engine:Label name="GameMessageLabel" style="background-color: rgba(0, 0, 0, 0.6); color: white; padding: 5px; unity-font-style: bold; display: none;" />
+        </engine:VisualElement>
         <engine:Label name="moralityLabel" text="Morality: 0" style="position: absolute; top: 10px; right: 10px;" />
-        <engine:Button name="pauseButton" text="Pause" class="hud-pause-button" />
+        <engine:Button name="pauseButton" text="Pause" class="hud-pause-button" style="top: 115px; left: 12px;" />
     </engine:VisualElement>
 </engine:UXML>

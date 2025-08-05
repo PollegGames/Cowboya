@@ -1,80 +1,32 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+[RequireComponent(typeof(UIDocument))]
 public class PauseMenuUI : MonoBehaviour
 {
-    private UIDocument document;
-    private VisualElement root;
-    private Button resumeButton;
-    private Button restartButton;
-    private Button mainMenuButton;
-    private void Awake()
+    public event Action OnResumeClicked;
+    public event Action OnRestartClicked;
+    public event Action OnMainMenuClicked;
+
+    [SerializeField] VisualTreeAsset _layout;  // drag in your UXML asset
+
+    UIDocument _uiDoc;
+    VisualElement _root;
+
+    void Awake()
     {
-        document = GetComponent<UIDocument>();
-        if (document == null)
-        {
-            document = gameObject.AddComponent<UIDocument>();
-            var tree = Resources.Load<VisualTreeAsset>("UI/PauseMenu");
-            if (tree != null)
-            {
-                document.visualTreeAsset = tree;
-            }
-        }
+        _uiDoc = GetComponent<UIDocument>();
+        _uiDoc.visualTreeAsset = _layout;
+        _root = _uiDoc.rootVisualElement;
+
+        _root.Q<Button>("resumeButton").clicked        += () => OnResumeClicked?.Invoke();
+        _root.Q<Button>("restartButton").clicked       += () => OnRestartClicked?.Invoke();
+        _root.Q<Button>("mainMenuButton").clicked      += () => OnMainMenuClicked?.Invoke();
+
+        gameObject.SetActive(false);  // hide at start
     }
 
-    private void OnEnable()
-    {
-        root = document.rootVisualElement;
-
-        resumeButton = root.Q<Button>("resumeButton");
-        restartButton = root.Q<Button>("restartButton");
-        mainMenuButton = root.Q<Button>("mainMenuButton");
-
-        if (resumeButton != null)
-        {
-            resumeButton.clicked += Hide;
-        }
-
-        if (restartButton != null)
-        {
-            restartButton.clicked += OnRestart;
-        }
-
-        if (mainMenuButton != null)
-        {
-            mainMenuButton.clicked += OnMainMenu;
-        }
-
-        Hide();
-    }
-
-    /// <summary>
-    /// Shows the pause menu and pauses the game.
-    /// </summary>
-    public void Show()
-    {
-        Time.timeScale = 0f;
-        root.style.display = DisplayStyle.Flex;
-    }
-
-    /// <summary>
-    /// Hides the pause menu and resumes the game.
-    /// </summary>
-    public void Hide()
-    {
-        Time.timeScale = 1f;
-        root.style.display = DisplayStyle.None;
-    }
-
-    private void OnRestart()
-    {
-        Time.timeScale = 1f;
-        RunProgressManager.Instance.RestartRun();
-    }
-
-    private void OnMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneController.instance.LoadScene("MenuScene");
-    }
+    public void Show()  => gameObject.SetActive(true);
+    public void Hide()  => gameObject.SetActive(false);
 }

@@ -76,6 +76,7 @@
     <Compile Include="Assets\Editor\UnitTests\PickupBoxTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\ICellProcessorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\CellPropertiesTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\EnemyFollowerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityMachineTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\IRobotNavigationListenerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\MapManagerTests.cs" />
