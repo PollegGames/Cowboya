@@ -12,11 +12,42 @@ public class JointBreaker : MonoBehaviour
     [Header("IK Solvers (Hinge2DIkSolver)")]
     public List<Hinge2DIkSolver> ikSolvers = new List<Hinge2DIkSolver>();
 
+    private class JointInfo
+    {
+        public GameObject owner;
+        public System.Type type;
+        public Rigidbody2D connectedBody;
+        public Vector2 anchor;
+        public Vector2 connectedAnchor;
+        public float breakForce;
+        public float breakTorque;
+        public bool enableCollision;
+        public bool autoConfigure;
+    }
+
+    private readonly List<JointInfo> jointInfos = new();
+
     private void Awake()
     {
         hingeJoints.AddRange(GetComponentsInChildren<HingeJoint2D>());
         fixedJoints.AddRange(GetComponentsInChildren<FixedJoint2D>());
         ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
+
+        foreach (var joint in GetComponentsInChildren<Joint2D>(true))
+        {
+            jointInfos.Add(new JointInfo
+            {
+                owner = joint.gameObject,
+                type = joint.GetType(),
+                connectedBody = joint.connectedBody,
+                anchor = joint.anchor,
+                connectedAnchor = joint.connectedAnchor,
+                breakForce = joint.breakForce,
+                breakTorque = joint.breakTorque,
+                enableCollision = joint.enableCollision,
+                autoConfigure = joint.autoConfigureConnectedAnchor
+            });
+        }
     }
 
     public void BreakAll()
@@ -48,5 +79,38 @@ public class JointBreaker : MonoBehaviour
     {
         foreach (var solver in ikSolvers)
             if (solver != null) solver.enabled = false;
+    }
+
+    /// <summary>
+    /// Restores all cached joints and re-enables any IK solvers.
+    /// </summary>
+    public void RestoreAll()
+    {
+        foreach (var info in jointInfos)
+        {
+            var component = info.owner.GetComponent(info.type);
+            Joint2D joint = component as Joint2D;
+            if (joint == null)
+                joint = info.owner.AddComponent(info.type) as Joint2D;
+            if (joint == null)
+                continue;
+            joint.connectedBody = info.connectedBody;
+            joint.anchor = info.anchor;
+            joint.connectedAnchor = info.connectedAnchor;
+            joint.breakForce = info.breakForce;
+            joint.breakTorque = info.breakTorque;
+            joint.enableCollision = info.enableCollision;
+            joint.autoConfigureConnectedAnchor = info.autoConfigure;
+        }
+
+        hingeJoints.Clear();
+        hingeJoints.AddRange(GetComponentsInChildren<HingeJoint2D>());
+        fixedJoints.Clear();
+        fixedJoints.AddRange(GetComponentsInChildren<FixedJoint2D>());
+        ikSolvers.Clear();
+        ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
+
+        foreach (var solver in ikSolvers)
+            if (solver != null) solver.enabled = true;
     }
 }
