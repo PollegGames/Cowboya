@@ -43,9 +43,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11a3baf3eb23ca54e82c39fbfbaf8f50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pauseUI: {fileID: 2580033757185065761}
+  m_Name:
+  m_EditorClassIdentifier:
+  _pauseUI: {fileID: 1831295359042944449, guid: d368ac34b09ee444d962a80928479dc7, type: 3}
   _pauseActionRef: {fileID: -29903817121712707, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   sceneControllerPrefab: {fileID: 5063093597393919596, guid: 3bf2939990ae2ab4f91281497ab365f7, type: 3}
 --- !u!1 &7155699494083347933
