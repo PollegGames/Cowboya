@@ -12,10 +12,7 @@ public class HealthBot : MonoBehaviour
         Debug.Log("HealthBot: Health changed by " + damage);
         OnHealthChanged?.Invoke(-damage);
         damageFeedback.Flash();
-        if(memory != null)
-        {
-            memory.RegisterAttack();
-        }
+        memory.RegisterAttack();
     }
 
 

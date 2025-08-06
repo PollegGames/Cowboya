@@ -17,8 +17,13 @@ public class GameUIViewModel : MonoBehaviour
     private VisualElement previewVE;      // <VisualElement name="preview">
 
     [Header("PAUSE MENU")]
-    private PauseController _pause; 
 
+    private Button pauseButton;
+    private Button resumeButton;
+    private Button restartButton;
+    private Button mainMenuButton;
+
+    private bool isPaused = false;
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
@@ -32,17 +37,62 @@ public class GameUIViewModel : MonoBehaviour
         }
         service.Initialize(ui);
 
-          // 1) find the PauseManager that’s already in the scene
-        _pause = FindObjectOfType<PauseController>(includeInactive: true);
-        if (_pause == null)
-            Debug.LogError("No PauseController found. Drag the PauseManager prefab into the scene!");
-        // 2) wire the HUD button
-        var pauseButton = ui.Q<Button>("pauseButton");
+        pauseButton = ui.Q<Button>("pauseButton");
+        resumeButton = ui.Q<Button>("resumeButton");
+        restartButton = ui.Q<Button>("restartButton");
+        mainMenuButton = ui.Q<Button>("mainMenuButton");
+
+        pauseButton.clicked += PauseGame;
+        resumeButton.clicked += ResumeGame;
+        restartButton.clicked += RestartGame;
+        mainMenuButton.clicked += GoToMainMenu;
+        // Initially, Resume/Restart/MainMenu hidden, Pause visible
+        SetPauseButtonsVisible(false);
+
+    }
+
+    void PauseGame()
+    {
+        Debug.Log("Pause clicked");
+        Time.timeScale = 0;
+        isPaused = true;
+        SetPauseButtonsVisible(true);
+    }
+
+    void ResumeGame()
+    {
+        Debug.Log("Resume clicked");
+        Time.timeScale = 1;
+        isPaused = false;
+        SetPauseButtonsVisible(false);
+    }
+
+    void RestartGame()
+    {
+        Debug.Log("Restart clicked");
+        Time.timeScale = 1;
+        RunProgressManager.Instance?.RestartRun();
+    }
+    void GoToMainMenu()
+    {
+        Debug.Log("MainMenu clicked");
+        Time.timeScale = 1;
+        SceneController.instance?.LoadScene("MenuScene");
+    }
+
+    void SetPauseButtonsVisible(bool visible)
+    {
+        if (resumeButton != null)
+            resumeButton.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (restartButton != null)
+            restartButton.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (mainMenuButton != null)
+            mainMenuButton.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+
         if (pauseButton != null)
-            pauseButton.clicked += () => _pause?.TogglePause();
-        else
-            Debug.LogWarning("pauseButton not found in UXML.");
-  
+            pauseButton.style.display = visible ? DisplayStyle.None : DisplayStyle.Flex;
     }
     private void Start()
     {

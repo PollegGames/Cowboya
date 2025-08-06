@@ -309,8 +309,8 @@ MonoBehaviour:
   healthBot: {fileID: 2375878962877187776}
   Stats:
     RobotName: Worker
-    MaxHealth: 10
-    CurrentHealth: 10
+    MaxHealth: 30
+    CurrentHealth: 30
     MaxEnergy: 10
     CurrentEnergy: 10
     AttackEnergyCost: 5
@@ -334,7 +334,6 @@ MonoBehaviour:
   points: {fileID: 7353721863927515775}
   poles: {fileID: 5653714254752795455}
   legJointLimiter: {fileID: 6927027784846965603}
-  bodyJointLimiter: {fileID: 0}
   stateMachine: {fileID: 9201182588516880390}
   memoryComponent: {fileID: 8505160515933744807}
   robotBehaviour: {fileID: 340242974285803334}
@@ -447,7 +446,6 @@ MonoBehaviour:
   points: {fileID: 7353721863927515775}
   poles: {fileID: 5653714254752795455}
   legJointLimiter: {fileID: 6927027784846965603}
-  bodyJointLimiter: {fileID: 0}
   arrivalThresholdX: 2
   arrivalThresholdY: 2
   deadZoneX: 5

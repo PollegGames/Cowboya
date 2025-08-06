@@ -16,5 +16,4 @@ public class SceneBootstrapConfigSO : ScriptableObject
     public PlayerSaveService saveServicePrefab;
     public RunMapConfigSO mapConfig;
     public RunProgressManager runProgressManagerPrefab;
-    public PauseController pauseControllerPrefab;
 }

@@ -123,7 +123,6 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\Shapes2D\Shaders\Shape.shader" />
-    <None Include="Assets\Resources\Prefabs\UI\PauseMenu.uss" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\UI Toolkit\MenuButtonsTemplate.uxml" />
     <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
@@ -142,7 +141,6 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\Shapes2D\Shaders\Polygon.cginc" />
-    <None Include="Assets\Resources\Prefabs\UI\PauseMenu.uxml" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Shapes2D\changelog.txt" />
     <None Include="Assets\UI Toolkit\MainMenuStyle.uss" />

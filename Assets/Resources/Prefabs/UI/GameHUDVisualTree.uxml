@@ -1,5 +1,10 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Resources/UI/GameUIStyles.uss?fileID=7433441132597879392&amp;guid=183c87636ad119f469e7c4126c120d04&amp;type=3#GameUIStyles" />
+    <Style src="project://database/Assets/Resources/Prefabs/UI/GameUIStyles.uss?fileID=7433441132597879392&amp;guid=183c87636ad119f469e7c4126c120d04&amp;type=3#GameUIStyles" />
+    <engine:VisualElement name="PauseMenu" enabled="true" style="height: 200px; width: 1180px; margin-left: 54px; background-color: rgba(0, 0, 0, 0.68); overflow: visible; visibility: visible; align-items: stretch;">
+        <engine:Button name="resumeButton" text="Resume" class="pause-button" />
+        <engine:Button name="restartButton" text="Restart" class="pause-button" />
+        <engine:Button name="mainMenuButton" text="Main Menu" class="pause-button" />
+    </engine:VisualElement>
     <engine:VisualElement name="VisualElement" style="flex-direction: column; flex-grow: 1; padding: 10px; justify-content: flex-start;">
         <engine:VisualElement style="flex-grow: 1; width: auto; height: auto; flex-direction: row;">
             <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 89px; margin-left: 0; flex-direction: column;">
@@ -48,6 +53,9 @@
                 </EnergyBar>
                 <engine:Label name="energyValueLabel" text="0" class="energy-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute;" />
             </engine:VisualElement>
+            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 186px; justify-content: flex-end; margin-bottom: 0; height: 81px; margin-left: 0; align-items: flex-start; align-self: auto; align-content: flex-start;">
+                <engine:Button name="pauseButton" text="Pause" style="top: 127px; left: 47px;" />
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement style="flex-grow: 1; align-items: flex-start; justify-content: flex-end;">
             <engine:VisualElement name="miniMapPreview" class="grid-preview" style="height: 134px; width: 442px; margin-top: 0;" />
@@ -56,6 +64,5 @@
             <engine:Label name="GameMessageLabel" style="background-color: rgba(0, 0, 0, 0.6); color: white; padding: 5px; unity-font-style: bold; display: none;" />
         </engine:VisualElement>
         <engine:Label name="moralityLabel" text="Morality: 0" style="position: absolute; top: 10px; right: 10px;" />
-        <engine:Button name="pauseButton" text="Pause" class="hud-pause-button" style="top: 115px; left: 12px;" />
     </engine:VisualElement>
 </engine:UXML>

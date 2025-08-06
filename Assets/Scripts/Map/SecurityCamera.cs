@@ -138,6 +138,22 @@ public class SecurityCamera : MonoBehaviour
                     factoryAlarm.LastPlayerPosition = memory.LastKnownPlayerPosition;
                 }
             }
+
+             // 3) Try get the EnemyWorkerController (and its memory) from this collider
+            var ewc = enemyCollider.GetComponentInParent<EnemyWorkerController>();
+            if (ewc != null)
+            {
+                var mem = ewc.GetComponent<IRobotMemory>();
+                if (mem != null && !enemiesInZone.Contains(mem))
+                    enemiesInZone.Add(mem);
+                var memory = ewc.memory;
+                if (memory != null && memory.WasRecentlyAttacked)
+                {
+                    // 3) If they were recently attacked, raise the alarm
+                    factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
+                    factoryAlarm.LastPlayerPosition = memory.LastKnownPlayerPosition;
+                }
+            }
         }
     }
 

@@ -14,12 +14,6 @@ public class SceneBootstrapper : MonoBehaviour
             return;
         }
 
-        if (PauseController.Instance == null)
-        {
-            Instantiate(config.pauseControllerPrefab);
-        }
-
-        
         if (RunProgressManager.Instance == null)
         {
             Instantiate(config.runProgressManagerPrefab);

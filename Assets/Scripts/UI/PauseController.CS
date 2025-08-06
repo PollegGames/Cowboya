@@ -10,14 +10,8 @@ public class PauseController : MonoBehaviour
     [SerializeField] private PauseMenuUI _pauseUI;          // assigné dans l’inspecteur
     [SerializeField] private InputActionReference _pauseActionRef;
     [SerializeField] private GameObject sceneControllerPrefab;
-    [SerializeField] VisualTreeAsset layout;  // drag in your UXML asset
-
     private InputAction _pauseAction;
     private bool _isPaused;
-    private VisualElement _root;
-    private Button _resumeBtn;
-    private Button _restartBtn;
-    private Button _mainMenuBtn;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -30,33 +24,17 @@ public class PauseController : MonoBehaviour
 
         if (SceneController.instance == null && sceneControllerPrefab)
             Instantiate(sceneControllerPrefab);
-    }
 
-    private void OnEnable()
-    {
-        if (_pauseActionRef == null)
-        {
-            Debug.LogError("PauseController: Pause action reference is missing.");
-            enabled = false;
-            return;
-        }
 
         _pauseAction = _pauseActionRef.action;
         _pauseAction.performed += OnPausePerformed;
         _pauseAction.Enable();
 
-        if (_pauseUI == null)
-        {
-            Debug.LogError("PauseController: PauseMenuUI reference is missing.");
-            return;
-        }
-
         _pauseUI.OnResumeClicked += TogglePause;
-        _pauseUI.OnRestartClicked += RestartRun;
-        _pauseUI.OnMainMenuClicked += GoToMainMenu;
     }
 
-    private void OnDisable()
+
+    private void OnDestroy()
     {
         if (_pauseAction != null)
         {
@@ -64,26 +42,17 @@ public class PauseController : MonoBehaviour
             _pauseAction.Disable();
         }
 
-        if (_pauseUI != null)
-        {
-            _pauseUI.OnResumeClicked -= TogglePause;
-            _pauseUI.OnRestartClicked -= RestartRun;
-            _pauseUI.OnMainMenuClicked -= GoToMainMenu;
-        }
-    }
-
-    private void OnDestroy() => OnDisable();   // même nettoyage
+        _pauseUI.OnResumeClicked -= TogglePause;
+        _pauseUI.OnRestartClicked -= RestartRun;
+        _pauseUI.OnMainMenuClicked -= GoToMainMenu;
+    }   
 
     private void OnPausePerformed(InputAction.CallbackContext _) => TogglePause();
 
     public void TogglePause()
     {
         _isPaused = !_isPaused;
-        Time.timeScale = _isPaused ? 0 : 1;
-
-        if (_pauseUI == null)
-            return;
-
+        // Time.timeScale = _isPaused ? 0 : 1;
         if (_isPaused)
             _pauseUI.Show();
         else
@@ -93,14 +62,14 @@ public class PauseController : MonoBehaviour
     private void RestartRun()
     {
         Debug.Log("PauseController: RestartRun called");
-        Time.timeScale = 1;
+        // Time.timeScale = 1;
         RunProgressManager.Instance.RestartRun();
     }
 
     private void GoToMainMenu()
     {
         Debug.Log("PauseController: GoToMainMenu called");
-        Time.timeScale = 1;
+        // Time.timeScale = 1;
         SceneController.instance.LoadScene("MenuScene");
     }
 }

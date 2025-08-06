@@ -3934,15 +3934,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -13.87
+      value: 1.97
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.01
+      value: 0.001
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.2
+      value: -0.05
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3972,6 +3972,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2560296908871061512, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: roomManager
+      value: 
+      objectReference: {fileID: 187235412449160675}
     - target: {fileID: 2724071842710282757, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_Name
       value: SecurityAlarm
@@ -3980,6 +3984,10 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
+    - target: {fileID: 3106291535013044476, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: targetRenderer
+      value: 
+      objectReference: {fileID: 99761916109582988}
     - target: {fileID: 3567484892239371285, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -3989,6 +3997,10 @@ PrefabInstance:
       value: 35183
       objectReference: {fileID: 0}
     - target: {fileID: 4030321230458249140, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: roomManager
+      value: 
+      objectReference: {fileID: 187235412449160675}
+    - target: {fileID: 4593602661915148328, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
@@ -4017,6 +4029,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+--- !u!23 &99761916109582988 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1958917434060942975, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+  m_PrefabInstance: {fileID: 1895195105079811315}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4233551567923993285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
