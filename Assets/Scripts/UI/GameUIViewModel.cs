@@ -146,16 +146,27 @@ public class GameUIViewModel : MonoBehaviour
 
     public void SetMiniMapTexture(MapManager mapManagerInstance)
     {
+        if (miniMapPreviewInstance != null)
+        {
+            Destroy(miniMapPreviewInstance);
+            miniMapPreviewInstance = null;
+        }
+
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
-
 
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
         {
             cam.orthographic = true;
-            float aspectRatio = (float)miniMapRT.width / miniMapRT.height;
+
+            float aspectRatio = 1f;
+            if (previewVE != null && previewVE.resolvedStyle.height != 0f)
+            {
+                aspectRatio = previewVE.resolvedStyle.width / previewVE.resolvedStyle.height;
+            }
+
             float halfVertSize = worldHeight / 2f;
             float halfHorzSize = (worldWidth / 2f) / aspectRatio;
             float orthoSize = Mathf.Max(halfVertSize, halfHorzSize);
@@ -166,10 +177,8 @@ public class GameUIViewModel : MonoBehaviour
                 worldHeight / 2f,
                 -10f
             );
-
-            // cam.targetTexture = miniMapRT;
         }
-        // 3) Capture en Texture2D via Coroutine
+
         StartCoroutine(CaptureRTToUI());
     }
     private void OnDestroy()
