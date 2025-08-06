@@ -111,7 +111,15 @@ public class GameUIViewModel : MonoBehaviour
         if (newState == RobotState.Dead)
         {
             MessageService.Instance?.ShowMessage(GameMessages.System.GameOver);
+            StartCoroutine(LoadSceneAfterDelay());
         }
+    }
+
+    private IEnumerator LoadSceneAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        string targetScene = RunProgressManager.Instance != null ? "GameOverScene" : "MenuScene";
+        SceneController.instance.LoadScene(targetScene);
     }
 
     private void UpdateMoralityLabel()
