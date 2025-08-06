@@ -17,12 +17,40 @@ public class PauseMenuUI : MonoBehaviour
     void Awake()
     {
         _uiDoc = GetComponent<UIDocument>();
+        if (_uiDoc == null)
+        {
+            Debug.LogError("PauseMenuUI: UIDocument component is missing.");
+            enabled = false;
+            return;
+        }
+
+        if (layout == null)
+        {
+            Debug.LogError("PauseMenuUI: Layout is not assigned.");
+            enabled = false;
+            return;
+        }
+
         _uiDoc.visualTreeAsset = layout;
         _root = _uiDoc.rootVisualElement;
 
-        _root.Q<Button>("resumeButton").clicked        += () => OnResumeClicked?.Invoke();
-        _root.Q<Button>("restartButton").clicked       += () => OnRestartClicked?.Invoke();
-        _root.Q<Button>("mainMenuButton").clicked      += () => OnMainMenuClicked?.Invoke();
+        var resumeButton = _root.Q<Button>("resumeButton");
+        if (resumeButton != null)
+            resumeButton.clicked += () => OnResumeClicked?.Invoke();
+        else
+            Debug.LogError("PauseMenuUI: 'resumeButton' not found in layout.");
+
+        var restartButton = _root.Q<Button>("restartButton");
+        if (restartButton != null)
+            restartButton.clicked += () => OnRestartClicked?.Invoke();
+        else
+            Debug.LogError("PauseMenuUI: 'restartButton' not found in layout.");
+
+        var mainMenuButton = _root.Q<Button>("mainMenuButton");
+        if (mainMenuButton != null)
+            mainMenuButton.clicked += () => OnMainMenuClicked?.Invoke();
+        else
+            Debug.LogError("PauseMenuUI: 'mainMenuButton' not found in layout.");
 
         gameObject.SetActive(false);  // hide at start
     }

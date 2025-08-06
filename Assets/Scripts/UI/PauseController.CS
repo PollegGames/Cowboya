@@ -34,9 +34,22 @@ public class PauseController : MonoBehaviour
 
     private void OnEnable()
     {
+        if (_pauseActionRef == null)
+        {
+            Debug.LogError("PauseController: Pause action reference is missing.");
+            enabled = false;
+            return;
+        }
+
         _pauseAction = _pauseActionRef.action;
         _pauseAction.performed += OnPausePerformed;
         _pauseAction.Enable();
+
+        if (_pauseUI == null)
+        {
+            Debug.LogError("PauseController: PauseMenuUI reference is missing.");
+            return;
+        }
 
         _pauseUI.OnResumeClicked += TogglePause;
         _pauseUI.OnRestartClicked += RestartRun;
@@ -51,9 +64,12 @@ public class PauseController : MonoBehaviour
             _pauseAction.Disable();
         }
 
-        _pauseUI.OnResumeClicked -= TogglePause;
-        _pauseUI.OnRestartClicked -= RestartRun;
-        _pauseUI.OnMainMenuClicked -= GoToMainMenu;
+        if (_pauseUI != null)
+        {
+            _pauseUI.OnResumeClicked -= TogglePause;
+            _pauseUI.OnRestartClicked -= RestartRun;
+            _pauseUI.OnMainMenuClicked -= GoToMainMenu;
+        }
     }
 
     private void OnDestroy() => OnDisable();   // même nettoyage
@@ -64,6 +80,9 @@ public class PauseController : MonoBehaviour
     {
         _isPaused = !_isPaused;
         Time.timeScale = _isPaused ? 0 : 1;
+
+        if (_pauseUI == null)
+            return;
 
         if (_isPaused)
             _pauseUI.Show();
