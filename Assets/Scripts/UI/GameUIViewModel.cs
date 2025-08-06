@@ -17,10 +17,8 @@ public class GameUIViewModel : MonoBehaviour
     private VisualElement previewVE;      // <VisualElement name="preview">
 
     [Header("PAUSE MENU")]
-    [Tooltip("Drag your PauseMenuPrefab asset here")]
-    [SerializeField] private GameObject pauseMenuPrefab;
+    private PauseController _pause; 
 
-    private PauseMenuUI _pauseMenuUI;  // runtime instance
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
@@ -34,33 +32,17 @@ public class GameUIViewModel : MonoBehaviour
         }
         service.Initialize(ui);
 
-          // 2) Instantiate the Pause‐Menu prefab under this GameObject
-        if (pauseMenuPrefab != null)
-        {
-            var go = Instantiate(pauseMenuPrefab, transform);
-            _pauseMenuUI = go.GetComponent<PauseMenuUI>();
-            if (_pauseMenuUI == null)
-                Debug.LogError("PauseMenuPrefab is missing a PauseMenuUI component!");
-
-            // ensure it starts hidden
-            _pauseMenuUI.Hide();
-        }
-        else
-        {
-            Debug.LogError("GameUIViewModel: pauseMenuPrefab not assigned in inspector!");
-        }
-
-        
-        // 3) Wire the pause button in your HUD to open it
+          // 1) find the PauseManager that’s already in the scene
+        _pause = FindObjectOfType<PauseController>(includeInactive: true);
+        if (_pause == null)
+            Debug.LogError("No PauseController found. Drag the PauseManager prefab into the scene!");
+        // 2) wire the HUD button
         var pauseButton = ui.Q<Button>("pauseButton");
-        if (pauseButton != null && _pauseMenuUI != null)
-        {
-            pauseButton.clicked += () => _pauseMenuUI.Show();
-        }
-        else if (pauseButton == null)
-        {
-            Debug.LogWarning("GameUIViewModel: pauseButton not found in UXML!");
-        }
+        if (pauseButton != null)
+            pauseButton.clicked += () => _pause?.TogglePause();
+        else
+            Debug.LogWarning("pauseButton not found in UXML.");
+  
     }
     private void Start()
     {

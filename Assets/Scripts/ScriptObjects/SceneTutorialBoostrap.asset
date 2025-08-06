@@ -25,3 +25,4 @@ MonoBehaviour:
   saveServicePrefab: {fileID: 8639871701414128267, guid: 21ef7e4e5e1583347918aa524ea63ead, type: 3}
   mapConfig: {fileID: 11400000, guid: 220ec21f1b0240946830eebd3a0ff311, type: 2}
   runProgressManagerPrefab: {fileID: 1307107713316042782, guid: a61efc6c57537a849ad1aed3eacb0b86, type: 3}
+  pauseControllerPrefab: {fileID: 9026173578920582110, guid: 33642828a4e9c454b8328f1088622cab, type: 3}

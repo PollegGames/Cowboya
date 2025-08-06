@@ -9,15 +9,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7003789679165456134}
-  - component: {fileID: 5036540021398416331}
-  - component: {fileID: 9215687716359409580}
+  - component: {fileID: 8303989005709304732}
+  - component: {fileID: 1831295359042944449}
   m_Layer: 5
   m_Name: PauseMenuPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7003789679165456134
 Transform:
   m_ObjectHideFlags: 0
@@ -33,7 +33,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5036540021398416331
+--- !u!114 &8303989005709304732
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -52,7 +52,7 @@ MonoBehaviour:
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
---- !u!114 &9215687716359409580
+--- !u!114 &1831295359042944449
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -64,4 +64,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fb6ac508b3d49d58d33f13624b2b918, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _layout: {fileID: 9197481963319205126, guid: 6aceac7040db46a5a61c953059cceb41, type: 3}
+  layout: {fileID: 9197481963319205126, guid: 6aceac7040db46a5a61c953059cceb41, type: 3}

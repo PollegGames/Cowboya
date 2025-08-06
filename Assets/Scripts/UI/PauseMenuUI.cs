@@ -9,7 +9,7 @@ public class PauseMenuUI : MonoBehaviour
     public event Action OnRestartClicked;
     public event Action OnMainMenuClicked;
 
-    [SerializeField] VisualTreeAsset _layout;  // drag in your UXML asset
+    [SerializeField] VisualTreeAsset layout;  // drag in your UXML asset
 
     UIDocument _uiDoc;
     VisualElement _root;
@@ -17,7 +17,7 @@ public class PauseMenuUI : MonoBehaviour
     void Awake()
     {
         _uiDoc = GetComponent<UIDocument>();
-        _uiDoc.visualTreeAsset = _layout;
+        _uiDoc.visualTreeAsset = layout;
         _root = _uiDoc.rootVisualElement;
 
         _root.Q<Button>("resumeButton").clicked        += () => OnResumeClicked?.Invoke();
@@ -29,4 +29,5 @@ public class PauseMenuUI : MonoBehaviour
 
     public void Show()  => gameObject.SetActive(true);
     public void Hide()  => gameObject.SetActive(false);
+    public void Toggle() => gameObject.SetActive(!gameObject.activeSelf);
 }
