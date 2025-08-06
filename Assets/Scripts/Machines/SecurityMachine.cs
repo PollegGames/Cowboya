@@ -38,12 +38,12 @@ public class SecurityMachine : BaseMachine
     public override void PowerOff()
     {
         if (!isOn) return;
+        var guard = currentGuard;
+        OnMachineTurningOff?.Invoke(this, guard);
         SendCurrentGuardToRest();
-        OnMachineTurningOff?.Invoke(this, currentGuard);
         base.PowerOff();
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, false);
-        currentGuard = null;
     }
 
     public override void AttachRobot(GameObject robot)
