@@ -4082,20 +4082,24 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 53ec3f936f3b0bf4dba7d803fd9c03a2, type: 2}
     - target: {fileID: 3036150070442820856, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.01
+      value: 2.11
       objectReference: {fileID: 0}
     - target: {fileID: 3036150070442820856, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3036150070442820856, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.14
+      value: -2.55
       objectReference: {fileID: 0}
     - target: {fileID: 3865668901669927916, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 467ce051cbbcd4c48a2b25903b45b7d5, type: 2}
+    - target: {fileID: 4568954887781084499, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
+      propertyPath: roomManager
+      value: 
+      objectReference: {fileID: 187235412449160675}
     - target: {fileID: 5226794923736213634, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_VersionIndex
       value: 16398

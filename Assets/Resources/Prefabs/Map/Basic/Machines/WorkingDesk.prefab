@@ -163,6 +163,7 @@ GameObject:
   - component: {fileID: 7200897456640363171}
   - component: {fileID: 6416570240696173683}
   - component: {fileID: 1403945648289567780}
+  - component: {fileID: 4568954887781084499}
   m_Layer: 0
   m_Name: WorkingDesk
   m_TagString: Untagged
@@ -892,6 +893,24 @@ MonoBehaviour:
   trigger: {fileID: 429215285151596846}
   materialOn: {fileID: 2100000, guid: 467ce051cbbcd4c48a2b25903b45b7d5, type: 2}
   materialOff: {fileID: 2100000, guid: 53ec3f936f3b0bf4dba7d803fd9c03a2, type: 2}
+--- !u!114 &4568954887781084499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542146199199913260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc28e6ac3fe0dc8469bebf1fbf8d73ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  warpFactorX: 0.35
+  maxWarpX: 7.5
+  warpFactorZ: 0.3
+  maxWarpZ: 1.5
+  roomManager: {fileID: 0}
 --- !u!1 &1273394523665273949
 GameObject:
   m_ObjectHideFlags: 0
