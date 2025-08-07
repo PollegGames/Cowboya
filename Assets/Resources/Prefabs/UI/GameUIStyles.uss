@@ -74,6 +74,14 @@
 }
 
 /* 6. Flexible HUD layout classes */
+.hud-panel {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    margin: 0;
+    border-width: 1px;
+    border-color: #555555;
+    border-radius: 6px;
+}
 .hud-root {
     width: 100%;
     height: 100%;
