@@ -226,8 +226,13 @@ public class WaypointService : MonoBehaviour, IWaypointService
             Debug.Log($"[WaypointReservation] Assigned BLOCKED ROOM CENTER '{best.WorldPos}' (count={workSpawnersUsageCounts[best]}).");
             return best;
         }
-
-        return null;
+        Debug.LogWarning("[WaypointReservation] No blocked room center found.");
+        blockedRooms = registry.GetAllWaypoints()
+          .Where(wp => wp.parentRoom.roomProperties.usageType == UsageType.Blocked
+              && wp.type == WaypointType.Center
+              && wp != exclude)
+          .ToList();
+        return blockedRooms.FirstOrDefault();
     }
 
     public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null)

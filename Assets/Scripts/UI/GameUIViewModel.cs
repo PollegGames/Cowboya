@@ -187,27 +187,15 @@ public class GameUIViewModel : MonoBehaviour
 
     public void SetMiniMapTexture(MapManager mapManagerInstance)
     {
-        if (miniMapPreviewInstance != null)
-        {
-            Destroy(miniMapPreviewInstance);
-            miniMapPreviewInstance = null;
-        }
-
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
-
+        
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
         {
             cam.orthographic = true;
-
-            float aspectRatio = 1f;
-            if (previewVE != null && previewVE.resolvedStyle.height != 0f)
-            {
-                aspectRatio = previewVE.resolvedStyle.width / previewVE.resolvedStyle.height;
-            }
-
+            float aspectRatio = (float)miniMapRT.width / miniMapRT.height;
             float halfVertSize = worldHeight / 2f;
             float halfHorzSize = (worldWidth / 2f) / aspectRatio;
             float orthoSize = Mathf.Max(halfVertSize, halfHorzSize);
@@ -218,10 +206,13 @@ public class GameUIViewModel : MonoBehaviour
                 worldHeight / 2f,
                 -10f
             );
-        }
 
+            // cam.targetTexture = miniMapRT;
+        }
+        // 3) Capture en Texture2D via Coroutine
         StartCoroutine(CaptureRTToUI());
     }
+
     private void OnDestroy()
     {
         if (robotBehaviour != null)
@@ -238,7 +229,6 @@ public class GameUIViewModel : MonoBehaviour
     private IEnumerator CaptureRTToUI()
     {
         yield return new WaitForEndOfFrame();
-
         var tex = new Texture2D(miniMapRT.width, miniMapRT.height, TextureFormat.RGBA32, false)
         { filterMode = FilterMode.Point };
 
@@ -247,18 +237,17 @@ public class GameUIViewModel : MonoBehaviour
         tex.ReadPixels(new Rect(0, 0, miniMapRT.width, miniMapRT.height), 0, 0);
         tex.Apply();
         RenderTexture.active = prev;
-        if (previewVE != null)
-        {
-            previewVE.style.backgroundImage = new StyleBackground(tex);
-            previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover);
-            BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
-            previewVE.style.backgroundPositionX = center;
-            previewVE.style.backgroundPositionY = center;
-        }
-        else
-        {
-            Debug.LogError("GameUIViewModel: previewVE is null.");
-        }
+
+        previewVE.style.backgroundImage = new StyleBackground(tex);
+        previewVE.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover);
+        BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
+        previewVE.style.backgroundPositionX = center;
+        previewVE.style.backgroundPositionY = center;
+        float spacing = 5f;
+        previewVE.style.paddingRight = new StyleLength(spacing);
+        previewVE.style.paddingLeft = new StyleLength(spacing);
+        previewVE.style.marginRight = new StyleLength(spacing);
+        previewVE.style.marginLeft = new StyleLength(spacing);
     }
 
 }

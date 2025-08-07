@@ -400,7 +400,6 @@ public class RunSetupManager : MonoBehaviour
     private IEnumerator CaptureRTToUI()
     {
         yield return new WaitForEndOfFrame();
-
         var tex = new Texture2D(miniMapRT.width, miniMapRT.height, TextureFormat.RGBA32, false)
         { filterMode = FilterMode.Point };
 
@@ -419,7 +418,7 @@ public class RunSetupManager : MonoBehaviour
         previewVE.style.paddingRight = new StyleLength(spacing);
         previewVE.style.paddingLeft = new StyleLength(spacing);
         previewVE.style.marginRight = new StyleLength(spacing);
-        previewVE.style.marginLeft = new StyleLength(spacing);   
+        previewVE.style.marginLeft = new StyleLength(spacing);
     }
 
     // =====================================================================

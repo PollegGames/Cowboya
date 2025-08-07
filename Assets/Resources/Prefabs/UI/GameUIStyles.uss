@@ -37,10 +37,12 @@
 
 /* 5. Preview area (the mini-map itself) */
 .grid-preview {
-    background-color: #000000;  /* black for the texture */
-    border-width: 1px;  /* light gray border */
-    border-color: #666666;
-    border-radius: 2px;
+    flex-grow: 1;
+    min-height: 300px;
+    background-color: rgb(42, 42, 42);
+    border-width: 1px;
+    border-color: rgb(58, 58, 58);
+    border-radius: 6px;
 }
 
 /* Numeric label displayed over the health bar */
