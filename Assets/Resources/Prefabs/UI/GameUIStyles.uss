@@ -45,22 +45,18 @@
     border-radius: 6px;
 }
 
-/* Numeric label displayed over the health bar */
-.health-value-label {
+/* Base HUD label styling */
+.hud-label {
+    -unity-font: var(--unity-default-font);
+    font-size: 20px;
     color: white;
-    position: absolute;
-    width: 40px;
-    -unity-text-align: middle-center;
-    -unity-user-interaction: none;
 }
 
-/* Numeric label displayed over the health bar */
-.energy-value-label {
+/* Variant for numeric values */
+.hud-value-label {
+    -unity-font: var(--unity-default-font);
+    font-size: 24px;
     color: white;
-    position: absolute;
-    width: 40px;
-    -unity-text-align: middle-center;
-    -unity-user-interaction: none;
 }
 
 .hud-button {

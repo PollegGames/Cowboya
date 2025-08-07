@@ -7,28 +7,28 @@
     </engine:VisualElement>
     <engine:VisualElement name="GameHUD" class="hud-root" style="flex-direction: column; flex-grow: 1; padding: 10px; justify-content: center; align-items: stretch; align-self: auto; align-content: auto; display: flex;">
         <engine:VisualElement style="flex-grow: 1; width: auto; height: auto; flex-direction: row;">
-            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout scoreboard" style="justify-content: center; margin-bottom: 0; margin-left: 0; flex-direction: column; font-size: 24px; background-color: rgba(236, 236, 236, 0.56);">
+            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout scoreboard" style="justify-content: center; margin-bottom: 0; margin-left: 0; flex-direction: column; background-color: rgba(236, 236, 236, 0.56);">
                 <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout stat-row" style="justify-content: center; margin-bottom: 0; margin-left: 0;">
-                    <engine:IntegerField label="Robots saved" value="42" data-source-path="currentSaved" enabled="true" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false">
+                    <engine:IntegerField label="Robots saved" value="42" data-source-path="currentSaved" enabled="true" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false" class="hud-value-label">
                         <Bindings>
                             <engine:DataBinding property="value" data-source-path="currentSaved" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
                     </engine:IntegerField>
-                    <engine:TextField label="/" placeholder-text="filler text" focusable="false" style="width: 14px;" />
-                    <engine:IntegerField value="42" data-source-path="robotsSavedTarget" enabled="true" focusable="false" select-line-by-triple-click="false" select-word-by-double-click="false" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup">
+                    <engine:Label text="/" class="hud-label" />
+                    <engine:IntegerField value="42" data-source-path="robotsSavedTarget" enabled="true" focusable="false" select-line-by-triple-click="false" select-word-by-double-click="false" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" class="hud-value-label">
                         <Bindings>
                             <engine:DataBinding property="value" data-source-path="robotsSavedTarget" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
                     </engine:IntegerField>
                 </engine:VisualElement>
                 <engine:VisualElement name="VisualElement" enabled="true" class="bars-container horizontal-layout stat-row" style="justify-content: center; margin-bottom: 0; margin-left: 0;">
-                    <engine:IntegerField label="Robots killed" value="42" data-source-path="currentKilled" select-all-on-mouse-up="false" select-all-on-focus="false" select-line-by-triple-click="false" select-word-by-double-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false">
+                    <engine:IntegerField label="Robots killed" value="42" data-source-path="currentKilled" select-all-on-mouse-up="false" select-all-on-focus="false" select-line-by-triple-click="false" select-word-by-double-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false" class="hud-value-label">
                         <Bindings>
                             <engine:DataBinding property="value" data-source-path="currentKilled" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
                     </engine:IntegerField>
-                    <engine:TextField label="/" placeholder-text="filler text" focusable="false" style="width: 14px;" />
-                    <engine:IntegerField value="42" data-source-path="robotsKilledTarget" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false">
+                    <engine:Label text="/" class="hud-label" />
+                    <engine:IntegerField value="42" data-source-path="robotsKilledTarget" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false" class="hud-value-label">
                         <Bindings>
                             <engine:DataBinding property="value" data-source-path="robotsKilledTarget" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
                         </Bindings>
@@ -42,7 +42,7 @@
                         <engine:DataBinding property="maxHealth" data-source-path="robotBehaviour.RobotInfo.MaxHealth" binding-mode="ToTarget" />
                     </Bindings>
                 </HealthBar>
-                <engine:Label name="healthValueLabel" text="0" class="health-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute; margin-left: 2px;" />
+                <engine:Label name="healthValueLabel" text="0" class="hud-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute; margin-left: 2px; -unity-text-align: middle-center; -unity-user-interaction: none;" />
             </engine:VisualElement>
             <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 186px; justify-content: flex-end; margin-bottom: 0; height: 81px; margin-left: 0; align-items: flex-start; align-self: auto; align-content: flex-start;">
                 <EnergyBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar" style="margin-right: 45px;">
@@ -51,13 +51,13 @@
                         <engine:DataBinding property="maxEnergy" data-source-path="robotBehaviour.RobotInfo.MaxEnergy" binding-mode="ToTarget" />
                     </Bindings>
                 </EnergyBar>
-                <engine:Label name="energyValueLabel" text="0" class="energy-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute;" />
+                <engine:Label name="energyValueLabel" text="0" class="hud-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute; -unity-text-align: middle-center; -unity-user-interaction: none;" />
             </engine:VisualElement>
             <engine:VisualElement name="VisualElement" style="width: 163px; justify-content: flex-start; margin-bottom: 0; height: 81px; margin-left: 0; align-items: stretch; align-self: auto; align-content: flex-start; left: 107px;">
                 <engine:Button name="pauseButton" text="Pause" class="hud-button" />
             </engine:VisualElement>
             <engine:VisualElement style="flex-grow: 1; height: 49px; width: 200px; left: 115px;">
-                <engine:Label name="moralityLabel" text="Morality: 0" style="position: absolute; top: 0; right: 0; font-size: 20px; width: auto; background-color: rgba(236, 236, 236, 0.58); left: 147px; bottom: 0;" />
+                <engine:Label name="moralityLabel" text="Morality: 0" class="hud-label" style="position: absolute; top: 0; right: 0; width: auto; background-color: rgba(236, 236, 236, 0.58); left: 147px; bottom: 0;" />
             </engine:VisualElement>
         </engine:VisualElement>
        <engine:VisualElement class="right-panel vertical-layout" style="height: 946px; padding: 0 20px 0 10px; width: 1567px; margin: 29px; align-items: flex-start; justify-content: flex-start;">
