@@ -1,14 +1,14 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/Prefabs/UI/GameUIStyles.uss?fileID=7433441132597879392&amp;guid=183c87636ad119f469e7c4126c120d04&amp;type=3#GameUIStyles" />
-    <engine:VisualElement name="PauseMenu" enabled="true" focusable="false" style="height: 100%; width: 100%; margin-left: 0; background-color: rgba(0, 0, 0, 0.68); overflow: visible; visibility: visible; align-items: center; position: relative; top: 0; left: 0; right: 0; bottom: 0; flex-direction: column; flex-wrap: nowrap; justify-content: space-evenly; align-content: auto; -unity-font-style: bold; font-size: 25px; display: none;">
+    <engine:VisualElement name="PauseMenu" enabled="true" focusable="false" class="pause-menu" style="margin-left: 0; background-color: rgba(0, 0, 0, 0.68); overflow: visible; visibility: visible; align-items: center; position: relative; flex-direction: column; flex-wrap: nowrap; justify-content: space-evenly; align-content: auto; -unity-font-style: bold; font-size: 25px; display: none;">
         <engine:Button name="resumeButton" text="Resume" class="pause-button" style="overflow: visible;" />
         <engine:Button name="restartButton" text="Restart" class="pause-button" style="overflow: visible;" />
         <engine:Button name="mainMenuButton" text="Main Menu" class="pause-button" style="position: relative; overflow: visible;" />
     </engine:VisualElement>
-    <engine:VisualElement name="GameHUD" style="flex-direction: column; flex-grow: 1; padding: 10px; justify-content: center; align-items: stretch; align-self: auto; align-content: auto; top: 0; display: flex;">
+    <engine:VisualElement name="GameHUD" class="hud-root" style="flex-direction: column; flex-grow: 1; padding: 10px; justify-content: center; align-items: stretch; align-self: auto; align-content: auto; display: flex;">
         <engine:VisualElement style="flex-grow: 1; width: auto; height: auto; flex-direction: row;">
-            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 89px; margin-left: 0; flex-direction: column; font-size: 24px; background-color: rgba(236, 236, 236, 0.56);">
-                <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 53px; margin-left: 0;">
+            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout scoreboard" style="justify-content: center; margin-bottom: 0; margin-left: 0; flex-direction: column; font-size: 24px; background-color: rgba(236, 236, 236, 0.56);">
+                <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout stat-row" style="justify-content: center; margin-bottom: 0; margin-left: 0;">
                     <engine:IntegerField label="Robots saved" value="42" data-source-path="currentSaved" enabled="true" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false">
                         <Bindings>
                             <engine:DataBinding property="value" data-source-path="currentSaved" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
@@ -21,7 +21,7 @@
                         </Bindings>
                     </engine:IntegerField>
                 </engine:VisualElement>
-                <engine:VisualElement name="VisualElement" enabled="true" class="bars-container horizontal-layout" style="width: 324px; justify-content: center; margin-bottom: 0; height: 53px; margin-left: 0;">
+                <engine:VisualElement name="VisualElement" enabled="true" class="bars-container horizontal-layout stat-row" style="justify-content: center; margin-bottom: 0; margin-left: 0;">
                     <engine:IntegerField label="Robots killed" value="42" data-source-path="currentKilled" select-all-on-mouse-up="false" select-all-on-focus="false" select-line-by-triple-click="false" select-word-by-double-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false">
                         <Bindings>
                             <engine:DataBinding property="value" data-source-path="currentKilled" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
@@ -61,9 +61,9 @@
             </engine:VisualElement>
         </engine:VisualElement>
        <engine:VisualElement class="right-panel vertical-layout" style="height: 946px; padding: 0 20px 0 10px; width: 1567px; margin: 29px; align-items: flex-start; justify-content: flex-start;">
-            <engine:VisualElement name="miniMapPreview" class="grid-preview" style="height: 710px; width: 1335px; margin-top: 0;" />
+            <engine:VisualElement name="miniMapPreview" class="grid-preview mini-map-preview" style="margin-top: 0;" />
         </engine:VisualElement>
-        <engine:VisualElement style="position: absolute; bottom: 10px; width: 100%; justify-content: center; align-items: center; display: flex;">
+        <engine:VisualElement class="message-container" style="position: absolute; justify-content: center; align-items: center; display: flex;">
             <engine:Label name="GameMessageLabel" style="background-color: rgba(0, 0, 0, 0.6); color: white; padding: 5px; unity-font-style: bold; display: none; font-size: 28px;" />
         </engine:VisualElement>
     </engine:VisualElement>
