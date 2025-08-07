@@ -9,6 +9,7 @@ public class GameUIViewModel : MonoBehaviour
     public VisualElement ui;
     private RobotStateController robotBehaviour;
     [SerializeField] private RunMapConfigSO config;
+    private VisualElement gameHUDContainer;
 
     [Header("UI MINIMAP")]
     [SerializeField] private GameObject miniMapPreviewPrefab; // prefab (MiniMapCamera + MapManager, etc.)
@@ -18,12 +19,12 @@ public class GameUIViewModel : MonoBehaviour
 
     [Header("PAUSE MENU")]
 
+    private VisualElement pauseMenuContainer;
     private Button pauseButton;
     private Button resumeButton;
     private Button restartButton;
     private Button mainMenuButton;
 
-    private bool isPaused = false;
     private void Awake()
     {
         ui = GetComponent<UIDocument>().rootVisualElement;
@@ -37,6 +38,8 @@ public class GameUIViewModel : MonoBehaviour
         }
         service.Initialize(ui);
 
+        pauseMenuContainer = ui.Q<VisualElement>("PauseMenu");
+        gameHUDContainer = ui.Q<VisualElement>("GameHUD");
         pauseButton = ui.Q<Button>("pauseButton");
         resumeButton = ui.Q<Button>("resumeButton");
         restartButton = ui.Q<Button>("restartButton");
@@ -46,25 +49,19 @@ public class GameUIViewModel : MonoBehaviour
         resumeButton.clicked += ResumeGame;
         restartButton.clicked += RestartGame;
         mainMenuButton.clicked += GoToMainMenu;
-        // Initially, Resume/Restart/MainMenu hidden, Pause visible
-        SetPauseButtonsVisible(false);
-
     }
 
     void PauseGame()
     {
-        Debug.Log("Pause clicked");
         Time.timeScale = 0;
-        isPaused = true;
-        SetPauseButtonsVisible(true);
+        SetPauseMenuVisible(true);
     }
 
     void ResumeGame()
     {
         Debug.Log("Resume clicked");
         Time.timeScale = 1;
-        isPaused = false;
-        SetPauseButtonsVisible(false);
+        SetPauseMenuVisible(false);
     }
 
     void RestartGame()
@@ -80,19 +77,23 @@ public class GameUIViewModel : MonoBehaviour
         SceneController.instance?.LoadScene("MenuScene");
     }
 
-    void SetPauseButtonsVisible(bool visible)
+    void SetPauseMenuVisible(bool visible)
     {
-        if (resumeButton != null)
-            resumeButton.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        if (pauseMenuContainer != null)
+        {
+            Debug.Log($"Setting pause menu visibility to {visible}");
+            pauseMenuContainer.style.display = visible
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
 
-        if (restartButton != null)
-            restartButton.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
-
-        if (mainMenuButton != null)
-            mainMenuButton.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
-
-        if (pauseButton != null)
-            pauseButton.style.display = visible ? DisplayStyle.None : DisplayStyle.Flex;
+            gameHUDContainer.style.display = visible
+            ? DisplayStyle.None
+            : DisplayStyle.Flex;
+        }
+        else
+        {
+            Debug.LogError("Pause menu container is null!");
+        }
     }
     private void Start()
     {
