@@ -68,3 +68,57 @@
     top: 10px;
     left: 10px;
 }
+
+/* 6. Flexible HUD layout classes */
+.hud-root {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    padding: 1%;
+}
+
+.pause-menu {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+}
+
+.scoreboard {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: column;
+    flex-basis: 0%;
+}
+
+.stat-row {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: row;
+    flex-basis: 0%;
+}
+
+.mini-map-preview {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0%;
+    flex-direction: column;
+}
+
+.message-container {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 1%;
+    flex-direction: row;
+}
