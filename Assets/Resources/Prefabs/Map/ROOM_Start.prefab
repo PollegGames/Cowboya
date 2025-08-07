@@ -3925,7 +3925,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.6926306
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3979,6 +3979,18 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
+    - target: {fileID: 5712132185743060454, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 7350906139293678865, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: m_VersionIndex
+      value: 16338
+      objectReference: {fileID: 0}
+    - target: {fileID: 8805780950486215985, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: m_VersionIndex
+      value: 16338
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

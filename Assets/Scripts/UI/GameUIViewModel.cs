@@ -165,9 +165,21 @@ public class GameUIViewModel : MonoBehaviour
         if (robotBehaviour != null && robotBehaviour.Stats != null)
         {
             int currentMorality = Mathf.RoundToInt(robotBehaviour.Stats.Morality);
-            ui.Q<Label>("moralityLabel").text = $"Morality: {currentMorality}";
+            var moralityLabel = ui.Q<Label>("moralityLabel");
+            moralityLabel.text = $"Morality: {currentMorality}";
+
+            // Remove color classes before setting the new one
+            moralityLabel.RemoveFromClassList("morality-positive");
+            moralityLabel.RemoveFromClassList("morality-negative");
+
+            if (currentMorality > 0)
+                moralityLabel.AddToClassList("morality-positive");
+            else if (currentMorality < 0)
+                moralityLabel.AddToClassList("morality-negative");
+            // No class for zero; default color from USS
         }
     }
+
     private void UpdateEnergyBar()
     {
         if (robotBehaviour != null && robotBehaviour.Stats != null)
@@ -195,7 +207,7 @@ public class GameUIViewModel : MonoBehaviour
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
-        
+
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
         {

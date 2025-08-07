@@ -1,70 +1,57 @@
-<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/Prefabs/UI/GameUIStyles.uss?fileID=7433441132597879392&amp;guid=183c87636ad119f469e7c4126c120d04&amp;type=3#GameUIStyles" />
-    <engine:VisualElement name="PauseMenu" enabled="true" focusable="false" class="pause-menu hud-panel" style="overflow: visible; visibility: visible; align-items: center; position: relative; flex-direction: column; flex-wrap: nowrap; justify-content: space-evenly; align-content: auto; -unity-font-style: bold; font-size: 25px; display: none;">
+    <engine:VisualElement name="PauseMenu" class="pause-menu" style="display: none;">
         <engine:Button name="resumeButton" text="Resume" class="hud-button" />
         <engine:Button name="restartButton" text="Restart" class="hud-button" />
         <engine:Button name="mainMenuButton" text="Main Menu" class="hud-button" />
     </engine:VisualElement>
-    <engine:VisualElement name="GameHUD" class="hud-root" style="flex-direction: column; flex-grow: 1; padding: 10px; justify-content: center; align-items: stretch; align-self: auto; align-content: auto; display: flex;">
-        <engine:VisualElement style="flex-grow: 1; width: auto; height: auto; flex-direction: row;">
-            <engine:VisualElement name="VisualElement" class="bars-container horizontal-layout scoreboard hud-panel" style="justify-content: center;">
-                <engine:VisualElement name="savedRobotsContainer" class="bars-container horizontal-layout stat-row" style="justify-content: center; margin-bottom: 0; margin-left: 0;">
-                    <engine:IntegerField label="Robots saved" value="42" data-source-path="currentSaved" enabled="true" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false" class="hud-value-label">
-                        <Bindings>
-                            <engine:DataBinding property="value" data-source-path="currentSaved" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
-                        </Bindings>
-                    </engine:IntegerField>
-                    <engine:Label text="/" class="hud-label" />
-                    <engine:IntegerField value="42" data-source-path="robotsSavedTarget" enabled="true" focusable="false" select-line-by-triple-click="false" select-word-by-double-click="false" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" class="hud-value-label">
-                        <Bindings>
-                            <engine:DataBinding property="value" data-source-path="robotsSavedTarget" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
-                        </Bindings>
-                    </engine:IntegerField>
-                </engine:VisualElement>
-                <engine:VisualElement name="killedRobotsContainer" enabled="true" class="bars-container horizontal-layout stat-row" style="justify-content: center; margin-bottom: 0; margin-left: 0;">
-                    <engine:IntegerField label="Robots killed" value="42" data-source-path="currentKilled" select-all-on-mouse-up="false" select-all-on-focus="false" select-line-by-triple-click="false" select-word-by-double-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false" class="hud-value-label">
-                        <Bindings>
-                            <engine:DataBinding property="value" data-source-path="currentKilled" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
-                        </Bindings>
-                    </engine:IntegerField>
-                    <engine:Label text="/" class="hud-label" />
-                    <engine:IntegerField value="42" data-source-path="robotsKilledTarget" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" readonly="true" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" focusable="false" class="hud-value-label">
-                        <Bindings>
-                            <engine:DataBinding property="value" data-source-path="robotsKilledTarget" binding-mode="ToTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" />
-                        </Bindings>
-                    </engine:IntegerField>
-                </engine:VisualElement>
-            </engine:VisualElement>
-            <engine:VisualElement name="healthBarContainer" class="bars-container horizontal-layout" style="width: 211px; justify-content: flex-end; margin-bottom: 0; height: 81px; margin-left: 0; align-items: flex-start; align-self: auto; align-content: flex-start;">
-                <HealthBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar" style="margin-right: 57px;">
+    <engine:VisualElement name="GameHUD" class="hud-root" style="display: flex;">
+        <engine:VisualElement class="hud-topbar">
+            <engine:VisualElement name="VisualElement" class="scoreboard">
+                <engine:Label text="Robots saved:" class="hud-label" />
+                <engine:Label name="robotsSavedValue" text="0" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" data-source-path="currentSaved" class="hud-value-label">
                     <Bindings>
-                        <engine:DataBinding property="currentHealth" data-source-path="robotBehaviour.RobotInfo.CurrentHealth" binding-mode="ToTarget" />
-                        <engine:DataBinding property="maxHealth" data-source-path="robotBehaviour.RobotInfo.MaxHealth" binding-mode="ToTarget" />
+                        <engine:DataBinding property="text" data-source-path="currentSaved" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" binding-mode="ToTarget" />
                     </Bindings>
-                </HealthBar>
-                <engine:Label name="healthValueLabel" text="0" class="hud-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute; margin-left: 2px; -unity-text-align: middle-center; -unity-user-interaction: none;" />
-            </engine:VisualElement>
-            <engine:VisualElement name="energyBarContainer" class="bars-container horizontal-layout" style="width: 186px; justify-content: flex-end; margin-bottom: 0; height: 81px; margin-left: 0; align-items: flex-start; align-self: auto; align-content: flex-start;">
-                <EnergyBar data-source="project://database/Assets/Scripts/ScriptObjects/PlayerV1.asset?fileID=11400000&amp;guid=b07a5fd08e0ce9144996ac8b5fd66cc0&amp;type=2#PlayerV1" data-source-path="RobotGameObjectPrefab" class="statbar" style="margin-right: 45px;">
+                </engine:Label>
+                <engine:Label text="/" class="hud-label" />
+                <engine:Label name="robotsSavedTarget" text="0" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" data-source-path="robotsSavedTarget" class="hud-value-label">
                     <Bindings>
-                        <engine:DataBinding property="currentEnergy" data-source-path="robotBehaviour.RobotInfo.CurrentEnergy" binding-mode="ToTarget" />
-                        <engine:DataBinding property="maxEnergy" data-source-path="robotBehaviour.RobotInfo.MaxEnergy" binding-mode="ToTarget" />
+                        <engine:DataBinding property="text" data-source-path="robotsSavedTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" binding-mode="ToTarget" />
                     </Bindings>
-                </EnergyBar>
-                <engine:Label name="energyValueLabel" text="0" class="hud-value-label" style="overflow: visible; flex-direction: row; align-items: auto; justify-content: flex-start; align-content: stretch; align-self: flex-start; padding-right: -1px; width: 40px; position: absolute; -unity-text-align: middle-center; -unity-user-interaction: none;" />
+                </engine:Label>
+                <engine:Label text="Robots killed:" class="hud-label" />
+                <engine:Label name="robotsKilledValue" text="0" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" data-source-path="currentKilled" class="hud-value-label">
+                    <Bindings>
+                        <engine:DataBinding property="text" data-source-path="currentKilled" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" binding-mode="ToTarget" />
+                    </Bindings>
+                </engine:Label>
+                <engine:Label text="/" class="hud-label" />
+                <engine:Label name="robotsKilledTarget" text="0" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" data-source-path="robotsKilledTarget" class="hud-value-label">
+                    <Bindings>
+                        <engine:DataBinding property="text" data-source-path="robotsKilledTarget" data-source="project://database/Assets/Scripts/ScriptObjects/VictorySetup.asset?fileID=11400000&amp;guid=71f325ff527d30649a5443ec4acf43a7&amp;type=2#VictorySetup" binding-mode="ToTarget" />
+                    </Bindings>
+                </engine:Label>
             </engine:VisualElement>
-            <engine:VisualElement name="pauseButtonContainer" style="width: 163px; justify-content: flex-start; margin-bottom: 0; height: 81px; margin-left: 0; align-items: stretch; align-self: auto; align-content: flex-start; left: 107px;">
-                <engine:Button name="pauseButton" text="Pause" class="hud-button" />
+            <engine:VisualElement class="hud-bar-container">
+                <engine:Label text="Health:" class="hud-label" />
+                <HealthBar name="healthBar" class="statbar" />
+                <engine:Label name="healthValueLabel" text="100" class="hud-value-label" />
             </engine:VisualElement>
-            <engine:VisualElement name="moralityContainer" style="flex-grow: 1; height: 49px; width: 200px; left: 115px;">
-                <engine:Label name="moralityLabel" text="Morality: 0" class="hud-label" style="position: absolute; top: 0; right: 0; width: auto; background-color: rgba(236, 236, 236, 0.58); left: 147px; bottom: 0;" />
+            <engine:VisualElement class="hud-bar-container">
+                <engine:Label text="Energy:" class="hud-label" />
+                <EnergyBar name="energyBar" class="statbar" />
+                <engine:Label name="energyValueLabel" text="100" class="hud-value-label" />
             </engine:VisualElement>
+            <engine:Label name="moralityLabel" text="Morality: 0" class="hud-label morality-group" />
+            <engine:Button name="pauseButton" text="Pause" class="hud-button pause-topright" />
         </engine:VisualElement>
-       <engine:VisualElement class="right-panel vertical-layout hud-panel" style="height: 946px; width: 1567px; align-items: flex-start; justify-content: flex-start;">
-            <engine:VisualElement name="miniMapPreview" class="grid-preview mini-map-preview" style="margin-top: 0;" />
+        <engine:VisualElement class="hud-mainrow">
+            <engine:VisualElement class="gameplaying-area" />
         </engine:VisualElement>
-        <engine:VisualElement class="message-container hud-panel" style="position: absolute; justify-content: center; align-items: center; display: flex;">
-            <engine:Label name="GameMessageLabel" style="background-color: rgba(0, 0, 0, 0.6); color: white; padding: 5px; unity-font-style: bold; display: none; font-size: 28px;" />
+        <engine:VisualElement class="hud-bottom-panel" style="align-self: flex-end;">
+            <engine:VisualElement name="miniMapPreview" class="mini-map-preview" />
+            <engine:Label name="GameMessageLabel" class="message-container" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

@@ -1,136 +1,253 @@
-/* 1. General layout */
-.horizontal-layout {
-    flex-direction: row;
-}
-.vertical-layout {
-    flex-direction: column;
-}
-
-/* 2. Bars container (top centered) */
-.bars-container {
-    height: auto;
-}
-
-/* 3. Style pour .statbar (HealthBar / EnergyBar) */
-.statbar {
-    width: 120px;
-    height: 28px;
-    background-color: #2A2A2A;
-    border-width: 2px;
-    border-color: #555555;
-    border-radius: 6px;
-    margin: 0 6px;      /* some horizontal spacing */
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-/* 4. Style for the mini-map background and border */
-.minibackground {
-    background-color: #1F1F1F;  /* dark gray to separate from the rest */
-    border-width: 1px;  /* subtle border */
-    border-color: #444444;
-    border-radius: 4px;
-    padding: 4px;               /* small padding around the grid */
-    /* align-self: flex-start handled in the UXML */
-}
-
-/* 5. Preview area (the mini-map itself) */
-.grid-preview {
-    flex-grow: 1;
-    min-height: 300px;
-    background-color: rgb(42, 42, 42);
-    border-width: 1px;
-    border-color: rgb(58, 58, 58);
-    border-radius: 6px;
-}
-
-/* Base HUD label styling */
-.hud-label {
-    -unity-font: var(--unity-default-font);
-    font-size: 20px;
-    color: white;
-}
-
-/* Variant for numeric values */
-.hud-value-label {
-    -unity-font: var(--unity-default-font);
-    font-size: 24px;
-    color: white;
-}
-
-.hud-button {
-    -unity-font: var(--unity-default-font);
-    color: white;
-    background-color: #333333;
-    border-color: #555555;
-    border-width: 1px;
-    border-radius: 6px;
-    padding: 4px 8px;
-}
-
-.hud-button:hover {
-    background-color: #555555;
-}
-
-/* 6. Flexible HUD layout classes */
-.hud-panel {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 10px;
-    margin: 0;
-    border-width: 1px;
-    border-color: #555555;
-    border-radius: 6px;
-}
 .hud-root {
     width: 100%;
     height: 100%;
-    flex-grow: 1;
-    flex-shrink: 1;
     flex-direction: column;
-    padding: 1%;
+    display: flex;
+    background-color: rgba(24, 25, 37, 0);
+}
+
+.hud-bottom-panel {
+    width: 100%;
+    min-height: 200px;
+    max-height: 300px;
+    background-color: rgba(35, 38, 58, 0);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 14px 18px 12px 18px;
+    gap: 22px;
+    box-sizing: border-box;
+    align-self: flex-start;
 }
 
 .pause-menu {
     width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    flex-shrink: 1;
+    min-height: 180px;
+    background-color: rgba(34, 49, 102, 0.31);
+    border-radius: 13px;
+    padding: 32px 22px;
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: center;
+}
+
+.bottom-overlay {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 20;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    display: flex;
+}
+
+.hud-topbar {
+    width: 100%;
+    min-height: 54px;
+    background-color: rgb(35, 38, 58);
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 24px;
+    padding-right: 24px;
+    gap: 40px;
+    position: relative;
+}
+
+.hud-topbar > .scoreboard {
+    margin-right: 38px;
+}
+
+.hud-topbar > .hud-bar-container {
+    margin-right: 38px;
+}
+
+.hud-topbar {
+    margin-right: 38px;
+}
+
+.morality-positive {
+    color: rgb(27, 230, 97);
+}
+
+.morality-negative {
+    color: rgb(255, 69, 69);
 }
 
 .scoreboard {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-direction: column;
-    flex-basis: 0%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 }
 
-.stat-row {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    flex-shrink: 1;
+.hud-bar-container {
+    display: flex;
     flex-direction: row;
-    flex-basis: 0%;
+    align-items: center;
+    gap: 6px;
+}
+
+.statbar {
+    width: 88px;
+    height: 14px;
+    background-color: rgb(43, 47, 60);
+    border-radius: 4px;
+    margin-left: 3px;
+    margin-right: 3px;
+    border-width: 1px;
+    border-color: rgb(68, 68, 68);
+}
+
+.hud-mainrow {
+    flex: 1 1 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.gameplaying-area {
+    flex: 1 1 auto;
+    background-color: rgba(0, 0, 0, 0);
+    -unity-background-image-tint-color: rgba(0, 0, 0, 0);
+}
+
+.right-panel {
+    width: 320px;
+    min-width: 180px;
+    background-color: rgb(35, 38, 58);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 16px 12px 0 12px;
+    margin: 12px 0 0 12px;
+    pointer-events: all;
 }
 
 .mini-map-preview {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 0%;
-    flex-direction: column;
+    width: 160px;
+    min-width: 600px;
+    max-width: none;
+    min-height: 200px;
+    height: 80px;
+    background-color: rgb(24, 26, 34);
+    border-width: 2px;
+    border-radius: 12px;
+    border-color: rgb(53, 58, 71);
+    margin-right: 18px;
 }
 
 .message-container {
+    flex: 1 1 auto;
+    min-height: 100px;
+    background-color: rgb(68, 68, 85);
+    color: rgb(255, 255, 255);
+    font-size: 28px;
+    border-radius: 7px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    margin-left: 0;
+    align-content: stretch;
+    align-self: flex-end;
+}
+
+.hud-topbar {
     width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    flex-shrink: 1;
-    padding: 1%;
+    min-height: 54px;
+    background-color: rgb(35, 38, 58);
     flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 24px;
+    padding-right: 24px;
+    gap: 40px;
+    position: relative;
+}
+
+.hud-topbar > .scoreboard {
+    margin-right: 38px;
+}
+
+.hud-topbar > .hud-bar-container {
+    margin-right: 38px;
+}
+
+.hud-topbar {
+    margin-right: 38px;
+}
+
+.scoreboard {
+    width: 350px;           /* Adjust as needed */
+    min-width: 280px;
+    max-width: 420px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+.hud-bar-container {
+    width: 220px;           /* Adjust as needed for bars */
+    min-width: 180px;
+    max-width: 320px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+.hud-label {
+    color: rgb(243, 246, 250);
+    font-size: 17px;
+    width: auto;
+}
+
+.hud-value-label {
+    color: rgb(255, 214, 107);
+    font-size: 19px;
+}
+
+.morality-group {
+    width: 140px;           /* Or just min-width: 80px; if you want it to grow */
+    min-width: 80px;
+    max-width: 180px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #91e6fa;
+    margin-right: 38px;
+    transition: color 0.15s;
+}
+
+.morality-positive {
+    color: rgb(27, 230, 97);
+}
+
+.morality-negative {
+    color: rgb(255, 69, 69);
+}
+
+.pause-topright {
+    margin-left: auto;
+    align-self: flex-start;
+}
+
+.hud-button {
+    background-color: rgb(30, 101, 232);
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    border-radius: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    height: 36px;
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
