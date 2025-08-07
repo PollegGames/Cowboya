@@ -63,10 +63,18 @@
     -unity-user-interaction: none;
 }
 
-.hud-pause-button {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+.hud-button {
+    -unity-font: var(--unity-default-font);
+    color: white;
+    background-color: #333333;
+    border-color: #555555;
+    border-width: 1px;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+.hud-button:hover {
+    background-color: #555555;
 }
 
 /* 6. Flexible HUD layout classes */
