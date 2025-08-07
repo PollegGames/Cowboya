@@ -133,7 +133,6 @@
 .mini-map-preview {
     width: 160px;
     min-width: 600px;
-    max-width: none;
     min-height: 200px;
     height: 80px;
     background-color: rgb(24, 26, 34);

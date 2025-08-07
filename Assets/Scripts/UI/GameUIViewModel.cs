@@ -212,23 +212,23 @@ public class GameUIViewModel : MonoBehaviour
         if (cam != null)
         {
             cam.orthographic = true;
-            float aspectRatio = (float)miniMapRT.width / miniMapRT.height;
-            float halfVertSize = worldHeight / 2f;
-            float halfHorzSize = (worldWidth / 2f) / aspectRatio;
-            float orthoSize = Mathf.Max(halfVertSize, halfHorzSize);
+            float aspect = (float)miniMapRT.width / miniMapRT.height;
+
+            float orthoSizeHeight = worldHeight / 2f;
+            float orthoSizeWidth = worldWidth / (2f * aspect);
+
+            // Use *2 for more padding, or remove *2 for tight fit
+            float orthoSize = Mathf.Max(orthoSizeHeight, orthoSizeWidth) * 2f;
             cam.orthographicSize = orthoSize;
 
-            cam.transform.position = new Vector3(
-                worldWidth / 2f,
-                worldHeight / 2f,
-                -10f
-            );
+            // Center the camera
+            cam.transform.position = new Vector3(worldWidth / 2f, worldHeight / 2f, -10f);
 
-            // cam.targetTexture = miniMapRT;
+            cam.targetTexture = miniMapRT;
         }
-        // 3) Capture en Texture2D via Coroutine
         StartCoroutine(CaptureRTToUI());
     }
+
 
     private void OnDestroy()
     {
@@ -260,11 +260,6 @@ public class GameUIViewModel : MonoBehaviour
         BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
         previewVE.style.backgroundPositionX = center;
         previewVE.style.backgroundPositionY = center;
-        float spacing = 5f;
-        previewVE.style.paddingRight = new StyleLength(spacing);
-        previewVE.style.paddingLeft = new StyleLength(spacing);
-        previewVE.style.marginRight = new StyleLength(spacing);
-        previewVE.style.marginLeft = new StyleLength(spacing);
     }
 
 }
