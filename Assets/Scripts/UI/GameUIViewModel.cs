@@ -45,6 +45,11 @@ public class GameUIViewModel : MonoBehaviour
         restartButton = ui.Q<Button>("restartButton");
         mainMenuButton = ui.Q<Button>("mainMenuButton");
 
+        pauseButton?.AddToClassList("hud-button");
+        resumeButton?.AddToClassList("hud-button");
+        restartButton?.AddToClassList("hud-button");
+        mainMenuButton?.AddToClassList("hud-button");
+
         pauseButton.clicked += PauseGame;
         resumeButton.clicked += ResumeGame;
         restartButton.clicked += RestartGame;
