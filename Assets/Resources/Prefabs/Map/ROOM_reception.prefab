@@ -3445,7 +3445,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.6926306
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2345686358523053622, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3495,6 +3495,10 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
+    - target: {fileID: 5712132185743060454, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.001
+      objectReference: {fileID: 0}
     - target: {fileID: 7350906139293678865, guid: 0945eb9f3de781f41868e779ef0a4fbe, type: 3}
       propertyPath: m_VersionIndex
       value: 16338
@@ -4015,8 +4019,16 @@ PrefabInstance:
       value: RestingDesk
       objectReference: {fileID: 0}
     - target: {fileID: 3036150070442820856, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.94
+      objectReference: {fileID: 0}
+    - target: {fileID: 3036150070442820856, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3036150070442820856, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.27
       objectReference: {fileID: 0}
     - target: {fileID: 5226794923736213634, guid: 70d45b433127c5748ade8b290ea25526, type: 3}
       propertyPath: m_VersionIndex
