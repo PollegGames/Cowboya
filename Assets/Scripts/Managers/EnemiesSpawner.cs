@@ -291,17 +291,33 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         // 2) Pick a random empty position
         Vector3 spawnPos = mapManager.GetRandomEmptyPosition();
         enemyGO.transform.position = spawnPos;
+        
+        // 3) Reset joints and refresh limiters
+        enemyGO.GetComponent<JointBreaker>()?.RestoreAll();
+        var pooled = enemyGO.GetComponent<PooledEnemy>();
+        var bodyLimiter = pooled?.GetComponent<BodyJointLimiter>();
+        if (bodyLimiter != null)
+        {
+            bodyLimiter.RefreshJoints();
+            bodyLimiter.enabled = true;
+        }
+        var legLimiter = pooled?.GetComponent<LegJointLimiter>();
+        if (legLimiter != null)
+        {
+            legLimiter.RefreshJoints();
+            legLimiter.enabled = true;
+        }
 
-        // 3) Activate it
+        // 4) Activate it
         enemyGO.SetActive(true);
 
-        // 4) Initialize its AI (waypoint service, etc.)
+        // 5) Initialize its AI (waypoint service, etc.)
         var ec = enemyGO.GetComponent<EnemyWorkerController>();
         ec.Initialize(waypointService, waypointService, respawnService);
         var guardAI = enemyGO.GetComponent<ReactiveMachineAI>();
         guardAI?.Initialize(waypointService, securityManager);
 
-        // 5) Keep track of it
+        // 6) Keep track of it
         spawnedWorkers.Add(enemyGO);
 
         Debug.Log($"[EnemiesSpawner] Spawned new enemy at {spawnPos}.");
