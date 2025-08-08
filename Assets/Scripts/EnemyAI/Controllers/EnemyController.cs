@@ -221,6 +221,9 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
     /// </summary>
     public void OnAcquireFromPool()
     {
+        var jointBreaker = GetComponent<JointBreaker>();
+        jointBreaker?.RestoreAll();
+
         if (pathFollower == null && waypointQueries != null)
         {
             SetupPathFollower();
