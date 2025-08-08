@@ -166,18 +166,16 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     {
         EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
 
-        var guard = Instantiate(enemyPrefab,
-                Vector3.zero,
-                Quaternion.identity,
-                enemiesParent);
+        var guard = ObjectPool.Instance.Get(enemyPrefab, enemiesParent);
         // Security guard prefabs may omit locomotion.
 
         var robotState = guard.GetComponent<RobotStateController>();
         robotState.Stats = enemyRobotFactory.CreateRobot();
         robotState.Stats.RobotName = "Security Guard";
-        guard.SetActive(false);
 
-        // 3) NOW it’s in the world at the correct spot — initialize its AI
+        guard.transform.position = spawnPos.WorldPos;
+        guard.SetActive(true);
+
         var ec = guard.GetComponent<EnemyController>();
         ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner);
 
