@@ -23,6 +23,7 @@ public class JointBreaker : MonoBehaviour
         public float breakTorque;
         public bool enableCollision;
         public bool autoConfigure;
+        public bool enabled;
     }
 
     private readonly List<JointInfo> jointInfos = new();
@@ -40,9 +41,13 @@ public class JointBreaker : MonoBehaviour
                 owner = joint.gameObject,
                 type = joint.GetType(),
                 connectedBody = joint.connectedBody,
+                anchor = joint.anchor,
+                connectedAnchor = joint.connectedAnchor,
                 breakForce = joint.breakForce,
                 breakTorque = joint.breakTorque,
                 enableCollision = joint.enableCollision,
+                autoConfigure = joint.autoConfigureConnectedAnchor,
+                enabled = joint.enabled,
             });
         }
     }
@@ -92,9 +97,14 @@ public class JointBreaker : MonoBehaviour
             if (joint == null)
                 continue;
             joint.connectedBody = info.connectedBody;
+            joint.anchor = info.anchor;
+            joint.connectedAnchor = info.connectedAnchor;
+            joint.autoConfigureConnectedAnchor = info.autoConfigure;
             joint.breakForce = info.breakForce;
             joint.breakTorque = info.breakTorque;
             joint.enableCollision = info.enableCollision;
+            joint.enabled = info.enabled;
+            joint.enabled = true;
         }
 
         hingeJoints.Clear();
