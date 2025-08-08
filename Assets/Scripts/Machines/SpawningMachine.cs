@@ -28,6 +28,8 @@ public class SpawningMachine : BaseMachine
     protected override void Awake()
     {
         base.Awake();
+        meshRenderer = GetComponent<MeshRenderer>();
+        ApplyMaterial();
     }
 
     private void OnEnable()

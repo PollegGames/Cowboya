@@ -70,7 +70,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     public void CreateEnemies(int enemiesToSpawn)
     {
-        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
+        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory(2);
 
         spawnedEnemies.Clear();
         for (int i = 0; i < enemiesToSpawn; i++)
@@ -87,7 +87,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     }
     public void CreateBoss()
     {
-        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
+        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory(3);
 
         boosInstance = ObjectPool.Instance.Get(bossPrefab, enemiesParent);
         var bossLocomotion = boosInstance.GetComponent<RobotLocomotionController>();
@@ -134,7 +134,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus)
     {
-        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
+        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory(1);
 
         spawnedFollowers.Clear();
 
@@ -164,7 +164,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine)
     {
-        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory();
+        EnemyRobotFactory enemyRobotFactory = new EnemyRobotFactory(2);
 
         var guard = ObjectPool.Instance.Get(enemyPrefab, enemiesParent);
         // Security guard prefabs may omit locomotion.

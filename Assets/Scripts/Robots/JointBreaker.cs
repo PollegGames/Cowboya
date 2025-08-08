@@ -36,19 +36,25 @@ public class JointBreaker : MonoBehaviour
 
         foreach (var joint in GetComponentsInChildren<Joint2D>(true))
         {
-            jointInfos.Add(new JointInfo
+            var info = new JointInfo
             {
                 owner = joint.gameObject,
                 type = joint.GetType(),
                 connectedBody = joint.connectedBody,
-                anchor = joint.anchor,
-                connectedAnchor = joint.connectedAnchor,
                 breakForce = joint.breakForce,
                 breakTorque = joint.breakTorque,
                 enableCollision = joint.enableCollision,
-                autoConfigure = joint.autoConfigureConnectedAnchor,
                 enabled = joint.enabled,
-            });
+            };
+
+            if (joint is AnchoredJoint2D anchored)
+            {
+                info.anchor = anchored.anchor;
+                info.connectedAnchor = anchored.connectedAnchor;
+                info.autoConfigure = anchored.autoConfigureConnectedAnchor;
+            }
+
+            jointInfos.Add(info);
         }
     }
 
@@ -97,9 +103,12 @@ public class JointBreaker : MonoBehaviour
             if (joint == null)
                 continue;
             joint.connectedBody = info.connectedBody;
-            joint.anchor = info.anchor;
-            joint.connectedAnchor = info.connectedAnchor;
-            joint.autoConfigureConnectedAnchor = info.autoConfigure;
+            if (joint is AnchoredJoint2D anchored)
+            {
+                anchored.anchor = info.anchor;
+                anchored.connectedAnchor = info.connectedAnchor;
+                anchored.autoConfigureConnectedAnchor = info.autoConfigure;
+            }
             joint.breakForce = info.breakForce;
             joint.breakTorque = info.breakTorque;
             joint.enableCollision = info.enableCollision;

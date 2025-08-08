@@ -23,7 +23,7 @@ public class AttackHitbox : MonoBehaviour
 
         RobotStateController target = other.GetComponentInParent<RobotStateController>();
         if (target == null || target == attacker)
-            return; // Ignore self or objects without PlayerStateController
+            return; // Ignore self or objects without RobotStateController
 
 
         // Apply damage
@@ -33,7 +33,13 @@ public class AttackHitbox : MonoBehaviour
         Rigidbody2D rb = other.attachedRigidbody;
         if (rb != null)
         {
-            Vector2 direction = (rb.position - (Vector2)transform.position).normalized;
+            // Use the direction from attacker to target (horizontal only if needed)
+            Vector2 attackerPos = attacker.transform.position;
+            Vector2 targetPos = rb.position;
+            Vector2 direction = (targetPos - attackerPos).normalized;
+            // Option: Only push horizontally (ignorer Y si tu veux)
+            direction.y = 0f;
+
             Vector2 forceToApply = new Vector2(direction.x * pushForce.x, pushForce.y);
             rb.AddForce(forceToApply, ForceMode2D.Impulse);
         }
