@@ -17,9 +17,9 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     public bool IsFacingRight => isFacingRight;
 
-    private Vector3 playerBodyReferencePosition;
+    private Transform playerBodyReference;
 
-    public Vector3 PlayerBodyReferencePosition => playerBodyReferencePosition;
+    public Vector3 PlayerBodyReferencePosition => playerBodyReference != null ? playerBodyReference.position : Vector3.zero;
 
     [SerializeField] private RobotMemory memory;
 
@@ -52,8 +52,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             var playerControl = collider.transform.root.GetComponent<PlayerMovementController>();
             if (playerControl != null)
             {
-                playerBodyReferencePosition = playerControl.BodyReference.transform.position;
-                memory.RememberPlayerPosition(playerBodyReferencePosition);
+                playerBodyReference = playerControl.BodyReference;
             }
         }
     }
@@ -61,7 +60,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     private void OnPlayerExitDetectZone()
     {
         // Reset the target position if the player leaves the zone
-        playerBodyReferencePosition = Vector3.zero;
+        playerBodyReference = null;
         memory.ClearPlayerPosition();
     }
 
@@ -85,20 +84,18 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         if (circleCenter == null || mainCamera == null)
             return;
 
-        if (playerBodyReferencePosition != Vector3.zero)
+        if (playerBodyReference != null)
         {
-            // 1. Update the memory with the player's position
-            memory.RememberPlayerPosition(playerBodyReferencePosition);
-            // 2. Calcul direction → position sur le cercle
-            Vector3 direction = (playerBodyReferencePosition - circleCenter.position).normalized;
+            Vector3 playerPosition = playerBodyReference.position;
+            memory.RememberPlayerPosition(playerPosition);
+
+            Vector3 direction = (playerPosition - circleCenter.position).normalized;
             Vector3 targetPos = circleCenter.position + direction * radius;
             transform.position = targetPos;
 
-            // 3. Rotation de la cible vers la souris (optionnel)
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-            // 4. Determine if the target is to the left or right of the player
             isFacingRight = transform.position.x <= circleCenter.position.x;
         }
 
