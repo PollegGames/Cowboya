@@ -165,7 +165,7 @@ public class GameUIViewModel : MonoBehaviour
     private IEnumerator LoadSceneAfterDelay()
     {
         yield return new WaitForSeconds(2f);
-        string targetScene = RunProgressManager.Instance != null ? "GameOverScene" : "MenuScene";
+        string targetScene = RunProgressManager.Instance != null ? "MenuScene" : "MenuScene";
         SceneController.instance.LoadScene(targetScene);
     }
 

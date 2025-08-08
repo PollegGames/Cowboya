@@ -17,10 +17,14 @@ public class HeadTargetController : MonoBehaviour
 
     private float currentBend = 0f;
     private InputSystem_Actions controls;
+    [SerializeField] public bool isPlayerControlled = false;
 
     private void Awake()
     {
-        controls = new InputSystem_Actions();
+        if (isPlayerControlled)
+        {
+            controls = new InputSystem_Actions();
+        }
     }
 
     private void OnEnable() => controls.Enable();

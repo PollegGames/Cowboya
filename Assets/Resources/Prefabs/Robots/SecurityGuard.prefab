@@ -103,7 +103,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7355150681414144440}
   m_Layer: 7
-  m_Name: RighArcPoint
+  m_Name: RightArcPoint
   m_TagString: Enemy
   m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -118,7 +118,7 @@ Transform:
   m_GameObject: {fileID: 368187552794492124}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.33, y: -1.119, z: 0}
+  m_LocalPosition: {x: -3.88, y: -1.245, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -149,7 +149,7 @@ Transform:
   m_GameObject: {fileID: 405258184280334076}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.96, y: -0.992, z: 0.10000001}
+  m_LocalPosition: {x: 1.53, y: -1.202, z: 0.10000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -328,10 +328,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1617637289307301190}
-  pole: {fileID: 8586645231740715026}
+  pole: {fileID: 2473490206524818188}
   chainLength: 2
-  SetForce: 80
-  delta: 0.25
+  SetForce: 100
+  delta: 0.4
   iterations: 10
   poleMinDistance: 1
   SnapStrength: 1
@@ -424,7 +424,7 @@ Transform:
   m_GameObject: {fileID: 1314521456378709308}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.29, y: 0.772, z: 0}
+  m_LocalPosition: {x: -3.95, y: 0.331, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -750,7 +750,7 @@ Transform:
   m_GameObject: {fileID: 1734184027078519700}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.46, y: -0.993, z: 0}
+  m_LocalPosition: {x: 0.584, y: -0.888, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1486,7 +1486,7 @@ Transform:
   m_GameObject: {fileID: 2572806056156882254}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.06, y: -0.989, z: 0.10000001}
+  m_LocalPosition: {x: -1.46, y: -1.24, z: 0.10000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2467,7 +2467,7 @@ Transform:
   m_GameObject: {fileID: 3951084510008059831}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.48, y: -1.164, z: 0}
+  m_LocalPosition: {x: 3.79, y: -1.208, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2898,7 +2898,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7232994655026755534}
   m_Layer: 7
-  m_Name: RighRestPoint
+  m_Name: RightRestPoint
   m_TagString: Enemy
   m_Icon: {fileID: 3306451490063965843, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -2913,7 +2913,7 @@ Transform:
   m_GameObject: {fileID: 4911724116162765009}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.33, y: -0.991, z: 0}
+  m_LocalPosition: {x: -0.56, y: -0.904, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3055,6 +3055,8 @@ GameObject:
   - component: {fileID: 1164607683927206813}
   - component: {fileID: 3392093481179504074}
   - component: {fileID: 5966958589997321214}
+  - component: {fileID: 7393531232669086007}
+  - component: {fileID: 680908383318631440}
   m_Layer: 7
   m_Name: Hips
   m_TagString: Enemy
@@ -3216,6 +3218,46 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.4434905, y: 0.44138008}
   m_EdgeRadius: 0
+--- !u!232 &7393531232669086007
+DistanceJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5616358365190158532}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 5491330495607492068}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_AutoConfigureConnectedAnchor: 0
+  m_Anchor: {x: -0.7176399, y: -0.03021357}
+  m_ConnectedAnchor: {x: -0.6982257, y: -0.26755524}
+  m_AutoConfigureDistance: 0
+  m_Distance: 0.48022753
+  m_MaxDistanceOnly: 0
+--- !u!232 &680908383318631440
+DistanceJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5616358365190158532}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 5491330495607492068}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_AutoConfigureConnectedAnchor: 0
+  m_Anchor: {x: 0.7174027, y: -0.006943725}
+  m_ConnectedAnchor: {x: 0.6688872, y: -0.2745961}
+  m_AutoConfigureDistance: 0
+  m_Distance: 0.462631
+  m_MaxDistanceOnly: 0
 --- !u!1 &5800184205497823839
 GameObject:
   m_ObjectHideFlags: 0
@@ -4151,7 +4193,7 @@ Transform:
   m_GameObject: {fileID: 7504175974217292254}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.98, y: 1.009, z: 0}
+  m_LocalPosition: {x: -3.6400003, y: 0.5679999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4385,6 +4427,7 @@ GameObject:
   - component: {fileID: 4039218795842909479}
   - component: {fileID: 8821255494166107071}
   - component: {fileID: 356648147594604746}
+  - component: {fileID: 765951975251855314}
   m_Layer: 7
   m_Name: SecurityGuard
   m_TagString: Enemy
@@ -4698,6 +4741,22 @@ MonoBehaviour:
   stateMachine: {fileID: 1327797449943358064}
   robotStateController: {fileID: 7891739421741480506}
   jointBreaker: {fileID: 1510882133398777467}
+--- !u!114 &765951975251855314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8465636778725824547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53c1985955a5fb94e9d3fda7246cce67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftLegPole: {fileID: 3402388566589530407}
+  rightLegPole: {fileID: 1834456982871538244}
+  leftArmPole: {fileID: 8586645231740715026}
+  rightArmPole: {fileID: 2473490206524818188}
 --- !u!1 &8491232064010109857
 GameObject:
   m_ObjectHideFlags: 0
@@ -4804,8 +4863,6 @@ GameObject:
   - component: {fileID: 5491330495607492068}
   - component: {fileID: 8873179512446160589}
   - component: {fileID: 5120231806531619291}
-  - component: {fileID: 5679413723893103937}
-  - component: {fileID: 6602836676068229575}
   m_Layer: 7
   m_Name: Torso
   m_TagString: Enemy
@@ -4982,48 +5039,6 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: -10
     m_UpperAngle: 0
---- !u!231 &5679413723893103937
-SpringJoint2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8792262408668882727}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_EnableCollision: 0
-  m_ConnectedRigidBody: {fileID: 3392093481179504074}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_BreakAction: 3
-  m_AutoConfigureConnectedAnchor: 0
-  m_Anchor: {x: -0.69060993, y: -0.29678416}
-  m_ConnectedAnchor: {x: -0.69061005, y: 0.14427029}
-  m_AutoConfigureDistance: 0
-  m_Distance: 0.66
-  m_DampingRatio: 0.3
-  m_Frequency: 1
---- !u!231 &6602836676068229575
-SpringJoint2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8792262408668882727}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_EnableCollision: 0
-  m_ConnectedRigidBody: {fileID: 3392093481179504074}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_BreakAction: 3
-  m_AutoConfigureConnectedAnchor: 0
-  m_Anchor: {x: 0.6796949, y: -0.31327215}
-  m_ConnectedAnchor: {x: 0.6176338, y: 0.14014797}
-  m_AutoConfigureDistance: 0
-  m_Distance: 0.62
-  m_DampingRatio: 0.3
-  m_Frequency: 1
 --- !u!1 &8826883949816225156
 GameObject:
   m_ObjectHideFlags: 0
@@ -5305,10 +5320,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 7808925488993355987}
-  pole: {fileID: 2473490206524818188}
+  pole: {fileID: 8586645231740715026}
   chainLength: 2
-  SetForce: 80
-  delta: 0.25
+  SetForce: 100
+  delta: 0.4
   iterations: 10
   poleMinDistance: 1
   SnapStrength: 1
@@ -5712,7 +5727,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: zoneSize.x
-      value: 5
+      value: 4.5
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: zoneSize.y
@@ -5771,6 +5786,10 @@ PrefabInstance:
       propertyPath: memory
       value: 
       objectReference: {fileID: 4652158946510775221}
+    - target: {fileID: 133832265789131172, guid: cf72da76aa0218c44ae0118724204a3a, type: 3}
+      propertyPath: radius
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 133832265789131172, guid: cf72da76aa0218c44ae0118724204a3a, type: 3}
       propertyPath: attackZone
       value: 

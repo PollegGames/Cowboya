@@ -91,6 +91,8 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// </summary>
     public void ClearPlayerPosition()
     {
+        if (WasRecentlyAttacked)
+            return;
         LastKnownPlayerPosition = Vector3.zero;
         TimeSincePlayerLastSeen = 0f;
     }

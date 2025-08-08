@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Enemy_AttackPlayer : EnemyState
 {
-    private float stopDistance = 1.5f;
+    private float stopDistance = 3f;
     private readonly EnemyState previousState;
 
     public Enemy_AttackPlayer(EnemyController enemy,

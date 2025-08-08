@@ -31,7 +31,6 @@ public class EnemyPunchAttack : MonoBehaviour
 
     [Header("Attack Settings")]
     private bool isPunching = false;
-    private bool useRightArmNext = true;
     private float lastPunchTime = 0f;
 
     private RobotStateController robotBehaviour;
@@ -66,17 +65,19 @@ public class EnemyPunchAttack : MonoBehaviour
 
         // If target is tracked and cooldown passed
         float damageCost = rightArmHitbox.DamageCost;
-        if (Time.time >= lastPunchTime + attackCooldown && robotBehaviour != null && robotBehaviour.CanPerformEnergy(damageCost))
+        if (Time.time >= lastPunchTime + attackCooldown &&
+           robotBehaviour != null &&
+           robotBehaviour.CanPerformEnergy(damageCost))
         {
             lastPunchTime = Time.time;
             robotBehaviour.PerformAttackbyEnergy(damageCost);
 
-            if (useRightArmNext)
+            // choose arm based on player side
+            bool playerIsOnRight = !targetToFollow.IsFacingRight;
+            if (playerIsOnRight)
                 StartCoroutine(PunchSequence(rightArmTarget, rightArmHitbox));
             else
                 StartCoroutine(PunchSequence(leftArmTarget, leftArmHitbox));
-
-            useRightArmNext = !useRightArmNext;
         }
     }
 

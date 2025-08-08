@@ -1331,6 +1331,7 @@ MonoBehaviour:
   maxMirrorOffset: 3
   maxBendOffset: 3
   bendSpeed: 10
+  isPlayerControlled: 1
 --- !u!1 &4223444372267196353
 GameObject:
   m_ObjectHideFlags: 0
@@ -3428,6 +3429,8 @@ GameObject:
   - component: {fileID: 9206399112436540779}
   - component: {fileID: 9206399112436540778}
   - component: {fileID: 9206399112436540781}
+  - component: {fileID: 5295180869094514354}
+  - component: {fileID: 5348351820894392378}
   m_Layer: 6
   m_Name: Hips
   m_TagString: Player
@@ -3584,6 +3587,46 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.4434905, y: 0.44138008}
   m_EdgeRadius: 0
+--- !u!232 &5295180869094514354
+DistanceJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399112436540689}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 9206399113523174608}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_AutoConfigureConnectedAnchor: 0
+  m_Anchor: {x: 0.70963836, y: -0.013315788}
+  m_ConnectedAnchor: {x: 0.6872676, y: -0.27280772}
+  m_AutoConfigureDistance: 0
+  m_Distance: 0.7
+  m_MaxDistanceOnly: 0
+--- !u!232 &5348351820894392378
+DistanceJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399112436540689}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 9206399113523174608}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_AutoConfigureConnectedAnchor: 0
+  m_Anchor: {x: -0.7274638, y: -0.020678887}
+  m_ConnectedAnchor: {x: -0.68498164, y: -0.2739919}
+  m_AutoConfigureDistance: 0
+  m_Distance: 0.7
+  m_MaxDistanceOnly: 0
 --- !u!1 &9206399112591901723
 GameObject:
   m_ObjectHideFlags: 0
@@ -5134,7 +5177,7 @@ GameObject:
   - component: {fileID: 3224323752040795107}
   - component: {fileID: 317205533927771976}
   m_Layer: 6
-  m_Name: Bot5
+  m_Name: Player5
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5176,9 +5219,6 @@ MonoBehaviour:
   - bone: {fileID: 9206399112885104982}
     restRotation: 0
     force: 700
-  - bone: {fileID: 9206399112436540778}
-    restRotation: 0
-    force: 100
 --- !u!114 &5046356896636356325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5295,7 +5335,7 @@ MonoBehaviour:
   legJointLimiter: {fileID: 3067009131450268787}
   bodyJointLimiter: {fileID: 6603793096190714630}
   robotBehaviour: {fileID: 340242974285803334}
-  bodyReference: {fileID: 9206399112885104982}
+  bodyReference: {fileID: 9206399112352681963}
   maximumLerp: 10
   inputSource: {fileID: 9062504079035036979}
   energyBot: {fileID: 6178835051735462}

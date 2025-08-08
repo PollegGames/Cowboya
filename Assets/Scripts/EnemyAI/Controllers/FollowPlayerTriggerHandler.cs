@@ -52,7 +52,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             var playerControl = collider.transform.root.GetComponent<PlayerMovementController>();
             if (playerControl != null)
             {
-                playerBodyReference = playerControl.BodyReference;
+                playerBodyReference = playerControl.BodyReference.transform;
             }
         }
     }
@@ -96,7 +96,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-            isFacingRight = transform.position.x <= circleCenter.position.x;
+            isFacingRight = transform.position.x >= circleCenter.position.x;
         }
 
 
