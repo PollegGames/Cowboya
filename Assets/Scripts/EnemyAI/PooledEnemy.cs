@@ -56,6 +56,9 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
             cachedTransforms[i].localPosition = defaultPositions[i];
             cachedTransforms[i].localRotation = defaultRotations[i];
         }
+
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
     }
 
     public void OnAcquireFromPool()

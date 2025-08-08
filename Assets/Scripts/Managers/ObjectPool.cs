@@ -48,6 +48,8 @@ public class ObjectPool : SingletonBehaviour<ObjectPool>
 
         obj.SetActive(false);
         obj.transform.SetParent(transform, false);
+        obj.transform.localPosition = Vector3.zero;
+        obj.transform.localRotation = Quaternion.identity;
 
         if (instanceToPrefab.TryGetValue(obj, out var prefab) && pools.TryGetValue(prefab, out var queue))
         {
