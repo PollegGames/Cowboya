@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class BodyJointLimiter : MonoBehaviour
@@ -6,6 +7,11 @@ public class BodyJointLimiter : MonoBehaviour
     [SerializeField] private HingeJoint2D bodyJoint;
     [SerializeField] private HingeJoint2D torsoJoint;
     [SerializeField] private HingeJoint2D lowTorsoJoint;
+
+    private void Awake()
+    {
+        RefreshJoints();
+    }
 
     public void SetBodyRotationLimits(bool goingRight)
     {
@@ -46,7 +52,7 @@ public class BodyJointLimiter : MonoBehaviour
 
     private HingeJoint2D FindJoint(string name)
     {
-        var child = transform.Find(name);
-        return child != null ? child.GetComponent<HingeJoint2D>() : null;
+        return GetComponentsInChildren<HingeJoint2D>(true)
+            .FirstOrDefault(j => j.name == name);
     }
 }

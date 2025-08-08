@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class LegJointLimiter : MonoBehaviour
@@ -5,6 +6,11 @@ public class LegJointLimiter : MonoBehaviour
     [Header("Hinge joints des jambes")]
     public HingeJoint2D leftLegJoint;
     public HingeJoint2D rightLegJoint;
+
+    private void Awake()
+    {
+        RefreshJoints();
+    }
 
     public void SetLegRotationLimits(bool goingRight)
     {
@@ -44,7 +50,7 @@ public class LegJointLimiter : MonoBehaviour
 
     private HingeJoint2D FindJoint(string name)
     {
-        var child = transform.Find(name);
-        return child != null ? child.GetComponent<HingeJoint2D>() : null;
+        return GetComponentsInChildren<HingeJoint2D>(true)
+            .FirstOrDefault(j => j.name == name);
     }
 }
