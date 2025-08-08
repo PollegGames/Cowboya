@@ -32,4 +32,19 @@ public class LegJointLimiter : MonoBehaviour
         joint.limits = limits;
         joint.useLimits = true;
     }
+
+    /// <summary>
+    /// Reacquires leg hinge joint references after joints have been restored.
+    /// </summary>
+    public void RefreshJoints()
+    {
+        leftLegJoint = FindJoint("LeftLowLeg");
+        rightLegJoint = FindJoint("RightLowLeg");
+    }
+
+    private HingeJoint2D FindJoint(string name)
+    {
+        var child = transform.Find(name);
+        return child != null ? child.GetComponent<HingeJoint2D>() : null;
+    }
 }

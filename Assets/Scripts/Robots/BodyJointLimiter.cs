@@ -33,4 +33,20 @@ public class BodyJointLimiter : MonoBehaviour
         joint.limits = limits;
         joint.useLimits = true;
     }
+
+    /// <summary>
+    /// Reacquires hinge joint references after joints have been restored.
+    /// </summary>
+    public void RefreshJoints()
+    {
+        bodyJoint = FindJoint("Body");
+        torsoJoint = FindJoint("Torso");
+        lowTorsoJoint = FindJoint("LowTorso");
+    }
+
+    private HingeJoint2D FindJoint(string name)
+    {
+        var child = transform.Find(name);
+        return child != null ? child.GetComponent<HingeJoint2D>() : null;
+    }
 }

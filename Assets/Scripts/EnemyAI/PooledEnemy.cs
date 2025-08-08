@@ -47,9 +47,9 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
         }
 
         if (bodyJointLimiter != null)
-            bodyJointLimiter.enabled = true;
+            bodyJointLimiter.enabled = false;
         if (legJointLimiter != null)
-            legJointLimiter.enabled = true;
+            legJointLimiter.enabled = false;
 
         for (int i = 0; i < cachedTransforms.Length; i++)
         {
@@ -64,6 +64,18 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
     public void OnAcquireFromPool()
     {
         jointBreaker?.RestoreAll();
+
+        if (bodyJointLimiter != null)
+        {
+            bodyJointLimiter.RefreshJoints();
+            bodyJointLimiter.enabled = true;
+        }
+
+        if (legJointLimiter != null)
+        {
+            legJointLimiter.RefreshJoints();
+            legJointLimiter.enabled = true;
+        }
 
         if (animator != null)
         {
