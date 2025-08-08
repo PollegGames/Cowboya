@@ -13,7 +13,6 @@ public class TutorialManager : MonoBehaviour
     };
 
     private int currentIndex = 0;
-    private HashSet<RoomManager> visitedRooms = new();
     private readonly List<RoomManager> subscribedRooms = new();
 
     private void Start()

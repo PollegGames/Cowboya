@@ -46,5 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   workerPrefab: {fileID: 9206399113533570876, guid: 124cddd2c9136ae4cafa668d5e05d093, type: 3}
   enemyPrefab: {fileID: 8465636778725824547, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
-  bossPrefab: {fileID: 8465636778725824547, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+  bossPrefab: {fileID: 5939241077308374182, guid: cf8fb7154b103a948953dfb7b734b301, type: 3}
   enemiesParent: {fileID: 2678707949269354773}
