@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-public class RobotStateController : MonoBehaviour
+public class RobotStateController : MonoBehaviour, IPooledObject
 {
     public event Action<RobotState> OnStateChanged;
     public RobotState CurrentState { get; private set; } = RobotState.Alive;
@@ -108,4 +108,26 @@ public class RobotStateController : MonoBehaviour
         OnStateChanged?.Invoke(newState);
     }
 
+    /// <summary>
+    /// Resets the robot when it is acquired from the pool.
+    /// </summary>
+    public void OnAcquireFromPool()
+    {
+        bool stateChanged = CurrentState != RobotState.Alive;
+        CurrentState = RobotState.Alive;
+        Stats.CurrentHealth = Stats.MaxHealth;
+        Stats.CurrentEnergy = Stats.MaxEnergy;
+        if (stateChanged)
+        {
+            OnStateChanged?.Invoke(RobotState.Alive);
+        }
+    }
+
+    /// <summary>
+    /// Performs cleanup when the robot is released to the pool.
+    /// </summary>
+    public void OnReleaseToPool()
+    {
+        OnStateChanged = null;
+    }
 }
