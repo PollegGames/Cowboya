@@ -90,7 +90,7 @@ public class EnemyPunchAttack : MonoBehaviour
         Transform controlPoint = targetToFollow.IsFacingRight ? arcControlRight : arcControlLeft;
         Vector3 control = controlPoint != null ? controlPoint.position : (start + end) / 2 + Vector3.up * 0.5f;
 
-        Transform restPosition = targetToFollow.IsFacingRight ? rightRestPosition : leftRestPosition;
+        Transform restPosition = armTarget == rightArmTarget ? rightRestPosition : leftRestPosition;
 
         if (hitbox != null) hitbox.Activate();
 

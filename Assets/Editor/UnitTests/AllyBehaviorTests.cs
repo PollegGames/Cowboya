@@ -2,6 +2,8 @@ using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine.TestTools;
+using System.Collections;
 
 public class AllyBehaviorTests
 {
@@ -130,6 +132,84 @@ public class AllyBehaviorTests
             .Invoke(punch, null);
 
         Assert.AreEqual(targetHandler.transform.position, punchTarget.position);
+    }
+
+    [UnityTest]
+    public IEnumerator EnemyPunching_RightArmReturnsToRightRest()
+    {
+        var go = new GameObject();
+        var punch = go.AddComponent<EnemyPunchAttack>();
+
+        punch.punchDuration = 0.01f;
+        punch.returnSpeed = 100f;
+
+        var targetHandler = new GameObject().AddComponent<FollowPlayerTriggerHandler>();
+        typeof(FollowPlayerTriggerHandler).GetField("isFacingRight", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(targetHandler, false);
+
+        punch.punchTarget = new GameObject().transform;
+        punch.punchTarget.position = new Vector3(1f, 0f, 0f);
+
+        punch.rightArmTarget = new GameObject().transform;
+        punch.rightRestPosition = new GameObject().transform;
+        punch.rightRestPosition.position = new Vector3(2f, 0f, 0f);
+        punch.rightArmTarget.position = punch.rightRestPosition.position;
+
+        punch.leftArmTarget = new GameObject().transform;
+        punch.leftRestPosition = new GameObject().transform;
+
+        var control = new GameObject().transform;
+        punch.arcControlLeft = control;
+        punch.arcControlRight = control;
+
+        typeof(EnemyPunchAttack).GetField("targetToFollow", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(punch, targetHandler);
+
+        punch.rightArmHitbox = new GameObject().AddComponent<AttackHitbox>();
+
+        var method = typeof(EnemyPunchAttack).GetMethod("PunchSequence", BindingFlags.NonPublic | BindingFlags.Instance);
+        yield return punch.StartCoroutine((IEnumerator)method.Invoke(punch, new object[] { punch.rightArmTarget, punch.rightArmHitbox }));
+
+        Assert.Less(Vector3.Distance(punch.rightArmTarget.position, punch.rightRestPosition.position), 0.01f);
+    }
+
+    [UnityTest]
+    public IEnumerator EnemyPunching_LeftArmReturnsToLeftRest()
+    {
+        var go = new GameObject();
+        var punch = go.AddComponent<EnemyPunchAttack>();
+
+        punch.punchDuration = 0.01f;
+        punch.returnSpeed = 100f;
+
+        var targetHandler = new GameObject().AddComponent<FollowPlayerTriggerHandler>();
+        typeof(FollowPlayerTriggerHandler).GetField("isFacingRight", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(targetHandler, true);
+
+        punch.punchTarget = new GameObject().transform;
+        punch.punchTarget.position = new Vector3(-1f, 0f, 0f);
+
+        punch.leftArmTarget = new GameObject().transform;
+        punch.leftRestPosition = new GameObject().transform;
+        punch.leftRestPosition.position = new Vector3(-2f, 0f, 0f);
+        punch.leftArmTarget.position = punch.leftRestPosition.position;
+
+        punch.rightArmTarget = new GameObject().transform;
+        punch.rightRestPosition = new GameObject().transform;
+
+        var control = new GameObject().transform;
+        punch.arcControlLeft = control;
+        punch.arcControlRight = control;
+
+        typeof(EnemyPunchAttack).GetField("targetToFollow", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(punch, targetHandler);
+
+        punch.leftArmHitbox = new GameObject().AddComponent<AttackHitbox>();
+
+        var method = typeof(EnemyPunchAttack).GetMethod("PunchSequence", BindingFlags.NonPublic | BindingFlags.Instance);
+        yield return punch.StartCoroutine((IEnumerator)method.Invoke(punch, new object[] { punch.leftArmTarget, punch.leftArmHitbox }));
+
+        Assert.Less(Vector3.Distance(punch.leftArmTarget.position, punch.leftRestPosition.position), 0.01f);
     }
 
     [Test]
