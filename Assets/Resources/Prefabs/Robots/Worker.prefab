@@ -188,6 +188,7 @@ GameObject:
   - component: {fileID: 6927027784846965603}
   - component: {fileID: 1652121089499442319}
   - component: {fileID: 4920133160292708415}
+  - component: {fileID: 681138149407633311}
   m_Layer: 7
   m_Name: Worker
   m_TagString: Enemy
@@ -465,6 +466,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectZone: {fileID: 9152245780975195678}
   radius: 20
+--- !u!114 &681138149407633311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bodyJointLimiter: {fileID: 0}
+  legJointLimiter: {fileID: 6927027784846965603}
+  animator: {fileID: 3831158568374747867}
+  stateMachine: {fileID: 0}
+  robotStateController: {fileID: 340242974285803334}
+  jointBreaker: {fileID: 574345331645963513}
 --- !u!1001 &446331177930903255
 PrefabInstance:
   m_ObjectHideFlags: 0

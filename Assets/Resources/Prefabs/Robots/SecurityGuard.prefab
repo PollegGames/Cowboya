@@ -4384,6 +4384,7 @@ GameObject:
   - component: {fileID: 4282379396995134653}
   - component: {fileID: 4039218795842909479}
   - component: {fileID: 8821255494166107071}
+  - component: {fileID: 356648147594604746}
   m_Layer: 7
   m_Name: SecurityGuard
   m_TagString: Enemy
@@ -4679,6 +4680,24 @@ MonoBehaviour:
   energyCostPerJump: 3
   waitStep: 1
   timeout: 0.5
+--- !u!114 &356648147594604746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8465636778725824547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bodyJointLimiter: {fileID: 4282379396995134653}
+  legJointLimiter: {fileID: 4923068343172411815}
+  animator: {fileID: 0}
+  stateMachine: {fileID: 1327797449943358064}
+  robotStateController: {fileID: 7891739421741480506}
+  jointBreaker: {fileID: 1510882133398777467}
 --- !u!1 &8491232064010109857
 GameObject:
   m_ObjectHideFlags: 0

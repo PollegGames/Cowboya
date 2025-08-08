@@ -5132,6 +5132,7 @@ GameObject:
   - component: {fileID: 6603793096190714630}
   - component: {fileID: 9062504079035036979}
   - component: {fileID: 3224323752040795107}
+  - component: {fileID: 317205533927771976}
   m_Layer: 6
   m_Name: Bot5
   m_TagString: Player
@@ -5436,6 +5437,24 @@ MonoBehaviour:
   rightHand: {fileID: 7014825927884115475}
   throwStrength: 5
   inputSource: {fileID: 9062504079035036979}
+--- !u!114 &317205533927771976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bodyJointLimiter: {fileID: 6603793096190714630}
+  legJointLimiter: {fileID: 3067009131450268787}
+  animator: {fileID: 0}
+  stateMachine: {fileID: 0}
+  robotStateController: {fileID: 340242974285803334}
+  jointBreaker: {fileID: 8027441940180791310}
 --- !u!1 &9206399113579118250
 GameObject:
   m_ObjectHideFlags: 0
