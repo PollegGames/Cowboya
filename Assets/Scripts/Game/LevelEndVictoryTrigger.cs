@@ -53,7 +53,8 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                 else
                 {
                     grabSystem.ClearHands();
-                    BatteryPickup.DropPlayerBattery();
+                    var inventory = collision.GetComponentInParent<Inventory>();
+                    inventory?.DropAll();
                 }
 
                 if (runStats != null && controller != null)

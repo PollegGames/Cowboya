@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(RobotLocomotionController))]
+[RequireComponent(typeof(RobotLocomotionController), typeof(Inventory))]
 public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 {
     [Header("Components")]
@@ -26,6 +26,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     private float targetRotation;
 
     [SerializeField] private EnergyBot energyBot;
+    [SerializeField] private Inventory inventory;
 
     private Vector2 lookDirection = Vector2.right;
 
@@ -43,6 +44,9 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
             robotBehaviour = GetComponent<RobotStateController>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
+
+        if (inventory == null)
+            inventory = GetComponent<Inventory>();
 
         input = inputSource as IPlayerInput;
         if (input == null)
@@ -159,9 +163,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     public void Die()
     {
-        // Drop any badge or battery the player is carrying
-        SecurityBadgePickup.DropPlayerBadge();
-        BatteryPickup.DropPlayerBattery();
+        inventory?.DropAll();
 
         var jointBreaker = GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();

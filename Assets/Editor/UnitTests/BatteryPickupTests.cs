@@ -24,6 +24,7 @@ public class BatteryPickupTests
 
         var playerRb = playerGO.AddComponent<Rigidbody2D>();
         var player = playerGO.AddComponent<DummyPlayerMovementController>();
+        var inventory = playerGO.AddComponent<Inventory>();
         typeof(PlayerMovementController)
             .GetField("bodyReference", BindingFlags.NonPublic | BindingFlags.Instance)
             .SetValue(player, playerRb);
@@ -40,7 +41,8 @@ public class BatteryPickupTests
 
         Assert.AreEqual(60f, playerState.Stats.CurrentHealth);
         Assert.IsFalse(battery.CanBeGrabbed());
-        BatteryPickup.DropPlayerBattery();
-        Assert.IsNull(BatteryPickup.PlayerHeldBattery);
+        Assert.AreEqual(battery, inventory.GetItem(PickupType.Battery));
+        inventory.DropItem(PickupType.Battery);
+        Assert.IsFalse(inventory.HasItem(PickupType.Battery));
     }
 }
