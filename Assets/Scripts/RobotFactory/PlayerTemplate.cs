@@ -8,17 +8,18 @@ public class PlayerTemplate : RobotTemplate
     public RobotStats CapturedStats { get; private set; }
     public RobotStateController InitializePlayerStateController(GameObject robotInstance)
     {
-        // Get PlayerStateController component
         robotBehaviour = robotInstance.GetComponent<RobotStateController>();
         Debug.Log("PlayerStateController initialized.");
         return robotBehaviour;
     }
 
+    /// <summary>
+    /// Initializes the player's stats based on save data.
+    /// </summary>
     public RobotStats InitializePlayerStats(SaveData saveData)
     {
-        // Use factory to create Robot instance
         PlayerRobotFactory playerFactory =
-         new PlayerRobotFactory((int)saveData.MaxHealth, (int)saveData.MaxEnergy, 0, (int)saveData.AttackEnergyCost);
+            new PlayerRobotFactory((int)saveData.MaxHealth, (int)saveData.MaxEnergy, 0, (int)saveData.AttackEnergyCost);
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
         Debug.Log("PlayerStats initialized with health: " + robotBehaviour.Stats.CurrentHealth
@@ -33,4 +34,46 @@ public class PlayerTemplate : RobotTemplate
         CapturedStats = stats;
     }
 
+    /// <summary>
+    /// Captures current robot stats from the active player.
+    /// </summary>
+    public void CaptureStats(RobotStats source)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        currentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
+        currentEnergy = Mathf.Clamp(source.CurrentEnergy, 0f, source.MaxEnergy);
+        currentMorality = Mathf.Clamp(source.Morality, MinMorality, MaxMorality);
+    }
+
+    /// <summary>
+    /// Applies stored stats to the target player.
+    /// </summary>
+    public void ApplyStats(RobotStats target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        target.CurrentHealth = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
+        target.CurrentEnergy = Mathf.Clamp(currentEnergy, 0f, target.MaxEnergy);
+        target.Morality = Mathf.Clamp(currentMorality, MinMorality, MaxMorality);
+        target.OnHealthChanged?.Invoke();
+        target.OnEnergyChanged?.Invoke();
+        target.OnMoralityChanged?.Invoke();
+    }
+
+    /// <summary>
+    /// Resets the stored stats to default values.
+    /// </summary>
+    public void ResetStats()
+    {
+        currentHealth = 0f;
+        currentEnergy = 0f;
+        currentMorality = 0f;
+    }
 }
