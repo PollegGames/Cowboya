@@ -25,7 +25,13 @@ public class PlayerTemplate : RobotTemplate
     public RobotStats InitializePlayerStats(SaveData saveData)
     {
         PlayerRobotFactory playerFactory =
-            new PlayerRobotFactory((int)saveData.MaxHealth, (int)saveData.MaxEnergy, 0, (int)saveData.AttackEnergyCost);
+            new PlayerRobotFactory(
+                (int)saveData.CurrentHealth,
+                (int)saveData.MaxHealth,
+                (int)saveData.CurrentEnergy,
+                (int)saveData.MaxEnergy,
+                0,
+                (int)saveData.AttackEnergyCost);
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
         Debug.Log("PlayerStats initialized with health: " + robotBehaviour.Stats.CurrentHealth

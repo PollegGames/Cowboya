@@ -5,24 +5,45 @@ using UnityEngine;
 // Player Robot Factory
 public class PlayerRobotFactory : RobotFactory
 {
+    private int currentHealth;
+    private int currentEnergy;
+
     public PlayerRobotFactory()
     {
         health = 100;
+        currentHealth = health;
         energy = 100;
-        energyAttackCost=5;
+        currentEnergy = energy;
+        energyAttackCost = 5;
         morality = 0;
     }
 
-    public PlayerRobotFactory(int healtFromSave, int energyFromSave, int moralityFromSave, int energyAttackCostFromSave)
+    public PlayerRobotFactory(
+        int currentHealthFromSave,
+        int maxHealthFromSave,
+        int currentEnergyFromSave,
+        int maxEnergyFromSave,
+        int moralityFromSave,
+        int energyAttackCostFromSave)
     {
-        health = healtFromSave;
-        energy = energyFromSave;
+        currentHealth = currentHealthFromSave;
+        health = maxHealthFromSave;
+        currentEnergy = currentEnergyFromSave;
+        energy = maxEnergyFromSave;
         morality = moralityFromSave;
         energyAttackCost = energyAttackCostFromSave;
     }
 
     public override RobotStats CreateRobot()
     {
-        return new RobotStats(health, health, energy, energy,energyAttackCost, morality, new List<Module>(modules), new List<Attack>(attacks));
+        return new RobotStats(
+            currentHealth,
+            health,
+            currentEnergy,
+            energy,
+            energyAttackCost,
+            morality,
+            new List<Module>(modules),
+            new List<Attack>(attacks));
     }
 }
