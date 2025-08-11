@@ -71,6 +71,12 @@ public class GrabSystem : MonoBehaviour
             Release(rightHand, ref rightHeld, 0f);
         }
 
+        var inventory = GetComponent<Inventory>();
+        if (inventory != null)
+        {
+            inventory.DropAll();
+        }
+
         leftHeld = null;
         rightHeld = null;
     }
@@ -81,7 +87,21 @@ public class GrabSystem : MonoBehaviour
         IGrabbable obj = hand.DetectGrabbable();
         if (obj != null && obj.CanBeGrabbed())
         {
+            var inventory = hand.GetComponentInParent<Inventory>();
+            PickupType? slot = null;
+
+            if (obj is SecurityBadgePickup)
+                slot = PickupType.SecurityBadge;
+            else if (obj is BatteryPickup)
+                slot = PickupType.Battery;
+
+            if (inventory != null && slot.HasValue && inventory.HasItem(slot.Value))
+                return;
+
             obj.OnGrab(hand.transform);
+
+            if (inventory != null && slot.HasValue)
+                inventory.SetItem(slot.Value, obj);
 
             // Badges or batteries attach to the player's body and should not remain in hand
             if (obj is SecurityBadgePickup || obj is BatteryPickup)
@@ -103,6 +123,16 @@ public class GrabSystem : MonoBehaviour
     private void Release(GrabHandAttractor hand, ref IGrabbable held, float strength)
     {
         if (hand == null || held == null) return;
+
+        var inventory = hand.GetComponentInParent<Inventory>();
+        if (inventory != null)
+        {
+            if (held is SecurityBadgePickup)
+                inventory.RemoveItem(PickupType.SecurityBadge);
+            else if (held is BatteryPickup)
+                inventory.RemoveItem(PickupType.Battery);
+        }
+
         Vector2 throwForce = (Vector2)(hand.transform.right) * strength;
         held.OnRelease(throwForce);
         held = null;
