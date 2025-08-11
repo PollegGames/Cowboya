@@ -11,7 +11,7 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
     private RoomWaypoint targetPoint;
     private bool hasArrived;
     private float readyStartTime;      // time when we entered ReadyToWork
-    private const float MaxReadyDuration = 2f;
+    private const float MaxReadyDuration = 10f;
     public Worker_GoingToLeastWorkedStation(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,
                                     IWaypointService waypointService)
@@ -26,6 +26,8 @@ public class Worker_GoingToLeastWorkedStation : WorkerState
         targetPoint = waypointService.GetLeastUsedFreeWorkPoint(enemy.memory.LastVisitedPoint);
         if (targetPoint == null)
         {
+
+            enemy.workerState = WorkerStatus.GoingToRest;
             Debug.LogWarning("[GoingToLeastWorkedStation] No free work point found. Going to rest.");
             stateMachine.ChangeState(new Worker_GoingToRestStation(
                 enemy, stateMachine, waypointService));

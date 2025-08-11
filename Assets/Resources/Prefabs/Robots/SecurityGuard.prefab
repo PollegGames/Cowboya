@@ -149,7 +149,7 @@ Transform:
   m_GameObject: {fileID: 405258184280334076}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.53, y: -1.202, z: 0.10000001}
+  m_LocalPosition: {x: 0.44, y: -1.347, z: 0.10000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1486,7 +1486,7 @@ Transform:
   m_GameObject: {fileID: 2572806056156882254}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.46, y: -1.24, z: 0.10000001}
+  m_LocalPosition: {x: -0.41, y: -1.341, z: 0.10000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4133,6 +4133,7 @@ MonoBehaviour:
   maxMirrorOffset: 3
   maxBendOffset: 3
   bendSpeed: 10
+  directionProviderComponent: {fileID: 2143343018950225475}
 --- !u!1 &7417427691832225714
 GameObject:
   m_ObjectHideFlags: 0
@@ -4536,6 +4537,7 @@ MonoBehaviour:
   locomotion: {fileID: 8974758250723312533}
   legJointLimiter: {fileID: 4923068343172411815}
   bodyJointLimiter: {fileID: 4282379396995134653}
+  facingController: {fileID: 765951975251855314}
   stateMachine: {fileID: 1327797449943358064}
   memoryComponent: {fileID: 4652158946510775221}
   bodyReference: {fileID: 995484738189706866}

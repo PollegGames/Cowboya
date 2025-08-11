@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 6206929599146606855}
   - component: {fileID: 5280327772437951530}
   - component: {fileID: 7876967260955353992}
-  - component: {fileID: 3403505193419145802}
+  - component: {fileID: 2933447607757072381}
   m_Layer: 11
-  m_Name: BadgeSecurity
+  m_Name: CubeUpgrade
   m_TagString: BadgeSecurity
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6.3415685, y: 0.81, z: -1}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 3.7135}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,12 +80,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 9112570489425086537, guid: 6cd446f68ca75b24aa819ce4f0880e72, type: 3}
-  m_Color: {r: 0.6896553, g: 0, b: 1, a: 1}
+  m_Sprite: {fileID: -8641287479173870057, guid: ca2f6ee679facf24f98e8aa27d40d831, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.31004062, y: 0.25}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -154,7 +154,7 @@ TargetJoint2D:
   m_MaxForce: 10000
   m_DampingRatio: 1
   m_Frequency: 5
---- !u!61 &3403505193419145802
+--- !u!61 &2933447607757072381
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -188,15 +188,15 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.014953457, y: -0.0003322661}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.31004062, y: 0.25}
-    newSize: {x: 0.31004062, y: 0.25}
+    oldSize: {x: 0.39005107, y: 0.35}
+    newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.31004062, y: 0.25}
+  m_Size: {x: 0.35778987, y: 0.35349166}
   m_EdgeRadius: 0

@@ -77,7 +77,7 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
             legJointLimiter.enabled = true;
         }
 
-        if (animator != null)
+        if (animator != null && animator.isInitialized)
         {
             animator.Rebind();
             animator.Update(0f);

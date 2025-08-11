@@ -53,7 +53,7 @@ public class MainMenuController : MonoBehaviour
     private void OnPlayClicked(ClickEvent evt)
     {
         _audioSource?.Play();
-        var saveService = FindObjectOfType<PlayerSaveService>();
+        var saveService = FindFirstObjectByType<PlayerSaveService>();
         saveService?.ResetSaveData();
         runProgressManagerPrefab.LoadFirstLevel();
     }

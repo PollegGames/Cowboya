@@ -10,6 +10,7 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover, ILookD
     [SerializeField] protected RobotLocomotionController locomotion;
     [SerializeField] protected LegJointLimiter legJointLimiter;
     [SerializeField] protected BodyJointLimiter bodyJointLimiter;
+    [SerializeField] protected FacingController facingController;
 
     protected float direction = 0f;
     protected float verticalDirection = 0f;
@@ -83,5 +84,10 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover, ILookD
         legJointLimiter.SetLegRotationLimits(flipped); // true = going left
         if (bodyJointLimiter != null)
             bodyJointLimiter.SetBodyRotationLimits(flipped);
+        if (facingController != null)
+        {
+            facingController.SetLegFacing(!flipped); // true = facing right
+            facingController.SetArmFacing(!flipped); // true = facing right
+        }
     }
 }

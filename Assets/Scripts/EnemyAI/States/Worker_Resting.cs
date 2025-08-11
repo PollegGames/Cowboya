@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Worker_Resting : WorkerState
 {
-    private const float Rest_DURATION = 5f;
+    private const float Rest_DURATION = 10f;
     private float _timer;
     public Worker_Resting(EnemyWorkerController enemy, WorkerStateMachine machine, IWaypointService waypointService)
         : base(enemy, machine, waypointService) { }

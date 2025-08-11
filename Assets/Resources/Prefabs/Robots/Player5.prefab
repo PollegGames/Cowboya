@@ -1331,7 +1331,7 @@ MonoBehaviour:
   maxMirrorOffset: 3
   maxBendOffset: 3
   bendSpeed: 10
-  isPlayerControlled: 1
+  directionProviderComponent: {fileID: 6137078262802834594}
 --- !u!1 &4223444372267196353
 GameObject:
   m_ObjectHideFlags: 0
@@ -3605,7 +3605,7 @@ DistanceJoint2D:
   m_Anchor: {x: 0.70963836, y: -0.013315788}
   m_ConnectedAnchor: {x: 0.6872676, y: -0.27280772}
   m_AutoConfigureDistance: 0
-  m_Distance: 0.7
+  m_Distance: 0.5684924
   m_MaxDistanceOnly: 0
 --- !u!232 &5348351820894392378
 DistanceJoint2D:
@@ -3625,7 +3625,7 @@ DistanceJoint2D:
   m_Anchor: {x: -0.7274638, y: -0.020678887}
   m_ConnectedAnchor: {x: -0.68498164, y: -0.2739919}
   m_AutoConfigureDistance: 0
-  m_Distance: 0.7
+  m_Distance: 0.5727468
   m_MaxDistanceOnly: 0
 --- !u!1 &9206399112591901723
 GameObject:
@@ -4448,7 +4448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 9066642679708734232}
   pole: {fileID: 0}
-  chainLength: 2
+  chainLength: 3
   SetForce: 100
   delta: 0.1
   iterations: 10
@@ -5335,8 +5335,8 @@ MonoBehaviour:
   legJointLimiter: {fileID: 3067009131450268787}
   bodyJointLimiter: {fileID: 6603793096190714630}
   robotBehaviour: {fileID: 340242974285803334}
-  bodyReference: {fileID: 9206399112352681963}
-  maximumLerp: 10
+  bodyReference: {fileID: 9206399112885104982}
+  maximumLerp: 2
   inputSource: {fileID: 9062504079035036979}
   energyBot: {fileID: 6178835051735462}
 --- !u!114 &3067009131450268787

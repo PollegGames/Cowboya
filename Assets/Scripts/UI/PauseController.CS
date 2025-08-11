@@ -65,7 +65,7 @@ public class PauseController : MonoBehaviour
     {
         Debug.Log("PauseController: RestartRun called");
         // Time.timeScale = 1;
-        var saveService = FindObjectOfType<PlayerSaveService>();
+        var saveService = FindFirstObjectByType<PlayerSaveService>();
         saveService?.ResetSaveData();
         RunProgressManager.Instance.RestartRun();
     }

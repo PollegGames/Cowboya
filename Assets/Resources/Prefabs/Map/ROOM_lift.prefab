@@ -5709,6 +5709,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6181356306809311036, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6204825933926312236, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: m_ForceMagnitude
       value: 10

@@ -52,18 +52,18 @@ public class Worker_GoingToRestStation : WorkerState
 
                 enemy.memory.SetLastVisitedPoint(targetPoint);
                 waypointService.ReleasePOI(targetPoint);
-                
+
                 enemy.workerState = WorkerStatus.ReadyToRest;
                 readyStartTime = Time.time;
             }
             return;
         }
-        // Once arrived and in ReadyToWork we check the timer
-        if (enemy.workerState == WorkerStatus.ReadyToWork &&
+        // Once arrived and in ReadyToRest we check the timer
+        if (enemy.workerState == WorkerStatus.ReadyToRest &&
             Time.time - readyStartTime >= MaxReadyDuration)
         {
             // switch to the state that goes to rest
-            stateMachine.ChangeState(new Worker_GoingToRestStation(
+            stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(
                 enemy, stateMachine, waypointService));
         }
     }

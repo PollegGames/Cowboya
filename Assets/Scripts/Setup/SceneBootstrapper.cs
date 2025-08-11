@@ -35,7 +35,7 @@ public class SceneBootstrapper : MonoBehaviour
             Instantiate(config.sceneControllerPrefab);
         }
         var viewModel = Instantiate(config.gameUIViewModelPrefab);
-        var saveService = FindObjectOfType<PlayerSaveService>();
+        var saveService = FindFirstObjectByType<PlayerSaveService>();
         if (saveService == null)
         {
             saveService = Instantiate(config.saveServicePrefab);

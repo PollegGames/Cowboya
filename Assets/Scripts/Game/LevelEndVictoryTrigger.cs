@@ -24,7 +24,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
 
         if (playerTemplate == null)
         {
-            PlayerSpawner spawner = FindObjectOfType<PlayerSpawner>();
+            PlayerSpawner spawner = FindFirstObjectByType<PlayerSpawner>();
             if (spawner != null)
             {
                 FieldInfo spawnerField = typeof(PlayerSpawner).GetField("playerTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -37,7 +37,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
 
         if (saveService == null)
         {
-            saveService = FindObjectOfType<PlayerSaveService>();
+            saveService = FindFirstObjectByType<PlayerSaveService>();
         }
 
         if (playerTemplate == null)

@@ -67,7 +67,6 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_AttackPlayer.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IMover.cs" />
-    <Compile Include="Assets\Scripts\Interfaces\ILookDirectionProvider.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointRegistry.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\GrabHandAttractor.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
@@ -138,6 +137,7 @@
     <Compile Include="Assets\Scripts\UI\RunSetupManager.cs" />
     <Compile Include="Assets\Scripts\Map\WarpMeshXYSkew.cs" />
     <Compile Include="Assets\Scripts\Machines\WorkerSlot.cs" />
+    <Compile Include="Assets\Scripts\Interfaces\ILookDirectionProvider.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IRobotRespawnService.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotMemory.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotRespawnService.cs" />

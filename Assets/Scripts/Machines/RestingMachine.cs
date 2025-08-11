@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
@@ -6,6 +7,8 @@ public class RestingMachine : BaseMachine
 {
     [SerializeField] private Material materialOn;
     [SerializeField] private Material materialOff;
+    [SerializeField] private float sendBackToWorkDelay = 5f;
+    private Coroutine restCountdownCo;
 
     private MeshRenderer meshRenderer;
     private EnemyWorkerController currentWorker;
@@ -31,12 +34,19 @@ public class RestingMachine : BaseMachine
         base.PowerOn();
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, true);
-        SendWorkerToRest(currentWorker);
+        // If a worker is already attached, (re)start their rest countdown.
+        if (currentWorker != null)
+        {
+            SendWorkerToRest(currentWorker);
+            StartRestCountdown(currentWorker);
+        }
     }
 
     public override void PowerOff()
     {
         if (!isOn) return;
+        CancelRestCountdown();
+
         SendCurrentWorkerToWork();
         OnMachineTurningOff?.Invoke(this, currentWorker);
         base.PowerOff();
@@ -55,15 +65,27 @@ public class RestingMachine : BaseMachine
             SendWorkerToWork(worker);
             return;
         }
+        // If already occupied, push the current one back to work
+        if (currentWorker != null && currentWorker != worker)
+        {
+            CancelRestCountdown();
+            SendWorkerToWork(currentWorker);
+        }
 
-        SendWorkerToWork(currentWorker);
-        SendWorkerToRest(worker);
+        // Accept the new worker and start their rest
         currentWorker = worker;
+        isOccupied = true;
+
+        SendWorkerToRest(currentWorker);
+        StartRestCountdown(currentWorker);
+
+
         base.AttachRobot(robot);
     }
 
     public override void ReleaseRobot()
     {
+        CancelRestCountdown();
         SendCurrentWorkerToWork();
         isOccupied = false;
         base.ReleaseRobot();
@@ -87,5 +109,43 @@ public class RestingMachine : BaseMachine
     private void SendCurrentWorkerToWork()
     {
         SendWorkerToWork(currentWorker);
+    }
+
+
+    private void StartRestCountdown(EnemyWorkerController worker)
+    {
+        CancelRestCountdown();
+        restCountdownCo = StartCoroutine(RestCountdown(worker));
+    }
+
+    private void CancelRestCountdown()
+    {
+        if (restCountdownCo != null)
+        {
+            StopCoroutine(restCountdownCo);
+            restCountdownCo = null;
+        }
+    }
+    private IEnumerator RestCountdown(EnemyWorkerController worker)
+    {
+        float t = 0f;
+        while (t < sendBackToWorkDelay)
+        {
+            // Abort if machine turns off or worker changes
+            if (!isOn || worker == null || worker != currentWorker)
+                yield break;
+
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // Still valid? Send back to work and free the slot.
+        if (isOn && worker != null && worker == currentWorker)
+        {
+            SendWorkerToWork(worker);
+            currentWorker = null;
+            isOccupied = false;
+            restCountdownCo = null;
+        }
     }
 }
