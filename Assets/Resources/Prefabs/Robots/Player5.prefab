@@ -2488,7 +2488,7 @@ MonoBehaviour:
   detectionRadius: 4
   detectionLayer:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 14336
 --- !u!1 &8147741203249090007
 GameObject:
   m_ObjectHideFlags: 0
@@ -2738,7 +2738,7 @@ MonoBehaviour:
   detectionRadius: 4
   detectionLayer:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 14336
 --- !u!1 &8618023788441786945
 GameObject:
   m_ObjectHideFlags: 0
@@ -5176,6 +5176,7 @@ GameObject:
   - component: {fileID: 9062504079035036979}
   - component: {fileID: 3224323752040795107}
   - component: {fileID: 317205533927771976}
+  - component: {fileID: 1795599177220237823}
   m_Layer: 6
   m_Name: Player5
   m_TagString: Player
@@ -5339,6 +5340,7 @@ MonoBehaviour:
   maximumLerp: 2
   inputSource: {fileID: 9062504079035036979}
   energyBot: {fileID: 6178835051735462}
+  inventory: {fileID: 0}
 --- !u!114 &3067009131450268787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5495,6 +5497,18 @@ MonoBehaviour:
   stateMachine: {fileID: 0}
   robotStateController: {fileID: 340242974285803334}
   jointBreaker: {fileID: 8027441940180791310}
+--- !u!114 &1795599177220237823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0fc7a5ea4be4010be29e4887b018d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9206399113579118250
 GameObject:
   m_ObjectHideFlags: 0

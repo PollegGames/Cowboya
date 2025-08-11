@@ -64,7 +64,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         if (inventory != null)
         {
             var held = inventory.GetItem(PickupType.Battery);
-            if (held != null && held != this)
+            if (held != null && (object)held != this)
                 return false;
         }
         return true;

@@ -91,12 +91,12 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         if (batterySpawner && initialBattery == null)
         {
             initialBattery = batterySpawner.SpawnBattery(bodyReference);
-            if (robotBehaviour != null)
-                robotBehaviour.Stats.UpdateHealth(10f);
             if (inventory != null && initialBattery != null)
             {
                 initialBattery.AssignInventory(inventory);
                 inventory.SetItem(PickupType.Battery, initialBattery);
+                if (robotBehaviour != null)
+                    robotBehaviour.Stats.UpdateHealth(10f);
             }
         }
     }

@@ -11,12 +11,11 @@ GameObject:
   - component: {fileID: 8505240776491623069}
   - component: {fileID: 6374700015707614389}
   - component: {fileID: 6206929599146606855}
-  - component: {fileID: 5280327772437951530}
   - component: {fileID: 7876967260955353992}
   - component: {fileID: 2933447607757072381}
-  m_Layer: 11
+  m_Layer: 12
   m_Name: Battery+40
-  m_TagString: BadgeSecurity
+  m_TagString: Battery
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,22 +117,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &5280327772437951530
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1934608487537832627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 600db2e5fe7eae540ae59baf9da86338, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  throwStrength: 5
-  frequency: 5
-  dampingRatio: 0.8
-  maxForce: 1000
 --- !u!257 &7876967260955353992
 TargetJoint2D:
   m_ObjectHideFlags: 0

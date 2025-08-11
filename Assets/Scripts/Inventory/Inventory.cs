@@ -4,7 +4,8 @@ using UnityEngine;
 public enum PickupType
 {
     SecurityBadge,
-    Battery
+    Battery,
+    Cube
 }
 
 /// <summary>

@@ -5,12 +5,12 @@ using UnityEngine;
 // Enemy Robot Factory
 public class EnemyRobotFactory : RobotFactory
 {
-    public EnemyRobotFactory(int multiplierValues  =1)
+    public EnemyRobotFactory(int multiplierValues = 1)
     {
         health = 20 * multiplierValues;
-        energy = 30 * multiplierValues;
+        energy = 20 * multiplierValues;
         morality = -10;
-        energyAttackCost = 5;
+        energyAttackCost = 10;
     }
 
     public override RobotStats CreateRobot()

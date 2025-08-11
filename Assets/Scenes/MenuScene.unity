@@ -171,6 +171,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 4332681343876191781, guid: 15ca5a9a01251344c90c26719dc32f14, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4332681343876191781, guid: 15ca5a9a01251344c90c26719dc32f14, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7779968853345734289, guid: 15ca5a9a01251344c90c26719dc32f14, type: 3}
+      propertyPath: field of view
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 7779968853345734289, guid: 15ca5a9a01251344c90c26719dc32f14, type: 3}
+      propertyPath: far clip plane
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7779968853345734289, guid: 15ca5a9a01251344c90c26719dc32f14, type: 3}
+      propertyPath: near clip plane
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7779968853345734289, guid: 15ca5a9a01251344c90c26719dc32f14, type: 3}
+      propertyPath: orthographic size
+      value: 201.69142
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -359,6 +383,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1317440420519519693, guid: 57a70f66108c59646bd5118e8aa9f11e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1317440420519519693, guid: 57a70f66108c59646bd5118e8aa9f11e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1317440420519519693, guid: 57a70f66108c59646bd5118e8aa9f11e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6001660164411657614, guid: 57a70f66108c59646bd5118e8aa9f11e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 507

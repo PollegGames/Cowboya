@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\Player\GrabSystem\GrabHandAttractor.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingToggle.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\RestState.cs" />
+    <Compile Include="Assets\Scripts\Inventory\Inventory.cs" />
     <Compile Include="Assets\Scripts\Map\SecuritySystem.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateFactoryMachine.cs" />
     <Compile Include="Assets\Scripts\Game\LevelEndVictoryTrigger.cs" />
@@ -85,6 +86,8 @@
     <Compile Include="Assets\Scripts\Navigation\PathSolver.cs" />
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerSlot.cs" />
     <Compile Include="Assets\Scripts\Navigation\EdgeCellProcessor.cs" />
+    <Compile Include="Assets\Scripts\Services\CubeSpawner.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\CubePickup.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
     <Compile Include="Assets\Scripts\Machines\RestingSlot.cs" />
     <Compile Include="Assets\Scripts\Game\TutorialManager.cs" />

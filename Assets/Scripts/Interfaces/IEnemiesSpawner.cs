@@ -12,11 +12,11 @@ public interface IEnemiesSpawner
         BatterySpawner batterySpawner);
     void SetDropContainer(Transform container);
     void CreateWorkers(int workersToSpawn);
-    void CreateEnemies(int enemiesToSpawn);
+    void CreateSecurityGuards(int enemiesToSpawn);
     void CreateBoss();
     void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus);
     void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine);
-    void CreateWorkersSpawner(int workersToSpawn);
+    void CreateWorkerSpawners(int workersToSpawn);
     void SpreadEnemies();
     void SpawnEnemyAtRandom();
     void SpawnBossAtRandom();

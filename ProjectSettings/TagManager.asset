@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - BadgeSecurity
+  - Battery
   layers:
   - Default
   - TransparentFX
@@ -19,8 +20,8 @@ TagManager:
   - MapPreview
   - Ground
   - BadgeSecurity
-  - 
-  - 
+  - Battery
+  - CubeUpgrade
   - 
   - 
   - 

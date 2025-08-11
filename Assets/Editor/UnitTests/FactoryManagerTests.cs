@@ -104,11 +104,11 @@ public class FactoryManagerTests
         public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService, MachineSecurityManager securityManager, SecurityBadgeSpawner securityBadgeSpawner, BatterySpawner batterySpawner) { }
         public void SetDropContainer(Transform container) { }
         public void CreateWorkers(int workersToSpawn) { }
-        public void CreateEnemies(int enemiesToSpawn) { }
+        public void CreateSecurityGuards(int enemiesToSpawn) { }
         public void CreateBoss() { }
         public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus) {}
         public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine) {}
-        public void CreateWorkersSpawner(int workersToSpawn) { }
+        public void CreateWorkerSpawners(int workersToSpawn) { }
         public void SpreadEnemies() { }
         public void SpawnEnemyAtRandom() { }
         public void SpawnBossAtRandom() { }
