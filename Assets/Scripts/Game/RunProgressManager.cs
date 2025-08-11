@@ -10,6 +10,7 @@ public class RunProgressManager : MonoBehaviour
     [SerializeField] private string runNormalSceneName = "MapGeneration";
     [SerializeField] private string runSandboxSceneName = "SetupSandbox";
     [SerializeField] private SceneController sceneControllerPrefab;
+    [SerializeField] private PlayerTemplate playerTemplate;
 
     // Maximum allowed values for dynamically generated configurations
     private const int MaxGridSize = 10;      // Maximum grid width/height
@@ -57,17 +58,20 @@ public class RunProgressManager : MonoBehaviour
     public void LoadSandBox()
     {
         currentLevelIndex = 0;
+        playerTemplate.ResetStats();
         SceneController.instance.LoadScene(runSandboxSceneName);
     }
     public void LoadStressTestLevel()
     {
         currentLevelIndex = 0;
+        playerTemplate.ResetStats();
         SceneController.instance.LoadScene(runNormalSceneName);
     }
     //load first level
     public void LoadFirstLevel()
     {
         currentLevelIndex = 1;
+        playerTemplate.ResetStats();
         SceneController.instance.LoadScene(runNormalSceneName);
     }
 
@@ -81,6 +85,7 @@ public class RunProgressManager : MonoBehaviour
     public void RestartRun()
     {
         currentLevelIndex = 1;
+        playerTemplate.ResetStats();
         SceneController.instance.LoadScene(runNormalSceneName);
     }
 
