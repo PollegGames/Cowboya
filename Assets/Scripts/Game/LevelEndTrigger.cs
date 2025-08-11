@@ -1,33 +1,15 @@
-using System.Reflection;
 using UnityEngine;
 
 public class LevelEndTrigger : MonoBehaviour
 {
-    [SerializeField] private PlayerTemplate playerTemplate;
+    [SerializeField] private PlayerRunStats runStats;
     [SerializeField] private PlayerSaveService saveService;
 
     private void Awake()
     {
-        if (playerTemplate == null && RunProgressManager.Instance != null)
+        if (runStats == null && RunProgressManager.Instance != null)
         {
-            FieldInfo field = typeof(RunProgressManager).GetField("playerTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (field != null)
-            {
-                playerTemplate = field.GetValue(RunProgressManager.Instance) as PlayerTemplate;
-            }
-        }
-
-        if (playerTemplate == null)
-        {
-            PlayerSpawner spawner = FindFirstObjectByType<PlayerSpawner>();
-            if (spawner != null)
-            {
-                FieldInfo spawnerField = typeof(PlayerSpawner).GetField("playerTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (spawnerField != null)
-                {
-                    playerTemplate = spawnerField.GetValue(spawner) as PlayerTemplate;
-                }
-            }
+            runStats = RunProgressManager.Instance.RunStats;
         }
 
         if (saveService == null)
@@ -35,9 +17,9 @@ public class LevelEndTrigger : MonoBehaviour
             saveService = FindFirstObjectByType<PlayerSaveService>();
         }
 
-        if (playerTemplate == null)
+        if (runStats == null)
         {
-            Debug.LogError("LevelEndTrigger: PlayerTemplate reference is missing.");
+            Debug.LogError("LevelEndTrigger: PlayerRunStats reference is missing.");
         }
         if (saveService == null)
         {
@@ -61,9 +43,9 @@ public class LevelEndTrigger : MonoBehaviour
                 grabSystem.ClearHands();
             }
 
-            if (playerTemplate != null && controller != null)
+            if (runStats != null && controller != null)
             {
-                playerTemplate.CaptureStats(controller.Stats);
+                runStats.Capture(controller.Stats);
                 if (saveService != null)
                 {
                     saveService.SaveGame(controller);
