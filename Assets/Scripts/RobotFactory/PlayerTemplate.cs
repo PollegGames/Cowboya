@@ -8,6 +8,7 @@ public class PlayerTemplate : RobotTemplate
     private float currentHealth;
     private float currentEnergy;
     private float currentMorality;
+    private bool hasCapturedStats;
 
     private const float MinMorality = -100f;
     private const float MaxMorality = 100f;
@@ -47,6 +48,7 @@ public class PlayerTemplate : RobotTemplate
         currentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
         currentEnergy = Mathf.Clamp(source.CurrentEnergy, 0f, source.MaxEnergy);
         currentMorality = Mathf.Clamp(source.Morality, MinMorality, MaxMorality);
+        hasCapturedStats = true;
     }
 
     /// <summary>
@@ -54,7 +56,7 @@ public class PlayerTemplate : RobotTemplate
     /// </summary>
     public void ApplyStats(RobotStats target)
     {
-        if (target == null)
+        if (target == null || !hasCapturedStats)
         {
             return;
         }
@@ -76,5 +78,11 @@ public class PlayerTemplate : RobotTemplate
         currentHealth = 0f;
         currentEnergy = 0f;
         currentMorality = 0f;
+        hasCapturedStats = false;
     }
+
+    /// <summary>
+    /// Indicates whether stats have been captured for later application.
+    /// </summary>
+    public bool HasCapturedStats => hasCapturedStats;
 }
