@@ -19,6 +19,8 @@ public class BatterySpawner : MonoBehaviour
             parent
         );
 
+        battery.gameObject.layer = LayerMask.NameToLayer("Battery");
+
         var rb = battery.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
