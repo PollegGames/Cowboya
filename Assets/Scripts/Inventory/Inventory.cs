@@ -66,9 +66,10 @@ public class Inventory : MonoBehaviour
     /// </summary>
     public void DropAll()
     {
-        foreach (var kvp in items)
+        var itemsToDrop = new List<IGrabbable>(items.Values);
+        foreach (var item in itemsToDrop)
         {
-            kvp.Value.OnRelease(Vector2.zero);
+            item?.OnRelease(Vector2.zero);
         }
         items.Clear();
     }
