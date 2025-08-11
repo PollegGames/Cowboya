@@ -39,7 +39,10 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
         playerRobotBehaviour = playerTemplate.InitializePlayerStateController(playerInstance);
         playerRobotInfo = playerTemplate.InitializePlayerStats(saveService.CurrentSaveData);
         // Apply stats before gameplay so HUD and AI use updated values
-        playerTemplate.ApplyStats(playerRobotInfo);
+        if (playerTemplate.HasCapturedStats)
+        {
+            playerTemplate.ApplyStats(playerRobotInfo);
+        }
 
         // Locate "WholeBody" container
         Transform wholeBody = playerInstance.transform.Find("WholeBody");
