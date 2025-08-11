@@ -53,3 +53,4 @@ MonoBehaviour:
   runSandboxSceneName: SetupSandbox
   sceneControllerPrefab: {fileID: 3662908670334199631, guid: 3bf2939990ae2ab4f91281497ab365f7, type: 3}
   playerTemplate: {fileID: 11400000, guid: b07a5fd08e0ce9144996ac8b5fd66cc0, type: 2}
+  runStats: {fileID: 11400000, guid: 905197fe5314bf546834e0276fed7add, type: 2}

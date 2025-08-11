@@ -14,9 +14,8 @@ GameObject:
   - component: {fileID: 5280327772437951530}
   - component: {fileID: 7876967260955353992}
   - component: {fileID: 2933447607757072381}
-  - component: {fileID: 4224148012328947793}
   m_Layer: 11
-  m_Name: Battery+10
+  m_Name: Battery+40
   m_TagString: BadgeSecurity
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -81,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -7226554674790848369, guid: 4cd2aaf9390b71f44a656668f4d62b06, type: 3}
+  m_Sprite: {fileID: -557782292268870157, guid: 40b053222a14a57418a19e3ef00f6712, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -201,19 +200,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.24675798, y: 0.3301165}
   m_EdgeRadius: 0
---- !u!114 &4224148012328947793
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1934608487537832627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5aa02ef95c42f24bb733cdf7c29329f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthGain: 10
-  frequency: 5
-  dampingRatio: 0.8
-  maxForce: 1000

@@ -169,6 +169,7 @@
     <Compile Include="Assets\Scripts\UI\EnergyBar.cs" />
     <Compile Include="Assets\Scripts\Map\FactoryAlarmStatus.cs" />
     <Compile Include="Assets\Scripts\Map\WaypointPathFinder.cs" />
+    <Compile Include="Assets\Scripts\Player\Data\PlayerRunStats.cs" />
     <Compile Include="Assets\Scripts\Game\TeleportToBaseCamp.cs" />
     <Compile Include="Assets\Scripts\Map\WaypointRegistry.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\LiftShaftController.cs" />
@@ -213,6 +214,7 @@
     <Compile Include="Assets\Scripts\Player\Interfaces\IPlayerInput.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\RobotTemplate.cs" />
     <Compile Include="Assets\Scripts\Navigation\CellProperties.cs" />
+    <Compile Include="Assets\Scripts\Player\GrabSystem\BatteryPickup.cs" />
     <Compile Include="Assets\Scripts\Managers\EnemiesSpawner.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerAttackController.cs" />
     <Compile Include="Assets\Scripts\Machines\MachineWorkerManager.cs" />
@@ -225,7 +227,6 @@
     <Compile Include="Assets\Scripts\Interfaces\IRobotMemory.cs" />
     <Compile Include="Assets\Scripts\Robots\HealthBot.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\SecurityBadgePickup.cs" />
-    <Compile Include="Assets\Scripts\Player\GrabSystem\BatteryPickup.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\AllyRobotFactory.cs" />
     <Compile Include="Assets\Scripts\Setup\GameInitiator.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaypointService.cs" />
@@ -270,8 +271,8 @@
     <Compile Include="Assets\Scripts\Robots\RobotState.cs" />
     <Compile Include="Assets\Scripts\Robots\FootStepper.cs" />
     <Compile Include="Assets\Scripts\Navigation\RoomLiftPerFloorProcessor.cs" />
-    <Compile Include="Assets\Scripts\Services\SecurityBadgeSpawner.cs" />
     <Compile Include="Assets\Scripts\Services\BatterySpawner.cs" />
+    <Compile Include="Assets\Scripts\Services\SecurityBadgeSpawner.cs" />
     <Compile Include="Assets\Scripts\Robots\Hinge2DIkSolver.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_GoingToLeastWorkedStation.cs" />

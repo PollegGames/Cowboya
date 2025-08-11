@@ -68,6 +68,7 @@
     <Compile Include="Assets\Editor\UnitTests\GridRendererTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\StationReservationServiceTests.cs" />
     <Compile Include="Assets\Shapes2D\Editor\MenuItems.cs" />
+    <Compile Include="Assets\Editor\UnitTests\BatteryPickupTests.cs" />
     <Compile Include="Assets\Editor\TestingPlaceholders\SquareMover.cs" />
     <Compile Include="Assets\Editor\TestingPlaceholders\SquareMovementData.cs" />
     <Compile Include="Assets\Editor\UnitTests\GrabSystemTests.cs" />
@@ -97,11 +98,10 @@
     <Compile Include="Assets\Editor\UnitTests\SecurityBadgeTheftTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityGuardRestTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\RoomLiftPerFloorProcessorTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\BatteryTheftTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\CellTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\PositionTriggerZoneTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityBadgePickupTests.cs" />
-    <Compile Include="Assets\Editor\UnitTests\BatteryPickupTests.cs" />
-    <Compile Include="Assets\Editor\UnitTests\BatteryTheftTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
