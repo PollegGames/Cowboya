@@ -18,25 +18,23 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
         LoadGame();
     }
 
-    // Save the current save data to a file
-    public void SaveGame()
-    {
-        RobotStateController robotBehaviour = runtimePlayerData.RobotGameObjectPrefab.GetComponent<RobotStateController>();
-        SaveGame(robotBehaviour);
-    }
-
+    /// <summary>
+    /// Save the current player stats to a file.
+    /// </summary>
+    /// <param name="controller">The active robot controller whose stats will be saved.</param>
     public void SaveGame(RobotStateController controller)
     {
         if (CurrentSaveData == null)
         {
-            CurrentSaveData = new SaveData(); // Ensure CurrentSaveData is not null before saving
+            CurrentSaveData = new SaveData();
         }
+
         CurrentSaveData.CurrentHealth = controller.Stats.CurrentHealth;
         CurrentSaveData.MaxHealth = controller.Stats.MaxHealth;
         CurrentSaveData.CurrentEnergy = controller.Stats.CurrentEnergy;
         CurrentSaveData.MaxEnergy = controller.Stats.MaxEnergy;
         CurrentSaveData.AttackEnergyCost = controller.Stats.AttackEnergyCost;
-        // CurrentSaveData.experience = runtimePlayerData.experience;
+        // CurrentSaveData.experience = controller.Stats.Experience;
         // Map other fields as needed
 
         var json = JsonUtility.ToJson(CurrentSaveData);
@@ -60,7 +58,8 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
             // happen when the IndexedDB storage is empty. PlayerPrefs can be
             // used as a fallback if file operations fail.
             CurrentSaveData = new SaveData();
-            SaveGame();
+            var json = JsonUtility.ToJson(CurrentSaveData);
+            File.WriteAllText(saveFilePath, json);
             Debug.Log("New save data created and saved.");
         }
     }
@@ -69,8 +68,8 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
     public void ResetSaveData()
     {
         CurrentSaveData = new SaveData();
-        SaveGame();
+        var json = JsonUtility.ToJson(CurrentSaveData);
+        File.WriteAllText(saveFilePath, json);
         Debug.Log("Save data reset.");
     }
-
 }
