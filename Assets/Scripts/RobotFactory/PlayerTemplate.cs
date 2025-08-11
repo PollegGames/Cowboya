@@ -59,12 +59,13 @@ public class PlayerTemplate : RobotTemplate
             return;
         }
 
-        target.CurrentHealth = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
-        target.CurrentEnergy = Mathf.Clamp(currentEnergy, 0f, target.MaxEnergy);
-        target.Morality = Mathf.Clamp(currentMorality, MinMorality, MaxMorality);
-        target.OnHealthChanged?.Invoke();
-        target.OnEnergyChanged?.Invoke();
-        target.OnMoralityChanged?.Invoke();
+        float healthTarget = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
+        float energyTarget = Mathf.Clamp(currentEnergy, 0f, target.MaxEnergy);
+        float moralityTarget = Mathf.Clamp(currentMorality, MinMorality, MaxMorality);
+
+        target.UpdateHealth(healthTarget - target.CurrentHealth);
+        target.UpdateEnergy(energyTarget - target.CurrentEnergy);
+        target.UpdateMorality(moralityTarget - target.Morality);
     }
 
     /// <summary>
