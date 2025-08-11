@@ -63,10 +63,14 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                 || victorySetup.currentSaved >= victorySetup.robotsSavedTarget;
             if (isVictoryDoor && isVictory && collision.CompareTag("Player"))
             {
-                RobotStateController controller = collision.GetComponent<RobotStateController>();
-                GrabSystem grabSystem = collision.GetComponent<GrabSystem>();
+                RobotStateController controller = collision.GetComponentInParent<RobotStateController>();
+                GrabSystem grabSystem = collision.GetComponentInParent<GrabSystem>();
 
-                if (grabSystem != null)
+                if (grabSystem == null)
+                {
+                    Debug.LogWarning("LevelEndVictoryTrigger: GrabSystem component is missing on Player or its parent.");
+                }
+                else
                 {
                     grabSystem.ClearHands();
                 }
@@ -78,6 +82,10 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                     {
                         saveService.SaveGame(controller);
                     }
+                }
+                else if (controller == null)
+                {
+                    Debug.LogWarning("LevelEndVictoryTrigger: RobotStateController component is missing on Player or its parent.");
                 }
 
                 RunProgressManager.Instance.LoadNextLevel();
