@@ -212,6 +212,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -2.14
       objectReference: {fileID: 0}
+    - target: {fileID: 3419217242892964986, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+      propertyPath: muscles.Array.data[1].force
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 3497312347630537695, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: -0.017000029
@@ -472,6 +476,10 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: -0.56501985
       objectReference: {fileID: 0}
+    - target: {fileID: 6227226312698977914, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+      propertyPath: verticalOffset
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6296212687096859134, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: m_Color.b
       value: 0
@@ -547,6 +555,10 @@ PrefabInstance:
     - target: {fileID: 6999563321373287652, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: m_AutoConfigureDistance
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7165636470059981675, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+      propertyPath: chainLength
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7215089972218485657, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: zoneSize.x

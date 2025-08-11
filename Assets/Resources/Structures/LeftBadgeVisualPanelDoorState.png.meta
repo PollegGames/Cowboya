@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      LeftBadgeVisualPanelDoorState_0: -6830099867618733444
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

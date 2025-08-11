@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      LeftOpenVisualPanelDoorState_0: -5245184376681325081
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

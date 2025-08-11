@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      AlarmWall_0: 6660794674476421070
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

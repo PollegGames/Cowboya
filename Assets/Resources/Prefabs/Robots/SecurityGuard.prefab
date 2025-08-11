@@ -4429,6 +4429,7 @@ GameObject:
   - component: {fileID: 8821255494166107071}
   - component: {fileID: 356648147594604746}
   - component: {fileID: 765951975251855314}
+  - component: {fileID: 523884686753273075}
   m_Layer: 7
   m_Name: SecurityGuard
   m_TagString: Enemy
@@ -4547,6 +4548,7 @@ MonoBehaviour:
   deadZoneX: 1
   deadZoneY: 5
   punchAttack: {fileID: 1084963490228556486}
+  inventory: {fileID: 0}
   updateLoop: 0
 --- !u!114 &1976096450392993643
 MonoBehaviour:
@@ -4624,9 +4626,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbc99932fe549d64f9b583f5964335ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hingeJoints: []
-  fixedJoints: []
-  ikSolvers: []
+  hingeJoints:
+  - {fileID: 266048238967456877}
+  - {fileID: 6184579575060252644}
+  - {fileID: 1990759541702478021}
+  - {fileID: 7666860303767856344}
+  - {fileID: 6054919508478058912}
+  - {fileID: 7064814038457939916}
+  - {fileID: 5773208471996699822}
+  - {fileID: 4472958890978182366}
+  - {fileID: 553861781250421296}
+  - {fileID: 3497312347630537695}
+  - {fileID: 5120231806531619291}
+  fixedJoints:
+  - {fileID: 1584063456800055839}
+  ikSolvers:
+  - {fileID: 6592260153268661156}
+  - {fileID: 6695492996797371852}
+  - {fileID: 4758259135092769269}
+  - {fileID: 3395585018061290687}
+  - {fileID: 7165636470059981675}
 --- !u!114 &1327797449943358064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4759,6 +4778,18 @@ MonoBehaviour:
   rightLegPole: {fileID: 1834456982871538244}
   leftArmPole: {fileID: 8586645231740715026}
   rightArmPole: {fileID: 2473490206524818188}
+--- !u!114 &523884686753273075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8465636778725824547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0fc7a5ea4be4010be29e4887b018d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8491232064010109857
 GameObject:
   m_ObjectHideFlags: 0
