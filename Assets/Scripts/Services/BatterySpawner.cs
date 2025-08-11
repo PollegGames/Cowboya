@@ -19,6 +19,12 @@ public class BatterySpawner : MonoBehaviour
             parent
         );
 
+        var rb = battery.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.simulated = true;
+        }
+
         battery.SetFollowTarget(parent);
 
         return battery;

@@ -129,6 +129,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         attached = false;
         joint.enabled = false;
         followTarget = null;
+        rb.simulated = true;
 
         if (ownerInventory != null)
         {
