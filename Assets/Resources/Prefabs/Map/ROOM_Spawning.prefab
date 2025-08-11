@@ -65,7 +65,7 @@ GameObject:
   - component: {fileID: 187235412449160675}
   - component: {fileID: 5857107069788241263}
   m_Layer: 3
-  m_Name: ROOM_Block
+  m_Name: ROOM_Spawning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4010,6 +4010,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpawingDesk
       objectReference: {fileID: 0}
+    - target: {fileID: 3036150070442820856, guid: 7e6f1147cb2847548b3ec38f5725516e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 3036150070442820856, guid: 7e6f1147cb2847548b3ec38f5725516e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3036150070442820856, guid: 7e6f1147cb2847548b3ec38f5725516e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 3865668901669927916, guid: 7e6f1147cb2847548b3ec38f5725516e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d374ea5b8f432894b98fac9636b77de8, type: 2}
     - target: {fileID: 5226794923736213634, guid: 7e6f1147cb2847548b3ec38f5725516e, type: 3}
       propertyPath: m_VersionIndex
       value: 16401

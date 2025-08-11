@@ -3,8 +3,8 @@ guid: 091606007c078f54fba2b416701bd004
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2593706568542898223
-    second: DeniedVisualPanelDoorState_0
+      213: 4933600235735312593
+    second: RIghtDeniedVisualPanelDoorState_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,11 +96,24 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: DeniedVisualPanelDoorState_0
+      name: RIghtDeniedVisualPanelDoorState_0
       rect:
         serializedVersion: 2
         x: 1901
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1d737623e9d410cd0800000000000000
-      internalID: -2593706568542898223
+      spriteID: 1d869ca664ba77440800000000000000
+      internalID: 4933600235735312593
       vertices: []
       indices: 
       edges: []
@@ -134,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      DeniedVisualPanelDoorState_0: -2593706568542898223
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

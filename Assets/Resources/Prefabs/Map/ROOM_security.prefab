@@ -684,7 +684,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c47e6256987cc304db7d31af9ad48b12, type: 2}
+  - {fileID: 2100000, guid: 018d625276a22aa458aff7442286ea75, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4052,9 +4052,21 @@ PrefabInstance:
       value: SecurityDesk
       objectReference: {fileID: 0}
     - target: {fileID: 3036150070442820856, guid: 3d8343159fc1f7f428abe57305afdcf3, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
+      propertyPath: m_LocalPosition.x
+      value: 3.19
       objectReference: {fileID: 0}
+    - target: {fileID: 3036150070442820856, guid: 3d8343159fc1f7f428abe57305afdcf3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3036150070442820856, guid: 3d8343159fc1f7f428abe57305afdcf3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 3865668901669927916, guid: 3d8343159fc1f7f428abe57305afdcf3, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1039f7c3bf79b004c82ab38f3f6076c0, type: 2}
     - target: {fileID: 5226794923736213634, guid: 3d8343159fc1f7f428abe57305afdcf3, type: 3}
       propertyPath: m_VersionIndex
       value: 16377

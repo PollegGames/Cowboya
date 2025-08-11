@@ -96,6 +96,7 @@
     <Compile Include="Assets\Editor\UnitTests\RoomManagerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityBadgeTheftTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityGuardRestTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\RoomLiftPerFloorProcessorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\CellTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\PositionTriggerZoneTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityBadgePickupTests.cs" />
