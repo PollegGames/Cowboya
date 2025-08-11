@@ -9,7 +9,7 @@ public class PickupBox : MonoBehaviour, IGrabbable
         if (rb == null) rb = GetComponent<Rigidbody2D>();
     }
 
-    public bool CanBeGrabbed()
+    public bool CanBeGrabbed(Inventory inventory)
     {
         return true;
     }

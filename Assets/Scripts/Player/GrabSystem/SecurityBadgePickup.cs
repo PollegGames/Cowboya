@@ -70,20 +70,15 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         }
     }
 
-    public bool CanBeGrabbed()
+    public bool CanBeGrabbed(Inventory inventory)
     {
-        var player = FindObjectOfType<PlayerMovementController>();
-        if (player != null)
+        if (inventory != null)
         {
-            var inventory = player.GetComponent<Inventory>();
-            if (inventory != null)
-            {
-                var held = inventory.GetItem(PickupType.SecurityBadge);
-                if (held != null && held != this)
-                    return false;
-            }
+            var held = inventory.GetItem(PickupType.SecurityBadge);
+            if (held != null && held != this)
+                return false;
         }
-        return !attached;
+        return true;
     }
 
     public void OnGrab(Transform grabParent)

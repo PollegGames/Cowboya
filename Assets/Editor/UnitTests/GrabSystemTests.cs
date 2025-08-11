@@ -42,7 +42,7 @@ public class GrabSystemTests
         public bool grabbed;
         public bool released;
         public Vector2 releasedForce;
-        public bool CanBeGrabbed() => true;
+        public bool CanBeGrabbed(Inventory inventory) => true;
         public void OnGrab(Transform grabParent)
         {
             grabbed = true;

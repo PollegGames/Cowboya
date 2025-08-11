@@ -7,7 +7,7 @@ public class HoldButton : MonoBehaviour, IGrabbable
     public UnityEvent OnReleased;
     private bool isHeld;
 
-    public bool CanBeGrabbed()
+    public bool CanBeGrabbed(Inventory inventory)
     {
         return true;
     }

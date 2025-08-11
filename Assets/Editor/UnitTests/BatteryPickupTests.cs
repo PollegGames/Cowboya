@@ -40,8 +40,14 @@ public class BatteryPickupTests
         battery.OnGrab(hand);
 
         Assert.AreEqual(60f, playerState.Stats.CurrentHealth);
-        Assert.IsFalse(battery.CanBeGrabbed());
+        Assert.IsTrue(battery.CanBeGrabbed(inventory));
         Assert.AreEqual(battery, inventory.GetItem(PickupType.Battery));
+
+        var otherInvGO = new GameObject("otherInv");
+        var otherInventory = otherInvGO.AddComponent<Inventory>();
+        otherInventory.SetItem(PickupType.Battery, new GameObject("otherBatt").AddComponent<BatteryPickup>());
+        Assert.IsFalse(battery.CanBeGrabbed(otherInventory));
+
         inventory.DropItem(PickupType.Battery);
         Assert.IsFalse(inventory.HasItem(PickupType.Battery));
     }
