@@ -53,6 +53,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                 else
                 {
                     grabSystem.ClearHands();
+                    BatteryPickup.DropPlayerBattery();
                 }
 
                 if (runStats != null && controller != null)
