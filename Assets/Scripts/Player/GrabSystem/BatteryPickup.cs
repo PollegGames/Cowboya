@@ -20,8 +20,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     private bool attached = false;
     private bool wasStolen = false;
 
-    public static BatteryPickup PlayerHeldBattery { get; private set; }
-    private bool heldByPlayer = false;
+    private Inventory ownerInventory;
 
     private void Awake()
     {
@@ -62,16 +61,23 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
     public bool CanBeGrabbed()
     {
-        if (PlayerHeldBattery != null && PlayerHeldBattery != this)
-            return false;
+        var player = FindObjectOfType<PlayerMovementController>();
+        if (player != null)
+        {
+            var inventory = player.GetComponent<Inventory>();
+            if (inventory != null)
+            {
+                var held = inventory.GetItem(PickupType.Battery);
+                if (held != null && held != this)
+                    return false;
+            }
+        }
         return !attached;
     }
 
     public void OnGrab(Transform grabParent)
     {
-        if (PlayerHeldBattery != null && PlayerHeldBattery != this)
-            return;
-
+        var inventory = grabParent.GetComponentInParent<Inventory>();
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
 
         if (!wasStolen && transform.parent != null)
@@ -95,21 +101,21 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         if (holderState != null)
             holderState.Stats.UpdateHealth(healthGain);
 
+        if (inventory != null)
+        {
+            if (ownerInventory != null && ownerInventory != inventory)
+                ownerInventory.RemoveItem(PickupType.Battery);
+            inventory.SetItem(PickupType.Battery, this);
+            ownerInventory = inventory;
+        }
+
         if (player != null)
         {
             var hip = player.BodyReference;
             if (hip != null)
-            {
-                PlayerHeldBattery = this;
-                heldByPlayer = true;
                 SetFollowTarget(hip.transform);
-
-                foreach (var battery in FindObjectsByType<BatteryPickup>(FindObjectsSortMode.None))
-                {
-                    if (battery != this)
-                        Destroy(battery.gameObject);
-                }
-            }
+            else
+                SetFollowTarget(grabParent);
         }
         else
         {
@@ -129,26 +135,18 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         joint.enabled = false;
         followTarget = null;
 
-        if (heldByPlayer)
+        if (ownerInventory != null)
         {
-            heldByPlayer = false;
-            if (PlayerHeldBattery == this)
-                PlayerHeldBattery = null;
+            ownerInventory.RemoveItem(PickupType.Battery);
+            ownerInventory = null;
         }
     }
 
-    private void OnDestroy()
+    /// <summary>
+    /// Sets the inventory that currently owns this pickup.
+    /// </summary>
+    public void AssignInventory(Inventory inventory)
     {
-        if (PlayerHeldBattery == this)
-            PlayerHeldBattery = null;
-    }
-
-    public static void DropPlayerBattery()
-    {
-        if (PlayerHeldBattery != null)
-        {
-            Destroy(PlayerHeldBattery.gameObject);
-            PlayerHeldBattery = null;
-        }
+        ownerInventory = inventory;
     }
 }

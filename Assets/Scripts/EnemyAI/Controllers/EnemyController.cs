@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-[RequireComponent(typeof(EnemyStateMachine), typeof(RobotMemory))]
+[RequireComponent(typeof(EnemyStateMachine), typeof(RobotMemory), typeof(Inventory))]
 /// <summary>
 /// Controls enemy behaviour and state transitions. Initializes path following
 /// and badge spawning services and provides APIs to change state or assign
@@ -30,6 +30,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
     public Transform BodyReference => bodyReference;
 
     [SerializeField] private EnemyPunchAttack punchAttack;
+    [SerializeField] private Inventory inventory;
 
     private FactoryAlarmStatus alarmStatus;
 
@@ -56,6 +57,9 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
             robotBehaviour = GetComponent<RobotStateController>();
 
         robotBehaviour.OnStateChanged += HandleStateChange;
+
+        if (inventory == null)
+            inventory = GetComponent<Inventory>();
     }
 
     public void Initialize(
@@ -77,6 +81,11 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         if (securityBadgeSpawner && initialBadge == null)
         {
             initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
+            if (inventory != null && initialBadge != null)
+            {
+                initialBadge.AssignInventory(inventory);
+                inventory.SetItem(PickupType.SecurityBadge, initialBadge);
+            }
         }
 
         if (batterySpawner && initialBattery == null)
@@ -84,6 +93,11 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
             initialBattery = batterySpawner.SpawnBattery(bodyReference);
             if (robotBehaviour != null)
                 robotBehaviour.Stats.UpdateHealth(10f);
+            if (inventory != null && initialBattery != null)
+            {
+                initialBattery.AssignInventory(inventory);
+                inventory.SetItem(PickupType.Battery, initialBattery);
+            }
         }
     }
 

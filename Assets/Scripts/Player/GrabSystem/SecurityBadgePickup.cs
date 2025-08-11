@@ -22,9 +22,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     // Flag to ensure stolen logic only runs once
     bool wasStolen = false;
 
-    // Tracks the badge currently held by the player
-    public static SecurityBadgePickup PlayerHeldBadge { get; private set; }
-    bool heldByPlayer = false;
+    Inventory ownerInventory;
 
     void Awake()
     {
@@ -74,17 +72,23 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     public bool CanBeGrabbed()
     {
-        if (PlayerHeldBadge != null && PlayerHeldBadge != this)
-            return false;
+        var player = FindObjectOfType<PlayerMovementController>();
+        if (player != null)
+        {
+            var inventory = player.GetComponent<Inventory>();
+            if (inventory != null)
+            {
+                var held = inventory.GetItem(PickupType.SecurityBadge);
+                if (held != null && held != this)
+                    return false;
+            }
+        }
         return !attached;
     }
 
     public void OnGrab(Transform grabParent)
     {
-        // Prevent grabbing a second badge once one is already attached
-        if (PlayerHeldBadge != null && PlayerHeldBadge != this)
-            return;
-
+        var inventory = grabParent.GetComponentInParent<Inventory>();
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
 
         // Detect if we're stealing from an enemy
@@ -104,27 +108,24 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
         attached = true;
         rb.simulated = true;
+        if (inventory != null)
+        {
+            if (ownerInventory != null && ownerInventory != inventory)
+                ownerInventory.RemoveItem(PickupType.SecurityBadge);
+            inventory.SetItem(PickupType.SecurityBadge, this);
+            ownerInventory = inventory;
+        }
+
         if (player != null)
         {
-            // Attach directly to the player's hips
             var hip = player.BodyReference;
             if (hip != null)
-            {
-                PlayerHeldBadge = this;
-                heldByPlayer = true;
                 SetFollowTarget(hip.transform);
-
-                // Disable or destroy all other badges in the scene
-                foreach (var badge in FindObjectsByType<SecurityBadgePickup>(FindObjectsSortMode.None))
-                {
-                    if (badge != this)
-                        Destroy(badge.gameObject);
-                }
-            }
+            else
+                SetFollowTarget(grabParent);
         }
         else
         {
-            // Fallback: follow whatever grabbed us
             SetFollowTarget(grabParent);
         }
 
@@ -146,28 +147,21 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         joint.enabled = false;
         followTarget = null;
 
-        if (heldByPlayer)
+        if (ownerInventory != null)
         {
-            heldByPlayer = false;
-            if (PlayerHeldBadge == this)
-                PlayerHeldBadge = null;
+            ownerInventory.RemoveItem(PickupType.SecurityBadge);
+            ownerInventory = null;
         }
 
         // // Give it some velocity so it flies off
         // rb.AddForce(throwForce * throwStrength, ForceMode2D.Impulse);
     }
 
-    private void OnDestroy()
+    /// <summary>
+    /// Sets the inventory that currently owns this pickup.
+    /// </summary>
+    public void AssignInventory(Inventory inventory)
     {
-        if (PlayerHeldBadge == this)
-            PlayerHeldBadge = null;
-    }
-
-    public static void DropPlayerBadge()
-    {
-        if (PlayerHeldBadge != null)
-        {
-            PlayerHeldBadge.OnRelease(Vector2.zero);
-        }
+        ownerInventory = inventory;
     }
 }
