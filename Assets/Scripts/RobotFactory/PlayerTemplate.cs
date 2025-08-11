@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerTemplate : RobotTemplate
 {
     private RobotStateController robotBehaviour;
-    public RobotStats CapturedStats { get; private set; }
     public RobotStateController InitializePlayerStateController(GameObject robotInstance)
     {
         robotBehaviour = robotInstance.GetComponent<RobotStateController>();
@@ -27,11 +26,6 @@ public class PlayerTemplate : RobotTemplate
         + " and attack energy cost: " + robotBehaviour.Stats.AttackEnergyCost);
 
         return robotBehaviour.Stats;
-    }
-
-    public void CaptureStats(RobotStats stats)
-    {
-        CapturedStats = stats;
     }
 
     /// <summary>
