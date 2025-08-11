@@ -21,16 +21,21 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
     // Save the current save data to a file
     public void SaveGame()
     {
+        RobotStateController robotBehaviour = runtimePlayerData.RobotGameObjectPrefab.GetComponent<RobotStateController>();
+        SaveGame(robotBehaviour);
+    }
+
+    public void SaveGame(RobotStateController controller)
+    {
         if (CurrentSaveData == null)
         {
             CurrentSaveData = new SaveData(); // Ensure CurrentSaveData is not null before saving
         }
-        RobotStateController robotBehaviour = runtimePlayerData.RobotGameObjectPrefab.GetComponent<RobotStateController>();
-        CurrentSaveData.CurrentHealth = robotBehaviour.Stats.CurrentHealth;
-        CurrentSaveData.MaxHealth = robotBehaviour.Stats.MaxHealth;
-        CurrentSaveData.CurrentEnergy = robotBehaviour.Stats.CurrentEnergy;
-        CurrentSaveData.MaxEnergy = robotBehaviour.Stats.MaxEnergy;
-        CurrentSaveData.AttackEnergyCost = robotBehaviour.Stats.AttackEnergyCost;
+        CurrentSaveData.CurrentHealth = controller.Stats.CurrentHealth;
+        CurrentSaveData.MaxHealth = controller.Stats.MaxHealth;
+        CurrentSaveData.CurrentEnergy = controller.Stats.CurrentEnergy;
+        CurrentSaveData.MaxEnergy = controller.Stats.MaxEnergy;
+        CurrentSaveData.AttackEnergyCost = controller.Stats.AttackEnergyCost;
         // CurrentSaveData.experience = runtimePlayerData.experience;
         // Map other fields as needed
 
