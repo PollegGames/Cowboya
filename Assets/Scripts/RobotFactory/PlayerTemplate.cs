@@ -5,15 +5,7 @@ using UnityEngine;
 public class PlayerTemplate : RobotTemplate
 {
     private RobotStateController robotBehaviour;
-    private float currentHealth;
-    private float currentEnergy;
-    private float currentMorality;
-    private const float MinMorality = -10f;
-    private const float MaxMorality = 10f;
-
-    /// <summary>
-    /// Initializes and returns the player's state controller component.
-    /// </summary>
+    public RobotStats CapturedStats { get; private set; }
     public RobotStateController InitializePlayerStateController(GameObject robotInstance)
     {
         robotBehaviour = robotInstance.GetComponent<RobotStateController>();
@@ -35,6 +27,11 @@ public class PlayerTemplate : RobotTemplate
         + " and attack energy cost: " + robotBehaviour.Stats.AttackEnergyCost);
 
         return robotBehaviour.Stats;
+    }
+
+    public void CaptureStats(RobotStats stats)
+    {
+        CapturedStats = stats;
     }
 
     /// <summary>
