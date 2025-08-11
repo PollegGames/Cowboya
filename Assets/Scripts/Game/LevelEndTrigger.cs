@@ -1,9 +1,49 @@
+using System.Reflection;
 using UnityEngine;
 
 public class LevelEndTrigger : MonoBehaviour
 {
     [SerializeField] private PlayerTemplate playerTemplate;
     [SerializeField] private PlayerSaveService saveService;
+
+    private void Awake()
+    {
+        if (playerTemplate == null && RunProgressManager.Instance != null)
+        {
+            FieldInfo field = typeof(RunProgressManager).GetField("playerTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field != null)
+            {
+                playerTemplate = field.GetValue(RunProgressManager.Instance) as PlayerTemplate;
+            }
+        }
+
+        if (playerTemplate == null)
+        {
+            PlayerSpawner spawner = FindObjectOfType<PlayerSpawner>();
+            if (spawner != null)
+            {
+                FieldInfo spawnerField = typeof(PlayerSpawner).GetField("playerTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (spawnerField != null)
+                {
+                    playerTemplate = spawnerField.GetValue(spawner) as PlayerTemplate;
+                }
+            }
+        }
+
+        if (saveService == null)
+        {
+            saveService = FindObjectOfType<PlayerSaveService>();
+        }
+
+        if (playerTemplate == null)
+        {
+            Debug.LogError("LevelEndTrigger: PlayerTemplate reference is missing.");
+        }
+        if (saveService == null)
+        {
+            Debug.LogError("LevelEndTrigger: PlayerSaveService reference is missing.");
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
