@@ -29,11 +29,8 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
             CurrentSaveData = new SaveData();
         }
 
-        CurrentSaveData.CurrentHealth = controller.Stats.CurrentHealth;
         CurrentSaveData.MaxHealth = controller.Stats.MaxHealth;
-        CurrentSaveData.CurrentEnergy = controller.Stats.CurrentEnergy;
         CurrentSaveData.MaxEnergy = controller.Stats.MaxEnergy;
-        CurrentSaveData.Morality = controller.Stats.Morality;
         CurrentSaveData.AttackEnergyCost = controller.Stats.AttackEnergyCost;
         // CurrentSaveData.experience = controller.Stats.Experience;
         // Map other fields as needed

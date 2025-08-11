@@ -5,6 +5,7 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
     [Header("Spawn Settings")]
     [SerializeField] private Vector3 _playerStartPosition;
     [SerializeField] private PlayerTemplate playerTemplate;
+    [SerializeField] private PlayerRunStats runStats;
 
     [Header("Runtime References")]
     public GameObject playerInstance { get; private set; }
@@ -38,10 +39,14 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
         // Setup behaviour and save-data info
         playerRobotBehaviour = playerTemplate.InitializePlayerStateController(playerInstance);
         playerRobotInfo = playerTemplate.InitializePlayerStats(saveService.CurrentSaveData);
-        // Apply stats before gameplay so HUD and AI use updated values
-        if (playerTemplate.HasCapturedStats)
+        if (runStats == null && RunProgressManager.Instance != null)
         {
-            playerTemplate.ApplyStats(playerRobotInfo);
+            runStats = RunProgressManager.Instance.RunStats;
+        }
+        // Apply stats before gameplay so HUD and AI use updated values
+        if (runStats != null && runStats.HasValues)
+        {
+            runStats.Apply(playerRobotInfo);
         }
 
         // Locate "WholeBody" container
