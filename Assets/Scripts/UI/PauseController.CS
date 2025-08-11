@@ -31,6 +31,8 @@ public class PauseController : MonoBehaviour
         _pauseAction.Enable();
 
         _pauseUI.OnResumeClicked += TogglePause;
+        _pauseUI.OnRestartClicked += RestartRun;
+        _pauseUI.OnMainMenuClicked += GoToMainMenu;
     }
 
 
@@ -63,6 +65,8 @@ public class PauseController : MonoBehaviour
     {
         Debug.Log("PauseController: RestartRun called");
         // Time.timeScale = 1;
+        var saveService = FindObjectOfType<PlayerSaveService>();
+        saveService?.ResetSaveData();
         RunProgressManager.Instance.RestartRun();
     }
 
