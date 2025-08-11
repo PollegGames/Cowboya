@@ -6,6 +6,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     [SerializeField] private DoorController doorNext;
     [SerializeField] private VictorySetup victorySetup;
     [SerializeField] private PlayerTemplate playerTemplate;
+    [SerializeField] private PlayerSaveService saveService;
 
     private bool isVictoryDoor = false;
 
@@ -33,6 +34,10 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                 if (playerTemplate != null && controller != null)
                 {
                     playerTemplate.CaptureStats(controller.Stats);
+                    if (saveService != null)
+                    {
+                        saveService.SaveGame(controller);
+                    }
                 }
 
                 RunProgressManager.Instance.LoadNextLevel();
