@@ -49,10 +49,14 @@ public class LevelEndTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player") && RunProgressManager.Instance != null)
         {
-            RobotStateController controller = other.GetComponent<RobotStateController>();
-            GrabSystem grabSystem = other.GetComponent<GrabSystem>();
+            RobotStateController controller = other.GetComponentInParent<RobotStateController>();
+            GrabSystem grabSystem = other.GetComponentInParent<GrabSystem>();
 
-            if (grabSystem != null)
+            if (grabSystem == null)
+            {
+                Debug.LogWarning("LevelEndTrigger: GrabSystem component is missing on Player or its parent.");
+            }
+            else
             {
                 grabSystem.ClearHands();
             }
@@ -64,6 +68,10 @@ public class LevelEndTrigger : MonoBehaviour
                 {
                     saveService.SaveGame(controller);
                 }
+            }
+            else if (controller == null)
+            {
+                Debug.LogWarning("LevelEndTrigger: RobotStateController component is missing on Player or its parent.");
             }
 
             RunProgressManager.Instance.LoadNextLevel();
