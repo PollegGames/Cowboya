@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(RobotLocomotionController))]
-public class PlayerMovementController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 {
     [Header("Components")]
     [SerializeField] private RobotLocomotionController locomotion;
@@ -27,6 +27,13 @@ public class PlayerMovementController : MonoBehaviour
 
     [SerializeField] private EnergyBot energyBot;
 
+    private Vector2 lookDirection = Vector2.right;
+
+    /// <summary>
+    /// Gets the current look direction.
+    /// </summary>
+    public Vector2 LookDirection => lookDirection;
+
     private void Awake()
     {
         locomotion.OnJumpStarted += HandleJumpStart;
@@ -51,6 +58,9 @@ public class PlayerMovementController : MonoBehaviour
         {
             horizontalInput = input.Movement.x;
             verticalInput = input.Movement.y;
+
+            if (Mathf.Abs(horizontalInput) > 0.1f)
+                lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
         }
         TryFlip();
         CalculateAndApplyBodyRotation();

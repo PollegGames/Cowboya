@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class HeadTargetController : MonoBehaviour
 {
@@ -16,23 +15,38 @@ public class HeadTargetController : MonoBehaviour
     public float bendSpeed = 5f;
 
     private float currentBend = 0f;
-    private InputSystem_Actions controls;
-    [SerializeField] public bool isPlayerControlled = false;
+
+    [SerializeField] private MonoBehaviour directionProviderComponent;
+    private ILookDirectionProvider directionProvider;
+    private bool providerLogged;
 
     private void Awake()
     {
-        if (isPlayerControlled)
+        if (directionProviderComponent != null)
+            directionProvider = directionProviderComponent as ILookDirectionProvider;
+
+        if (directionProvider == null)
+            directionProvider = GetComponentInParent<ILookDirectionProvider>();
+
+        if (directionProvider == null && !providerLogged)
         {
-            controls = new InputSystem_Actions();
+            Debug.LogError("HeadTargetController: ILookDirectionProvider not found.", this);
+            providerLogged = true;
         }
     }
 
-    private void OnEnable() => controls.Enable();
-    private void OnDisable() => controls.Disable();
+    private void OnValidate()
+    {
+        if (directionProviderComponent == null)
+        {
+            var provider = GetComponentInParent<ILookDirectionProvider>();
+            directionProviderComponent = provider as MonoBehaviour;
+        }
+    }
 
     private void LateUpdate()
     {
-        if (!hips || !head || !locomotion) return;
+        if (!hips || !head || !locomotion || directionProvider == null) return;
 
         // 1. Mirror relative to the head position
         float headOffsetX = head.position.x - hips.position.x;
@@ -40,7 +54,7 @@ public class HeadTargetController : MonoBehaviour
         mirroredOffsetX = Mathf.Clamp(mirroredOffsetX, -maxMirrorOffset, maxMirrorOffset);
 
         // 2. Movement direction → bend offset (which way to lean)
-        float input = controls.Player.Move.ReadValue<Vector2>().x;
+        float input = directionProvider.LookDirection.x;
         float targetBend = Mathf.Clamp(input, -1f, 1f) * maxBendOffset;
 
         // Smooth interpolation to avoid jerks

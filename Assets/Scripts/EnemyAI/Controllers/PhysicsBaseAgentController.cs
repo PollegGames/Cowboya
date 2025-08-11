@@ -4,7 +4,7 @@ using UnityEngine;
 /// Base class for agents (player, enemies, allies) that handles movement, facing, and jumping using physical components.
 /// Uses RobotLocomotionController, and LegJointLimiter instead of Animator.
 /// </summary>
-public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
+public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover, ILookDirectionProvider
 {
     [Header("Movement & Facing Modules")]
     [SerializeField] protected RobotLocomotionController locomotion;
@@ -14,6 +14,12 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
     protected float direction = 0f;
     protected float verticalDirection = 0f;
     protected bool flipped = false;
+    private Vector2 lookDirection = Vector2.right;
+
+    /// <summary>
+    /// Gets the current look direction.
+    /// </summary>
+    public Vector2 LookDirection => lookDirection;
 
     protected virtual void Awake()
     {
@@ -30,6 +36,8 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover
     public virtual void SetMovement(float input)
     {
         direction = Mathf.Clamp(input, -1f, 1f);
+        if (!Mathf.Approximately(direction, 0f))
+            lookDirection = new Vector2(Mathf.Sign(direction), 0f);
         locomotion.HandleMovement(direction, flipped);
     }
 
