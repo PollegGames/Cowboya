@@ -30,12 +30,13 @@ public class PlayerTemplate : RobotTemplate
                 (int)saveData.MaxHealth,
                 (int)saveData.CurrentEnergy,
                 (int)saveData.MaxEnergy,
-                0,
+                (int)saveData.Morality,
                 (int)saveData.AttackEnergyCost);
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
         Debug.Log("PlayerStats initialized with health: " + robotBehaviour.Stats.CurrentHealth
         + " and energy: " + robotBehaviour.Stats.CurrentEnergy
+        + " and morality: " + robotBehaviour.Stats.Morality
         + " and attack energy cost: " + robotBehaviour.Stats.AttackEnergyCost);
 
         return robotBehaviour.Stats;

@@ -8,8 +8,10 @@ public class SaveData
     [field: SerializeField] public float MaxHealth = 100f;
     [field: SerializeField] public float CurrentHealth = 100f;
     [field: SerializeField] public float MaxEnergy { get; set; } = 100f;
+    [field: SerializeField] public float CurrentEnergy { get; set; } = 100f;
     [field: SerializeField] public float EnergyRechargeRate { get; set; } = 5f;
     [field: SerializeField] public float AttackEnergyCost { get; set; } = 5f;
+    [field: SerializeField] public float Morality { get; set; } = 0f;
     [field: SerializeField] public List<string> UnlockedAttacks { get; set; }
     [field: SerializeField] public List<string> AttackOrder { get; set; } // Customizable order of attacks
     [field: SerializeField] public int Gears { get; set; } = 0;// Total gears stored at the camp
@@ -28,6 +30,8 @@ public class SaveData
     {
         Guid g = Guid.NewGuid();
         SaveName = g.ToString();
+        CurrentEnergy = 100f;
+        Morality = 0f;
         UnlockedAttacks = new List<string>(); // Start with no unlocked attacks
         AttackOrder = new List<string>(); // Start with no attack order
         SpecialResources = new Dictionary<string, int>(); // Empty special resources
