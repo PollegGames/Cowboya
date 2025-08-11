@@ -83,6 +83,7 @@
     <Compile Include="Assets\Tests\UnitTests\CellTests.cs" />
     <Compile Include="Assets\Tests\UnitTests\PlayerInitiatorTests.cs" />
     <Compile Include="Assets\Tests\UnitTests\StationReservationServiceTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\RoomLiftPerFloorProcessorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tests\UnitTests\Unit.Tests.asmdef" />
