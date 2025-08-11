@@ -15,7 +15,7 @@ public class LeverHandle : MonoBehaviour, IGrabbable
     private bool _isGrabbed;
     private float _currentT;
 
-    public bool CanBeGrabbed()
+    public bool CanBeGrabbed(Inventory inventory)
     {
         return true;
     }

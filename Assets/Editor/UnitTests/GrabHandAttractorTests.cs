@@ -6,7 +6,7 @@ public class GrabHandAttractorTests
 {
     private class DummyGrabbable : MonoBehaviour, IGrabbable
     {
-        public bool CanBeGrabbed() => true;
+        public bool CanBeGrabbed(Inventory inventory) => true;
         public void OnGrab(Transform grabParent) {}
         public void OnRelease(Vector2 throwForce) {}
         public void OnAttract(Vector2 attractPoint) {}

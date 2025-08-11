@@ -85,9 +85,9 @@ public class GrabSystem : MonoBehaviour
     {
         if (hand == null || held != null) return;
         IGrabbable obj = hand.DetectGrabbable();
-        if (obj != null && obj.CanBeGrabbed())
+        var inventory = hand.GetComponentInParent<Inventory>();
+        if (obj != null && obj.CanBeGrabbed(inventory))
         {
-            var inventory = hand.GetComponentInParent<Inventory>();
             PickupType? slot = null;
 
             if (obj is SecurityBadgePickup)
