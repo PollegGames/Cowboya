@@ -101,7 +101,7 @@ public class FactoryManagerTests
     }
     private class DummyEnemiesSpawner : IEnemiesSpawner
     {
-        public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService, MachineSecurityManager securityManager, SecurityBadgeSpawner securityBadgeSpawner) { }
+        public void Initialize(MapManager mapManager, IWaypointService waypointService, GameUIViewModel viewModel, IRobotRespawnService respawnService, MachineSecurityManager securityManager, SecurityBadgeSpawner securityBadgeSpawner, BatterySpawner batterySpawner) { }
         public void SetDropContainer(Transform container) { }
         public void CreateWorkers(int workersToSpawn) { }
         public void CreateEnemies(int enemiesToSpawn) { }

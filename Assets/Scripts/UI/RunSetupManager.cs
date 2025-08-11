@@ -331,7 +331,7 @@ public class RunSetupManager : MonoBehaviour
         waypointServiceInstance = Instantiate(waypointServicePrefab);
         enemiesSpawnerInstance = Instantiate(enemiesSpawnerPrefab);
         enemiesSpawnerInstance.SetDropContainer(factoryManagerInstance.transform);
-        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager, null);
+        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager, null, null);
 
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 

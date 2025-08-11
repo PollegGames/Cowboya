@@ -37,6 +37,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
     public EnemyStatus EnemyStatus { get; set; } = EnemyStatus.Idle;
 
     private SecurityBadgePickup initialBadge;
+    private BatteryPickup initialBattery;
 
     private Transform dropContainer;
 
@@ -62,7 +63,8 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         IWaypointNotifier waypointNotifier,
         IRobotRespawnService respawnService,
         Transform dropContainer,
-        SecurityBadgeSpawner securityBadgeSpawner)
+        SecurityBadgeSpawner securityBadgeSpawner,
+        BatterySpawner batterySpawner = null)
     {
         this.waypointQueries = waypointQueries;
         this.waypointNotifier = waypointNotifier;
@@ -75,6 +77,13 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         if (securityBadgeSpawner && initialBadge == null)
         {
             initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
+        }
+
+        if (batterySpawner && initialBattery == null)
+        {
+            initialBattery = batterySpawner.SpawnBattery(bodyReference);
+            if (robotBehaviour != null)
+                robotBehaviour.Stats.UpdateHealth(10f);
         }
     }
 
@@ -172,20 +181,32 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
     private void DetachHeldBadges()
     {
-        if (initialBadge == null) return;
-
-        initialBadge.OnRelease(Vector2.zero);
-
-        if (dropContainer != null)
+        if (initialBadge != null)
         {
-            initialBadge.transform.SetParent(dropContainer, true);
+            initialBadge.OnRelease(Vector2.zero);
+            if (dropContainer != null)
+                initialBadge.transform.SetParent(dropContainer, true);
+            initialBadge = null;
         }
-        initialBadge = null;
+
+        if (initialBattery != null)
+        {
+            initialBattery.OnRelease(Vector2.zero);
+            if (dropContainer != null)
+                initialBattery.transform.SetParent(dropContainer, true);
+            initialBattery = null;
+        }
     }
 
     public void OnBadgeStolen(GameObject player)
     {
         Debug.Log($"{name} badge stolen by {player.name}");
+    }
+
+    public void OnBatteryStolen(GameObject player)
+    {
+        Debug.Log($"{name} battery stolen by {player.name}");
+        robotBehaviour.Health.TakeDamage(10);
     }
 
     private void UpdateBalance(bool enabledBalance)

@@ -30,6 +30,7 @@ public class SceneBootstrapper : MonoBehaviour
         var waypointService = Instantiate(config.waypointServicePrefab);
         var respawnService = Instantiate(config.respawnServicePrefab);
         var badgeSpawner = Instantiate(config.badgeSpawnerPrefab);
+        var batterySpawner = Instantiate(config.batterySpawnerPrefab);
         if (SceneController.instance == null)
         {
             Instantiate(config.sceneControllerPrefab);
@@ -54,7 +55,8 @@ public class SceneBootstrapper : MonoBehaviour
                 respawnService,
                 config.victorySetupPrefab,
                 saveService,
-                badgeSpawner
+                badgeSpawner,
+                batterySpawner
             );
         }
 

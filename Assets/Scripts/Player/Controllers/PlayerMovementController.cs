@@ -159,8 +159,9 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     public void Die()
     {
-        // Drop any badge the player is carrying
+        // Drop any badge or battery the player is carrying
         SecurityBadgePickup.DropPlayerBadge();
+        BatteryPickup.DropPlayerBattery();
 
         var jointBreaker = GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();

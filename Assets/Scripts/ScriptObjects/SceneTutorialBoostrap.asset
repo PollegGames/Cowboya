@@ -19,6 +19,7 @@ MonoBehaviour:
   waypointServicePrefab: {fileID: 604041955278505729, guid: cd189dbc195162d4f82e578e1bf48275, type: 3}
   respawnServicePrefab: {fileID: 2201941774247748942, guid: 2738a4e7ee710ef4ab66ab6cca2af1a3, type: 3}
   badgeSpawnerPrefab: {fileID: 2599893765140896267, guid: 824e0a32fecc7e7428f19bb692f62171, type: 3}
+  batterySpawnerPrefab: {fileID: 0}
   sceneControllerPrefab: {fileID: 3662908670334199631, guid: 3bf2939990ae2ab4f91281497ab365f7, type: 3}
   gameUIViewModelPrefab: {fileID: 7317822581930453079, guid: 5a8f0b8511669f44fa106314ede53f67, type: 3}
   victorySetupPrefab: {fileID: 11400000, guid: 71f325ff527d30649a5443ec4acf43a7, type: 2}
