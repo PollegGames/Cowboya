@@ -86,6 +86,7 @@
     <Compile Include="Assets\Editor\UnitTests\SceneInitiatorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\GrabHandAttractorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\GridFactoryTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\BatteryStealFromEnemyTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\AllyBehaviorTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\WaypointPathFinderTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\ObjectPoolTests.cs" />

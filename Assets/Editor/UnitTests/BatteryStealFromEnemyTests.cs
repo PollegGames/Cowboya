@@ -98,7 +98,7 @@ public class BatteryStealFromEnemyTests
         Assert.IsFalse(playerInventory.HasItem(PickupType.Battery));
 
         input.PressGrab();
-        grabSystem.Update();
+        // grabSystem.Update();
         input.NextFrame();
 
         Assert.AreEqual(battery, playerInventory.GetItem(PickupType.Battery));
