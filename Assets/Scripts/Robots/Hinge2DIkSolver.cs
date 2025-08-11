@@ -46,11 +46,29 @@ public class Hinge2DIkSolver : MonoBehaviour {
 
     public delegate void OnSolve ();
     public OnSolve CallBackOnSolve;
-    // Start is called before the first frame update
-    void Start () {
-        init ();
-        // we need to run solve once so the values would at least be somewhat right.
-        Solve ();
+
+    /// <summary>
+    /// Rebuilds cached joints and transforms and runs the solver once.
+    /// </summary>
+    public void Reinitialize() {
+        positions = null;
+        bones = null;
+        bonesT = null;
+        bonesR = null;
+        StartDir = null;
+        bonesLength = null;
+        avAngles = null;
+        angleOffset = null;
+        completeLength = 0f;
+        root = null;
+        rootrb = null;
+
+        init();
+        Solve();
+    }
+
+    private void OnEnable() {
+        Reinitialize();
     }
 
     void init () {
