@@ -4,7 +4,7 @@ using UnityEngine;
 /// Base class for horizontal and vertical movement.
 /// Used by the player, enemies and allies.
 /// </summary>
-public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
+public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILookDirectionProvider
 {
     [Header("Movement Settings")]
     [SerializeField] protected float moveSpeed = 3f;
@@ -20,6 +20,12 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     [SerializeField] private Transform points;
     [SerializeField] private Transform poles;
     private bool flipped = false;
+    private Vector2 lookDirection = Vector2.right;
+
+    /// <summary>
+    /// Gets the current look direction.
+    /// </summary>
+    public Vector2 LookDirection => lookDirection;
 
     protected bool isMoving;
     protected bool isVerticalMoving;
@@ -64,6 +70,8 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover
     {
         this.direction = Mathf.Clamp(direction, -1f, 1f);
         isMoving = direction != 0;
+        if (!Mathf.Approximately(this.direction, 0f))
+            lookDirection = new Vector2(Mathf.Sign(this.direction), 0f);
     }
 
     /// <summary>
