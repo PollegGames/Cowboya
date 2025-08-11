@@ -124,6 +124,10 @@ public class JointBreaker : MonoBehaviour
         ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
 
         foreach (var solver in ikSolvers)
-            if (solver != null) solver.enabled = true;
+            if (solver != null)
+            {
+                solver.Reinitialize();
+                solver.enabled = true;
+            }
     }
 }
