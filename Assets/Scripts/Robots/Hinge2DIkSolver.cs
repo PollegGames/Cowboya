@@ -41,6 +41,7 @@ public class Hinge2DIkSolver : MonoBehaviour {
     private float completeLength = 0;
     private Transform root;
     private Rigidbody2D rootrb;
+    private bool isReinitializing;
 
     public bool active = true;
 
@@ -51,6 +52,11 @@ public class Hinge2DIkSolver : MonoBehaviour {
     /// Rebuilds cached joints and transforms and runs the solver once.
     /// </summary>
     public void Reinitialize() {
+        if (isReinitializing) {
+            return;
+        }
+        isReinitializing = true;
+
         positions = null;
         bones = null;
         bonesT = null;
@@ -65,6 +71,8 @@ public class Hinge2DIkSolver : MonoBehaviour {
 
         init();
         Solve();
+
+        isReinitializing = false;
     }
 
     private void OnEnable() {
@@ -119,13 +127,28 @@ public class Hinge2DIkSolver : MonoBehaviour {
         //Debug.Log(root + " , " + rootrb);
     }
 
+    private bool IsValidBone(int index) {
+        return bonesT != null && bones != null && index >= 0 &&
+            index < bonesT.Length && bonesT[index] != null && bones[index] != null;
+    }
+
     private Vector2 getBonePos (int index) {
-        // get the position iof the anchor in world pos
+        if (!IsValidBone(index)) {
+            Reinitialize();
+            if (!IsValidBone(index)) {
+                return Vector2.zero;
+            }
+        }
         return bonesT[index].rotation * bones[index].anchor + bonesT[index].position;
     }
 
     private Vector2 getBonePosVR2 (int index) {
-        // get the position iof the anchor in world pos
+        if (!IsValidBone(index)) {
+            Reinitialize();
+            if (!IsValidBone(index)) {
+                return Vector2.zero;
+            }
+        }
         return bones[index].anchor + (Vector2) bonesT[index].position;
     }
     private Vector2 BonePosToPos (int index, Vector2 pos) {
@@ -156,6 +179,9 @@ public class Hinge2DIkSolver : MonoBehaviour {
         // nothing much to say here
         Vector2 targetPos = target.position;
         for (int i = 0; i < chainLength + 1; i++) {
+            if (!IsValidBone(i)) {
+                return;
+            }
             positions[i] = getBonePos (i);
         }
 
@@ -226,6 +252,9 @@ public class Hinge2DIkSolver : MonoBehaviour {
         vmd = Mathf.Clamp01 (vmd);
         var fxs50 = 25 * Time.fixedDeltaTime;
         for (int i = 1; i <= chainLength; i++) {
+            if (!IsValidBone(i - 1) || bonesR == null || bonesR[i - 1] == null) {
+                continue;
+            }
             var t = PlainMath.AngleFromDirection (positions[i - 1] - positions[i]);
             var angle = -Mathf.DeltaAngle (bonesT[i - 1].eulerAngles.z + angleOffset[i - 1], t);
 
@@ -274,6 +303,9 @@ public class Hinge2DIkSolver : MonoBehaviour {
         var fxs50 = 25 * Time.fixedDeltaTime;
         //Debug.Log (n + " ," + rootrb.velocity.magnitude);
         for (int i = 0; i <= chainLength; i++) {
+            if (!IsValidBone(i) || bonesR == null || bonesR[i] == null) {
+                continue;
+            }
             //calculate the direction from anchor to position[i]
             var dir = (positions[i] - getBonePos (i));
             var mag = dir.magnitude;
