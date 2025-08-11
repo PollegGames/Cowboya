@@ -5,6 +5,12 @@ using UnityEngine;
 public class PlayerTemplate : RobotTemplate
 {
     private RobotStateController robotBehaviour;
+    private float currentHealth;
+    private float currentEnergy;
+    private float currentMorality;
+
+    private const float MinMorality = -100f;
+    private const float MaxMorality = 100f;
     public RobotStateController InitializePlayerStateController(GameObject robotInstance)
     {
         robotBehaviour = robotInstance.GetComponent<RobotStateController>();
