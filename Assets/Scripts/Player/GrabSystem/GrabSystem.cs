@@ -56,17 +56,23 @@ public class GrabSystem : MonoBehaviour
             rightHeld.OnAttract(rightHand.transform.position);
     }
 
+    /// <summary>
+    /// Releases any held objects without applying a throw force.
+    /// </summary>
     public void ClearHands()
     {
         if (leftHeld != null)
         {
-            Release(leftHand, ref leftHeld);
+            Release(leftHand, ref leftHeld, 0f);
         }
 
         if (rightHeld != null)
         {
-            Release(rightHand, ref rightHeld);
+            Release(rightHand, ref rightHeld, 0f);
         }
+
+        leftHeld = null;
+        rightHeld = null;
     }
 
     private void TryGrab(GrabHandAttractor hand, ref IGrabbable held)
@@ -91,8 +97,13 @@ public class GrabSystem : MonoBehaviour
 
     private void Release(GrabHandAttractor hand, ref IGrabbable held)
     {
+        Release(hand, ref held, throwStrength);
+    }
+
+    private void Release(GrabHandAttractor hand, ref IGrabbable held, float strength)
+    {
         if (hand == null || held == null) return;
-        Vector2 throwForce = (Vector2)(hand.transform.right) * throwStrength;
+        Vector2 throwForce = (Vector2)(hand.transform.right) * strength;
         held.OnRelease(throwForce);
         held = null;
     }
