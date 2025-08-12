@@ -30,6 +30,8 @@ public class JointBreaker : MonoBehaviour
 
     private void Awake()
     {
+        // Ensure lists start empty to avoid duplicate entries when the
+        // component is reused or deserialized with existing items.
         hingeJoints.Clear();
         fixedJoints.Clear();
         ikSolvers.Clear();
