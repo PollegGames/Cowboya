@@ -1,4 +1,5 @@
 using System.Reflection;
+
 using NUnit.Framework;
 using UnityEngine;
 
@@ -18,5 +19,6 @@ public class CubeUpgradeSOTests
         upgradeSO.ApplyUpgrade(stats);
 
         Assert.AreEqual(1f + upgradeSO.UpgradeEnergyRechargeValue, stats.EnergyRechargeRate);
+
     }
 }

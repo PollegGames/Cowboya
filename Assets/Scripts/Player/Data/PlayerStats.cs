@@ -12,7 +12,7 @@ public class RobotStats
     public float MaxEnergy = 1f;
     public float CurrentEnergy = 1f;
     public float AttackEnergyCost = 1f;
-    public float EnergyRechargeRate = 0f;
+    public float EnergyRechargeRate = 1f;
     public event Action OnHealthChanged;
     public event Action OnEnergyChanged;
     public event Action OnEnergyRechargeChanged;
@@ -43,11 +43,16 @@ public class RobotStats
         Attacks = attacks ?? new List<Attack>();
     }
 
-     public void UpdateEnergy(float delta)
+    public void UpdateEnergy(float delta)
     {
         CurrentEnergy = Mathf.Clamp(CurrentEnergy + delta, 0, MaxEnergy);
         OnEnergyChanged?.Invoke();
+    }
 
+    public void UpdateEnergyRecharge(float delta)
+    {
+        EnergyRechargeRate = math.max(0f, EnergyRechargeRate + delta);
+        OnEnergyRechargeChanged?.Invoke();
     }
 
     /// <summary>

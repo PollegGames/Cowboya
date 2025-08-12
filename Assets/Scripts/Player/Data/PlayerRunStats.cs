@@ -47,7 +47,13 @@ public class PlayerRunStats : ScriptableObject
             attackDamage = attack.Damage;
         }
 
+
         hasValues = true;
+    }
+
+    public void Capture(RobotStats source)
+    {
+        Capture(source, null, null);
     }
 
     /// <summary>
@@ -69,6 +75,7 @@ public class PlayerRunStats : ScriptableObject
         float healthTarget = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
         target.UpdateHealth(healthTarget - target.CurrentHealth);
         target.UpdateMorality(morality - target.Morality);
+        target.EnergyRechargeRate = energyRechargeRate;
         if (energyBot != null)
         {
             energyBot.rechargeRate = energyRechargeRate;
@@ -78,7 +85,6 @@ public class PlayerRunStats : ScriptableObject
         {
             attack.Damage = attackDamage;
         }
-
     }
 
     /// <summary>
