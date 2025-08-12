@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7810815151187080829}
   - component: {fileID: 41544107772198061}
   - component: {fileID: 429215285151596846}
+  - component: {fileID: 5514208816963108588}
   m_Layer: 0
   m_Name: TriggerSlot
   m_TagString: Untagged
@@ -134,6 +135,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &5514208816963108588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 329611954728020130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6350df1f9d87488384d18ab751b17262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  upgradeStore: {fileID: 0}
 --- !u!1 &542146199199913260
 GameObject:
   m_ObjectHideFlags: 0

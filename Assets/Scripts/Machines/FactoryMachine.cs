@@ -23,6 +23,7 @@ public class FactoryMachine : BaseMachine
 
     public bool HasWorker => currentWorker != null;
     public EnemyWorkerController CurrentWorker => currentWorker;
+
     protected override void Awake()
     {
         base.Awake();
@@ -30,6 +31,10 @@ public class FactoryMachine : BaseMachine
         ApplyMaterial();
         OnPoweredOn += HandlePoweredOn;
         OnPoweredOff += HandlePoweredOff;
+
+        OnRobotAssigned += HandleRobotAssigned;
+        OnRobotFreed += HandleRobotFreed;
+
         if (cubeConveyorController != null)
             cubeConveyorController.OnCubeProcessed += HandleCubeProcessed;
     }
@@ -38,6 +43,9 @@ public class FactoryMachine : BaseMachine
     {
         OnPoweredOn -= HandlePoweredOn;
         OnPoweredOff -= HandlePoweredOff;
+
+        OnRobotAssigned -= HandleRobotAssigned;
+        OnRobotFreed -= HandleRobotFreed;
         if (cubeConveyorController != null)
             cubeConveyorController.OnCubeProcessed -= HandleCubeProcessed;
     }
@@ -111,6 +119,18 @@ public class FactoryMachine : BaseMachine
             CancelInvoke(nameof(BeginConveyorInternal));
         }
     }
+    private void HandleRobotAssigned(BaseMachine m)
+    {
+        if (m != this) return;
+        ScheduleSpawn();
+    }
+
+    private void HandleRobotFreed(BaseMachine m)
+    {
+        if (m != this) return;
+        cubeConveyorController?.DetachCube();        // drop any cube currently on the conveyor
+        CancelInvoke(nameof(BeginConveyorInternal)); // stop future spawns
+    }
 
     private void HandleCubeProcessed()
     {
@@ -120,9 +140,7 @@ public class FactoryMachine : BaseMachine
 
     private void ScheduleSpawn()
     {
-        if (!isOn || cubeConveyorController == null || cubeActive)
-            return;
-        if (factoryAlarmStatus != null && factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted)
+        if (!isOccupied || cubeConveyorController == null || cubeActive)
             return;
 
         float timeSinceLast = Time.time - lastSpawnTime;
@@ -131,16 +149,15 @@ public class FactoryMachine : BaseMachine
         Invoke(nameof(BeginConveyorInternal), delay);
     }
 
+
     private void BeginConveyorInternal()
     {
-        if (!isOn || cubeConveyorController == null || cubeActive)
-            return;
-        if (factoryAlarmStatus != null && factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted)
+        if (!isOccupied || cubeConveyorController == null || cubeActive)
             return;
 
-        cubeConveyorController.BeginConveyor();
         cubeActive = true;
         lastSpawnTime = Time.time;
+        cubeConveyorController.BeginConveyor();
     }
 
     /// <summary>

@@ -12,9 +12,12 @@ public class CubeSpawner : MonoBehaviour
             return null;
         }
 
+        Vector3 spawnPos = parent.position;
+        spawnPos.z = 0.01f;
+
         var cube = Instantiate(
             cubePrefab,
-            parent.position,
+            spawnPos,
             parent.rotation,
             parent
         );

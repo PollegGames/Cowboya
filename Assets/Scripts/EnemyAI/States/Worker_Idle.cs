@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public class Worker_Idle : WorkerState
 {
-    private const float IDLE_DURATION = 10f;
+    private const float IDLE_DURATION = 1f;
     private float _timer;
     public Worker_Idle(EnemyWorkerController enemy,
                                     WorkerStateMachine machine,

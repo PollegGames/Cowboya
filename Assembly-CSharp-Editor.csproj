@@ -92,6 +92,7 @@
     <Compile Include="Assets\Editor\UnitTests\ObjectPoolTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\GridManagerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\WaypointServiceTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\CubeCollectorTests.cs" />
     <Compile Include="Assets\Shapes2D\Editor\CustomHandles.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityCameraTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\RoomWaypointTests.cs" />

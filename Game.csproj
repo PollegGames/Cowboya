@@ -203,6 +203,7 @@
     <Compile Include="Assets\Scripts\Robots\Attack.cs" />
     <Compile Include="Assets\Scripts\UI\MessageSystem\GameMessage.cs" />
     <Compile Include="Assets\Scripts\Navigation\BlockedCellProcessor.cs" />
+    <Compile Include="Assets\Scripts\Machines\CubeUpgradeSO.cs" />
     <Compile Include="Assets\Scripts\Map\AlarmFlasher.cs" />
     <Compile Include="Assets\Scripts\InputSystem_Actions.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactiveRestingMachine.cs" />
@@ -271,6 +272,7 @@
     <Compile Include="Assets\Scripts\RobotFactory\RobotLocomotionController.cs" />
     <Compile Include="Assets\Scripts\Player\Controllers\PlayerInputReader.cs" />
     <Compile Include="Assets\Scripts\Navigation\EndpointsFactory.cs" />
+    <Compile Include="Assets\Scripts\Machines\CubeCollector.cs" />
     <Compile Include="Assets\Scripts\Navigation\RoomRenderer.cs" />
     <Compile Include="Assets\Scripts\Robots\RobotState.cs" />
     <Compile Include="Assets\Scripts\Robots\FootStepper.cs" />

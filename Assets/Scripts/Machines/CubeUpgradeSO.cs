@@ -8,6 +8,12 @@ public class CubeUpgradeSO : ScriptableObject
 {
     [SerializeField] private CubeUpgradeType selectedUpgrade;
 
+    [SerializeField] private float upgradeMaxHealthValue = 10f;
+    [SerializeField] private float upgradeMaxEnergyValue = 10f;
+    [SerializeField] private float upgradeEnergyRechargeValue = 5f;
+    [SerializeField] private int upgradeAttackDamageValue = 5;
+
+
     /// <summary>
     /// Gets the stored upgrade type.
     /// </summary>
@@ -34,19 +40,20 @@ public class CubeUpgradeSO : ScriptableObject
         switch (selectedUpgrade)
         {
             case CubeUpgradeType.MaxHealth:
-                target.MaxHealth += 1f;
-                target.UpdateHealth(1f);
+                target.MaxHealth += upgradeMaxHealthValue;
+                target.UpdateHealth(upgradeMaxHealthValue);
                 break;
             case CubeUpgradeType.MaxEnergy:
-                target.MaxEnergy += 1f;
-                target.UpdateEnergy(1f);
+                target.MaxEnergy += upgradeMaxEnergyValue;
+                target.UpdateEnergy(upgradeMaxEnergyValue);
                 break;
-            case CubeUpgradeType.EnergyRecharge:
-                target.UpdateEnergy(1f);
-                break;
+            // case CubeUpgradeType.EnergyRecharge:
+            // target.EnergyRechargeRate += upgradeEnergyRechargeValue;
+            //     target.UpdateEnergyRecharge(upgradeEnergyRechargeValue);
+            //     break;
             case CubeUpgradeType.AttackDamage:
                 foreach (Attack attack in target.Attacks)
-                    attack.Damage += 1;
+                    attack.Damage += upgradeAttackDamageValue;
                 break;
         }
     }
