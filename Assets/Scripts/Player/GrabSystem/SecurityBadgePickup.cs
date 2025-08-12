@@ -28,21 +28,23 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     {
         rb = GetComponent<Rigidbody2D>();
         joint = GetComponent<TargetJoint2D>();
+        if (joint != null)
+        {
+            // Start disabled — only enable when grabbed
+            joint.enabled = false;
 
-        // Start disabled — only enable when grabbed
-        joint.enabled = false;
-
-        // Configure joint behavior
-        joint.autoConfigureTarget = false;
-        joint.target = rb.position;
-        joint.frequency = frequency;
-        joint.dampingRatio = dampingRatio;
-        joint.maxForce = maxForce;
+            // Configure joint behavior
+            joint.autoConfigureTarget = false;
+            joint.target = rb.position;
+            joint.frequency = frequency;
+            joint.dampingRatio = dampingRatio;
+            joint.maxForce = maxForce;
+        }
     }
 
     void FixedUpdate()
     {
-        if (joint.enabled && followTarget != null)
+        if (joint != null && joint.enabled && followTarget != null)
         {
             joint.target = followTarget.position;
         }
@@ -127,18 +129,18 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     public void OnAttract(Vector2 attractPoint)
     {
+        if (joint == null)
+            return;
+
         if (attached && joint.enabled && followTarget == null)
-        {
             joint.target = attractPoint;
-        }
     }
 
     public void OnRelease(Vector2 throwForce)
     {
         attached = false;
-
-        // Turn off the joint
-        joint.enabled = false;
+        if (joint != null)
+            joint.enabled = false;
         followTarget = null;
 
         if (ownerInventory != null)
