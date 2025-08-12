@@ -201,17 +201,23 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
     {
         if (initialBadge != null)
         {
-            initialBadge.OnRelease(Vector2.zero);
-            if (dropContainer != null)
-                initialBadge.transform.SetParent(dropContainer, true);
+            if (inventory != null && inventory.GetItem(PickupType.SecurityBadge) == initialBadge)
+            {
+                initialBadge.OnRelease(Vector2.zero);
+                if (dropContainer != null)
+                    initialBadge.transform.SetParent(dropContainer, true);
+            }
             initialBadge = null;
         }
 
         if (initialBattery != null)
         {
-            initialBattery.OnRelease(Vector2.zero);
-            if (dropContainer != null)
-                initialBattery.transform.SetParent(dropContainer, true);
+            if (inventory != null && inventory.GetItem(PickupType.Battery) == initialBattery)
+            {
+                initialBattery.OnRelease(Vector2.zero);
+                if (dropContainer != null)
+                    initialBattery.transform.SetParent(dropContainer, true);
+            }
             initialBattery = null;
         }
     }
