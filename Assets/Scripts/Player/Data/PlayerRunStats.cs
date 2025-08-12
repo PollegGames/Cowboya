@@ -9,6 +9,10 @@ public class PlayerRunStats : ScriptableObject
     public float energyRechargeRate;
     public int attackDamage;
     public float morality;
+    public float MaxHealthBonus;
+    public float MaxEnergyBonus;
+    public float EnergyRechargeBonus;
+    public int AttackDamageBonus;
 
     private bool hasValues;
 
@@ -30,16 +34,15 @@ public class PlayerRunStats : ScriptableObject
         maxHealth = source.MaxHealth;
         maxEnergy = source.MaxEnergy;
         morality = source.Morality;
-        if (energyBot != null)
-        {
-            energyRechargeRate = energyBot.rechargeRate;
-        }
-        if (attack != null)
-        {
-            attackDamage = attack.Damage;
-        }
+        energyRechargeRate = energyBot != null ? energyBot.rechargeRate : source.EnergyRechargeRate;
+        attackDamage = attack != null ? attack.Damage : (source.Attacks.Count > 0 ? source.Attacks[0].Damage : 0);
 
         hasValues = true;
+    }
+
+    public void Capture(RobotStats source)
+    {
+        Capture(source, null, null);
     }
 
     /// <summary>
@@ -61,6 +64,7 @@ public class PlayerRunStats : ScriptableObject
         float healthTarget = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
         target.UpdateHealth(healthTarget - target.CurrentHealth);
         target.UpdateMorality(morality - target.Morality);
+        target.EnergyRechargeRate = energyRechargeRate;
         if (energyBot != null)
         {
             energyBot.rechargeRate = energyRechargeRate;
@@ -69,7 +73,6 @@ public class PlayerRunStats : ScriptableObject
         {
             attack.Damage = attackDamage;
         }
-
     }
 
     /// <summary>
@@ -83,6 +86,10 @@ public class PlayerRunStats : ScriptableObject
         energyRechargeRate = 0f;
         attackDamage = 0;
         morality = 0f;
+        MaxHealthBonus = 0f;
+        MaxEnergyBonus = 0f;
+        EnergyRechargeBonus = 0f;
+        AttackDamageBonus = 0;
 
         hasValues = false;
     }
