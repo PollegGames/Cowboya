@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Collects conveyor cubes and stores their upgrade.
+/// Collects upgrade cubes and stores their upgrade type.
 /// Requires a trigger Collider2D.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
@@ -24,17 +24,38 @@ public class CubeCollector : MonoBehaviour
             return;
 
         CubePickup pickup = other.GetComponent<CubePickup>();
-        ConveyorCube cube = other.GetComponent<ConveyorCube>();
+        CubeUpgrade cube = other.GetComponent<CubeUpgrade>();
 
         if (pickup != null && cube != null && upgradeStore != null)
         {
-            upgradeStore.Store(cube.SelectedUpgrade);
+            upgradeStore.Store(cube.UpgradeType);
 
             RobotStats playerStats = other.GetComponentInParent<RobotStateController>()?.Stats;
+            PlayerRunStats runStats = RunProgressManager.Instance?.RunStats;
             if (playerStats != null)
             {
+                if (runStats != null)
+                {
+                    switch (cube.UpgradeType)
+                    {
+                        case CubeUpgradeType.MaxHealth:
+                            runStats.MaxHealthBonus += upgradeStore.UpgradeMaxHealthValue;
+                            break;
+                        case CubeUpgradeType.MaxEnergy:
+                            runStats.MaxEnergyBonus += upgradeStore.UpgradeMaxEnergyValue;
+                            break;
+                        case CubeUpgradeType.EnergyRecharge:
+                            // No direct property on PlayerRunStats yet; placeholder for future logic
+                            break;
+        
+                        case CubeUpgradeType.AttackDamage:
+                            runStats.AttackDamageBonus += upgradeStore.UpgradeAttackDamageValue;
+                            break;
+                    }
+                }
+
                 upgradeStore.ApplyUpgrade(playerStats);
-                RunProgressManager.Instance?.RunStats?.Capture(playerStats);
+                runStats?.Capture(playerStats);
             }
 
             Destroy(pickup.gameObject);

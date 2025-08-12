@@ -9,6 +9,7 @@ public class PlayerRunStats : ScriptableObject
     public float energyRechargeRate;
     public int attackDamage;
     public float morality;
+
     private bool hasValues;
 
     public bool HasValues => hasValues;
@@ -25,7 +26,6 @@ public class PlayerRunStats : ScriptableObject
         {
             return;
         }
-
         currentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
         maxHealth = source.MaxHealth;
         maxEnergy = source.MaxEnergy;
@@ -38,11 +38,13 @@ public class PlayerRunStats : ScriptableObject
         {
             attackDamage = attack.Damage;
         }
+
         hasValues = true;
     }
 
     /// <summary>
     /// Applies captured stats to the target robot and related systems.
+
     /// </summary>
     /// <param name="target">Robot receiving stored values.</param>
     /// <param name="energyBot">Energy system to update recharge rate.</param>
@@ -67,6 +69,7 @@ public class PlayerRunStats : ScriptableObject
         {
             attack.Damage = attackDamage;
         }
+
     }
 
     /// <summary>
@@ -80,6 +83,7 @@ public class PlayerRunStats : ScriptableObject
         energyRechargeRate = 0f;
         attackDamage = 0;
         morality = 0f;
+
         hasValues = false;
     }
 }
