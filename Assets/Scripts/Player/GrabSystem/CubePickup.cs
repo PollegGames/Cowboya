@@ -96,7 +96,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
         if (joint == null)
             return;
 
-        if (attached && joint.enabled && followTarget == null)
+        if (attached && joint != null && joint.enabled && followTarget == null)
             joint.target = attractPoint;
     }
 
@@ -106,7 +106,8 @@ public class CubePickup : MonoBehaviour, IGrabbable
             return;
 
         attached = false;
-        joint.enabled = false;
+        if (joint != null)
+            joint.enabled = false;
         followTarget = null;
 
         OnReleased?.Invoke(this);
