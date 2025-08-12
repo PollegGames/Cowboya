@@ -39,8 +39,10 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
     private void FixedUpdate()
     {
-        if (joint != null && joint.enabled && followTarget != null)
-            joint.target = followTarget.position;
+        if (joint == null || !joint.enabled || followTarget == null)
+            return;
+
+        joint.target = followTarget.position;
     }
 
     public void SetFollowTarget(Transform target)
@@ -122,11 +124,10 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
     public void OnAttract(Vector2 attractPoint)
     {
-        if (joint == null)
+        if (joint == null || !attached || !joint.enabled || followTarget != null)
             return;
 
-        if (attached && joint.enabled && followTarget == null)
-            joint.target = attractPoint;
+        joint.target = attractPoint;
     }
 
     public void OnRelease(Vector2 throwForce)
@@ -134,6 +135,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         attached = false;
         if (joint != null)
             joint.enabled = false;
+
         followTarget = null;
         rb.simulated = true;
 
