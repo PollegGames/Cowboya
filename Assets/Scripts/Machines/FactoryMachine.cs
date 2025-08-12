@@ -1,8 +1,6 @@
 using UnityEngine;
 using System;
 
-
-
 [RequireComponent(typeof(MeshRenderer))]
 public class FactoryMachine : BaseMachine
 {
@@ -10,6 +8,14 @@ public class FactoryMachine : BaseMachine
     [SerializeField] private Material materialOff;
 
     private MeshRenderer meshRenderer;
+
+    [Header("Conveyor Settings")]
+    [SerializeField] private CubeConveyorController cubeConveyorController;
+    [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
+    [SerializeField] private float spawnCooldown = 1f;
+
+    private float lastSpawnTime = -Mathf.Infinity;
+    private bool cubeActive = false;
 
     public event Action<FactoryMachine, bool> OnMachineStateChanged;
     public event Action<FactoryMachine, EnemyWorkerController> OnMachineTurningOff;
@@ -22,6 +28,31 @@ public class FactoryMachine : BaseMachine
         base.Awake();
         meshRenderer = GetComponent<MeshRenderer>();
         ApplyMaterial();
+        OnPoweredOn += HandlePoweredOn;
+        OnPoweredOff += HandlePoweredOff;
+        if (cubeConveyorController != null)
+            cubeConveyorController.OnCubeProcessed += HandleCubeProcessed;
+    }
+
+    private void OnDestroy()
+    {
+        OnPoweredOn -= HandlePoweredOn;
+        OnPoweredOff -= HandlePoweredOff;
+        if (cubeConveyorController != null)
+            cubeConveyorController.OnCubeProcessed -= HandleCubeProcessed;
+    }
+
+    private void OnEnable()
+    {
+        if (factoryAlarmStatus != null)
+            factoryAlarmStatus.OnAlarmStateChanged += HandleAlarmChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (factoryAlarmStatus != null)
+            factoryAlarmStatus.OnAlarmStateChanged -= HandleAlarmChanged;
+        CancelInvoke(nameof(BeginConveyorInternal));
     }
 
     public override void PowerOn()
@@ -55,6 +86,60 @@ public class FactoryMachine : BaseMachine
         if (meshRenderer == null)
             meshRenderer = GetComponent<MeshRenderer>();
         ApplyMaterial();
+    }
+
+    private void HandlePoweredOn(BaseMachine machine)
+    {
+        ScheduleSpawn();
+    }
+
+    private void HandlePoweredOff(BaseMachine machine)
+    {
+        cubeConveyorController?.DetachCube();
+        CancelInvoke(nameof(BeginConveyorInternal));
+    }
+
+    private void HandleAlarmChanged(AlarmState state)
+    {
+        if (state == AlarmState.Wanted && isOn)
+        {
+            ScheduleSpawn();
+        }
+        else
+        {
+            cubeConveyorController?.DetachCube();
+            CancelInvoke(nameof(BeginConveyorInternal));
+        }
+    }
+
+    private void HandleCubeProcessed()
+    {
+        cubeActive = false;
+    }
+
+    private void ScheduleSpawn()
+    {
+        if (!isOn || cubeConveyorController == null || cubeActive)
+            return;
+        if (factoryAlarmStatus != null && factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted)
+            return;
+
+        float timeSinceLast = Time.time - lastSpawnTime;
+        float delay = Mathf.Max(0f, spawnCooldown - timeSinceLast);
+        CancelInvoke(nameof(BeginConveyorInternal));
+        Invoke(nameof(BeginConveyorInternal), delay);
+    }
+
+    private void BeginConveyorInternal()
+    {
+        if (!isOn || cubeConveyorController == null || cubeActive)
+            return;
+        if (factoryAlarmStatus != null && factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted)
+            return;
+
+        cubeConveyorController.BeginConveyor();
+        cubeActive = true;
+        lastSpawnTime = Time.time;
     }
 
     /// <summary>
