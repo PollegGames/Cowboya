@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
@@ -18,7 +19,8 @@ public class CubePickup : MonoBehaviour, IGrabbable
     private bool attached = false;
     private bool wasStolen = false;
 
-    private Inventory ownerInventory;
+    public event Action<CubePickup> OnGrabbed;
+    public event Action<CubePickup> OnReleased;
 
     private void Awake()
     {
@@ -59,18 +61,11 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
     public bool CanBeGrabbed(Inventory inventory)
     {
-        if (inventory != null)
-        {
-            var held = inventory.GetItem(PickupType.Cube);
-            if (held != null && (object)held != this)
-                return false;
-        }
         return true;
     }
 
     public void OnGrab(Transform grabParent)
     {
-        var inventory = grabParent.GetComponentInParent<Inventory>();
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
 
         if (!wasStolen && transform.parent != null)
@@ -89,26 +84,9 @@ public class CubePickup : MonoBehaviour, IGrabbable
         attached = true;
         rb.simulated = true;
 
-        if (inventory != null)
-        {
-            if (ownerInventory != null && ownerInventory != inventory)
-                ownerInventory.RemoveItem(PickupType.Cube);
-            inventory.SetItem(PickupType.Cube, this);
-            ownerInventory = inventory;
-        }
+        SetFollowTarget(grabParent);
 
-        if (player != null)
-        {
-            var hip = player.BodyReference;
-            if (hip != null)
-                SetFollowTarget(hip.transform);
-            else
-                SetFollowTarget(grabParent);
-        }
-        else
-        {
-            SetFollowTarget(grabParent);
-        }
+        OnGrabbed?.Invoke(this);
     }
 
     public void OnAttract(Vector2 attractPoint)
@@ -123,18 +101,6 @@ public class CubePickup : MonoBehaviour, IGrabbable
         joint.enabled = false;
         followTarget = null;
 
-        if (ownerInventory != null)
-        {
-            ownerInventory.RemoveItem(PickupType.Cube);
-            ownerInventory = null;
-        }
-    }
-
-    /// <summary>
-    /// Sets the inventory that currently owns this pickup.
-    /// </summary>
-    public void AssignInventory(Inventory inventory)
-    {
-        ownerInventory = inventory;
+        OnReleased?.Invoke(this);
     }
 }
