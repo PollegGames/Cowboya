@@ -39,8 +39,10 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
     private void FixedUpdate()
     {
-        if (joint != null && joint.enabled && followTarget != null)
-            joint.target = followTarget.position;
+        if (joint == null || !joint.enabled || followTarget == null)
+            return;
+
+        joint.target = followTarget.position;
     }
 
     public void SetFollowTarget(Transform target)
@@ -96,7 +98,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
         if (joint == null)
             return;
 
-        if (attached && joint != null && joint.enabled && followTarget == null)
+        if (attached && joint.enabled && followTarget == null)
             joint.target = attractPoint;
     }
 
@@ -106,8 +108,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
             return;
 
         attached = false;
-        if (joint != null)
-            joint.enabled = false;
+        joint.enabled = false;
         followTarget = null;
 
         OnReleased?.Invoke(this);
