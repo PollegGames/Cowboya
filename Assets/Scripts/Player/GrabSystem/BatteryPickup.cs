@@ -79,7 +79,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         if (!wasStolen && transform.parent != null)
         {
-            var enemy = transform.parent.GetComponentInParent<EnemyController>();
+            var enemy = transform.parent.GetComponentInParent<EnemyWorkerController>();
             if (enemy != null)
             {
                 var stateController = enemy.GetComponent<RobotStateController>();

@@ -39,9 +39,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
     [field: SerializeField] public bool IsBoss { get; private set; }
 
     private SecurityBadgePickup initialBadge;
-    private BatteryPickup initialBattery;
     private SecurityBadgeSpawner securityBadgeSpawner;
-    private BatterySpawner batterySpawner;
 
     private Transform dropContainer;
 
@@ -71,7 +69,6 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         IRobotRespawnService respawnService,
         Transform dropContainer,
         SecurityBadgeSpawner securityBadgeSpawner,
-        BatterySpawner batterySpawner = null,
         bool spawnInitialPickups = true)
     {
         this.waypointQueries = waypointQueries;
@@ -82,7 +79,6 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         memory.SetRespawnService(respawnService);
         this.dropContainer = dropContainer;
         this.securityBadgeSpawner = securityBadgeSpawner;
-        this.batterySpawner = batterySpawner;
 
         if (spawnInitialPickups)
         {
@@ -93,18 +89,6 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
                 {
                     initialBadge.AssignInventory(inventory);
                     inventory.SetItem(PickupType.SecurityBadge, initialBadge);
-                }
-            }
-
-            if (batterySpawner && initialBattery == null)
-            {
-                initialBattery = batterySpawner.SpawnBattery(bodyReference);
-                if (inventory != null && initialBattery != null)
-                {
-                    initialBattery.AssignInventory(inventory);
-                    inventory.SetItem(PickupType.Battery, initialBattery);
-                    if (robotBehaviour != null)
-                        robotBehaviour.Stats.UpdateHealth(10f);
                 }
             }
         }
@@ -218,16 +202,6 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
             initialBadge = null;
         }
 
-        if (initialBattery != null)
-        {
-            if (inventory != null && (object)inventory.GetItem(PickupType.Battery) == initialBattery)
-            {
-                initialBattery.OnRelease(Vector2.zero);
-                if (dropContainer != null)
-                    initialBattery.transform.SetParent(dropContainer, true);
-            }
-            initialBattery = null;
-        }
 
         if (IsBoss)
         {
@@ -240,13 +214,6 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
                     badge.transform.SetParent(dropContainer, true);
             }
 
-            if (batterySpawner != null)
-            {
-                var battery = batterySpawner.SpawnBattery(spawnParent);
-                battery?.OnRelease(Vector2.zero);
-                if (dropContainer != null && battery != null)
-                    battery.transform.SetParent(dropContainer, true);
-            }
         }
     }
 
@@ -255,11 +222,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         Debug.Log($"{name} badge stolen by {player.name}");
     }
 
-    public void OnBatteryStolen(GameObject player)
-    {
-        Debug.Log($"{name} battery stolen by {player.name}");
-        robotBehaviour.Stats.UpdateEnergy(robotBehaviour.Stats.CurrentEnergy);
-    }
+
 
     private void UpdateBalance(bool enabledBalance)
     {

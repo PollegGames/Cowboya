@@ -158,7 +158,13 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var ec = guard.GetComponent<EnemyController>();
         if (ec != null)
         {
-            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, batterySpawner, true);
+            ec.Initialize
+            (waypointService,
+            waypointService,
+            respawnService,
+            dropContainer,
+            securityBadgeSpawner,
+            true);
             ec.SetSecurityGuardState();
             ec.memory.SetLastVisitedPoint(spawnPos);
         }
@@ -208,7 +214,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             var p = waypointService.GetWorkOrRestPoint();
             PositionAndWake(w, p.WorldPos);
             var c = w.GetComponent<EnemyWorkerController>();
-            c.Initialize(waypointService, waypointService, respawnService);
+            c.Initialize(waypointService, waypointService, respawnService, dropContainer, batterySpawner);
             c.memory.SetLastVisitedPoint(p);
             Debug.Log($"Worker spread to {p.WorldPos} and initialized");
         }
@@ -220,7 +226,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             PositionAndWake(ws, p.WorldPos);
             var c = ws.GetComponent<EnemyWorkerController>();
             c.SetWorkerSpawnerState();
-            c.Initialize(waypointService, waypointService, respawnService);
+            c.Initialize(waypointService, waypointService, respawnService,dropContainer, batterySpawner, true);
             c.memory.SetLastVisitedPoint(p);
             Debug.Log($"Worker spawner spread to {p.WorldPos} and initialized");
         }
@@ -270,7 +276,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         PositionAndWake(go, pos);
 
         var c = go.GetComponent<EnemyWorkerController>();
-        c.Initialize(waypointService, waypointService, respawnService);
+        c.Initialize(waypointService, waypointService, respawnService, dropContainer, batterySpawner);
 
         var ai = go.GetComponent<ReactiveMachineAI>();
         ai?.Initialize(waypointService, securityManager);
@@ -311,7 +317,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     {
         var ec = go.GetComponent<EnemyController>();
         if (ec != null)
-            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, batterySpawner, spawnInitialPickups);
+            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, spawnInitialPickups);
     }
 
     private void PositionAndWake(GameObject go, Vector3 worldPos)

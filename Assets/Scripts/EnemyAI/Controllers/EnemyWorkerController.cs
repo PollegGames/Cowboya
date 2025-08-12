@@ -30,6 +30,10 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
     public bool IsWorkerSpawner { get; private set; }
 
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
+    [SerializeField] private Inventory inventory;
+    private BatteryPickup initialBattery;
+    private BatterySpawner batterySpawner;
+    private Transform dropContainer;
 
     protected override void Awake()
     {
@@ -50,7 +54,11 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
             allyWorkerController.enabled = false;
     }
 
-    public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService, IRobotRespawnService respawnService)
+    public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService,
+    IRobotRespawnService respawnService,
+        Transform dropContainer,
+        BatterySpawner batterySpawner = null,
+        bool spawnInitialPickups = true)
     {
         this.waypointQueries = waypointQueries;
         this.waypointService = waypointService;
@@ -59,6 +67,20 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
         waypointService.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
+        if (spawnInitialPickups)
+        {
+            if (batterySpawner && initialBattery == null)
+            {
+                initialBattery = batterySpawner.SpawnBattery(bodyReference);
+                if (inventory != null && initialBattery != null)
+                {
+                    initialBattery.AssignInventory(inventory);
+                    inventory.SetItem(PickupType.Battery, initialBattery);
+                    if (robotBehaviour != null)
+                        robotBehaviour.Stats.UpdateHealth(10f);
+                }
+            }
+        }
     }
 
     private void SetupPathFollower()
@@ -109,10 +131,30 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
             pathFollower?.Update(Time.deltaTime);
     }
 
+    public void OnBatteryStolen(GameObject player)
+    {
+        Debug.Log($"{name} battery stolen by {player.name}");
+        robotBehaviour.Stats.UpdateEnergy(robotBehaviour.Stats.CurrentEnergy);
+    }
+
     private void FixedUpdate()
     {
         if (updateLoop == UpdateLoop.FixedUpdate)
             pathFollower?.Update(Time.fixedDeltaTime);
+    }
+
+    private void DropBossLoot()
+    {
+        if (initialBattery != null)
+        {
+            if (inventory != null && (object)inventory.GetItem(PickupType.Battery) == initialBattery)
+            {
+                initialBattery.OnRelease(Vector2.zero);
+                if (dropContainer != null)
+                    initialBattery.transform.SetParent(dropContainer, true);
+            }
+            initialBattery = null;
+        }
     }
 
 
@@ -158,6 +200,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
         jointBreaker?.BreakAll();
         SceneController.instance.RobotKilled();
 
+        DropBossLoot();
         StartCoroutine(DieRoutine());
     }
 

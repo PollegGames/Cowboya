@@ -48,4 +48,3 @@ MonoBehaviour:
   upgradeCubePrefabs:
   - {fileID: -3281786584640236443, guid: 5eae2a5d019b88a468fe542a5e503e66, type: 3}
   - {fileID: -3281786584640236443, guid: 9bc7a386174f6d14bb442ecd98983b61, type: 3}
-  - {fileID: -3281786584640236443, guid: 91db61f0cd0e0bb45b6533dc6f61131d, type: 3}

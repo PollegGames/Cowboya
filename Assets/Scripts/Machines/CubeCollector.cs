@@ -7,7 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class CubeCollector : MonoBehaviour
 {
-    [SerializeField] private CubeUpgradeSO upgradeStore;
+    [SerializeField] private CubeUpgradeSO upgradeConfig; 
 
     private void Awake()
     {
@@ -20,49 +20,31 @@ public class CubeCollector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"CubeCollector: OnTriggerEnter2D with {other.name}");
-        if (other == null)
-            return;
+        if (other == null) return;
 
-        CubePickup pickup = other.GetComponent<CubePickup>();
-        CubeUpgrade cube = other.GetComponent<CubeUpgrade>();
+        var pickup = other.GetComponent<CubePickup>();
+        var cube = other.GetComponent<CubeUpgrade>();
+        if (pickup == null || cube == null) return;
 
-        if (pickup != null && cube != null && upgradeStore != null)
+        var runStats = RunProgressManager.Instance?.RunStats;
+
+        if (runStats != null)
         {
-            upgradeStore.Store(cube.UpgradeType);
-
-            RobotStateController controller = other.GetComponentInParent<RobotStateController>();
-            RobotStats playerStats = controller?.Stats;
-            PlayerRunStats runStats = RunProgressManager.Instance?.RunStats;
-            if (playerStats != null)
+            switch (cube.UpgradeType)
             {
-                if (runStats != null)
-                {
-                    switch (cube.UpgradeType)
-                    {
-                        case CubeUpgradeType.MaxHealth:
-                            runStats.MaxHealthBonus += upgradeStore.UpgradeMaxHealthValue;
-                            break;
-                        case CubeUpgradeType.MaxEnergy:
-                            runStats.MaxEnergyBonus += upgradeStore.UpgradeMaxEnergyValue;
-                            break;
-                        case CubeUpgradeType.EnergyRecharge:
-                            runStats.AddEnergyRechargeBonus(upgradeStore.UpgradeEnergyRechargeValue);
-                            break;
-                        case CubeUpgradeType.AttackDamage:
-                            runStats.AttackDamageBonus += upgradeStore.UpgradeAttackDamageValue;
-                            break;
-                    }
-                }
-
-                upgradeStore.ApplyUpgrade(playerStats);
-                EnergyBot energyBot = controller != null ? controller.GetComponent<EnergyBot>() : null;
-                Attack attack = playerStats.Attacks.Count > 0 ? playerStats.Attacks[0] : null;
-                runStats?.Capture(playerStats, energyBot, attack);
+                case CubeUpgradeType.MaxHealth:
+                    runStats.MaxHealthBonus += upgradeConfig.UpgradeMaxHealthValue; break;
+                case CubeUpgradeType.MaxEnergy:
+                    runStats.MaxEnergyBonus += upgradeConfig.UpgradeMaxEnergyValue; break;
+                case CubeUpgradeType.EnergyRecharge:
+                    runStats.AddEnergyRechargeBonus(upgradeConfig.UpgradeEnergyRechargeValue); break;
+                case CubeUpgradeType.AttackDamage:
+                    runStats.AttackDamageBonus += upgradeConfig.UpgradeAttackDamageValue; break;
             }
-
-            Destroy(pickup.gameObject);
         }
+
+        // Do NOT call ApplyUpgrade(...) and do NOT Capture() here anymore.
+        Destroy(pickup.gameObject);
     }
 }
 

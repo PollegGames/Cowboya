@@ -3940,6 +3940,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CubeCollecteur
       objectReference: {fileID: 0}
+    - target: {fileID: 5514208816963108588, guid: af91b798aed0c7a4087a974dd62d1202, type: 3}
+      propertyPath: upgradeStore
+      value: 
+      objectReference: {fileID: 11400000, guid: 1dee94155aed3224a9a4143dc8c26a1c, type: 2}
     - target: {fileID: 7047981207480481909, guid: af91b798aed0c7a4087a974dd62d1202, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.05

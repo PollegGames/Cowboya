@@ -101,6 +101,7 @@
     <Compile Include="Assets\Scripts\Map\WaypointService.cs" />
     <Compile Include="Assets\Scripts\Game\TargetAim.cs" />
     <Compile Include="Assets\Scripts\Robots\EnergyBot.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_GoingToStart.cs" />
     <Compile Include="Assets\Scripts\Navigation\RunMapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPlayerSpawner.cs" />
     <Compile Include="Assets\Scripts\Navigation\Cell.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Assets\Scripts\Navigation\MapManager.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\GoPowerOnMachineState.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridBuilder.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_Saved.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IMachineReservationService.cs" />
     <Compile Include="Assets\Scripts\Interfaces\ITargetSelector.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\UpdateLoop.cs" />

@@ -44,7 +44,7 @@ public class EnemyPunchAttack : MonoBehaviour
         robotBehaviour = GetComponent<RobotStateController>();
         if (alarmStatus == null)
         {
-            alarmStatus = FindObjectOfType<FactoryManager>()?.factoryAlarmStatus;
+            alarmStatus = FindFirstObjectByType<FactoryManager>()?.factoryAlarmStatus;
         }
     }
     private void Start()

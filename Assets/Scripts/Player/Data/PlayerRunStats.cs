@@ -31,7 +31,7 @@ public class PlayerRunStats : ScriptableObject
             return;
         }
         CurrentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
-        CurrentEnergy = Mathf.Clamp(source.CurrentEnergy, 0f, source.MaxEnergy);
+        CurrentEnergy = Mathf.Clamp(source.MaxEnergy, 0f, source.MaxEnergy);
         MaxHealth = source.MaxHealth;
         MaxEnergy = source.MaxEnergy;
         Morality = source.Morality;
@@ -71,23 +71,23 @@ public class PlayerRunStats : ScriptableObject
             return;
         }
 
-        target.MaxHealth = MaxHealth;
-        target.MaxEnergy = MaxEnergy;
-        float healthTarget = Mathf.Clamp(CurrentHealth, 0f, target.MaxHealth);
-        float energyTarget = Mathf.Clamp(CurrentEnergy, 0f, target.MaxEnergy);
+        target.MaxHealth = MaxHealth + MaxHealthBonus;
+        target.MaxEnergy = MaxEnergy + MaxEnergyBonus;
+        float healthTarget = Mathf.Clamp(CurrentHealth + MaxHealthBonus, 0f, target.MaxHealth);
+        float energyTarget = Mathf.Clamp(MaxEnergy + MaxEnergyBonus, 0f, target.MaxEnergy);
         target.UpdateHealth(healthTarget - target.CurrentHealth);
         target.UpdateEnergy(energyTarget - target.CurrentEnergy);
         target.UpdateMorality(Morality - target.Morality);
-        target.EnergyRechargeRate = EnergyRechargeRate;
+        target.EnergyRechargeRate = EnergyRechargeRate + EnergyRechargeBonus;
 
         if (energyBot != null)
         {
-            energyBot.rechargeRate = EnergyRechargeRate;
+            energyBot.rechargeRate = EnergyRechargeRate + EnergyRechargeBonus;
         }
 
         if (attack != null)
         {
-            attack.Damage = AttackDamage;
+            attack.Damage = AttackDamage + AttackDamageBonus;
         }
     }
 
@@ -101,7 +101,7 @@ public class PlayerRunStats : ScriptableObject
         MaxHealth = 0f;
         MaxEnergy = 0f;
         EnergyRechargeRate = 0f;
-        AttackDamage = 0;
+        AttackDamage = 5;
         Morality = 0f;
         MaxHealthBonus = 0f;
         MaxEnergyBonus = 0f;
