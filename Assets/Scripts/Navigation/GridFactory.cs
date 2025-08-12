@@ -17,7 +17,7 @@ public class GridFactory
         {
             for (int y = 0; y < height; y++)
             {
-                var cell = new Cell(new Vector2(x, y), UsageType.Empty);
+                var cell = new Cell(new Vector2(x, y), UsageType.Work);
                 cell.cellProperties.GridPosition = new Vector2Int(x, y);
                 cell.cellProperties.poiType = POIType.None;
                 grid[new Vector2(x, y)] = cell;
@@ -42,9 +42,9 @@ public class GridFactory
         // Exclude start and end positions from POI candidates
         var excluded = new HashSet<Vector2> { startPosition, endPosition };
 
-        // Collect all eligible positions (empty cells only)
+        // Collect all eligible positions (work cells only)
         var eligibleCells = cellDataGrid
-            .Where(kvp => kvp.Value.cellProperties.usageType == UsageType.Empty && !excluded.Contains(kvp.Key))
+            .Where(kvp => kvp.Value.cellProperties.usageType == UsageType.Work && !excluded.Contains(kvp.Key))
             .Select(kvp => kvp.Key)
             .ToList();
 
@@ -82,23 +82,23 @@ public class GridFactory
 
     public void AssignBlockedCells(int wallCount)
     {
-        // 1. Collect all empty cells
-        var emptyCells = cellDataGrid.Values
-            .Where(cell => cell.cellProperties.usageType == UsageType.Empty)
+        // 1. Collect all work cells
+        var workCells = cellDataGrid.Values
+            .Where(cell => cell.cellProperties.usageType == UsageType.Work)
             .ToList();
 
         // 2. Shuffle the list
-        for (int i = emptyCells.Count - 1; i > 0; i--)
+        for (int i = workCells.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);
-            var temp = emptyCells[i];
-            emptyCells[i] = emptyCells[j];
-            emptyCells[j] = temp;
+            var temp = workCells[i];
+            workCells[i] = workCells[j];
+            workCells[j] = temp;
         }
 
         // 3. Assign blocked type to the first wallCount cells
         int blockedCount = 0;
-        foreach (var cell in emptyCells)
+        foreach (var cell in workCells)
         {
             if (blockedCount >= wallCount)
                 break;
@@ -134,7 +134,7 @@ public class GridFactory
                 poiPaths[i] = path;
                 foreach (var pos in path)
                 {
-                    if (cellDataGrid[pos].cellProperties.usageType == UsageType.Empty)
+                    if (cellDataGrid[pos].cellProperties.usageType == UsageType.Work)
                         cellDataGrid[pos].cellProperties.usageType = UsageType.PathToPOI;
                 }
             }

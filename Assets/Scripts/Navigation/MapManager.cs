@@ -23,7 +23,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject receptionPOI_Prefab;
     [SerializeField] private GameObject securityPOI_Prefab;
     [SerializeField] private GameObject pathToPOIPrefab;
-    [SerializeField] private GameObject emptyPrefab;
+    [SerializeField] private GameObject workPrefab;
 
     // ---------------------------------------------------------------- Instances & services
     private Dictionary<Vector2, GameObject> roomInstances;
@@ -151,7 +151,7 @@ public class MapManager : MonoBehaviour
             new Vector2(cellWidth, cellHeight),
             transform.position,
             transform,
-            emptyPrefab);
+            workPrefab);
 
         gridManager.AssignRoomProperties(roomInstances, cellDataGrid);
     }
@@ -168,7 +168,7 @@ public class MapManager : MonoBehaviour
             { UsageType.End,       endPrefab       },
             { UsageType.POI,       defaultPOI_Prefab},
             { UsageType.PathToPOI, pathToPOIPrefab },
-            { UsageType.Empty,     emptyPrefab     },
+            { UsageType.Work,      workPrefab      },
         };
     }
 
@@ -245,33 +245,33 @@ public class MapManager : MonoBehaviour
         return poiPos;
     }
     
-    private List<Vector3> unusedEmptyPositions = new List<Vector3>();
-    public Vector3 GetRandomEmptyPosition()
+    private List<Vector3> unusedWorkPositions = new List<Vector3>();
+    public Vector3 GetRandomWorkPosition()
     {
         if (roomInstances == null)
             return Vector3.zero;
 
-        // Populate unusedEmptyPositions if empty
-        if (unusedEmptyPositions.Count == 0)
+        // Populate unusedWorkPositions if empty
+        if (unusedWorkPositions.Count == 0)
         {
-            unusedEmptyPositions = roomInstances.Values
+            unusedWorkPositions = roomInstances.Values
                 .Select(roomObj => roomObj.GetComponent<RoomProperties>())
-                .Where(roomProps => roomProps != null && roomProps.usageType == UsageType.Empty)
+                .Where(roomProps => roomProps != null && roomProps.usageType == UsageType.Work)
                 .Select(roomProps => roomProps.gameObject.transform.position)
                 .ToList();
 
-            if (unusedEmptyPositions.Count == 0)
+            if (unusedWorkPositions.Count == 0)
             {
-                Debug.LogWarning("No Empty cells found in roomInstances.");
+                Debug.LogWarning("No Work cells found in roomInstances.");
                 return Vector3.zero;
             }
         }
 
-        // Pick a random Empty from the unused list
-        int idx = UnityEngine.Random.Range(0, unusedEmptyPositions.Count);
-        Vector3 EmptyPos = unusedEmptyPositions[idx];
-        unusedEmptyPositions.RemoveAt(idx);
-        return EmptyPos;
+        // Pick a random Work cell from the unused list
+        int idx = UnityEngine.Random.Range(0, unusedWorkPositions.Count);
+        Vector3 workPos = unusedWorkPositions[idx];
+        unusedWorkPositions.RemoveAt(idx);
+        return workPos;
     }
 
 }

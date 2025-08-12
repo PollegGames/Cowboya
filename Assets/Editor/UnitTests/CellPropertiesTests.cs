@@ -20,7 +20,7 @@ public class CellPropertiesTests
         Assert.IsFalse(_props.HasRightDoorLocked);
         Assert.IsFalse(_props.HasLiftUpBlocked);
         Assert.IsFalse(_props.HasLiftDownBlocked);
-        Assert.AreEqual(UsageType.Empty, _props.usageType);
+        Assert.AreEqual(UsageType.Work, _props.usageType);
         Assert.AreEqual(POIType.None, _props.poiType);
     }
 }

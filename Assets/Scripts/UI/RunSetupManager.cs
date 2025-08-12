@@ -258,13 +258,13 @@ public class RunSetupManager : MonoBehaviour
         if (poi + blocked > cellsAvailable) isValid = false;
 
         // 3) Ensure enemy count ≤ (cellsAvailable - poi - blocked)
-        int emptyCells = cellsAvailable - poi - blocked;
+        int workCells = cellsAvailable - poi - blocked;
 
         // Highlight si erreur
         void Mark(VisualElement f, bool ok) => f.style.borderBottomColor = ok ? Color.clear : Color.red;
         Mark(poiField, poi + blocked <= cellsAvailable);
         Mark(blockedField, poi + blocked <= cellsAvailable);
-        Mark(workersCountField, workers <= emptyCells);
+        Mark(workersCountField, workers <= workCells);
 
         if (!isValid)
         {

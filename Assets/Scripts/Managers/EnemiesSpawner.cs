@@ -259,9 +259,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     public void SpawnEnemyAtRandom()
     {
-        // Example: spawn a NEW worker at a random empty cell
+        // Example: spawn a NEW worker at a random work cell
         var go = PoolGet(workerPrefab);
-        var pos = mapManager.GetRandomEmptyPosition();
+        var pos = mapManager.GetRandomWorkPosition();
 
         PrepareSkeleton(go);
         PositionAndWake(go, pos);
@@ -279,7 +279,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     public void SpawnBossAtRandom()
     {
         var go = PoolGet(bossPrefab);
-        var pos = mapManager.GetRandomEmptyPosition();
+        var pos = mapManager.GetRandomWorkPosition();
 
         PrepareSkeleton(go);
         PositionAndWake(go, pos);
