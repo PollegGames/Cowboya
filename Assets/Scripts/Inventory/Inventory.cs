@@ -54,9 +54,13 @@ public class Inventory : MonoBehaviour
     /// </summary>
     public void DropItem(PickupType type)
     {
-        if (items.TryGetValue(type, out var item) && item != null)
+        if (items.TryGetValue(type, out var item))
         {
-            item.OnRelease(Vector2.zero);
+            var unityObject = item as Object;
+            if (unityObject != null)
+            {
+                item.OnRelease(Vector2.zero);
+            }
         }
         items.Remove(type);
     }
@@ -69,7 +73,11 @@ public class Inventory : MonoBehaviour
         var itemsToDrop = new List<IGrabbable>(items.Values);
         foreach (var item in itemsToDrop)
         {
-            item?.OnRelease(Vector2.zero);
+            var unityObject = item as Object;
+            if (unityObject != null)
+            {
+                item.OnRelease(Vector2.zero);
+            }
         }
         items.Clear();
     }
