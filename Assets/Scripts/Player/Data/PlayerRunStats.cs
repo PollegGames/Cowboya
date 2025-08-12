@@ -4,12 +4,13 @@ using UnityEngine.Serialization;
 [CreateAssetMenu(fileName = "PlayerRunStats", menuName = "Player/RunStats")]
 public class PlayerRunStats : ScriptableObject
 {
-    public float currentHealth;
-    public float maxHealth;
-    public float maxEnergy;
-    public float energyRechargeRate;
-    public int attackDamage;
-    public float morality;
+    public float CurrentHealth;
+    public float CurrentEnergy;
+    public float MaxHealth;
+    public float MaxEnergy;
+    public float EnergyRechargeRate;
+    public int AttackDamage;
+    public float Morality;
     public float MaxHealthBonus;
     public float MaxEnergyBonus;
     public float EnergyRechargeBonus;
@@ -30,6 +31,7 @@ public class PlayerRunStats : ScriptableObject
             return;
         }
         CurrentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
+        CurrentEnergy = Mathf.Clamp(source.CurrentEnergy, 0f, source.MaxEnergy);
         MaxHealth = source.MaxHealth;
         MaxEnergy = source.MaxEnergy;
         Morality = source.Morality;
@@ -39,7 +41,7 @@ public class PlayerRunStats : ScriptableObject
         }
         else
         {
-            energyRechargeRate = source.EnergyRechargeRate;
+            EnergyRechargeRate = source.EnergyRechargeRate;
         }
         if (attack != null)
         {
@@ -72,15 +74,17 @@ public class PlayerRunStats : ScriptableObject
         target.MaxHealth = MaxHealth;
         target.MaxEnergy = MaxEnergy;
         float healthTarget = Mathf.Clamp(CurrentHealth, 0f, target.MaxHealth);
+        float energyTarget = Mathf.Clamp(CurrentEnergy, 0f, target.MaxEnergy);
         target.UpdateHealth(healthTarget - target.CurrentHealth);
-        target.UpdateMorality(morality - target.Morality);
-        target.EnergyRechargeRate = energyRechargeRate;
+        target.UpdateEnergy(energyTarget - target.CurrentEnergy);
+        target.UpdateMorality(Morality - target.Morality);
+        target.EnergyRechargeRate = EnergyRechargeRate;
 
         if (energyBot != null)
         {
             energyBot.rechargeRate = EnergyRechargeRate;
         }
-        target.EnergyRechargeRate = energyRechargeRate;
+
         if (attack != null)
         {
             attack.Damage = AttackDamage;
@@ -92,12 +96,13 @@ public class PlayerRunStats : ScriptableObject
     /// </summary>
     public void Reset()
     {
-        currentHealth = 0f;
-        maxHealth = 0f;
-        maxEnergy = 0f;
-        energyRechargeRate = 0f;
-        attackDamage = 0;
-        morality = 0f;
+        CurrentHealth = 0f;
+        CurrentEnergy = 0f;
+        MaxHealth = 0f;
+        MaxEnergy = 0f;
+        EnergyRechargeRate = 0f;
+        AttackDamage = 0;
+        Morality = 0f;
         MaxHealthBonus = 0f;
         MaxEnergyBonus = 0f;
         EnergyRechargeBonus = 0f;
