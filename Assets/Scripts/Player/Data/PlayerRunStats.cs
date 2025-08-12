@@ -3,52 +3,73 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerRunStats", menuName = "Player/RunStats")]
 public class PlayerRunStats : ScriptableObject
 {
-    public float CurrentHealth;
-    public float Morality;
-    public float MaxHealthBonus;
-    public float MaxEnergyBonus;
-    public int AttackDamageBonus;
+    public float currentHealth;
+    public float maxHealth;
+    public float maxEnergy;
+    public float energyRechargeRate;
+    public int attackDamage;
+    public float morality;
+
     private bool hasValues;
 
     public bool HasValues => hasValues;
 
     /// <summary>
-    /// Captures temporary stats from the source robot.
+    /// Captures temporary stats from the source robot and related systems.
     /// </summary>
     /// <param name="source">Robot providing current values.</param>
-    public void Capture(RobotStats source)
+    /// <param name="energyBot">Energy system supplying recharge rate.</param>
+    /// <param name="attack">Attack providing damage values.</param>
+    public void Capture(RobotStats source, EnergyBot energyBot, Attack attack)
     {
         if (source == null)
         {
             return;
         }
+        currentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
+        maxHealth = source.MaxHealth;
+        maxEnergy = source.MaxEnergy;
+        morality = source.Morality;
+        if (energyBot != null)
+        {
+            energyRechargeRate = energyBot.rechargeRate;
+        }
+        if (attack != null)
+        {
+            attackDamage = attack.Damage;
+        }
 
-        CurrentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
-        Morality = source.Morality;
         hasValues = true;
     }
 
     /// <summary>
-    /// Applies captured stats and accumulated upgrades to the target robot.
+    /// Applies captured stats to the target robot and related systems.
+
     /// </summary>
     /// <param name="target">Robot receiving stored values.</param>
-    public void Apply(RobotStats target)
+    /// <param name="energyBot">Energy system to update recharge rate.</param>
+    /// <param name="attack">Attack to update with stored damage.</param>
+    public void Apply(RobotStats target, EnergyBot energyBot, Attack attack)
     {
         if (target == null || !hasValues)
         {
             return;
         }
 
-        target.MaxHealth += MaxHealthBonus;
-        target.MaxEnergy += MaxEnergyBonus;
-        foreach (Attack attack in target.Attacks)
+        target.MaxHealth = maxHealth;
+        target.MaxEnergy = maxEnergy;
+        float healthTarget = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
+        target.UpdateHealth(healthTarget - target.CurrentHealth);
+        target.UpdateMorality(morality - target.Morality);
+        if (energyBot != null)
         {
-            attack.Damage += AttackDamageBonus;
+            energyBot.rechargeRate = energyRechargeRate;
+        }
+        if (attack != null)
+        {
+            attack.Damage = attackDamage;
         }
 
-        float healthTarget = Mathf.Clamp(CurrentHealth, 0f, target.MaxHealth);
-        target.UpdateHealth(healthTarget - target.CurrentHealth);
-        target.UpdateMorality(Morality - target.Morality);
     }
 
     /// <summary>
@@ -56,11 +77,13 @@ public class PlayerRunStats : ScriptableObject
     /// </summary>
     public void Reset()
     {
-        CurrentHealth = 0f;
-        Morality = 0f;
-        MaxHealthBonus = 0f;
-        MaxEnergyBonus = 0f;
-        AttackDamageBonus = 0;
+        currentHealth = 0f;
+        maxHealth = 0f;
+        maxEnergy = 0f;
+        energyRechargeRate = 0f;
+        attackDamage = 0;
+        morality = 0f;
+
         hasValues = false;
     }
 }
