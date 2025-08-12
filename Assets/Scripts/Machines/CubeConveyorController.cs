@@ -65,4 +65,24 @@ public class CubeConveyorController : MonoBehaviour
             OnCubeProcessed?.Invoke();
         }
     }
+
+    /// <summary>
+    /// Detaches the current cube from the conveyor, enabling physics and
+    /// stopping any guided movement.
+    /// </summary>
+    public void DetachCube()
+    {
+        if (currentCube == null)
+            return;
+
+        currentCube.OnRelease(Vector2.zero);
+        var rb = currentCube.GetComponent<Rigidbody2D>();
+        if (rb != null)
+            rb.bodyType = RigidbodyType2D.Dynamic;
+
+        currentCube.transform.SetParent(null);
+        currentCube = null;
+        midpointActivated = false;
+        OnCubeProcessed?.Invoke();
+    }
 }
