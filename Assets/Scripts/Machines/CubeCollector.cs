@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Collects conveyor cubes and stores their upgrade.
+/// Collects upgrade cubes and stores their upgrade type.
 /// Requires a trigger Collider2D.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
@@ -24,11 +24,11 @@ public class CubeCollector : MonoBehaviour
             return;
 
         CubePickup pickup = other.GetComponent<CubePickup>();
-        ConveyorCube cube = other.GetComponent<ConveyorCube>();
+        CubeUpgrade cube = other.GetComponent<CubeUpgrade>();
 
         if (pickup != null && cube != null && upgradeStore != null)
         {
-            upgradeStore.Store(cube.SelectedUpgrade);
+            upgradeStore.Store(cube.UpgradeType);
 
             RobotStats playerStats = other.GetComponentInParent<RobotStateController>()?.Stats;
             if (playerStats != null)
