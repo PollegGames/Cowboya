@@ -57,7 +57,23 @@ public class CubeConveyorController : MonoBehaviour
         // Check for midpoint activation.
         if (!midpointActivated && midpointTrigger != null && cubeTransform.position.x >= midpointTrigger.position.x)
         {
-            currentCube.SendMessage("Activate", SendMessageOptions.DontRequireReceiver);
+            if (cubeSpawner != null)
+            {
+                Transform parent = currentCube.transform.parent;
+                Vector3 position = currentCube.transform.position;
+
+                currentCube.OnGrabbed -= HandleCubeGrabbed;
+                Destroy(currentCube.gameObject);
+
+                currentCube = cubeSpawner.SpawnRandomUpgrade(parent, position);
+                if (currentCube != null)
+                {
+                    currentCube.OnGrabbed += HandleCubeGrabbed;
+                    var rbNew = currentCube.GetComponent<Rigidbody2D>();
+                    if (rbNew != null)
+                        rbNew.bodyType = RigidbodyType2D.Kinematic;
+                }
+            }
             midpointActivated = true;
         }
 
