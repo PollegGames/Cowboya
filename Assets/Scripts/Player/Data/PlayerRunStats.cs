@@ -1,14 +1,19 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "PlayerRunStats", menuName = "Player/RunStats")]
 public class PlayerRunStats : ScriptableObject
 {
-    public float currentHealth;
-    public float maxHealth;
-    public float maxEnergy;
-    public float energyRechargeRate;
-    public int attackDamage;
-    public float morality;
+    [FormerlySerializedAs("currentHealth")] public float CurrentHealth;
+    [FormerlySerializedAs("maxHealth")] public float MaxHealth;
+    [FormerlySerializedAs("maxEnergy")] public float MaxEnergy;
+    [FormerlySerializedAs("energyRechargeRate")] public float EnergyRechargeRate;
+    [FormerlySerializedAs("attackDamage")] public int AttackDamage;
+    [FormerlySerializedAs("morality")] public float Morality;
+
+    public float MaxHealthBonus;
+    public float MaxEnergyBonus;
+    public int AttackDamageBonus;
 
     private bool hasValues;
 
@@ -26,17 +31,17 @@ public class PlayerRunStats : ScriptableObject
         {
             return;
         }
-        currentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
-        maxHealth = source.MaxHealth;
-        maxEnergy = source.MaxEnergy;
-        morality = source.Morality;
+        CurrentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
+        MaxHealth = source.MaxHealth;
+        MaxEnergy = source.MaxEnergy;
+        Morality = source.Morality;
         if (energyBot != null)
         {
-            energyRechargeRate = energyBot.rechargeRate;
+            EnergyRechargeRate = energyBot.rechargeRate;
         }
         if (attack != null)
         {
-            attackDamage = attack.Damage;
+            AttackDamage = attack.Damage;
         }
 
         hasValues = true;
@@ -56,18 +61,18 @@ public class PlayerRunStats : ScriptableObject
             return;
         }
 
-        target.MaxHealth = maxHealth;
-        target.MaxEnergy = maxEnergy;
-        float healthTarget = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
+        target.MaxHealth = MaxHealth;
+        target.MaxEnergy = MaxEnergy;
+        float healthTarget = Mathf.Clamp(CurrentHealth, 0f, target.MaxHealth);
         target.UpdateHealth(healthTarget - target.CurrentHealth);
-        target.UpdateMorality(morality - target.Morality);
+        target.UpdateMorality(Morality - target.Morality);
         if (energyBot != null)
         {
-            energyBot.rechargeRate = energyRechargeRate;
+            energyBot.rechargeRate = EnergyRechargeRate;
         }
         if (attack != null)
         {
-            attack.Damage = attackDamage;
+            attack.Damage = AttackDamage;
         }
 
     }
@@ -77,12 +82,15 @@ public class PlayerRunStats : ScriptableObject
     /// </summary>
     public void Reset()
     {
-        currentHealth = 0f;
-        maxHealth = 0f;
-        maxEnergy = 0f;
-        energyRechargeRate = 0f;
-        attackDamage = 0;
-        morality = 0f;
+        CurrentHealth = 0f;
+        MaxHealth = 0f;
+        MaxEnergy = 0f;
+        EnergyRechargeRate = 0f;
+        AttackDamage = 0;
+        Morality = 0f;
+        MaxHealthBonus = 0f;
+        MaxEnergyBonus = 0f;
+        AttackDamageBonus = 0;
 
         hasValues = false;
     }

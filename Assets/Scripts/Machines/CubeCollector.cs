@@ -30,7 +30,8 @@ public class CubeCollector : MonoBehaviour
         {
             upgradeStore.Store(cube.UpgradeType);
 
-            RobotStats playerStats = other.GetComponentInParent<RobotStateController>()?.Stats;
+            RobotStateController controller = other.GetComponentInParent<RobotStateController>();
+            RobotStats playerStats = controller?.Stats;
             PlayerRunStats runStats = RunProgressManager.Instance?.RunStats;
             if (playerStats != null)
             {
@@ -47,7 +48,7 @@ public class CubeCollector : MonoBehaviour
                         case CubeUpgradeType.EnergyRecharge:
                             // No direct property on PlayerRunStats yet; placeholder for future logic
                             break;
-        
+
                         case CubeUpgradeType.AttackDamage:
                             runStats.AttackDamageBonus += upgradeStore.UpgradeAttackDamageValue;
                             break;
@@ -55,7 +56,9 @@ public class CubeCollector : MonoBehaviour
                 }
 
                 upgradeStore.ApplyUpgrade(playerStats);
-                runStats?.Capture(playerStats);
+                EnergyBot energyBot = controller != null ? controller.GetComponent<EnergyBot>() : null;
+                Attack attack = playerStats.Attacks.Count > 0 ? playerStats.Attacks[0] : null;
+                runStats?.Capture(playerStats, energyBot, attack);
             }
 
             Destroy(pickup.gameObject);
