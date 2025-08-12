@@ -34,11 +34,23 @@ public class GrabSystem : MonoBehaviour
         else if (input.LeftGrabUp)
         {
             if (leftHeld != null)
-                Release(leftHand, ref leftHeld);
+            {
+                UnityEngine.Object obj = leftHeld as UnityEngine.Object;
+                if (obj != null)
+                    Release(leftHand, ref leftHeld);
+                else
+                    leftHeld = null;
+            }
         }
 
         if (leftHeld != null && input.LeftGrabHeld)
-            leftHeld.OnAttract(leftHand.transform.position);
+        {
+            UnityEngine.Object obj = leftHeld as UnityEngine.Object;
+            if (obj != null)
+                leftHeld.OnAttract(leftHand.transform.position);
+            else
+                leftHeld = null;
+        }
 
         // RIGHT HAND (same pattern)
         if (input.RightGrabDown)
@@ -49,11 +61,23 @@ public class GrabSystem : MonoBehaviour
         else if (input.RightGrabUp)
         {
             if (rightHeld != null)
-                Release(rightHand, ref rightHeld);
+            {
+                UnityEngine.Object obj = rightHeld as UnityEngine.Object;
+                if (obj != null)
+                    Release(rightHand, ref rightHeld);
+                else
+                    rightHeld = null;
+            }
         }
 
         if (rightHeld != null && input.RightGrabHeld)
-            rightHeld.OnAttract(rightHand.transform.position);
+        {
+            UnityEngine.Object obj = rightHeld as UnityEngine.Object;
+            if (obj != null)
+                rightHeld.OnAttract(rightHand.transform.position);
+            else
+                rightHeld = null;
+        }
     }
 
     /// <summary>
@@ -63,12 +87,20 @@ public class GrabSystem : MonoBehaviour
     {
         if (leftHeld != null)
         {
-            Release(leftHand, ref leftHeld, 0f);
+            UnityEngine.Object obj = leftHeld as UnityEngine.Object;
+            if (obj != null)
+                Release(leftHand, ref leftHeld, 0f);
+            else
+                leftHeld = null;
         }
 
         if (rightHeld != null)
         {
-            Release(rightHand, ref rightHeld, 0f);
+            UnityEngine.Object obj = rightHeld as UnityEngine.Object;
+            if (obj != null)
+                Release(rightHand, ref rightHeld, 0f);
+            else
+                rightHeld = null;
         }
 
         var inventory = GetComponent<Inventory>();
@@ -122,7 +154,12 @@ public class GrabSystem : MonoBehaviour
 
     private void Release(GrabHandAttractor hand, ref IGrabbable held, float strength)
     {
-        if (hand == null || held == null) return;
+        UnityEngine.Object obj = held as UnityEngine.Object;
+        if (hand == null || obj == null)
+        {
+            held = null;
+            return;
+        }
 
         var inventory = hand.GetComponentInParent<Inventory>();
         if (inventory != null)
