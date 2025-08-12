@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 8505240776491623069}
   - component: {fileID: 6374700015707614389}
   - component: {fileID: 6206929599146606855}
+  - component: {fileID: 4224148012328947793}
   - component: {fileID: 7876967260955353992}
   - component: {fileID: 2933447607757072381}
-  - component: {fileID: -3281786584640236443}
-  m_Layer: 13
-  m_Name: CubeUpgrade
-  m_TagString: BadgeSecurity
+  m_Layer: 12
+  m_Name: Battery+40
+  m_TagString: Battery
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -8641287479173870057, guid: ca2f6ee679facf24f98e8aa27d40d831, type: 3}
+  m_Sprite: {fileID: -557782292268870157, guid: 40b053222a14a57418a19e3ef00f6712, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -110,7 +110,7 @@ Rigidbody2D:
   m_Material: {fileID: 6200000, guid: 1ed51ff7ad378ee48a2365f678b5ad70, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 8192
+    m_Bits: 4096
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -118,6 +118,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &4224148012328947793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934608487537832627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5aa02ef95c42f24bb733cdf7c29329f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthGain: 10
+  frequency: 5
+  dampingRatio: 0.8
+  maxForce: 1000
 --- !u!257 &7876967260955353992
 TargetJoint2D:
   m_ObjectHideFlags: 0
@@ -172,30 +188,15 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.014953457, y: -0.0003322661}
+  m_Offset: {x: 0.0146089345, y: -0.014608949}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.39005107, y: 0.35}
+    oldSize: {x: 0.31004062, y: 0.35999998}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.35778987, y: 0.35349166}
+  m_Size: {x: 0.23797, y: 0.33078206}
   m_EdgeRadius: 0
---- !u!114 &-3281786584640236443
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1934608487537832627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 413bbe5d24595fb4dbe8e97033614dcb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frequency: 5
-  dampingRatio: 0.8
-  maxForce: 1000
