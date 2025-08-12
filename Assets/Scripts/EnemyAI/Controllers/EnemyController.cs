@@ -36,6 +36,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
     public EnemyStatus EnemyStatus { get; set; } = EnemyStatus.Idle;
+    [field: SerializeField] public bool IsBoss { get; private set; }
 
     private SecurityBadgePickup initialBadge;
     private BatteryPickup initialBattery;
@@ -116,16 +117,19 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
     public void SetSecurityGuardState()
     {
+        IsBoss = false;
         stateMachine.ChangeState(new Enemy_ReturnToSecurityPost(this, stateMachine, (IWaypointService)waypointQueries, null));
     }
 
     public void SetBossState()
     {
+        IsBoss = true;
         stateMachine.ChangeState(new Enemy_Idle(this, stateMachine, (IWaypointService)waypointQueries));
     }
 
     public void SetFollowerState(FactoryAlarmStatus factoryAlarmStatus)
     {
+        IsBoss = false;
         alarmStatus = factoryAlarmStatus;
         stateMachine.ChangeState(new Enemy_Follower(this, stateMachine, (IWaypointService)waypointQueries, alarmStatus));
     }
@@ -249,6 +253,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         }
         pathFollower = null;
         stuckHandler = null;
+        IsBoss = false;
     }
 
     /// <summary>
