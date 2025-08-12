@@ -46,9 +46,8 @@ public class CubeCollector : MonoBehaviour
                             runStats.MaxEnergyBonus += upgradeStore.UpgradeMaxEnergyValue;
                             break;
                         case CubeUpgradeType.EnergyRecharge:
-                            // No direct property on PlayerRunStats yet; placeholder for future logic
+                            runStats.AddEnergyRechargeBonus(upgradeStore.UpgradeEnergyRechargeValue);
                             break;
-
                         case CubeUpgradeType.AttackDamage:
                             runStats.AttackDamageBonus += upgradeStore.UpgradeAttackDamageValue;
                             break;

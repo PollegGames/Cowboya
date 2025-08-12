@@ -4,19 +4,17 @@ using UnityEngine.Serialization;
 [CreateAssetMenu(fileName = "PlayerRunStats", menuName = "Player/RunStats")]
 public class PlayerRunStats : ScriptableObject
 {
-    [FormerlySerializedAs("currentHealth")] public float CurrentHealth;
-    [FormerlySerializedAs("maxHealth")] public float MaxHealth;
-    [FormerlySerializedAs("maxEnergy")] public float MaxEnergy;
-    [FormerlySerializedAs("energyRechargeRate")] public float EnergyRechargeRate;
-    [FormerlySerializedAs("attackDamage")] public int AttackDamage;
-    [FormerlySerializedAs("morality")] public float Morality;
-
+    public float currentHealth;
+    public float maxHealth;
+    public float maxEnergy;
+    public float energyRechargeRate;
+    public int attackDamage;
+    public float morality;
     public float MaxHealthBonus;
     public float MaxEnergyBonus;
+    public float EnergyRechargeBonus;
     public int AttackDamageBonus;
-
     private bool hasValues;
-
     public bool HasValues => hasValues;
 
     /// <summary>
@@ -39,12 +37,22 @@ public class PlayerRunStats : ScriptableObject
         {
             EnergyRechargeRate = energyBot.rechargeRate;
         }
+        else
+        {
+            energyRechargeRate = source.EnergyRechargeRate;
+        }
         if (attack != null)
         {
             AttackDamage = attack.Damage;
         }
 
+
         hasValues = true;
+    }
+
+    public void Capture(RobotStats source)
+    {
+        Capture(source, null, null);
     }
 
     /// <summary>
@@ -65,16 +73,18 @@ public class PlayerRunStats : ScriptableObject
         target.MaxEnergy = MaxEnergy;
         float healthTarget = Mathf.Clamp(CurrentHealth, 0f, target.MaxHealth);
         target.UpdateHealth(healthTarget - target.CurrentHealth);
-        target.UpdateMorality(Morality - target.Morality);
+        target.UpdateMorality(morality - target.Morality);
+        target.EnergyRechargeRate = energyRechargeRate;
+
         if (energyBot != null)
         {
             energyBot.rechargeRate = EnergyRechargeRate;
         }
+        target.EnergyRechargeRate = energyRechargeRate;
         if (attack != null)
         {
             attack.Damage = AttackDamage;
         }
-
     }
 
     /// <summary>
@@ -82,16 +92,26 @@ public class PlayerRunStats : ScriptableObject
     /// </summary>
     public void Reset()
     {
-        CurrentHealth = 0f;
-        MaxHealth = 0f;
-        MaxEnergy = 0f;
-        EnergyRechargeRate = 0f;
-        AttackDamage = 0;
-        Morality = 0f;
+        currentHealth = 0f;
+        maxHealth = 0f;
+        maxEnergy = 0f;
+        energyRechargeRate = 0f;
+        attackDamage = 0;
+        morality = 0f;
         MaxHealthBonus = 0f;
         MaxEnergyBonus = 0f;
+        EnergyRechargeBonus = 0f;
         AttackDamageBonus = 0;
 
         hasValues = false;
+    }
+
+    /// <summary>
+    /// Adds to the energy recharge bonus accumulated during the run.
+    /// </summary>
+    /// <param name="value">Bonus amount to add.</param>
+    public void AddEnergyRechargeBonus(float value)
+    {
+        EnergyRechargeBonus += value;
     }
 }

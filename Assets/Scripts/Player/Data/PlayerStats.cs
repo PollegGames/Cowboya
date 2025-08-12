@@ -12,8 +12,10 @@ public class RobotStats
     public float MaxEnergy = 1f;
     public float CurrentEnergy = 1f;
     public float AttackEnergyCost = 1f;
+    public float EnergyRechargeRate = 1f;
     public event Action OnHealthChanged;
     public event Action OnEnergyChanged;
+    public event Action OnEnergyRechargeChanged;
     public event Action OnMoralityChanged;
     public bool AbleToAttack => CurrentEnergy >= AttackEnergyCost;
     public float Morality { get; set; } = 0f;
@@ -41,11 +43,26 @@ public class RobotStats
         Attacks = attacks ?? new List<Attack>();
     }
 
-     public void UpdateEnergy(float delta)
+    public void UpdateEnergy(float delta)
     {
         CurrentEnergy = Mathf.Clamp(CurrentEnergy + delta, 0, MaxEnergy);
         OnEnergyChanged?.Invoke();
+    }
 
+    public void UpdateEnergyRecharge(float delta)
+    {
+        EnergyRechargeRate = math.max(0f, EnergyRechargeRate + delta);
+        OnEnergyRechargeChanged?.Invoke();
+    }
+
+    /// <summary>
+    /// Adjusts the energy recharge rate by the provided amount.
+    /// </summary>
+    /// <param name="delta">Amount to change recharge rate.</param>
+    public void UpdateEnergyRecharge(float delta)
+    {
+        EnergyRechargeRate = math.max(0f, EnergyRechargeRate + delta);
+        OnEnergyRechargeChanged?.Invoke();
     }
 
     public void UpdateHealth(float delta)
