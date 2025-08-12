@@ -26,18 +26,20 @@ public class CubePickup : MonoBehaviour, IGrabbable
     {
         rb = GetComponent<Rigidbody2D>();
         joint = GetComponent<TargetJoint2D>();
-
-        joint.enabled = false;
-        joint.autoConfigureTarget = false;
-        joint.target = rb.position;
-        joint.frequency = frequency;
-        joint.dampingRatio = dampingRatio;
-        joint.maxForce = maxForce;
+        if (joint != null)
+        {
+            joint.enabled = false;
+            joint.autoConfigureTarget = false;
+            joint.target = rb.position;
+            joint.frequency = frequency;
+            joint.dampingRatio = dampingRatio;
+            joint.maxForce = maxForce;
+        }
     }
 
     private void FixedUpdate()
     {
-        if (joint.enabled && followTarget != null)
+        if (joint != null && joint.enabled && followTarget != null)
             joint.target = followTarget.position;
     }
 
@@ -91,12 +93,18 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
     public void OnAttract(Vector2 attractPoint)
     {
+        if (joint == null)
+            return;
+
         if (attached && joint.enabled && followTarget == null)
             joint.target = attractPoint;
     }
 
     public void OnRelease(Vector2 throwForce)
     {
+        if (joint == null)
+            return;
+
         attached = false;
         joint.enabled = false;
         followTarget = null;
