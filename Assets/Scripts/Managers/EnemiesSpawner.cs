@@ -52,6 +52,9 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         this.securityBadgeSpawner = securityBadgeSpawner;
         this.batterySpawner = batterySpawner;
 
+        if (this.securityManager != null)
+            this.securityManager.OnAllMachinesOff += HandleAllMachinesOff;
+
         if (respawnService is RobotRespawnService service)
             service.Initialize(this);
 
@@ -339,5 +342,24 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             legLimiter.RefreshJoints();
             legLimiter.enabled = true;
         }
+    }
+
+    private void HandleAllMachinesOff()
+    {
+        var enemies = FindObjectsOfType<EnemyController>();
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null && enemy.IsBoss)
+            {
+                enemy.Faint();
+                break;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (securityManager != null)
+            securityManager.OnAllMachinesOff -= HandleAllMachinesOff;
     }
 }
