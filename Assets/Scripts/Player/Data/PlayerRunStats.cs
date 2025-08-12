@@ -9,6 +9,10 @@ public class PlayerRunStats : ScriptableObject
     public float energyRechargeRate;
     public int attackDamage;
     public float morality;
+    public float MaxHealthBonus;
+    public float MaxEnergyBonus;
+    public float EnergyRechargeBonus;
+    public int AttackDamageBonus;
 
     private bool hasValues;
 
@@ -33,6 +37,10 @@ public class PlayerRunStats : ScriptableObject
         if (energyBot != null)
         {
             energyRechargeRate = energyBot.rechargeRate;
+        }
+        else
+        {
+            energyRechargeRate = source.EnergyRechargeRate;
         }
         if (attack != null)
         {
@@ -65,6 +73,7 @@ public class PlayerRunStats : ScriptableObject
         {
             energyBot.rechargeRate = energyRechargeRate;
         }
+        target.EnergyRechargeRate = energyRechargeRate;
         if (attack != null)
         {
             attack.Damage = attackDamage;
@@ -83,7 +92,20 @@ public class PlayerRunStats : ScriptableObject
         energyRechargeRate = 0f;
         attackDamage = 0;
         morality = 0f;
+        MaxHealthBonus = 0f;
+        MaxEnergyBonus = 0f;
+        EnergyRechargeBonus = 0f;
+        AttackDamageBonus = 0;
 
         hasValues = false;
+    }
+
+    /// <summary>
+    /// Adds to the energy recharge bonus accumulated during the run.
+    /// </summary>
+    /// <param name="value">Bonus amount to add.</param>
+    public void AddEnergyRechargeBonus(float value)
+    {
+        EnergyRechargeBonus += value;
     }
 }
