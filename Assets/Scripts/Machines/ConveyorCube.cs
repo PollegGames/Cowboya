@@ -17,6 +17,9 @@ public class ConveyorCube : MonoBehaviour
     [SerializeField] private Sprite attackDamageSprite;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    public bool isUpgradeActive = false;
+    public CubeUpgradeType upgradeType;
+
     private enum CubeState { Normal, Active }
     private CubeState state = CubeState.Normal;
 
@@ -26,15 +29,15 @@ public class ConveyorCube : MonoBehaviour
     public CubeUpgradeType SelectedUpgrade { get; private set; }
 
     /// <summary>
-    /// Randomly selects an upgrade type and updates the sprite.
+    /// Activates the cube's configured upgrade and updates the sprite.
     /// </summary>
     public void Activate()
     {
         if (state == CubeState.Active)
             return;
 
-        Array values = Enum.GetValues(typeof(CubeUpgradeType));
-        SelectedUpgrade = (CubeUpgradeType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+        isUpgradeActive = true;
+        SelectedUpgrade = upgradeType;
 
         switch (SelectedUpgrade)
         {
