@@ -44,10 +44,10 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     void FixedUpdate()
     {
-        if (joint != null && joint.enabled && followTarget != null)
-        {
-            joint.target = followTarget.position;
-        }
+        if (joint == null || !joint.enabled || followTarget == null)
+            return;
+
+        joint.target = followTarget.position;
     }
 
     public void SetFollowTarget(Transform target)
@@ -129,11 +129,10 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     public void OnAttract(Vector2 attractPoint)
     {
-        if (joint == null)
+        if (joint == null || !attached || !joint.enabled || followTarget != null)
             return;
 
-        if (attached && joint.enabled && followTarget == null)
-            joint.target = attractPoint;
+        joint.target = attractPoint;
     }
 
     public void OnRelease(Vector2 throwForce)
