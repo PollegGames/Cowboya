@@ -89,28 +89,27 @@ public class GrabSystem : MonoBehaviour
         {
             UnityEngine.Object obj = leftHeld as UnityEngine.Object;
             if (obj != null)
+            {
                 Release(leftHand, ref leftHeld, 0f);
+            }
             else
+            {
                 leftHeld = null;
+            }
         }
 
         if (rightHeld != null)
         {
             UnityEngine.Object obj = rightHeld as UnityEngine.Object;
             if (obj != null)
+            {
                 Release(rightHand, ref rightHeld, 0f);
+            }
             else
+            {
                 rightHeld = null;
+            }
         }
-
-        var inventory = GetComponent<Inventory>();
-        if (inventory != null)
-        {
-            inventory.DropAll();
-        }
-
-        leftHeld = null;
-        rightHeld = null;
     }
 
     private void TryGrab(GrabHandAttractor hand, ref IGrabbable held)

@@ -45,6 +45,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
             {
                 RobotStateController controller = collision.GetComponentInParent<RobotStateController>();
                 GrabSystem grabSystem = collision.GetComponentInParent<GrabSystem>();
+                Inventory inventory = collision.GetComponentInParent<Inventory>();
 
                 if (grabSystem == null)
                 {
@@ -53,7 +54,6 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                 else
                 {
                     grabSystem.ClearHands();
-                    var inventory = collision.GetComponentInParent<Inventory>();
                     inventory?.DropAll();
                 }
 
