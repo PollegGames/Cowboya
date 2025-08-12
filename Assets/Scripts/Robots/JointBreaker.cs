@@ -30,6 +30,10 @@ public class JointBreaker : MonoBehaviour
 
     private void Awake()
     {
+        hingeJoints.Clear();
+        fixedJoints.Clear();
+        ikSolvers.Clear();
+
         hingeJoints.AddRange(GetComponentsInChildren<HingeJoint2D>());
         fixedJoints.AddRange(GetComponentsInChildren<FixedJoint2D>());
         ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
