@@ -19,19 +19,20 @@ public class CubeCollectorTests
         var cubeGO = new GameObject("cube");
         cubeGO.AddComponent<Rigidbody2D>();
         cubeGO.AddComponent<TargetJoint2D>();
-        cubeGO.AddComponent<CubePickup>();
-        var conveyor = cubeGO.AddComponent<ConveyorCube>();
+        var pickup = cubeGO.AddComponent<CubePickup>();
+        var upgrade = cubeGO.AddComponent<CubeUpgrade>();
         var cubeCollider = cubeGO.AddComponent<BoxCollider2D>();
 
-        typeof(ConveyorCube)
-            .GetField("<SelectedUpgrade>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
-            .SetValue(conveyor, CubeUpgradeType.AttackDamage);
+        typeof(CubeUpgrade)
+            .GetField("upgradeType", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(upgrade, CubeUpgradeType.AttackDamage);
 
         var method = typeof(CubeCollector)
             .GetMethod("OnTriggerEnter2D", BindingFlags.Instance | BindingFlags.NonPublic);
         method.Invoke(collector, new object[] { cubeCollider });
 
         Assert.AreEqual(CubeUpgradeType.AttackDamage, upgradeSO.SelectedUpgrade);
+        Assert.IsTrue(pickup == null);
     }
 }
 
