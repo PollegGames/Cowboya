@@ -137,7 +137,15 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             joint.enabled = false;
 
         followTarget = null;
-        rb.simulated = true;
+
+        if (rb != null)
+        {
+            rb.simulated = true;
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(BatteryPickup)} on {name} is missing a {nameof(Rigidbody2D)} component.");
+        }
 
         if (ownerInventory != null)
         {
