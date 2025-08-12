@@ -19,6 +19,9 @@ public class CubeConveyorController : MonoBehaviour
     /// </summary>
     public void BeginConveyor()
     {
+        if (currentCube != null)
+            return;
+
         if (cubeSpawner == null || spawnPoint == null)
         {
             Debug.LogWarning("CubeConveyorController: Missing references.");
@@ -28,6 +31,8 @@ public class CubeConveyorController : MonoBehaviour
         currentCube = cubeSpawner.SpawnCube(spawnPoint);
         if (currentCube == null)
             return;
+
+        currentCube.OnGrabbed += HandleCubeGrabbed;
 
         var rb = currentCube.GetComponent<Rigidbody2D>();
         if (rb != null)
@@ -56,13 +61,11 @@ public class CubeConveyorController : MonoBehaviour
             midpointActivated = true;
         }
 
-        // Check if cube reached exit or was detached.
-        if (Vector2.Distance(cubeTransform.position, exitPoint.position) < 0.01f || cubeTransform.parent != spawnPoint)
+        // Check if cube reached the exit.
+        if (Vector2.Distance(cubeTransform.position, exitPoint.position) < 0.01f)
         {
             Destroy(currentCube.gameObject);
-            currentCube = null;
-            midpointActivated = false;
-            OnCubeProcessed?.Invoke();
+            ClearCurrentCube();
         }
     }
 
@@ -81,6 +84,26 @@ public class CubeConveyorController : MonoBehaviour
             rb.bodyType = RigidbodyType2D.Dynamic;
 
         currentCube.transform.SetParent(null);
+        ClearCurrentCube();
+    }
+
+    private void HandleCubeGrabbed(CubePickup cube)
+    {
+        if (cube != currentCube)
+            return;
+
+        var rb = cube.GetComponent<Rigidbody2D>();
+        if (rb != null)
+            rb.bodyType = RigidbodyType2D.Dynamic;
+
+        ClearCurrentCube();
+    }
+
+    private void ClearCurrentCube()
+    {
+        if (currentCube != null)
+            currentCube.OnGrabbed -= HandleCubeGrabbed;
+
         currentCube = null;
         midpointActivated = false;
         OnCubeProcessed?.Invoke();
