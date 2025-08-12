@@ -893,6 +893,9 @@ MonoBehaviour:
   trigger: {fileID: 429215285151596846}
   materialOn: {fileID: 2100000, guid: 467ce051cbbcd4c48a2b25903b45b7d5, type: 2}
   materialOff: {fileID: 2100000, guid: 53ec3f936f3b0bf4dba7d803fd9c03a2, type: 2}
+  cubeConveyorController: {fileID: 0}
+  factoryAlarmStatus: {fileID: 0}
+  spawnCooldown: 1
 --- !u!114 &4568954887781084499
 MonoBehaviour:
   m_ObjectHideFlags: 0

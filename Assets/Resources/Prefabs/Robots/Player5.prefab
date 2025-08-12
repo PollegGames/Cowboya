@@ -1329,7 +1329,7 @@ MonoBehaviour:
   locomotion: {fileID: 2461518573604142914}
   verticalOffset: 2.5
   maxMirrorOffset: 3
-  maxBendOffset: 3
+  maxBendOffset: 1
   bendSpeed: 10
   directionProviderComponent: {fileID: 6137078262802834594}
 --- !u!1 &4223444372267196353

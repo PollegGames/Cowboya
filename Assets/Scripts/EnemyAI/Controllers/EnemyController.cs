@@ -164,7 +164,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         switch (newState)
         {
             case RobotState.Faint:
-                Faint();
+                UpdateBalance(false);
                 break;
             case RobotState.Dead:
                 Die();
@@ -177,7 +177,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
     public void Faint()
     {
-        UpdateBalance(false);
+        robotBehaviour.UpdateState(RobotState.Faint);
     }
 
     public void Die()
@@ -201,7 +201,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
     {
         if (initialBadge != null)
         {
-            if (inventory != null && inventory.GetItem(PickupType.SecurityBadge) == initialBadge)
+            if (inventory != null && (object)inventory.GetItem(PickupType.SecurityBadge) == initialBadge)
             {
                 initialBadge.OnRelease(Vector2.zero);
                 if (dropContainer != null)
@@ -212,7 +212,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
         if (initialBattery != null)
         {
-            if (inventory != null && inventory.GetItem(PickupType.Battery) == initialBattery)
+            if (inventory != null && (object)inventory.GetItem(PickupType.Battery) == initialBattery)
             {
                 initialBattery.OnRelease(Vector2.zero);
                 if (dropContainer != null)

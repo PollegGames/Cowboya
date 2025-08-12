@@ -7,9 +7,9 @@ public class WorkerRobotFactory : RobotFactory
 {
     public WorkerRobotFactory()
     {
-        health = 5;
-        energy = 5;
-        morality = -10;
+        health = 30;
+        energy = 30;
+        morality = -1;
         energyAttackCost = 1;
     }
 

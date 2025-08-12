@@ -4131,7 +4131,7 @@ MonoBehaviour:
   locomotion: {fileID: 8974758250723312533}
   verticalOffset: 2.5
   maxMirrorOffset: 3
-  maxBendOffset: 3
+  maxBendOffset: 1
   bendSpeed: 10
   directionProviderComponent: {fileID: 2143343018950225475}
 --- !u!1 &7417427691832225714
@@ -4550,6 +4550,7 @@ MonoBehaviour:
   punchAttack: {fileID: 1084963490228556486}
   inventory: {fileID: 0}
   updateLoop: 0
+  <IsBoss>k__BackingField: 0
 --- !u!114 &1976096450392993643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4584,7 +4585,7 @@ MonoBehaviour:
     CurrentHealth: 30
     MaxEnergy: 30
     CurrentEnergy: 30
-    AttackEnergyCost: 5
+    AttackEnergyCost: 10
   hips: {fileID: 3392093481179504074}
 --- !u!114 &7188059881045560196
 MonoBehaviour:

@@ -124,6 +124,7 @@
     <Compile Include="Assets\Scripts\Interfaces\INeighborConnector.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Spawning.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IFactoryManager.cs" />
+    <Compile Include="Assets\Scripts\Machines\CubeConveyorController.cs" />
     <Compile Include="Assets\Scripts\Setup\ShowLoadingScreenDisposable.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\LeverHandle.cs" />
     <Compile Include="Assets\Scripts\Setup\SaveData.cs" />
@@ -273,6 +274,7 @@
     <Compile Include="Assets\Scripts\Navigation\RoomRenderer.cs" />
     <Compile Include="Assets\Scripts\Robots\RobotState.cs" />
     <Compile Include="Assets\Scripts\Robots\FootStepper.cs" />
+    <Compile Include="Assets\Scripts\Machines\ConveyorCube.cs" />
     <Compile Include="Assets\Scripts\Navigation\RoomLiftPerFloorProcessor.cs" />
     <Compile Include="Assets\Scripts\Services\BatterySpawner.cs" />
     <Compile Include="Assets\Scripts\Services\SecurityBadgeSpawner.cs" />

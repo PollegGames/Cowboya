@@ -477,6 +477,10 @@ PrefabInstance:
       value: -0.56501985
       objectReference: {fileID: 0}
     - target: {fileID: 6227226312698977914, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+      propertyPath: maxBendOffset
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6227226312698977914, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: verticalOffset
       value: 4
       objectReference: {fileID: 0}

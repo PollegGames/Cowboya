@@ -346,7 +346,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     private void HandleAllMachinesOff()
     {
-        var enemies = FindObjectsOfType<EnemyController>();
+        var enemies = FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
         foreach (var enemy in enemies)
         {
             if (enemy != null && enemy.IsBoss)

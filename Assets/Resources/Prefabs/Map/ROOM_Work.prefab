@@ -656,6 +656,7 @@ Transform:
   - {fileID: 928507644759588395}
   - {fileID: 6730483614755004952}
   - {fileID: 489592574393403773}
+  - {fileID: 831957902178848496}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: -90, z: 90}
 --- !u!114 &5226794923736213634
@@ -4080,6 +4081,14 @@ PrefabInstance:
       propertyPath: materialOff
       value: 
       objectReference: {fileID: 2100000, guid: 53ec3f936f3b0bf4dba7d803fd9c03a2, type: 2}
+    - target: {fileID: 1403945648289567780, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
+      propertyPath: factoryAlarmStatus
+      value: 
+      objectReference: {fileID: 11400000, guid: ce6d93aba8639b74f8e3f0b7ef4b3919, type: 2}
+    - target: {fileID: 1403945648289567780, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
+      propertyPath: cubeConveyorController
+      value: 
+      objectReference: {fileID: 6757885727604863804}
     - target: {fileID: 3036150070442820856, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.14
@@ -4178,3 +4187,76 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7047981207480481909, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
   m_PrefabInstance: {fileID: 4370759522471352941}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4789122690209588203
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7047981207480481909}
+    m_Modifications:
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.149711
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 22.159956
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.2115154
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8050141362589384954, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+      propertyPath: m_Name
+      value: CubeController
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+--- !u!4 &831957902178848496 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+  m_PrefabInstance: {fileID: 4789122690209588203}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6757885727604863804 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2287464628552552663, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
+  m_PrefabInstance: {fileID: 4789122690209588203}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fffc712bbd0f4623b25d65d9616a382e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
