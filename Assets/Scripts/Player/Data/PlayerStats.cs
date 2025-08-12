@@ -55,6 +55,16 @@ public class RobotStats
         OnEnergyRechargeChanged?.Invoke();
     }
 
+    /// <summary>
+    /// Adjusts the energy recharge rate by the provided amount.
+    /// </summary>
+    /// <param name="delta">Amount to change recharge rate.</param>
+    public void UpdateEnergyRecharge(float delta)
+    {
+        EnergyRechargeRate = math.max(0f, EnergyRechargeRate + delta);
+        OnEnergyRechargeChanged?.Invoke();
+    }
+
     public void UpdateHealth(float delta)
     {
         CurrentHealth = Mathf.Clamp(CurrentHealth + delta, 0, MaxHealth);

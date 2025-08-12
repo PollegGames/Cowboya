@@ -45,8 +45,9 @@ public class CubeCollector : MonoBehaviour
                             runStats.MaxEnergyBonus += upgradeStore.UpgradeMaxEnergyValue;
                             break;
                         case CubeUpgradeType.EnergyRecharge:
-                            runStats.EnergyRechargeBonus += upgradeStore.UpgradeEnergyRechargeValue;
+                            runStats.AddEnergyRechargeBonus(upgradeStore.UpgradeEnergyRechargeValue);
                             break;
+                        
 
                         case CubeUpgradeType.AttackDamage:
                             runStats.AttackDamageBonus += upgradeStore.UpgradeAttackDamageValue;

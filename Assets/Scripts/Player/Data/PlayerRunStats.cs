@@ -34,8 +34,19 @@ public class PlayerRunStats : ScriptableObject
         maxHealth = source.MaxHealth;
         maxEnergy = source.MaxEnergy;
         morality = source.Morality;
-        energyRechargeRate = energyBot != null ? energyBot.rechargeRate : source.EnergyRechargeRate;
-        attackDamage = attack != null ? attack.Damage : (source.Attacks.Count > 0 ? source.Attacks[0].Damage : 0);
+        if (energyBot != null)
+        {
+            energyRechargeRate = energyBot.rechargeRate;
+        }
+        else
+        {
+            energyRechargeRate = source.EnergyRechargeRate;
+        }
+        if (attack != null)
+        {
+            attackDamage = attack.Damage;
+        }
+
 
         hasValues = true;
     }
@@ -69,6 +80,7 @@ public class PlayerRunStats : ScriptableObject
         {
             energyBot.rechargeRate = energyRechargeRate;
         }
+        target.EnergyRechargeRate = energyRechargeRate;
         if (attack != null)
         {
             attack.Damage = attackDamage;
@@ -92,5 +104,14 @@ public class PlayerRunStats : ScriptableObject
         AttackDamageBonus = 0;
 
         hasValues = false;
+    }
+
+    /// <summary>
+    /// Adds to the energy recharge bonus accumulated during the run.
+    /// </summary>
+    /// <param name="value">Bonus amount to add.</param>
+    public void AddEnergyRechargeBonus(float value)
+    {
+        EnergyRechargeBonus += value;
     }
 }

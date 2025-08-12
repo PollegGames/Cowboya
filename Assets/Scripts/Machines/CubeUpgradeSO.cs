@@ -67,7 +67,6 @@ public class CubeUpgradeSO : ScriptableObject
                 target.UpdateEnergy(upgradeMaxEnergyValue);
                 break;
             case CubeUpgradeType.EnergyRecharge:
-                target.EnergyRechargeRate += upgradeEnergyRechargeValue;
                 target.UpdateEnergyRecharge(upgradeEnergyRechargeValue);
                 break;
             case CubeUpgradeType.AttackDamage:
