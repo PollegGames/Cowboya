@@ -13,6 +13,25 @@ public class CubeUpgradeSO : ScriptableObject
     [SerializeField] private float upgradeEnergyRechargeValue = 5f;
     [SerializeField] private int upgradeAttackDamageValue = 5;
 
+    /// <summary>
+    /// Value added to MaxHealth when upgrading.
+    /// </summary>
+    public float UpgradeMaxHealthValue => upgradeMaxHealthValue;
+
+    /// <summary>
+    /// Value added to MaxEnergy when upgrading.
+    /// </summary>
+    public float UpgradeMaxEnergyValue => upgradeMaxEnergyValue;
+
+    /// <summary>
+    /// Value added to energy recharge when upgrading.
+    /// </summary>
+    public float UpgradeEnergyRechargeValue => upgradeEnergyRechargeValue;
+
+    /// <summary>
+    /// Value added to attack damage when upgrading.
+    /// </summary>
+    public int UpgradeAttackDamageValue => upgradeAttackDamageValue;
 
     /// <summary>
     /// Gets the stored upgrade type.
