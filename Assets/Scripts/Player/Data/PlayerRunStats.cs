@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "PlayerRunStats", menuName = "Player/RunStats")]
 public class PlayerRunStats : ScriptableObject
@@ -13,9 +14,7 @@ public class PlayerRunStats : ScriptableObject
     public float MaxEnergyBonus;
     public float EnergyRechargeBonus;
     public int AttackDamageBonus;
-
     private bool hasValues;
-
     public bool HasValues => hasValues;
 
     /// <summary>
@@ -30,13 +29,13 @@ public class PlayerRunStats : ScriptableObject
         {
             return;
         }
-        currentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
-        maxHealth = source.MaxHealth;
-        maxEnergy = source.MaxEnergy;
-        morality = source.Morality;
+        CurrentHealth = Mathf.Clamp(source.CurrentHealth, 0f, source.MaxHealth);
+        MaxHealth = source.MaxHealth;
+        MaxEnergy = source.MaxEnergy;
+        Morality = source.Morality;
         if (energyBot != null)
         {
-            energyRechargeRate = energyBot.rechargeRate;
+            EnergyRechargeRate = energyBot.rechargeRate;
         }
         else
         {
@@ -44,7 +43,7 @@ public class PlayerRunStats : ScriptableObject
         }
         if (attack != null)
         {
-            attackDamage = attack.Damage;
+            AttackDamage = attack.Damage;
         }
 
 
@@ -70,20 +69,21 @@ public class PlayerRunStats : ScriptableObject
             return;
         }
 
-        target.MaxHealth = maxHealth;
-        target.MaxEnergy = maxEnergy;
-        float healthTarget = Mathf.Clamp(currentHealth, 0f, target.MaxHealth);
+        target.MaxHealth = MaxHealth;
+        target.MaxEnergy = MaxEnergy;
+        float healthTarget = Mathf.Clamp(CurrentHealth, 0f, target.MaxHealth);
         target.UpdateHealth(healthTarget - target.CurrentHealth);
         target.UpdateMorality(morality - target.Morality);
         target.EnergyRechargeRate = energyRechargeRate;
+
         if (energyBot != null)
         {
-            energyBot.rechargeRate = energyRechargeRate;
+            energyBot.rechargeRate = EnergyRechargeRate;
         }
         target.EnergyRechargeRate = energyRechargeRate;
         if (attack != null)
         {
-            attack.Damage = attackDamage;
+            attack.Damage = AttackDamage;
         }
     }
 
