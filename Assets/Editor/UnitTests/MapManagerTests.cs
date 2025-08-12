@@ -82,17 +82,17 @@ public class MapManagerTests
     }
 
     [Test]
-    public void GetRandomEmptyPosition_ReturnsPosition()
+    public void GetRandomWorkPosition_ReturnsPosition()
     {
-        var emptyGO = new GameObject();
-        emptyGO.transform.position = new Vector3(3, 0, 0);
-        var props = emptyGO.AddComponent<RoomProperties>();
-        props.usageType = UsageType.Empty;
-        var dict = new System.Collections.Generic.Dictionary<Vector2, GameObject> { { Vector2.zero, emptyGO } };
+        var workGO = new GameObject();
+        workGO.transform.position = new Vector3(3, 0, 0);
+        var props = workGO.AddComponent<RoomProperties>();
+        props.usageType = UsageType.Work;
+        var dict = new System.Collections.Generic.Dictionary<Vector2, GameObject> { { Vector2.zero, workGO } };
         typeof(MapManager).GetField("roomInstances", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_manager, dict);
 
-        var pos = _manager.GetRandomEmptyPosition();
-        Assert.AreEqual(emptyGO.transform.position, pos);
+        var pos = _manager.GetRandomWorkPosition();
+        Assert.AreEqual(workGO.transform.position, pos);
     }
 
     private class DummyGridBuilder : IGridBuilder

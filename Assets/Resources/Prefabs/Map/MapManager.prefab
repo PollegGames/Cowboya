@@ -54,4 +54,4 @@ MonoBehaviour:
   receptionPOI_Prefab: {fileID: 542146199199913260, guid: 3d6b903f23f088d4ab161eccb58e9190, type: 3}
   securityPOI_Prefab: {fileID: 542146199199913260, guid: 61ec338c4d025b14eb781d8691fbccd7, type: 3}
   pathToPOIPrefab: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
-  emptyPrefab: {fileID: 542146199199913260, guid: 698d313749aa0524a957563038d9f5cf, type: 3}
+  workPrefab: {fileID: 542146199199913260, guid: 698d313749aa0524a957563038d9f5cf, type: 3}

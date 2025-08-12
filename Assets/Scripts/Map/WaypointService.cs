@@ -144,7 +144,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
         var works = registry
             .GetActiveWaypoints()
             .Where(wp =>
-                wp.parentRoom.roomProperties.usageType == UsageType.Empty
+                wp.parentRoom.roomProperties.usageType == UsageType.Work
                 && wp.type == WaypointType.Work
                 && wp.parentRoom.factorymMachinesInRoom.Any(m =>
                     m.IsOn && m.CurrentWorker == null && !reservedMachines.ContainsKey(m)
@@ -159,7 +159,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
             works = registry
                 .GetActiveWaypoints()
                 .Where(wp =>
-                    wp.parentRoom.roomProperties.usageType == UsageType.Empty
+                    wp.parentRoom.roomProperties.usageType == UsageType.Work
                     && wp.type == WaypointType.Work
                     && wp.parentRoom.factorymMachinesInRoom.Any(m =>
                         m.IsOn && m.CurrentWorker != null
@@ -174,7 +174,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
             works = registry
                 .GetActiveWaypoints()
                 .Where(wp =>
-                    wp.parentRoom.roomProperties.usageType == UsageType.Empty
+                    wp.parentRoom.roomProperties.usageType == UsageType.Work
                     && wp.type == WaypointType.Work
                     && wp.parentRoom.factorymMachinesInRoom.Any(m => m.IsOn)
                     && wp != exclude
@@ -192,7 +192,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 : 1;
             reservedWaypoints.Add(best);
             Debug.Log(
-                $"[WaypointReservation] Assigned EMPTY WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
+                $"[WaypointReservation] Assigned WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
             );
             return best;
         }
@@ -205,7 +205,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
         var works = registry
             .GetActiveWaypoints()
             .Where(wp =>
-                wp.parentRoom.roomProperties.usageType == UsageType.Empty
+                wp.parentRoom.roomProperties.usageType == UsageType.Work
                 && wp.type == WaypointType.Work
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp)
@@ -222,7 +222,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 : 1;
             reservedWaypoints.Add(best);
             Debug.Log(
-                $"[WaypointReservation] Assigned EMPTY WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
+                $"[WaypointReservation] Assigned WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
             );
             return best;
         }

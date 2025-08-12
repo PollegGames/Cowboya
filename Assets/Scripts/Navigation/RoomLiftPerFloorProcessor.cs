@@ -123,12 +123,12 @@ public class RoomLiftPerFloorProcessor : CellProcessor
         if (c == null) return false;
 
         // Adjust this whitelist to your project’s enum:
-        // We avoid overwriting Start/End/Doors/etc. Keep what you had (Blocked/POI/Empty) plus any "WORK" mapping if needed.
-        var t = c.cellProperties.usageType;
-        return t == UsageType.Empty
-            || t == UsageType.Blocked
-            || t == UsageType.POI
-            || t == UsageType.PathToPOI; // allow aligning existing lifts too
+          // We avoid overwriting Start/End/Doors/etc. Keep what you had (Blocked/POI/Work) plus any "WORK" mapping if needed.
+          var t = c.cellProperties.usageType;
+          return t == UsageType.Work
+              || t == UsageType.Blocked
+              || t == UsageType.POI
+              || t == UsageType.PathToPOI; // allow aligning existing lifts too
     }
 
     private void SetLift(Cell c)

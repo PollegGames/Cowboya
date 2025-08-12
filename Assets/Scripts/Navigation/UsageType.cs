@@ -1,6 +1,6 @@
 public enum UsageType
 {
-    Empty,
+    Work,
     Blocked,
     Start,
     End,

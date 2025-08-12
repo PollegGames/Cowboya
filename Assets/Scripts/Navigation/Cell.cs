@@ -7,7 +7,7 @@ public class Cell
 
     public int fCost, gCost, hCost;
 
-    public Cell(Vector2 pos, UsageType usageType = UsageType.Empty)
+    public Cell(Vector2 pos, UsageType usageType = UsageType.Work)
     {
         position = pos;
         gCost = int.MaxValue;
