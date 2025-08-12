@@ -158,7 +158,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var ec = guard.GetComponent<EnemyController>();
         if (ec != null)
         {
-            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, batterySpawner);
+            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, batterySpawner, true);
             ec.SetSecurityGuardState();
             ec.memory.SetLastVisitedPoint(spawnPos);
         }
@@ -249,7 +249,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         {
             var p = waypointService.GetEndPoint();
             PositionAndWake(bossInstance, (p != null) ? p.WorldPos : bossInstance.transform.position);
-            InitEnemyController(bossInstance);
+            InitEnemyController(bossInstance, false);
             bossInstance.GetComponent<EnemyController>()?.SetBossState();
             bossInstance.GetComponent<EnemyController>()?.memory.SetLastVisitedPoint(p);
             Debug.Log("Boss spread and initialized");
@@ -286,7 +286,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
         PrepareSkeleton(go);
         PositionAndWake(go, pos);
-        InitEnemyController(go);
+        InitEnemyController(go, false);
         go.GetComponent<EnemyController>()?.SetBossState();
 
         bossInstance = go;
@@ -307,11 +307,11 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         return ObjectPool.Instance.Get(prefab, enemiesParent);
     }
 
-    private void InitEnemyController(GameObject go)
+    private void InitEnemyController(GameObject go, bool spawnInitialPickups = true)
     {
         var ec = go.GetComponent<EnemyController>();
         if (ec != null)
-            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, batterySpawner);
+            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, batterySpawner, spawnInitialPickups);
     }
 
     private void PositionAndWake(GameObject go, Vector3 worldPos)

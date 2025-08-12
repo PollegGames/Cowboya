@@ -40,6 +40,8 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
     private SecurityBadgePickup initialBadge;
     private BatteryPickup initialBattery;
+    private SecurityBadgeSpawner securityBadgeSpawner;
+    private BatterySpawner batterySpawner;
 
     private Transform dropContainer;
 
@@ -69,7 +71,8 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         IRobotRespawnService respawnService,
         Transform dropContainer,
         SecurityBadgeSpawner securityBadgeSpawner,
-        BatterySpawner batterySpawner = null)
+        BatterySpawner batterySpawner = null,
+        bool spawnInitialPickups = true)
     {
         this.waypointQueries = waypointQueries;
         this.waypointNotifier = waypointNotifier;
@@ -78,26 +81,31 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         waypointNotifier.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
         this.dropContainer = dropContainer;
+        this.securityBadgeSpawner = securityBadgeSpawner;
+        this.batterySpawner = batterySpawner;
 
-        if (securityBadgeSpawner && initialBadge == null)
+        if (spawnInitialPickups)
         {
-            initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
-            if (inventory != null && initialBadge != null)
+            if (securityBadgeSpawner && initialBadge == null)
             {
-                initialBadge.AssignInventory(inventory);
-                inventory.SetItem(PickupType.SecurityBadge, initialBadge);
+                initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
+                if (inventory != null && initialBadge != null)
+                {
+                    initialBadge.AssignInventory(inventory);
+                    inventory.SetItem(PickupType.SecurityBadge, initialBadge);
+                }
             }
-        }
 
-        if (batterySpawner && initialBattery == null)
-        {
-            initialBattery = batterySpawner.SpawnBattery(bodyReference);
-            if (inventory != null && initialBattery != null)
+            if (batterySpawner && initialBattery == null)
             {
-                initialBattery.AssignInventory(inventory);
-                inventory.SetItem(PickupType.Battery, initialBattery);
-                if (robotBehaviour != null)
-                    robotBehaviour.Stats.UpdateHealth(10f);
+                initialBattery = batterySpawner.SpawnBattery(bodyReference);
+                if (inventory != null && initialBattery != null)
+                {
+                    initialBattery.AssignInventory(inventory);
+                    inventory.SetItem(PickupType.Battery, initialBattery);
+                    if (robotBehaviour != null)
+                        robotBehaviour.Stats.UpdateHealth(10f);
+                }
             }
         }
     }
@@ -187,7 +195,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         var jointBreaker = GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();
         SceneController.instance.RobotKilled();
-        DetachHeldBadges();
+        DropBossLoot();
         StartCoroutine(DieRoutine());
     }
 
@@ -197,7 +205,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         ObjectPool.Instance.Release(gameObject);
     }
 
-    private void DetachHeldBadges()
+    private void DropBossLoot()
     {
         if (initialBadge != null)
         {
@@ -219,6 +227,26 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
                     initialBattery.transform.SetParent(dropContainer, true);
             }
             initialBattery = null;
+        }
+
+        if (IsBoss)
+        {
+            var spawnParent = transform;
+            if (securityBadgeSpawner != null)
+            {
+                var badge = securityBadgeSpawner.SpawnBadge(spawnParent);
+                badge?.OnRelease(Vector2.zero);
+                if (dropContainer != null && badge != null)
+                    badge.transform.SetParent(dropContainer, true);
+            }
+
+            if (batterySpawner != null)
+            {
+                var battery = batterySpawner.SpawnBattery(spawnParent);
+                battery?.OnRelease(Vector2.zero);
+                if (dropContainer != null && battery != null)
+                    battery.transform.SetParent(dropContainer, true);
+            }
         }
     }
 
