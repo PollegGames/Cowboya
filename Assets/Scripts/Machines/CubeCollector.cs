@@ -29,6 +29,15 @@ public class CubeCollector : MonoBehaviour
         if (pickup != null && cube != null && upgradeStore != null)
         {
             upgradeStore.Store(cube.SelectedUpgrade);
+
+            RobotStats playerStats = other.GetComponentInParent<RobotStateController>()?.Stats;
+            if (playerStats != null)
+            {
+                upgradeStore.ApplyUpgrade(playerStats);
+                RunProgressManager.Instance?.RunStats?.Capture(playerStats);
+            }
+
+            Destroy(pickup.gameObject);
         }
     }
 }
