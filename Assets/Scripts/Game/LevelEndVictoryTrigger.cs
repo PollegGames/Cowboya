@@ -59,7 +59,9 @@ public class LevelEndVictoryTrigger : MonoBehaviour
 
                 if (runStats != null && controller != null)
                 {
-                    runStats.Capture(controller.Stats);
+                    EnergyBot energyBot = controller.GetComponent<EnergyBot>();
+                    Attack attack = controller.Stats.Attacks.Count > 0 ? controller.Stats.Attacks[0] : null;
+                    runStats.Capture(controller.Stats, energyBot, attack);
                     if (saveService != null)
                     {
                         saveService.SaveGame(controller);

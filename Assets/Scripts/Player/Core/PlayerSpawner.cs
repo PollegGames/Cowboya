@@ -46,7 +46,9 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
         // Apply stats before gameplay so HUD and AI use updated values
         if (runStats != null && runStats.HasValues)
         {
-            runStats.Apply(playerRobotInfo);
+            EnergyBot energyBot = playerInstance.GetComponent<EnergyBot>();
+            Attack attack = playerRobotInfo.Attacks.Count > 0 ? playerRobotInfo.Attacks[0] : null;
+            runStats.Apply(playerRobotInfo, energyBot, attack);
         }
 
         // Locate "WholeBody" container
