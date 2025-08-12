@@ -31,10 +31,31 @@ public class CubeCollector : MonoBehaviour
             upgradeStore.Store(cube.UpgradeType);
 
             RobotStats playerStats = other.GetComponentInParent<RobotStateController>()?.Stats;
+            PlayerRunStats runStats = RunProgressManager.Instance?.RunStats;
             if (playerStats != null)
             {
+                if (runStats != null)
+                {
+                    switch (cube.UpgradeType)
+                    {
+                        case CubeUpgradeType.MaxHealth:
+                            runStats.MaxHealthBonus += upgradeStore.UpgradeMaxHealthValue;
+                            break;
+                        case CubeUpgradeType.MaxEnergy:
+                            runStats.MaxEnergyBonus += upgradeStore.UpgradeMaxEnergyValue;
+                            break;
+                        case CubeUpgradeType.EnergyRecharge:
+                            // No direct property on PlayerRunStats yet; placeholder for future logic
+                            break;
+        
+                        case CubeUpgradeType.AttackDamage:
+                            runStats.AttackDamageBonus += upgradeStore.UpgradeAttackDamageValue;
+                            break;
+                    }
+                }
+
                 upgradeStore.ApplyUpgrade(playerStats);
-                RunProgressManager.Instance?.RunStats?.Capture(playerStats);
+                runStats?.Capture(playerStats);
             }
 
             Destroy(pickup.gameObject);
