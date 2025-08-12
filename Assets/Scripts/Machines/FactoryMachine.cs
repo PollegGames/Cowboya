@@ -115,6 +115,7 @@ public class FactoryMachine : BaseMachine
     private void HandleCubeProcessed()
     {
         cubeActive = false;
+        ScheduleSpawn();
     }
 
     private void ScheduleSpawn()
