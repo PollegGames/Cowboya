@@ -186,7 +186,6 @@ GameObject:
   - component: {fileID: 5579768388783519933}
   - component: {fileID: 574345331645963513}
   - component: {fileID: 6927027784846965603}
-  - component: {fileID: 1652121089499442319}
   - component: {fileID: 4920133160292708415}
   - component: {fileID: 681138149407633311}
   m_Layer: 7
@@ -343,7 +342,7 @@ MonoBehaviour:
   deadZoneX: 1
   deadZoneY: 5
   lowMoralityTriggerHandler: {fileID: 4920133160292708415}
-  allyWorkerController: {fileID: 1652121089499442319}
+  allyWorkerController: {fileID: 0}
   updateLoop: 0
 --- !u!114 &9201182588516880390
 MonoBehaviour:
@@ -428,30 +427,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftLegJoint: {fileID: 9206399113579118249}
   rightLegJoint: {fileID: 1967472705241727288}
---- !u!114 &1652121089499442319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113533570876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91c4743f29dfcbb42ab1d8ebd2a1caef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  animator: {fileID: 3831158568374747867}
-  bodyReference: {fileID: 9206399112436540782}
-  hipRb: {fileID: 9206399112436540778}
-  points: {fileID: 7353721863927515775}
-  poles: {fileID: 5653714254752795455}
-  legJointLimiter: {fileID: 6927027784846965603}
-  arrivalThresholdX: 2
-  arrivalThresholdY: 2
-  deadZoneX: 5
-  deadZoneY: 5
-  updateLoop: 0
 --- !u!114 &4920133160292708415
 MonoBehaviour:
   m_ObjectHideFlags: 0

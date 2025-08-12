@@ -99,8 +99,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
         var followHandler = GetComponent<FollowPlayerTriggerHandler>();
         if (followHandler != null)
             followHandler.enabled = false;
-        allyWorkerController.Initialize(waypointService);
-        allyWorkerController.enabled = true;
     }
 
     protected override void Update()

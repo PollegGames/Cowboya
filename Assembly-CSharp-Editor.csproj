@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\UnitTests\GridRendererTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\CubeUpgradeSOTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\StationReservationServiceTests.cs" />
     <Compile Include="Assets\Shapes2D\Editor\MenuItems.cs" />
     <Compile Include="Assets\Editor\UnitTests\BatteryPickupTests.cs" />

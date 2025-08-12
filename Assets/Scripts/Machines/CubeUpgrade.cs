@@ -13,3 +13,11 @@ public class CubeUpgrade : MonoBehaviour
     public CubeUpgradeType UpgradeType => upgradeType;
 }
 
+
+public enum CubeUpgradeType
+{
+    MaxHealth,
+    MaxEnergy,
+    EnergyRecharge,
+    AttackDamage
+}

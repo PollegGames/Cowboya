@@ -42,10 +42,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05c90c2f4fc74534694d7c5b3e322169, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   normalCubePrefab: {fileID: -3281786584640236443, guid: 965968b2004a3024dbf6cf8534199579, type: 3}
   upgradeCubePrefabs:
   - {fileID: -3281786584640236443, guid: 5eae2a5d019b88a468fe542a5e503e66, type: 3}
   - {fileID: -3281786584640236443, guid: 9bc7a386174f6d14bb442ecd98983b61, type: 3}
-  - {fileID: -3281786584640236443, guid: 7582993ae06bd514f890146089f13a4e, type: 3}
+  - {fileID: -3281786584640236443, guid: 91db61f0cd0e0bb45b6533dc6f61131d, type: 3}

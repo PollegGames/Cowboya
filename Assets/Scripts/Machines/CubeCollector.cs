@@ -20,6 +20,7 @@ public class CubeCollector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log($"CubeCollector: OnTriggerEnter2D with {other.name}");
         if (other == null)
             return;
 

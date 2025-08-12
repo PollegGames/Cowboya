@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6206929599146606855}
   - component: {fileID: 7876967260955353992}
   - component: {fileID: 2933447607757072381}
-  - component: {fileID: 7240392201043162274}
   - component: {fileID: -3281786584640236443}
   m_Layer: 13
   m_Name: CubeNormal
@@ -185,25 +184,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.35778987, y: 0.35349166}
   m_EdgeRadius: 0
---- !u!114 &7240392201043162274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1934608487537832627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfc698cb89374e83a3c08762d256803c, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  maxHealthSprite: {fileID: 0}
-  maxEnergySprite: {fileID: 0}
-  energyRechargeSprite: {fileID: 0}
-  attackDamageSprite: {fileID: 0}
-  spriteRenderer: {fileID: 6374700015707614389}
-  isUpgradeActive: 0
-  upgradeType: 0
 --- !u!114 &-3281786584640236443
 MonoBehaviour:
   m_ObjectHideFlags: 0

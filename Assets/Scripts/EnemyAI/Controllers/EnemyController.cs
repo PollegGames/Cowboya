@@ -258,7 +258,7 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
     public void OnBatteryStolen(GameObject player)
     {
         Debug.Log($"{name} battery stolen by {player.name}");
-        robotBehaviour.Health.TakeDamage(10);
+        robotBehaviour.Stats.UpdateEnergy(robotBehaviour.Stats.CurrentEnergy);
     }
 
     private void UpdateBalance(bool enabledBalance)

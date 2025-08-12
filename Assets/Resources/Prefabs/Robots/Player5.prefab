@@ -5284,6 +5284,7 @@ MonoBehaviour:
     MaxEnergy: 100
     CurrentEnergy: 100
     AttackEnergyCost: 5
+    EnergyRechargeRate: 1
   hips: {fileID: 9206399112436540778}
 --- !u!114 &8782515306010581955
 MonoBehaviour:
@@ -6051,6 +6052,22 @@ PrefabInstance:
     - target: {fileID: 4500328786175125369, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
       propertyPath: minAngleRight
       value: -50.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5657812123428391822, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+      propertyPath: m_Color.a
+      value: 0.5686275
+      objectReference: {fileID: 0}
+    - target: {fileID: 5657812123428391822, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5657812123428391822, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+      propertyPath: m_Color.g
+      value: 0.92892253
+      objectReference: {fileID: 0}
+    - target: {fileID: 5657812123428391822, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
