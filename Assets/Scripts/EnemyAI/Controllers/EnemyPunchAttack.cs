@@ -36,16 +36,28 @@ public class EnemyPunchAttack : MonoBehaviour
     private RobotStateController robotBehaviour;
 
     [SerializeField] private RobotMemory memory;
+    [SerializeField] private FactoryAlarmStatus alarmStatus;
+    private RobotStats playerStats;
     private bool playerInAttackZone = false;
     private void Awake()
     {
         robotBehaviour = GetComponent<RobotStateController>();
+        if (alarmStatus == null)
+        {
+            alarmStatus = FindObjectOfType<FactoryManager>()?.factoryAlarmStatus;
+        }
     }
     private void Start()
     {
         if (targetToFollow != null)
         {
             targetToFollow.OnPlayerDetectInAttackZoneChanged += HandlePlayerInAttackZoneChange;
+        }
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            RobotStateController controller = player.GetComponent<RobotStateController>();
+            playerStats = controller?.Stats;
         }
     }
 
@@ -56,6 +68,14 @@ public class EnemyPunchAttack : MonoBehaviour
 
     private void Update()
     {
+        if (playerStats != null &&
+            playerStats.Morality > 5f &&
+            alarmStatus != null &&
+            alarmStatus.CurrentAlarmState != AlarmState.Wanted)
+        {
+            return; // Guards stand down
+        }
+
         if (!targetToFollow || !punchTarget || isPunching) return;
 
         if (!playerInAttackZone || targetToFollow.PlayerBodyReferencePosition == Vector3.zero) return;

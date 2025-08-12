@@ -4697,6 +4697,7 @@ MonoBehaviour:
   leftArmHitbox: {fileID: 3250705526059779659}
   rightArmHitbox: {fileID: 1545105698887083221}
   memory: {fileID: 4652158946510775221}
+  alarmStatus: {fileID: 11400000, guid: ce6d93aba8639b74f8e3f0b7ef4b3919, type: 2}
 --- !u!114 &4282379396995134653
 MonoBehaviour:
   m_ObjectHideFlags: 0
