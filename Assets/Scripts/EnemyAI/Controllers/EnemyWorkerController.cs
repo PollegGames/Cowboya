@@ -137,6 +137,17 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
         robotBehaviour.Stats.UpdateEnergy(robotBehaviour.Stats.CurrentEnergy);
     }
 
+    /// <summary>
+    /// Removes the stolen battery from the inventory and clears the initial reference.
+    /// </summary>
+    public void HandleBatteryStolen()
+    {
+        if (inventory != null)
+            inventory.RemoveItem(PickupType.Battery);
+
+        initialBattery = null;
+    }
+
     private void FixedUpdate()
     {
         if (updateLoop == UpdateLoop.FixedUpdate)
