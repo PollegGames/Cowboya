@@ -152,6 +152,7 @@
     <Compile Include="Assets\Scripts\UI\CanvasLevelUI.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\EnemyState.cs" />
     <Compile Include="Assets\Scripts\Interfaces\ICellProcessor.cs" />
+    <Compile Include="Assets\Scripts\Navigation\PathToPOIToWorkProcessor.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\IGrabbable.cs" />
     <Compile Include="Assets\Scripts\Player\Core\PlayerSpawner.cs" />
     <Compile Include="Assets\Scripts\UI\HealthBar.cs" />
@@ -251,7 +252,6 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Saved.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\ReactiveMachineAI.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathCellProcessor.cs" />
-    <Compile Include="Assets\Scripts\Navigation\PathToPOIToWorkProcessor.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPOIReservationService.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />

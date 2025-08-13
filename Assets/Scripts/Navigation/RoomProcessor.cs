@@ -8,11 +8,11 @@ public class RoomProcessor : MonoBehaviour, IRoomProcessor
         var processors = new List<ICellProcessor>
         {
             new RoomLiftPerFloorProcessor(width, height),
+            new PathToPOIToWorkProcessor(width, height),
             new PathCellProcessor(width, height, UsageType.PathToPOI),
             new BlockedCellProcessor(width, height),
             new LockEndRoomDoorProcessor(width, height),
             new EdgeCellProcessor(width, height),
-            new PathToPOIToWorkProcessor(width, height),
         };
 
         foreach (var p in processors)
