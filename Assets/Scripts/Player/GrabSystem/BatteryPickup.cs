@@ -143,6 +143,8 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             }
         }
 
+        transform.SetParent(grabParent, true);
+
         attached = true;
         rb.simulated = true;
         rb.bodyType = RigidbodyType2D.Kinematic;
@@ -189,6 +191,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             joint.enabled = false;
 
         followTarget = null;
+        transform.SetParent(null, true);
 
         if (rb != null)
         {
