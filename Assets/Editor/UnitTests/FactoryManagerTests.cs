@@ -32,16 +32,21 @@ public class FactoryManagerTests
     public void GetStartCellWorldPosition_ReturnsPosition()
     {
         var mapManager = new GameObject().AddComponent<MapManager>();
+        mapManager.cellWidth = 40;
+        typeof(MapManager).GetField("gridWidth", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(mapManager, 10);
+
         var startGO = new GameObject();
         startGO.transform.position = new Vector3(2, 3, 0);
         var props = startGO.AddComponent<RoomProperties>();
         props.usageType = UsageType.Start;
+        props.GridPosition = new Vector2Int(8, 0); // Right half of grid
         var dict = new System.Collections.Generic.Dictionary<Vector2, GameObject> { { Vector2.zero, startGO } };
         typeof(MapManager).GetField("roomInstances", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(mapManager, dict);
         typeof(FactoryManager).GetField("mapManager", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_factoryManager, mapManager);
 
         var pos = _factoryManager.GetStartCellWorldPosition();
-        Assert.AreEqual(startGO.transform.position, pos);
+        var expected = startGO.transform.position + new Vector3(-mapManager.cellWidth * 0.25f, 0f, 0f);
+        Assert.AreEqual(expected, pos);
     }
 
     [Test]

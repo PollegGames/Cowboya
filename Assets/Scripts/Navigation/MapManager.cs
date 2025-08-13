@@ -233,6 +233,10 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns the world position of the start cell with a slight horizontal offset.
+    /// Rooms on the left half of the grid are nudged right; rooms on the right half are nudged left.
+    /// </summary>
     public Vector3 GetStartCellWorldPosition()
     {
         if (roomInstances == null)
@@ -244,8 +248,13 @@ public class MapManager : MonoBehaviour
             var roomProps = roomObj.GetComponent<RoomProperties>();
             if (roomProps != null && roomProps.usageType == UsageType.Start)
             {
-                // Return the center position of the cell (room)
-                return roomObj.transform.position;
+                Vector3 pos = roomObj.transform.position;
+                float offset = cellWidth * 0.25f;
+                if (roomProps.GridPosition.x < gridWidth / 2f)
+                    pos += new Vector3(offset, 0f, 0f);
+                else
+                    pos += new Vector3(-offset, 0f, 0f);
+                return pos;
             }
         }
         Debug.LogWarning("No start cell found in roomInstances.");
