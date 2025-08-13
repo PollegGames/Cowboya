@@ -361,10 +361,6 @@ public class RunSetupManager : MonoBehaviour
             cam.transform.rotation = Quaternion.identity;
 
             // cam.targetTexture = miniMapRT;
-
-            var debug = cam.GetComponent<MiniMapDebugGizmos>();
-            if (debug != null)
-                debug.gridBounds = bounds;
         }
 
         // 3) Capture to Texture2D via coroutine

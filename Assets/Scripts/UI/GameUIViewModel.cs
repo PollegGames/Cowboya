@@ -222,9 +222,6 @@ public class GameUIViewModel : MonoBehaviour
 
             cam.targetTexture = miniMapRT;
 
-            var debug = cam.GetComponent<MiniMapDebugGizmos>();
-            if (debug != null)
-                debug.gridBounds = bounds;
         }
         StartCoroutine(CaptureRTToUI());
     }

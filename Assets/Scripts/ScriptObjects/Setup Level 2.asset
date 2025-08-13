@@ -16,6 +16,6 @@ MonoBehaviour:
   gridHeight: 4
   poiCount: 3
   blockedCount: 1
-  workersCount: 3
-  enemiesCount: 2
-  seed: 234644
+  workersCount: 5
+  enemiesCount: 4
+  seed: 235575

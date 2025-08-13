@@ -28,6 +28,11 @@ public class LevelEndVictoryTrigger : MonoBehaviour
         {
             Debug.LogError("LevelEndVictoryTrigger: PlayerSaveService reference is missing.");
         }
+        
+        if (doorNext != null)
+        {
+            isVictoryDoor = doorNext.isVictoryDoor;
+        }
     }
 
 
