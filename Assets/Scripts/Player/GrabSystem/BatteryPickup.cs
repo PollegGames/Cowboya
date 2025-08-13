@@ -43,6 +43,12 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             return;
 
         joint.target = followTarget.position;
+
+        if (attached)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
     }
 
     public void SetFollowTarget(Transform target)
