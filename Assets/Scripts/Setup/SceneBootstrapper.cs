@@ -62,7 +62,7 @@ public class SceneBootstrapper : MonoBehaviour
 
         if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 1)
         {
-            new GameObject("TutorialManager").AddComponent<TutorialManager>();
+            new GameObject("HintManager").AddComponent<HintManager>();
         }
     }
 }
