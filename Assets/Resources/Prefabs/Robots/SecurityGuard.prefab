@@ -4426,7 +4426,6 @@ GameObject:
   - component: {fileID: 1084963490228556486}
   - component: {fileID: 4282379396995134653}
   - component: {fileID: 4039218795842909479}
-  - component: {fileID: 8821255494166107071}
   - component: {fileID: 356648147594604746}
   - component: {fileID: 765951975251855314}
   - component: {fileID: 523884686753273075}
@@ -4548,7 +4547,7 @@ MonoBehaviour:
   deadZoneX: 1
   deadZoneY: 5
   punchAttack: {fileID: 1084963490228556486}
-  inventory: {fileID: 0}
+  inventory: {fileID: 523884686753273075}
   updateLoop: 0
   <IsBoss>k__BackingField: 0
 --- !u!114 &1976096450392993643
@@ -4581,11 +4580,12 @@ MonoBehaviour:
   healthBot: {fileID: 1976096450392993643}
   Stats:
     RobotName: Guard
-    MaxHealth: 30
-    CurrentHealth: 30
-    MaxEnergy: 30
-    CurrentEnergy: 30
+    MaxHealth: 20
+    CurrentHealth: 20
+    MaxEnergy: 20
+    CurrentEnergy: 20
     AttackEnergyCost: 10
+    EnergyRechargeRate: 1
   hips: {fileID: 3392093481179504074}
 --- !u!114 &7188059881045560196
 MonoBehaviour:
@@ -4725,27 +4725,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9181977428c5aaa4ea03ec4c8504121c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8821255494166107071
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8465636778725824547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1ba8a2f18b0d3542bee04008ff45c99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftFoot: {fileID: 2869664709595005715}
-  rightFoot: {fileID: 4279841641114245177}
-  jumpUpDuration: 18
-  jumpDownDuration: 18
-  isPlayerControlled: 0
-  energyCostPerStep: 1
-  energyCostPerJump: 3
-  waitStep: 1
-  timeout: 0.5
 --- !u!114 &356648147594604746
 MonoBehaviour:
   m_ObjectHideFlags: 0

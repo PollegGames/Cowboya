@@ -188,6 +188,7 @@ GameObject:
   - component: {fileID: 6927027784846965603}
   - component: {fileID: 4920133160292708415}
   - component: {fileID: 681138149407633311}
+  - component: {fileID: 5794384738814828582}
   m_Layer: 7
   m_Name: Worker
   m_TagString: Enemy
@@ -309,11 +310,12 @@ MonoBehaviour:
   healthBot: {fileID: 2375878962877187776}
   Stats:
     RobotName: Worker
-    MaxHealth: 30
-    CurrentHealth: 30
+    MaxHealth: 20
+    CurrentHealth: 20
     MaxEnergy: 10
     CurrentEnergy: 10
     AttackEnergyCost: 5
+    EnergyRechargeRate: 1
   hips: {fileID: 9206399112436540778}
 --- !u!114 &38189445005439173
 MonoBehaviour:
@@ -344,6 +346,7 @@ MonoBehaviour:
   lowMoralityTriggerHandler: {fileID: 4920133160292708415}
   allyWorkerController: {fileID: 0}
   updateLoop: 0
+  inventory: {fileID: 5794384738814828582}
 --- !u!114 &9201182588516880390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -459,6 +462,18 @@ MonoBehaviour:
   stateMachine: {fileID: 0}
   robotStateController: {fileID: 340242974285803334}
   jointBreaker: {fileID: 574345331645963513}
+--- !u!114 &5794384738814828582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0fc7a5ea4be4010be29e4887b018d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &446331177930903255
 PrefabInstance:
   m_ObjectHideFlags: 0
