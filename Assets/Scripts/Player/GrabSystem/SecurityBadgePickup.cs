@@ -87,11 +87,12 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     {
         var inventory = grabParent.GetComponentInParent<Inventory>();
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
+        EnemyController enemy = null;
 
         // Detect if we're stealing from an enemy
         if (!wasStolen && transform.parent != null)
         {
-            var enemy = transform.parent.GetComponentInParent<EnemyController>();
+            enemy = transform.parent.GetComponentInParent<EnemyController>();
             if (enemy != null)
             {
                 var stateController = enemy.GetComponent<RobotStateController>();
@@ -115,6 +116,12 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         // Detach from any previous hierarchy so the badge is no longer
         // parented to an enemy when picked up.
         transform.SetParent(grabParent.root, worldPositionStays: true);
+
+        if (wasStolen && enemy != null && player != null)
+        {
+            enemy.HandleBadgeStolen();
+            enemy.OnBadgeStolen(player.gameObject);
+        }
 
         if (player != null)
         {
