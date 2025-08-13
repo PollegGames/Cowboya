@@ -222,6 +222,19 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
         Debug.Log($"{name} badge stolen by {player.name}");
     }
 
+    /// <summary>
+    /// Handles cleanup when this enemy's security badge has been stolen.
+    /// Removes the badge from the inventory and clears the reference so a new
+    /// badge will be spawned on the next initialization.
+    /// </summary>
+    public void HandleBadgeStolen()
+    {
+        if (inventory != null)
+            inventory.RemoveItem(PickupType.SecurityBadge);
+
+        initialBadge = null;
+    }
+
 
 
     private void UpdateBalance(bool enabledBalance)
