@@ -227,7 +227,7 @@ public class GameUIViewModel : MonoBehaviour
             float orthoSizeWidth = worldWidth / (2f * aspect);
 
             // Use *2 for more padding, or remove *2 for tight fit
-            float orthoSize = Mathf.Max(orthoSizeHeight, orthoSizeWidth) * 2f;
+            float orthoSize = Mathf.Max(orthoSizeHeight, orthoSizeWidth);
             cam.orthographicSize = orthoSize;
 
             // Center the camera
