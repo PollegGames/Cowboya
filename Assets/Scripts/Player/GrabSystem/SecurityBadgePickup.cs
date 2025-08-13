@@ -112,6 +112,10 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
             ownerInventory = inventory;
         }
 
+        // Detach from any previous hierarchy so the badge is no longer
+        // parented to an enemy when picked up.
+        transform.SetParent(grabParent.root, worldPositionStays: true);
+
         if (player != null)
         {
             var hip = player.BodyReference;
@@ -141,6 +145,9 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         if (joint != null)
             joint.enabled = false;
         followTarget = null;
+
+        // Re-parent to world root so it no longer follows any holder.
+        transform.SetParent(null, worldPositionStays: true);
 
         if (ownerInventory != null)
         {
