@@ -12,6 +12,7 @@ public class RoomProcessor : MonoBehaviour, IRoomProcessor
             new BlockedCellProcessor(width, height),
             new LockEndRoomDoorProcessor(width, height),
             new EdgeCellProcessor(width, height),
+            new PathToPOIToWorkProcessor(width, height),
         };
 
         foreach (var p in processors)
