@@ -342,9 +342,7 @@ public class RunSetupManager : MonoBehaviour
         {
             factoryManagerInstance.Initialize(mapManagerInstance, waypointServiceInstance, victorySetup, enemiesSpawnerInstance);
         }
-        float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
-        float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
-        Vector3 origin = mapManagerInstance.transform.position;
+        Bounds bounds = mapManagerInstance.GetGridWorldBounds();
 
         // 2) Frame the camera
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
@@ -352,16 +350,21 @@ public class RunSetupManager : MonoBehaviour
         {
             cam.orthographic = true;
             float aspect = (float)miniMapRT.width / miniMapRT.height;
-            float halfH = worldHeight * 0.5f;
-            float halfW_as_H = (worldWidth * 0.5f) / aspect;
+            float halfH = bounds.size.y * 0.5f;
+            float halfWAsH = (bounds.size.x * 0.5f) / aspect;
             float padding = 0.05f;
-            cam.orthographicSize = Mathf.Max(halfH, halfW_as_H) * (1f + padding);
+            cam.orthographicSize = Mathf.Max(halfH, halfWAsH) * (1f + padding);
 
-            Vector3 center = origin + new Vector3(worldWidth * 0.5f, worldHeight * 0.5f, 0f);
-            cam.transform.position = new Vector3(center.x, center.y, -10f);
+            Vector3 pos = bounds.center;
+            pos.z = -10f;
+            cam.transform.position = pos;
             cam.transform.rotation = Quaternion.identity;
 
             // cam.targetTexture = miniMapRT;
+
+            var debug = cam.GetComponent<MiniMapDebugGizmos>();
+            if (debug != null)
+                debug.gridBounds = bounds;
         }
 
         // 3) Capture to Texture2D via coroutine
