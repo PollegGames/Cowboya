@@ -113,9 +113,13 @@ public class Hinge2DIkSolver : MonoBehaviour {
             current = current.connectedBody.GetComponent<AnchoredJoint2D> ();
         }
         root = bones[0].connectedBody.transform;
-        rootrb = root.GetComponent<Rigidbody2D> ();
+        rootrb = root.GetComponent<Rigidbody2D>();
         if (!rootrb) {
-            rootrb = rootrb.GetComponentInParent<Rigidbody2D> ();
+            rootrb = root.GetComponentInParent<Rigidbody2D>();
+        }
+        if (!rootrb) {
+            Debug.LogError("Hinge2DIkSolver: Root object is missing a Rigidbody2D. Solver disabled.", this);
+            enabled = false;
         }
 
         for (int i = 1; i <= chainLength; i++) {
