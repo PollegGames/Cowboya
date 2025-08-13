@@ -258,8 +258,9 @@ public class Hinge2DIkSolver : MonoBehaviour {
             }
             return;
         }
-        float vmd = 10 / rootrb.linearVelocity.sqrMagnitude;
-        vmd = Mathf.Clamp01 (vmd);
+        float sqrVel = rootrb.linearVelocity.sqrMagnitude;
+        float vmd = sqrVel <= Mathf.Epsilon ? 1f : 10f / sqrVel;
+        vmd = Mathf.Clamp01(vmd);
         var fxs50 = 25 * Time.fixedDeltaTime;
         for (int i = 1; i <= chainLength; i++) {
             if (!IsValidBone(i - 1) || bonesR == null || bonesR[i - 1] == null) {
