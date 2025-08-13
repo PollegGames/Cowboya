@@ -106,14 +106,14 @@ public class HintManager : MonoBehaviour
     {
         if (inputSource != null)
         {
-            if (inputSource.Movement.sqrMagnitude > 1f)
-                TryShowHint(HintType.MovementEnergy, allowRepeat: false);
+            if (inputSource.Movement.sqrMagnitude > 0.01f)
+                TryShowHint(HintType.MovementEnergy);
 
             if (inputSource.PrimaryAttack)
-                TryShowHint(HintType.TargetAttack, allowRepeat: false);
+                TryShowHint(HintType.TargetAttack);
 
             if (inputSource.LeftGrabDown || inputSource.RightGrabDown)
-                TryShowHint(HintType.InteractGrab, allowRepeat: false);
+                TryShowHint(HintType.InteractGrab);
         }
 
         if (nearLockedDoor)

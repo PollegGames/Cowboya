@@ -143,8 +143,6 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             }
         }
 
-        transform.SetParent(grabParent, true);
-
         attached = true;
         rb.simulated = true;
         rb.bodyType = RigidbodyType2D.Kinematic;
@@ -165,6 +163,10 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         if (player != null)
         {
             var hip = player.BodyReference;
+            // Detach from any previous hierarchy so the badge is no longer
+            // parented to an enemy when picked up.
+            transform.SetParent(hip.transform, true);
+
             if (hip != null)
                 SetFollowTarget(hip.transform);
             else

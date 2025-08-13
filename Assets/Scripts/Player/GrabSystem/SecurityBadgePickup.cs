@@ -158,7 +158,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
         // Detach from any previous hierarchy so the badge is no longer
         // parented to an enemy when picked up.
-        transform.SetParent(grabParent.root, worldPositionStays: true);
+        transform.SetParent(grabParent.root, true);
 
         if (wasStolen && enemy != null && player != null)
         {
