@@ -19,12 +19,14 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     private Transform followTarget;
     private bool attached = false;
     private bool wasStolen = false;
+    private float originalGravityScale;
 
     private Inventory ownerInventory;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        originalGravityScale = rb.gravityScale;
         joint = GetComponent<TargetJoint2D>();
         if (joint != null)
         {
@@ -101,6 +103,8 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         attached = true;
         rb.simulated = true;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.gravityScale = 0f;
 
         var holderState = grabParent.GetComponentInParent<RobotStateController>();
         if (holderState != null)
@@ -146,6 +150,8 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         if (rb != null)
         {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = originalGravityScale;
             rb.simulated = true;
         }
         else
