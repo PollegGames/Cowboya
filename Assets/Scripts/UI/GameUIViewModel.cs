@@ -211,11 +211,15 @@ public class GameUIViewModel : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Configures the minimap camera to frame the generated map.
+    /// </summary>
     public void SetMiniMapTexture(MapManager mapManagerInstance)
     {
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
+        Vector3 origin = mapManagerInstance.transform.position;
 
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
@@ -223,15 +227,14 @@ public class GameUIViewModel : MonoBehaviour
             cam.orthographic = true;
             float aspect = (float)miniMapRT.width / miniMapRT.height;
 
-            float orthoSizeHeight = worldHeight / 2f;
-            float orthoSizeWidth = worldWidth / (2f * aspect);
+            float halfH = worldHeight * 0.5f;
+            float halfW_as_H = (worldWidth * 0.5f) / aspect;
+            float padding = 0.05f;
+            cam.orthographicSize = Mathf.Max(halfH, halfW_as_H) * (1f + padding);
 
-            // Use *2 for more padding, or remove *2 for tight fit
-            float orthoSize = Mathf.Max(orthoSizeHeight, orthoSizeWidth);
-            cam.orthographicSize = orthoSize;
-
-            // Center the camera
-            cam.transform.position = new Vector3(worldWidth / 2f, worldHeight / 2f, -10f);
+            Vector3 center = origin + new Vector3(worldWidth * 0.5f, worldHeight * 0.5f, 0f);
+            cam.transform.position = new Vector3(center.x, center.y, -10f);
+            cam.transform.rotation = Quaternion.identity;
 
             cam.targetTexture = miniMapRT;
         }

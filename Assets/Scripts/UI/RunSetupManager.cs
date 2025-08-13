@@ -344,23 +344,22 @@ public class RunSetupManager : MonoBehaviour
         }
         float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
         float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
+        Vector3 origin = mapManagerInstance.transform.position;
 
         // 2) Frame the camera
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
         {
             cam.orthographic = true;
-            float aspectRatio = (float)miniMapRT.width / miniMapRT.height;
-            float halfVertSize = worldHeight / 2f;
-            float halfHorzSize = (worldWidth / 2f) / aspectRatio;
-            float orthoSize = Mathf.Max(halfVertSize, halfHorzSize);
-            cam.orthographicSize = orthoSize;
+            float aspect = (float)miniMapRT.width / miniMapRT.height;
+            float halfH = worldHeight * 0.5f;
+            float halfW_as_H = (worldWidth * 0.5f) / aspect;
+            float padding = 0.05f;
+            cam.orthographicSize = Mathf.Max(halfH, halfW_as_H) * (1f + padding);
 
-            cam.transform.position = new Vector3(
-                worldWidth / 2f,
-                worldHeight / 2f,
-                -10f
-            );
+            Vector3 center = origin + new Vector3(worldWidth * 0.5f, worldHeight * 0.5f, 0f);
+            cam.transform.position = new Vector3(center.x, center.y, -10f);
+            cam.transform.rotation = Quaternion.identity;
 
             // cam.targetTexture = miniMapRT;
         }
