@@ -138,6 +138,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
                 if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
                 {
                     enemy.OnBatteryStolen(player.gameObject);
+                    enemy.HandleBatteryStolen();
                     wasStolen = true;
                 }
             }
