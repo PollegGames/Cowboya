@@ -252,6 +252,12 @@ public class Hinge2DIkSolver : MonoBehaviour {
     private float[] avAngles;
     const float tc = 0.05f;
     private void ApplyByTorque () {
+        if (rootrb == null || rootrb.linearVelocity == Vector2.zero) {
+            if (rootrb == null) {
+                Reinitialize();
+            }
+            return;
+        }
         float vmd = 10 / rootrb.linearVelocity.sqrMagnitude;
         vmd = Mathf.Clamp01 (vmd);
         var fxs50 = 25 * Time.fixedDeltaTime;
@@ -290,8 +296,14 @@ public class Hinge2DIkSolver : MonoBehaviour {
     private float vn = 1;
     const float rForce = 0.5f;
     private void ApplyPositions () {
+        if (rootrb == null || rootrb.linearVelocity == Vector2.zero || bonesR == null) {
+            if (rootrb == null || bonesR == null) {
+                Reinitialize();
+            }
+            return;
+        }
         // well this method just doing one thing
-        // its trying to set our transform position into the positions we calculated 
+        // its trying to set our transform position into the positions we calculated
         // you can implement it in any way.
 
         // note!, the positions[i] are the desired position for the hinge.anchor so setting transform.position
