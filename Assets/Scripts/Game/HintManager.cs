@@ -40,6 +40,8 @@ public class HintManager : MonoBehaviour
 
     private HintType? activeHint = null;
     private Coroutine clearHintCoroutine;
+    private readonly Queue<GameMessage> queuedHints = new();
+    private bool processingQueue = false;
 
     [Header("References")]
     [SerializeField] private MonoBehaviour inputSource;
@@ -70,6 +72,35 @@ public class HintManager : MonoBehaviour
     {
         if (health != null)
             health.OnHealthChanged -= HandleHealthChanged;
+    }
+
+    /// <summary>
+    /// Queues a hint to be displayed in order without overlapping others.
+    /// </summary>
+    /// <param name="hint">The hint message to display.</param>
+    public void QueueHint(GameMessage hint)
+    {
+        if (hint == null)
+            return;
+
+        queuedHints.Enqueue(hint);
+
+        if (!processingQueue)
+            StartCoroutine(ProcessQueuedHints());
+    }
+
+    private IEnumerator ProcessQueuedHints()
+    {
+        processingQueue = true;
+
+        while (queuedHints.Count > 0)
+        {
+            var nextHint = queuedHints.Dequeue();
+            MessageService.Instance?.ShowHint(nextHint, 7f);
+            yield return new WaitForSeconds(7f);
+        }
+
+        processingQueue = false;
     }
 
     private void Update()

@@ -100,18 +100,13 @@ public class GameUIViewModel : MonoBehaviour
     }
     private void Start()
     {
-        var startMessage = GameMessages.System.Start;
-        string levelPrefix = string.Empty;
+        var hintManager = FindObjectOfType<HintManager>();
 
-        if (RunProgressManager.Instance != null)
+        if (hintManager != null)
         {
-            int index = RunProgressManager.Instance.CurrentLevelIndex;
-            var realLevel = index - 1;
-            levelPrefix = index == 1 ? "Level Tutorial. " : $"Level {realLevel}: ";
+            hintManager.QueueHint(new GameMessage("Move with [A][D]...", MessageSpeaker.Narrator));
+            hintManager.QueueHint(new GameMessage("Energy powers your actions.", MessageSpeaker.Narrator));
         }
-
-        var msg = new GameMessage(levelPrefix + startMessage.Text, startMessage.Speaker);
-        MessageService.Instance?.ShowMessage(msg);
     }
 
     public void SetPlayer(RobotStateController robot)
