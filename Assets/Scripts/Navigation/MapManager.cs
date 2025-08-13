@@ -156,6 +156,42 @@ public class MapManager : MonoBehaviour
         gridManager.AssignRoomProperties(roomInstances, cellDataGrid);
     }
 
+    /// <summary>
+    /// Returns the world-space bounds of all renderers under this map.
+    /// </summary>
+    /// <param name="rootOverride">Optional root transform to search under.</param>
+    /// <param name="layerMask">Layer mask for filtering included renderers.</param>
+    /// <returns>Bounds encompassing all included renderers.</returns>
+    public Bounds GetGridWorldBounds(Transform rootOverride = null, int layerMask = ~0)
+    {
+        var root = rootOverride != null ? rootOverride : transform;
+        var renderers = root.GetComponentsInChildren<Renderer>(includeInactive: false);
+
+        bool hasBounds = false;
+        Bounds bounds = default;
+
+        foreach (var r in renderers)
+        {
+            if (((1 << r.gameObject.layer) & layerMask) == 0)
+                continue;
+
+            if (!hasBounds)
+            {
+                bounds = r.bounds;
+                hasBounds = true;
+            }
+            else
+            {
+                bounds.Encapsulate(r.bounds);
+            }
+        }
+
+        if (!hasBounds)
+            bounds = new Bounds(root.position, Vector3.one);
+
+        return bounds;
+    }
+
     // ============================================================================
     //  HELPERS
     // ============================================================================
