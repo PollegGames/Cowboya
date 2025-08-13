@@ -84,6 +84,7 @@
     <Compile Include="Assets\Tests\UnitTests\PlayerInitiatorTests.cs" />
     <Compile Include="Assets\Tests\UnitTests\StationReservationServiceTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\RoomLiftPerFloorProcessorTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\PathToPOIToWorkProcessorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tests\UnitTests\Unit.Tests.asmdef" />

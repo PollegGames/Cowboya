@@ -251,6 +251,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Worker_Saved.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\ReactiveMachineAI.cs" />
     <Compile Include="Assets\Scripts\Navigation\PathCellProcessor.cs" />
+    <Compile Include="Assets\Scripts\Navigation\PathToPOIToWorkProcessor.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IPOIReservationService.cs" />
     <Compile Include="Assets\Scripts\Robots\AttackHitbox.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs" />
