@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -24,7 +22,6 @@ public class GameUIViewModel : MonoBehaviour
     private Button resumeButton;
     private Button restartButton;
     private Button mainMenuButton;
-    private readonly List<RoomManager> subscribedRooms = new();
 
     private void Awake()
     {
@@ -111,13 +108,6 @@ public class GameUIViewModel : MonoBehaviour
             int index = RunProgressManager.Instance.CurrentLevelIndex;
             var realLevel = index - 1;
             levelPrefix = index == 1 ? "Level Tutorial. " : $"Level {realLevel}: ";
-
-            var rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
-            foreach (var room in rooms)
-            {
-                room.PlayerEntered += RefreshMinimapWhenPlayerEnteredRoom;
-                subscribedRooms.Add(room);
-            }
         }
 
         var msg = new GameMessage(levelPrefix + startMessage.Text, startMessage.Speaker);
@@ -250,12 +240,6 @@ public class GameUIViewModel : MonoBehaviour
         Debug.Log("Minimap texture refreshed.");
     }
 
-    private void RefreshMinimapWhenPlayerEnteredRoom(RoomManager room)
-    {
-        RefreshMinimapTexture();
-    }
-
-
     private void OnDestroy()
     {
         if (robotBehaviour != null)
@@ -264,14 +248,6 @@ public class GameUIViewModel : MonoBehaviour
             if (robotBehaviour.Stats != null)
             {
                 robotBehaviour.Stats.OnMoralityChanged -= UpdateMoralityLabel;
-            }
-        }
-
-        foreach (var room in subscribedRooms)
-        {
-            if (room != null)
-            {
-                room.PlayerEntered -= RefreshMinimapWhenPlayerEnteredRoom;
             }
         }
     }
