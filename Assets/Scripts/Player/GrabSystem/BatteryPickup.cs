@@ -7,12 +7,54 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     [SerializeField] private float healthGain = 10f;
 
     [Header("Target Joint Settings")]
-    [Tooltip("How springy the joint movement is.")]
-    [SerializeField] private float frequency = 5f;
-    [Tooltip("How much the joint resists oscillation.")]
-    [SerializeField] private float dampingRatio = 0.8f;
-    [Tooltip("Maximum force the joint can apply.")]
-    [SerializeField] private float maxForce = 1000f;
+    [Tooltip("How springy the joint movement is. Recommended range: 5–15.")]
+    [SerializeField, Range(5f, 15f)] private float frequency = 10f;
+    [Tooltip("How much the joint resists oscillation. Recommended range: 0–1.")]
+    [SerializeField, Range(0f, 1f)] private float dampingRatio = 0.9f;
+    [Tooltip("Maximum force the joint can apply. Recommended range: 500–3000.")]
+    [SerializeField, Range(500f, 3000f)] private float maxForce = 2000f;
+
+    /// <summary>
+    /// How springy the joint movement is.
+    /// </summary>
+    public float Frequency
+    {
+        get => frequency;
+        set
+        {
+            frequency = value;
+            if (joint != null)
+                joint.frequency = frequency;
+        }
+    }
+
+    /// <summary>
+    /// How much the joint resists oscillation.
+    /// </summary>
+    public float DampingRatio
+    {
+        get => dampingRatio;
+        set
+        {
+            dampingRatio = value;
+            if (joint != null)
+                joint.dampingRatio = dampingRatio;
+        }
+    }
+
+    /// <summary>
+    /// Maximum force the joint can apply.
+    /// </summary>
+    public float MaxForce
+    {
+        get => maxForce;
+        set
+        {
+            maxForce = value;
+            if (joint != null)
+                joint.maxForce = maxForce;
+        }
+    }
 
     private Rigidbody2D rb;
     private TargetJoint2D joint;
