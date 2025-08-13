@@ -131,10 +131,11 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
             pathFollower?.Update(Time.deltaTime);
     }
 
-    public void OnBatteryStolen(GameObject player)
+    public void OnBatteryStolen(GameObject player, float healthGain)
     {
         Debug.Log($"{name} battery stolen by {player.name}");
         robotBehaviour.Stats.UpdateEnergy(robotBehaviour.Stats.CurrentEnergy);
+        robotBehaviour.Stats.UpdateHealth(-healthGain);
     }
 
     /// <summary>
