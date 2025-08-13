@@ -52,7 +52,7 @@ public class SecurityCamera : MonoBehaviour
             detectAggresionZone.onEnter.AddListener(OnSecondaryZoneEnter);
         }
 
-        minimapView = FindObjectOfType<GameUIViewModel>();
+        minimapView = FindFirstObjectByType<GameUIViewModel>();
     }
 
     private void Update()

@@ -100,7 +100,7 @@ public class GameUIViewModel : MonoBehaviour
     }
     private void Start()
     {
-        var hintManager = FindObjectOfType<HintManager>();
+        var hintManager = FindFirstObjectByType<HintManager>();
 
         if (hintManager != null)
         {

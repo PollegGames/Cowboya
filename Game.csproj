@@ -77,6 +77,7 @@
     <Compile Include="Assets\Scripts\Game\LevelEndVictoryTrigger.cs" />
     <Compile Include="Assets\Scripts\Map\AxisNeighborConnector.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\WorkState.cs" />
+    <Compile Include="Assets\Scripts\Robots\SquareMover.cs" />
     <Compile Include="Assets\Scripts\Game\SceneInitiator.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\AnimatorBaseAgentController.cs" />
     <Compile Include="Assets\Scripts\Map\CameraController.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="Assets\Scripts\Player\GrabSystem\CubePickup.cs" />
     <Compile Include="Assets\Scripts\Navigation\GridManager.cs" />
     <Compile Include="Assets\Scripts\Machines\RestingSlot.cs" />
-    <Compile Include="Assets\Scripts\Game\HintManager.cs" />
     <Compile Include="Assets\Scripts\Game\RunProgressManager.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWorkerStateMachine.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Core\EnemyStateMachine.cs" />
@@ -149,6 +149,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\Core\RobotRespawnService.cs" />
     <Compile Include="Assets\Scripts\Services\StationReservationService.cs" />
     <Compile Include="Assets\Scripts\OBSOLETE\WarpMeshByVertexColor.cs" />
+    <Compile Include="Assets\Scripts\UI\CanvasLevelUI.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\EnemyState.cs" />
     <Compile Include="Assets\Scripts\Interfaces\ICellProcessor.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\IGrabbable.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="Assets\Scripts\FactoryCore\RoomManager.cs" />
     <Compile Include="Assets\Scripts\Player\GrabSystem\HoldButton.cs" />
     <Compile Include="Assets\Scripts\Ally\Controllers\FollowEnemyTriggerHandler.cs" />
+    <Compile Include="Assets\Scripts\UI\MiniMapDebugGizmos.cs" />
     <Compile Include="Assets\Scripts\Machines\MachineSecurityManager.cs" />
     <Compile Include="Assets\Scripts\Setup\SceneBootstrapConfigSO.cs" />
     <Compile Include="Assets\Scripts\Player\Interfaces\ISaveService.cs" />
@@ -290,6 +292,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateSecurityMachine.cs" />
     <Compile Include="Assets\Scripts\Robots\GroundChecker.cs" />
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
+    <Compile Include="Assets\Scripts\Game\HintManager.cs" />
     <Compile Include="Assets\Scripts\Robots\AlternatingPunchAttack.cs" />
     <Compile Include="Assets\Scripts\Robots\JointBreaker.cs" />
     <Compile Include="Assets\Scripts\Map\LiftData.cs" />
@@ -1318,6 +1321,10 @@
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

@@ -80,7 +80,7 @@ public class HintManager : MonoBehaviour
     /// <param name="hint">The hint message to display.</param>
     public void QueueHint(GameMessage hint)
     {
-        if (hint == null)
+        if (hint.Text == null || hint.Text.Length == 0)
             return;
 
         queuedHints.Enqueue(hint);
