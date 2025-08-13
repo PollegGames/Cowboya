@@ -16,6 +16,7 @@ public class SceneInitiator : GameInitiator
     private SceneController sceneController;
     private SecurityBadgeSpawner securityBadgeSpawner;
     private BatterySpawner batterySpawner;
+    private HintManager hintManager;
 
     public void Construct(
         IFactoryManager factoryManager,
@@ -28,7 +29,8 @@ public class SceneInitiator : GameInitiator
         VictorySetup victorySetup,
         ISaveService saveService,
         SecurityBadgeSpawner securityBadgeSpawner,
-        BatterySpawner batterySpawner)
+        BatterySpawner batterySpawner,
+        HintManager hintManager)
     {
         this.factoryManager = factoryManager;
         this.gameUIViewModel = gameUIViewModel;
@@ -41,6 +43,7 @@ public class SceneInitiator : GameInitiator
         this.saveService = saveService;
         this.securityBadgeSpawner = securityBadgeSpawner;
         this.batterySpawner = batterySpawner;
+        this.hintManager = hintManager;
 
         if (RunProgressManager.Instance != null)
         {
@@ -92,7 +95,22 @@ public class SceneInitiator : GameInitiator
         gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
         SetCinemachineTarget(playerInitiator.playerHeadTransform);
 
+        InitializeHintManager();
+
         Debug.Log("Player initialized.");
+    }
+
+    private void InitializeHintManager()
+    {
+         // --- Setup HintManager here ---
+        if (hintManager != null && playerInitiator.playerInstance != null)
+        {
+            var playerState = playerInitiator.playerInstance.GetComponent<PlayerMovementController>();
+            var inputSource = playerState.Input;
+            var health = playerInitiator.playerInstance.GetComponent<HealthBot>();
+            var inventory = playerInitiator.playerInstance.GetComponent<Inventory>();
+            hintManager.Setup(inputSource, health, inventory);
+        }
     }
 
     private void InitializeEnemies()

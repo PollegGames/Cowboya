@@ -44,28 +44,27 @@ public class HintManager : MonoBehaviour
     private bool processingQueue = false;
 
     [Header("References")]
-    [SerializeField] private MonoBehaviour inputSource;
-    [SerializeField] private HealthBot health;
-    [SerializeField] private Inventory inventory;
+    private HealthBot health;
+    private Inventory inventory;
 
-    private IPlayerInput input;
+    private IPlayerInput inputSource;
 
     // Door tracking for re-showing security hints
     private bool nearLockedDoor = false;
     private float doorTimer = 0f;
 
-    private void Awake()
+    /// <summary>
+    /// Initializes the HintManager with required references.
+    /// </summary>
+    public void Setup(IPlayerInput input, HealthBot health, Inventory inventory)
     {
-        if (inputSource != null)
-            input = inputSource as IPlayerInput;
+        this.inputSource = input;
+        this.health = health;
+        this.inventory = inventory;
 
-        if (health == null)
-            health = GetComponent<HealthBot>();
-        if (inventory == null)
-            inventory = GetComponent<Inventory>();
 
-        if (health != null)
-            health.OnHealthChanged += HandleHealthChanged;
+        if (this.health != null)
+            this.health.OnHealthChanged += HandleHealthChanged;
     }
 
     private void OnDestroy()
@@ -105,15 +104,15 @@ public class HintManager : MonoBehaviour
 
     private void Update()
     {
-        if (input != null)
+        if (inputSource != null)
         {
-            if (input.Movement.sqrMagnitude > 0.01f)
+            if (inputSource.Movement.sqrMagnitude > 0.01f)
                 TryShowHint(HintType.MovementEnergy);
 
-            if (input.PrimaryAttack)
+            if (inputSource.PrimaryAttack)
                 TryShowHint(HintType.TargetAttack);
 
-            if (input.LeftGrabDown || input.RightGrabDown)
+            if (inputSource.LeftGrabDown || inputSource.RightGrabDown)
                 TryShowHint(HintType.InteractGrab);
         }
 

@@ -5278,7 +5278,7 @@ MonoBehaviour:
   energyBot: {fileID: 6178835051735462}
   healthBot: {fileID: 2375878962877187776}
   Stats:
-    RobotName: 
+    RobotName: Player
     MaxHealth: 100
     CurrentHealth: 100
     MaxEnergy: 100
@@ -5316,7 +5316,7 @@ MonoBehaviour:
   rightFoot: {fileID: 7086515708544877790}
   jumpUpDuration: 0.1
   jumpDownDuration: 0.1
-  isPlayerControlled: 0
+  isPlayerControlled: 1
   energyCostPerStep: 1
   energyCostPerJump: 5
   waitStep: 1
@@ -5340,11 +5340,11 @@ MonoBehaviour:
   legJointLimiter: {fileID: 3067009131450268787}
   bodyJointLimiter: {fileID: 6603793096190714630}
   robotBehaviour: {fileID: 340242974285803334}
-  bodyReference: {fileID: 9206399112885104982}
+  bodyReference: {fileID: 9206399113523174608}
   maximumLerp: 2
   inputSource: {fileID: 9062504079035036979}
   energyBot: {fileID: 6178835051735462}
-  inventory: {fileID: 0}
+  inventory: {fileID: 1795599177220237823}
 --- !u!114 &3067009131450268787
 MonoBehaviour:
   m_ObjectHideFlags: 0

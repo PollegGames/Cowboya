@@ -20,6 +20,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     [SerializeField] private MonoBehaviour inputSource;
     private IPlayerInput input;
 
+    public IPlayerInput Input => input;
     private bool flipped = false;
     private float horizontalInput;
     private float verticalInput;
@@ -112,7 +113,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     private void HandleMovement()
     {
-        locomotion.HandleMovement(horizontalInput,flipped);
+        locomotion.HandleMovement(horizontalInput, flipped);
     }
 
     private void HandleJump()
