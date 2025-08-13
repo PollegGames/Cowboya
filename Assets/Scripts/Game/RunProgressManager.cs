@@ -7,6 +7,7 @@ public class RunProgressManager : MonoBehaviour
     public static RunProgressManager Instance { get; private set; }
 
     [SerializeField] private List<RunMapConfigSO> mapConfigs = new List<RunMapConfigSO>();
+    private readonly List<RunMapConfigSO> originalMapConfigs = new List<RunMapConfigSO>();
     [SerializeField] private RunMapConfigSO sandboxConfig;
     [SerializeField] private string runNormalSceneName = "MapGeneration";
     [SerializeField] private string runSandboxSceneName = "SetupSandbox";
@@ -63,6 +64,7 @@ public class RunProgressManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        originalMapConfigs.AddRange(mapConfigs);
         if (SceneController.instance == null)
         {
             Instantiate(sceneControllerPrefab);
@@ -86,6 +88,7 @@ public class RunProgressManager : MonoBehaviour
     //load first level
     public void LoadFirstLevel()
     {
+        ResetMapConfigs();
         currentLevelIndex = 1;
         playerTemplate.ResetStats();
         runStats.Reset();
@@ -101,10 +104,17 @@ public class RunProgressManager : MonoBehaviour
 
     public void RestartRun()
     {
+        ResetMapConfigs();
         currentLevelIndex = 1;
         playerTemplate.ResetStats();
         runStats.Reset();
         SceneController.instance.LoadScene(runNormalSceneName);
+    }
+
+    private void ResetMapConfigs()
+    {
+        mapConfigs.Clear();
+        mapConfigs.AddRange(originalMapConfigs);
     }
 
     private RunMapConfigSO CreateDynamicConfig(int levelIndex)
