@@ -6,11 +6,15 @@ public class GrabHandAttractor : MonoBehaviour
     public LayerMask detectionLayer;
     public System.Action<IGrabbable> OnObjectDetected;
 
+    [SerializeField] ToggleBox toggleBox;
+
     /// <summary>
     /// Detects the closest grabbable object within range.
     /// </summary>
     public IGrabbable DetectGrabbable()
     {
+        if (toggleBox.IsActive == false)
+            return null;
         Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, detectionRadius, detectionLayer);
         IGrabbable closestGrabbable = null;
         float closestDistance = float.MaxValue;

@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 public class CubeSpawner : MonoBehaviour
 {
     [SerializeField] private CubePickup normalCubePrefab;
     [SerializeField] private CubePickup[] upgradeCubePrefabs;
+    private Unity.Mathematics.Random _rnd = new Unity.Mathematics.Random((uint)Environment.TickCount);
+
 
     /// <summary>
     /// Instantiates the normal cube prefab at the provided parent.
@@ -29,7 +32,8 @@ public class CubeSpawner : MonoBehaviour
             return null;
         }
 
-        int index = Random.Range(0, upgradeCubePrefabs.Length);
+
+        int index = (int)Math.Floor(_rnd.NextFloat(0f, upgradeCubePrefabs.Length));
         CubePickup prefab = upgradeCubePrefabs[index];
 
         return InstantiateCube(prefab, parent, position, parent.rotation);

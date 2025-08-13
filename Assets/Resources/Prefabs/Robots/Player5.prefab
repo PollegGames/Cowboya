@@ -2489,6 +2489,7 @@ MonoBehaviour:
   detectionLayer:
     serializedVersion: 2
     m_Bits: 14336
+  toggleBox: {fileID: 1089127729545754364}
 --- !u!1 &8147741203249090007
 GameObject:
   m_ObjectHideFlags: 0
@@ -2739,6 +2740,7 @@ MonoBehaviour:
   detectionLayer:
     serializedVersion: 2
     m_Bits: 14336
+  toggleBox: {fileID: 822488358545292604}
 --- !u!1 &8618023788441786945
 GameObject:
   m_ObjectHideFlags: 0

@@ -146,7 +146,6 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         attached = true;
         rb.simulated = true;
-        rb.bodyType = RigidbodyType2D.Kinematic;
         rb.gravityScale = 0f;
 
         var holderState = grabParent.GetComponentInParent<RobotStateController>();
