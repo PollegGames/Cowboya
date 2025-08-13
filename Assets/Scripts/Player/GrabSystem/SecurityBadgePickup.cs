@@ -98,6 +98,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
                 var stateController = enemy.GetComponent<RobotStateController>();
                 if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
                 {
+                    enemy.OnBadgeStolen(player.gameObject);
                     wasStolen = true;
                 }
             }
@@ -120,7 +121,6 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         if (wasStolen && enemy != null && player != null)
         {
             enemy.HandleBadgeStolen();
-            enemy.OnBadgeStolen(player.gameObject);
         }
 
         if (player != null)
