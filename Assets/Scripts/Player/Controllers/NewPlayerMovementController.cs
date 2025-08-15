@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// Handles horizontal movement and jumping for the Player6 prefab.
@@ -10,8 +9,6 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     private const float DefaultMoveSpeed = 5f;
     private const float DefaultJumpForce = 12f;
     private const float MinGroundNormalY = 0.5f;
-    private const string MoveActionName = "Move";
-    private const string JumpActionName = "Jump";
 
     [Header("Movement")]
     [SerializeField]
@@ -28,6 +25,7 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     private PlayerInput playerInput;
     private IPlayerInput input;
     private InputAction jumpAction;
+
     private float moveInput;
     private float horizontalInput;
     private float verticalInput;
@@ -56,11 +54,16 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     {        
         if (input != null)
         {
-            horizontalInput = input.Movement.x;
-            verticalInput = input.Movement.y;
+            moveInput = input.Movement.x;
+            if (Mathf.Abs(moveInput) > 0.1f)
+            {
+                lookDirection = new Vector2(Mathf.Sign(moveInput), 0f);
+            }
 
-            if (Mathf.Abs(horizontalInput) > 0.1f)
-                lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
+            if (input.JumpPressed)
+            {
+                HandleJump();
+            }
         }
 
         moveInput = horizontalInput;
@@ -79,7 +82,7 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
     private void HandleJump()
     {
-        if (jumpAction.triggered && IsGrounded)
+        if (input != null && input.JumpPressed && IsGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             IsGrounded = false;
