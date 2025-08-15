@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Animator))]
 public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionProvider
@@ -22,7 +21,6 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     private Animator animator;
 
     // Input
-    private PlayerInput playerInput;
     private IPlayerInput input;
 
     private float moveInput;
@@ -47,7 +45,6 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     {
         if (!body) Debug.LogError("Assign a Rigidbody2D to 'body'.");
         animator = GetComponent<Animator>();
-        playerInput = GetComponent<PlayerInput>();
         input = GetComponent<IPlayerInput>();
 
         if (sprites == null || sprites.Length == 0)
