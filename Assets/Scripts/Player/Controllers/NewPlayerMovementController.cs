@@ -102,7 +102,15 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     private void SetFacing(bool left)
     {
         if (facingLeft == left) return;
+
+        bool moving = Mathf.Abs(moveInput) > 0.01f;
         facingLeft = left;
+
+        if (moving)
+        {
+            float t = animator.GetCurrentAnimatorStateInfo(0).normalizedTime % 1f;
+            animator.Play("Walk", 0, (t + 0.5f) % 1f);
+        }
 
         // visuals
         if (sprites != null)
