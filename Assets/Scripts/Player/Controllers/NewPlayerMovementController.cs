@@ -25,15 +25,17 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
     private Rigidbody2D rb;
     private Animator animator;
-    private IPlayerInput playerInput;
-    private InputAction moveAction;
+    private PlayerInput playerInput;
+    private IPlayerInput input;
     private InputAction jumpAction;
     private float moveInput;
+    private float horizontalInput;
+    private float verticalInput;
 
     private static readonly int SpeedParam = Animator.StringToHash("Speed");
     private static readonly int GroundedParam = Animator.StringToHash("Grounded");
 
-        private Vector2 lookDirection = Vector2.right;
+    private Vector2 lookDirection = Vector2.right;
     public Vector2 LookDirection => lookDirection;
     /// <summary>
     /// Indicates whether the player is currently grounded.
@@ -44,15 +46,15 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        playerInput = playerInput as IPlayerInput;
+        playerInput = GetComponent<PlayerInput>();
+        input = GetComponent<IPlayerInput>();
 
-        moveAction = playerInput.actions[MoveActionName];
         jumpAction = playerInput.actions[JumpActionName];
     }
 
     private void Update()
     {        
-        if (playerInput != null)
+        if (input != null)
         {
             horizontalInput = input.Movement.x;
             verticalInput = input.Movement.y;
@@ -60,6 +62,8 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
             if (Mathf.Abs(horizontalInput) > 0.1f)
                 lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
         }
+
+        moveInput = horizontalInput;
         HandleJump();
 
         animator.SetFloat(SpeedParam, Mathf.Abs(moveInput));
