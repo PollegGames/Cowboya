@@ -22,10 +22,13 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
     private Rigidbody2D rb;
     private Animator animator;
-    [SerializeField]
-    private MonoBehaviour inputSource;
+    private PlayerInput playerInput;
     private IPlayerInput input;
+    private InputAction jumpAction;
+
     private float moveInput;
+    private float horizontalInput;
+    private float verticalInput;
 
     private static readonly int SpeedParam = Animator.StringToHash("Speed");
     private static readonly int GroundedParam = Animator.StringToHash("Grounded");
@@ -41,11 +44,10 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        input = inputSource as IPlayerInput;
-        if (input == null)
-        {
-            Debug.LogError("NewPlayerMovementController: inputSource does not implement IPlayerInput");
-        }
+        playerInput = GetComponent<PlayerInput>();
+        input = GetComponent<IPlayerInput>();
+
+        jumpAction = playerInput.actions[JumpActionName];
     }
 
     private void Update()
@@ -63,6 +65,9 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
                 HandleJump();
             }
         }
+
+        moveInput = horizontalInput;
+        HandleJump();
 
         animator.SetFloat(SpeedParam, Mathf.Abs(moveInput));
         animator.SetBool(GroundedParam, IsGrounded);
