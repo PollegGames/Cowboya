@@ -114,7 +114,7 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
         // poles
         if (poleMirror) poleMirror.SetFacing(!left);              // expects isRight
-        if (legJointLimiter) legJointLimiter.SetLegRotationLimits(left); // expects facingRight
+        if (legJointLimiter) legJointLimiter.SetLegRotationLimits(!left); // expects facingRight
 
 
     }
