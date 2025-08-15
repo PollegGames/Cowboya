@@ -75,7 +75,7 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
     private void HandleJump()
     {
-        if (jumpAction.triggered && IsGrounded)
+        if (input != null && input.JumpPressed && IsGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             IsGrounded = false;
