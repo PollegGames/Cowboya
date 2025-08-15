@@ -14,7 +14,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
 
     [Header("Body Reference")]
     [SerializeField] protected Transform bodyReference;
-    [SerializeField] private Rigidbody2D hipRb;
+    [SerializeField] protected Rigidbody2D hipRb;
 
     [Header("Flip Settings")]
     [SerializeField] private SpriteRenderer[] sprites; // optional assign

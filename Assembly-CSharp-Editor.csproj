@@ -104,6 +104,7 @@
     <Compile Include="Assets\Editor\UnitTests\HintManagerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\BatteryTheftTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\CellTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\NewPlayerMovementControllerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\PositionTriggerZoneTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityBadgePickupTests.cs" />
   </ItemGroup>

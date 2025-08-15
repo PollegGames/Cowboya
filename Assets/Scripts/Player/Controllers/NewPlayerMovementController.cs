@@ -1,145 +1,80 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Animator))]
-public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionProvider
+[RequireComponent(typeof(PlayerInput))]
+public sealed class NewPlayerMovementController : AnimatorBaseAgentController
 {
-    private const float DefaultMoveSpeed = 5f;
-    private const float DefaultJumpForce = 12f;
-    private const float MinGroundNormalY = 0.5f;
-    private const string JumpActionName = "Jump";
+    [Header("Input")]
+    [SerializeField] private string moveActionName = "Move"; // Vector2
 
-    [Header("Movement")]
-    [SerializeField] private float moveSpeed = DefaultMoveSpeed;
-    [SerializeField] private float jumpForce = DefaultJumpForce;
-    [SerializeField] private LayerMask groundMask;
+    private PlayerInput _playerInput;
+    private InputAction _moveAction;
+    private Vector2 _move;
 
-    [Header("Physics targets")]
-    [SerializeField] private Rigidbody2D body;      // hips/torso RB
-    [SerializeField] private Transform groundProbe; // optional probe beneath feet
-    [SerializeField] private float groundCheckDistance = 0.06f;
-
-    private Animator animator;
-
-    // Input
-    private IPlayerInput input;
-
-    private float moveInput;
-    private float previousSpeed;
-
-    private static readonly int SpeedParam = Animator.StringToHash("Speed");
-    private static readonly int GroundedParam = Animator.StringToHash("Grounded");
-
-    private Vector2 lookDirection = Vector2.right;
-    /// <summary>
-    /// Current direction the character is facing.
-    /// </summary>
-    public Vector2 LookDirection => lookDirection;
-
-    public bool IsGrounded { get; private set; }
-
-    [Header("Visual flip + poles")]
-    [SerializeField] private SpriteRenderer[] sprites; // optional assign
-    [SerializeField] private Transform visualRoot;      // optional scale target
-    [SerializeField] private PoleMirror2D poleMirror;   // optional
-    [SerializeField] private LegJointLimiter legJointLimiter; // optional
-
-    private bool facingLeft = false; // single source of truth
-
-    private void Awake()
+    protected override void Awake()
     {
-        if (!body) Debug.LogError("Assign a Rigidbody2D to 'body'.");
-        animator = GetComponent<Animator>();
-        input = GetComponent<IPlayerInput>();
+        base.Awake();
+        _playerInput = GetComponent<PlayerInput>();
+        if (this.hipRb == null) hipRb = GetComponent<Rigidbody2D>();
 
-        if (sprites == null || sprites.Length == 0)
-            sprites = GetComponentsInChildren<SpriteRenderer>(true);
-
-        if (transform.localScale != Vector3.one)
-            Debug.LogWarning("Root transform should have localScale == Vector3.one");
-        if (body && body.transform.localScale != Vector3.one)
-            Debug.LogWarning("Rigidbody parent should have localScale == Vector3.one");
+        _moveAction = _playerInput.actions[moveActionName];
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        SetFacing(facingLeft); // apply initial pose
+        _moveAction?.Enable();
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        if (input != null)
-        {
-            moveInput = input.Movement.x;
+        _moveAction?.Disable();
+    }
 
-            if (Mathf.Abs(moveInput) > 0.01f)
-                SetFacing(moveInput < 0f);
+    protected override void Update()
+    {
+        // Read input once per frame
+        _move = _moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
 
-            if (input.JumpPressed)
-                HandleJump();
-        }
+        // Set directions
+        SetMovement(_move.x);
+        SetVerticalMovement(_move.y);
 
-        float currentSpeed = Mathf.Abs(moveInput);
-        bool startedWalking = previousSpeed <= 0.01f && currentSpeed > 0.01f;
+        // Animator flags only (no physics here)
+        animator.SetBool("IsWalking", isMoving);
+        animator.SetBool("IsVerticalWalking", isVerticalMoving);
 
-        if (startedWalking && facingLeft)
-            animator.Play("Walk", 0, 0.5f);
-
-        animator.SetFloat(SpeedParam, currentSpeed);
-        animator.SetBool(GroundedParam, IsGrounded);
-
-        lookDirection = facingLeft ? Vector2.left : Vector2.right;
-        previousSpeed = currentSpeed;
+        // Face where we go  
+        if (isMoving) TryFlip(direction);
     }
 
     private void FixedUpdate()
     {
-        var v = body.linearVelocity;   // use .velocity if needed
-        v.x = moveInput * moveSpeed;
-        body.linearVelocity = v;
-
-        // Grounding check using a downward raycast or probe
-        Vector2 origin = groundProbe ? (Vector2)groundProbe.position : body.position;
-        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, groundCheckDistance, groundMask);
-        IsGrounded = hit.collider != null;
+        if (isMoving) Move();
+        if (isVerticalMoving) MoveVertical();
     }
 
-    private void HandleJump()
+    public override void SetMovement(float dir)
     {
-        if (!IsGrounded) return;
-        body.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        IsGrounded = false;
+        base.SetMovement(dir);
+        isMoving = !Mathf.Approximately(direction, 0f);
     }
 
-    private void SetFacing(bool left)
+    public override void SetVerticalMovement(float dir)
     {
-        if (facingLeft == left) return;
-
-        bool moving = Mathf.Abs(moveInput) > 0.01f;
-        facingLeft = left;
-
-        if (moving)
-        {
-            float t = animator.GetCurrentAnimatorStateInfo(0).normalizedTime % 1f;
-            animator.Play("Walk", 0, (t + 0.5f) % 1f);
-        }
-
-        // visuals
-        if (sprites != null && sprites.Length > 0)
-        {
-            for (int i = 0; i < sprites.Length; i++)
-                if (sprites[i]) sprites[i].flipX = left;
-        }
-        else if (visualRoot)
-        {
-            var s = visualRoot.localScale;
-            s.x = left ? -Mathf.Abs(s.x) : Mathf.Abs(s.x);
-            visualRoot.localScale = s;
-        }
-
-        // poles
-        if (poleMirror) poleMirror.SetFacing(!left);              // expects isRight
-        if (legJointLimiter) legJointLimiter.SetLegRotationLimits(!left); // expects facingRight
-
-
+        verticalDirection = Mathf.Clamp(dir, -1f, 1f);
+        isVerticalMoving = !Mathf.Approximately(verticalDirection, 0f);
     }
+
+    // Use Y for vertical motion
+    protected override void MoveVertical()
+    {
+        animator.SetFloat("VerticalDirection", verticalDirection);
+
+        Vector2 desired = new Vector2(hipRb.linearVelocity.x, verticalDirection * moveSpeed);
+        Vector2 delta = desired - hipRb.linearVelocity;
+        Vector2 force = delta * hipRb.mass / Time.fixedDeltaTime;
+        hipRb.AddForce(force);
+    }
+
+    // Optional: keep base Move as-is. Ensure it uses X velocity only.
 }

@@ -5069,8 +5069,6 @@ GameObject:
   - component: {fileID: 317205533927771976}
   - component: {fileID: 1795599177220237823}
   - component: {fileID: 479767149910990366}
-  - component: {fileID: 8025166717172381337}
-  - component: {fileID: 8959831624664349535}
   m_Layer: 6
   m_Name: Player6
   m_TagString: Player
@@ -5384,69 +5382,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8025166717172381337
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113533570876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ee1fea37eed08c4f8d6108ee96335ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 1
-  jumpForce: 12
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  body: {fileID: 9206399112436540778}
-  groundProbe: {fileID: 8356540621759172424}
-  groundProbeRadius: 0.06
-  sprites:
-  - {fileID: 9206399113276938839}
-  - {fileID: 7086331897419207449}
-  - {fileID: 9206399112591901716}
-  - {fileID: 9206399113579118244}
-  - {fileID: 9206399112157314880}
-  - {fileID: 9206399112713860122}
-  - {fileID: 9206399112872844431}
-  - {fileID: 9206399113594718158}
-  - {fileID: 9206399112233741187}
-  - {fileID: 9206399112352681960}
-  - {fileID: 914351883353996106}
-  - {fileID: 9206399113523174609}
-  - {fileID: 9206399112919556915}
-  - {fileID: 9206399112436540779}
-  poleMirror: {fileID: 8959831624664349535}
---- !u!114 &8959831624664349535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113533570876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90265f1d1f7e7ef4cb26cf9d5eeb881b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  poles:
-  - target: {fileID: 5777551822076249676}
-    localRight: {x: 0, y: 0, z: 0}
-    mirrorZRotation: 0
-  - target: {fileID: 8433065265253862054}
-    localRight: {x: 0, y: 0, z: 0}
-    mirrorZRotation: 0
-  - target: {fileID: 2641922349688283432}
-    localRight: {x: 0, y: 0, z: 0}
-    mirrorZRotation: 0
-  - target: {fileID: 6315316417302259119}
-    localRight: {x: 0, y: 0, z: 0}
-    mirrorZRotation: 0
-  captureOnAwake: 1
-  startFacingRight: 1
 --- !u!1 &9206399113579118250
 GameObject:
   m_ObjectHideFlags: 0
