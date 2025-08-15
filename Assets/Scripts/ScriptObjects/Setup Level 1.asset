@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Setup Level 1
   m_EditorClassIdentifier: 
   gridWidth: 4
-  gridHeight: 3
-  poiCount: 3
+  gridHeight: 2
+  poiCount: 2
   blockedCount: 1
   workersCount: 4
-  enemiesCount: 3
+  enemiesCount: 1
   seed: 410408

@@ -47,7 +47,6 @@ MonoBehaviour:
   mapConfigs:
   - {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
   - {fileID: 11400000, guid: 220ec21f1b0240946830eebd3a0ff311, type: 2}
-  - {fileID: 11400000, guid: a39337ca76c62d44b8d72f119f51a4e8, type: 2}
   sandboxConfig: {fileID: 11400000, guid: 7389573697e35074e8cf50f45fae4d43, type: 2}
   runNormalSceneName: MapGeneration
   runSandboxSceneName: SetupSandbox

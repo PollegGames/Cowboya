@@ -291,6 +291,7 @@
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_CheckingSecurity.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\FactoryManager.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\States\Enemy_ReactivateSecurityMachine.cs" />
+    <Compile Include="Assets\Scripts\Player\Controllers\NewPlayerMovementController.cs" />
     <Compile Include="Assets\Scripts\Robots\GroundChecker.cs" />
     <Compile Include="Assets\Scripts\Game\HintManager.cs" />
     <Compile Include="Assets\Scripts\Machines\SpawningWorkerManager.cs" />
