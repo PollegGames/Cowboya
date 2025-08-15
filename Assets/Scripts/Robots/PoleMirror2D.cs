@@ -6,30 +6,30 @@ public sealed class PoleMirror2D : MonoBehaviour
     public struct Pole
     {
         public Transform target;    // pole Transform
-        public Vector3 localRight;  // right-facing local position (0 = auto-capture)
         public bool mirrorZRotation;
+        [HideInInspector] public float rightLocalX; // captured in Awake
     }
 
     [SerializeField] private Pole[] poles;
-    [SerializeField] private bool captureOnAwake = true;
     [SerializeField] private bool startFacingRight = true;
 
     private bool facingRight;
 
     private void Awake()
     {
-        if (captureOnAwake)
-        {
-            for (int i = 0; i < poles.Length; i++)
-                if (poles[i].target && poles[i].localRight == Vector3.zero)
-                    poles[i].localRight = poles[i].target.localPosition;
-        }
+        for (int i = 0; i < poles.Length; i++)
+            if (poles[i].target)
+                poles[i].rightLocalX = poles[i].target.localPosition.x;
 
         // Force an initial apply
         facingRight = !startFacingRight;
         SetFacing(startFacingRight);
     }
 
+    /// <summary>
+    /// Mirrors all poles to face the specified direction.
+    /// </summary>
+    /// <param name="isRight">True when facing right.</param>
     public void SetFacing(bool isRight)
     {
         if (facingRight == isRight) return;
@@ -40,9 +40,8 @@ public sealed class PoleMirror2D : MonoBehaviour
             var p = poles[i];
             if (!p.target) continue;
 
-            // mirror local X from the captured right pose
-            var pos = p.localRight;
-            if (!isRight) pos.x = -pos.x;
+            var pos = p.target.localPosition;
+            pos.x = isRight ? p.rightLocalX : -p.rightLocalX;
             p.target.localPosition = pos;
 
             if (p.mirrorZRotation)
