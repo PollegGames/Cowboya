@@ -17,8 +17,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     [SerializeField] private Rigidbody2D hipRb;
 
     [Header("Flip Settings")]
-    [SerializeField] private Transform points;
-    [SerializeField] private Transform poles;
+    [SerializeField] private SpriteRenderer[] sprites; // optional assign
     private bool flipped = false;
     private Vector2 lookDirection = Vector2.right;
 
@@ -37,6 +36,8 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     {
         if (legJointLimiter == null)
             legJointLimiter = GetComponent<LegJointLimiter>();
+        if (sprites == null || sprites.Length == 0)
+            sprites = GetComponentsInChildren<SpriteRenderer>(true);
         Debug.Log("AnimatorBaseAgentController: Awake called, components initialized.");
     }
 
@@ -122,21 +123,9 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         if ((direction > 0 && flipped) || (direction < 0 && !flipped))
         {
             flipped = !flipped;
-
-            // Adjust points and poles if additional flipping is necessary
-            if (points != null)
-            {
-                Vector3 pointsScale = points.localScale;
-                pointsScale.x *= -1;
-                points.localScale = pointsScale;
-            }
-
-            if (poles != null)
-            {
-                Vector3 polesScale = poles.localScale;
-                polesScale.x *= -1;
-                poles.localScale = polesScale;
-            }
+            if (sprites != null)
+                for (int i = 0; i < sprites.Length; i++)
+                    if (sprites[i]) sprites[i].flipX = flipped;
         }
     }
 }
