@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// Handles horizontal movement and jumping for the Player6 prefab.
@@ -10,8 +9,6 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     private const float DefaultMoveSpeed = 5f;
     private const float DefaultJumpForce = 12f;
     private const float MinGroundNormalY = 0.5f;
-    private const string MoveActionName = "Move";
-    private const string JumpActionName = "Jump";
 
     [Header("Movement")]
     [SerializeField]
@@ -25,15 +22,15 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
     private Rigidbody2D rb;
     private Animator animator;
-    private IPlayerInput playerInput;
-    private InputAction moveAction;
-    private InputAction jumpAction;
+    [SerializeField]
+    private MonoBehaviour inputSource;
+    private IPlayerInput input;
     private float moveInput;
 
     private static readonly int SpeedParam = Animator.StringToHash("Speed");
     private static readonly int GroundedParam = Animator.StringToHash("Grounded");
 
-        private Vector2 lookDirection = Vector2.right;
+    private Vector2 lookDirection = Vector2.right;
     public Vector2 LookDirection => lookDirection;
     /// <summary>
     /// Indicates whether the player is currently grounded.
@@ -44,23 +41,28 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        playerInput = playerInput as IPlayerInput;
-
-        moveAction = playerInput.actions[MoveActionName];
-        jumpAction = playerInput.actions[JumpActionName];
+        input = inputSource as IPlayerInput;
+        if (input == null)
+        {
+            Debug.LogError("NewPlayerMovementController: inputSource does not implement IPlayerInput");
+        }
     }
 
     private void Update()
     {        
-        if (playerInput != null)
+        if (input != null)
         {
-            horizontalInput = input.Movement.x;
-            verticalInput = input.Movement.y;
+            moveInput = input.Movement.x;
+            if (Mathf.Abs(moveInput) > 0.1f)
+            {
+                lookDirection = new Vector2(Mathf.Sign(moveInput), 0f);
+            }
 
-            if (Mathf.Abs(horizontalInput) > 0.1f)
-                lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
+            if (input.JumpPressed)
+            {
+                HandleJump();
+            }
         }
-        HandleJump();
 
         animator.SetFloat(SpeedParam, Mathf.Abs(moveInput));
         animator.SetBool(GroundedParam, IsGrounded);
@@ -75,7 +77,7 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
     private void HandleJump()
     {
-        if (jumpAction.triggered && IsGrounded)
+        if (IsGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             IsGrounded = false;
