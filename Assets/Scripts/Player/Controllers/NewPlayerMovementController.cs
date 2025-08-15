@@ -15,8 +15,8 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
     [Header("Physics targets")]
     [SerializeField] private Rigidbody2D body;      // hips/torso RB
-    [SerializeField] private Transform groundProbe; // empty under feet
-    [SerializeField] private float groundProbeRadius = 0.06f;
+    [SerializeField] private Transform groundProbe; // optional probe beneath feet
+    [SerializeField] private float groundCheckDistance = 0.06f;
 
     private Animator animator;
 
@@ -88,8 +88,10 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
         v.x = moveInput * moveSpeed;
         body.linearVelocity = v;
 
-        if (groundProbe)
-            IsGrounded = Physics2D.OverlapCircle(groundProbe.position, groundProbeRadius, groundMask);
+        // Grounding check using a downward raycast or probe
+        Vector2 origin = groundProbe ? (Vector2)groundProbe.position : body.position;
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, groundCheckDistance, groundMask);
+        IsGrounded = hit.collider != null;
     }
 
     private void HandleJump()
