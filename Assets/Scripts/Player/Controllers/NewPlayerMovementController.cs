@@ -30,13 +30,17 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     private static readonly int GroundedParam = Animator.StringToHash("Grounded");
 
     private Vector2 lookDirection = Vector2.right;
+    /// <summary>
+    /// Current direction the character is facing.
+    /// </summary>
     public Vector2 LookDirection => lookDirection;
 
     public bool IsGrounded { get; private set; }
 
     [Header("Visual flip + poles")]
     [SerializeField] private SpriteRenderer[] sprites; // optional assign
-    [SerializeField] private PoleMirror2D poleMirror;  // optional
+    [SerializeField] private Transform visualRoot;      // optional scale target
+    [SerializeField] private PoleMirror2D poleMirror;   // optional
     [SerializeField] private LegJointLimiter legJointLimiter; // optional
 
     private bool facingLeft = false; // single source of truth
@@ -49,6 +53,11 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
 
         if (sprites == null || sprites.Length == 0)
             sprites = GetComponentsInChildren<SpriteRenderer>(true);
+
+        if (transform.localScale != Vector3.one)
+            Debug.LogWarning("Root transform should have localScale == Vector3.one");
+        if (body && body.transform.localScale != Vector3.one)
+            Debug.LogWarning("Rigidbody parent should have localScale == Vector3.one");
     }
 
     private void Start()
@@ -115,9 +124,17 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
         }
 
         // visuals
-        if (sprites != null)
+        if (sprites != null && sprites.Length > 0)
+        {
             for (int i = 0; i < sprites.Length; i++)
                 if (sprites[i]) sprites[i].flipX = left;
+        }
+        else if (visualRoot)
+        {
+            var s = visualRoot.localScale;
+            s.x = left ? -Mathf.Abs(s.x) : Mathf.Abs(s.x);
+            visualRoot.localScale = s;
+        }
 
         // poles
         if (poleMirror) poleMirror.SetFacing(!left);              // expects isRight
