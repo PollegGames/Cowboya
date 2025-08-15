@@ -26,6 +26,7 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
     private IPlayerInput input;
 
     private float moveInput;
+    private float previousSpeed;
 
     private static readonly int SpeedParam = Animator.StringToHash("Speed");
     private static readonly int GroundedParam = Animator.StringToHash("Grounded");
@@ -71,10 +72,17 @@ public sealed class NewPlayerMovementController : MonoBehaviour, ILookDirectionP
                 HandleJump();
         }
 
-        animator.SetFloat(SpeedParam, Mathf.Abs(moveInput));
+        float currentSpeed = Mathf.Abs(moveInput);
+        bool startedWalking = previousSpeed <= 0.01f && currentSpeed > 0.01f;
+
+        if (startedWalking && facingLeft)
+            animator.Play("Walk", 0, 0.5f);
+
+        animator.SetFloat(SpeedParam, currentSpeed);
         animator.SetBool(GroundedParam, IsGrounded);
 
         lookDirection = facingLeft ? Vector2.left : Vector2.right;
+        previousSpeed = currentSpeed;
     }
 
     private void FixedUpdate()
