@@ -5,46 +5,39 @@ using UnityEngine.InputSystem;
 public sealed class NewPlayerMovementController : AnimatorBaseAgentController
 {
     [Header("Input")]
-    [SerializeField] private string moveActionName = "Move"; // Vector2
 
-    private PlayerInput _playerInput;
-    private InputAction _moveAction;
+    [Header("Input (IPlayerInput)")]
+    [SerializeField] private MonoBehaviour inputSource; // must implement IPlayerInput
+    private IPlayerInput input;
+    public IPlayerInput Input;
+
     private Vector2 _move;
 
     protected override void Awake()
     {
         base.Awake();
-        _playerInput = GetComponent<PlayerInput>();
-        if (this.hipRb == null) hipRb = GetComponent<Rigidbody2D>();
+        if (hipRb == null) hipRb = GetComponent<Rigidbody2D>();
 
-        _moveAction = _playerInput.actions[moveActionName];
-    }
-
-    private void OnEnable()
-    {
-        _moveAction?.Enable();
-    }
-
-    private void OnDisable()
-    {
-        _moveAction?.Disable();
+        input = inputSource as IPlayerInput;
+        if (input == null)
+            Debug.LogError($"{nameof(NewPlayerMovementController)}: inputSource does not implement IPlayerInput");
     }
 
     protected override void Update()
     {
-        TryFlip(direction);
-        // Read input once per frame
-        _move = _moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
+        // Read input
+        _move = input != null ? input.Movement : Vector2.zero;
 
-        // Set directions
+        // Horizontal + vertical intents
         SetMovement(_move.x);
         SetVerticalMovement(_move.y);
 
-        // Animator flags only (no physics here)
+        // Animator flags (no physics)
         animator.SetBool("IsWalking", isMoving);
         animator.SetBool("IsVerticalWalking", isVerticalMoving);
 
-        // Face where we go  
+        // Face where we go
+        TryFlip(direction);
     }
 
     private void FixedUpdate()
@@ -68,12 +61,12 @@ public sealed class NewPlayerMovementController : AnimatorBaseAgentController
     // Use Y for vertical motion
     protected override void MoveVertical()
     {
-        animator.SetFloat("VerticalDirection", verticalDirection);
+        // animator.SetFloat("VerticalDirection", verticalDirection);
 
-        Vector2 desired = new Vector2(hipRb.linearVelocity.x, verticalDirection * moveSpeed);
-        Vector2 delta = desired - hipRb.linearVelocity;
-        Vector2 force = delta * hipRb.mass / Time.fixedDeltaTime;
-        hipRb.AddForce(force);
+        // Vector2 desired = new Vector2(hipRb.linearVelocity.x, verticalDirection * moveSpeed);
+        // Vector2 delta = desired - hipRb.linearVelocity;
+        // Vector2 force = delta * hipRb.mass / Time.fixedDeltaTime;
+        // hipRb.AddForce(force);
     }
 
     // Optional: keep base Move as-is. Ensure it uses X velocity only.

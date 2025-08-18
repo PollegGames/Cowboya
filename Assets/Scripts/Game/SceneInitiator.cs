@@ -105,7 +105,7 @@ public class SceneInitiator : GameInitiator
          // --- Setup HintManager here ---
         if (hintManager != null && playerInitiator.playerInstance != null)
         {
-            var playerState = playerInitiator.playerInstance.GetComponent<PlayerMovementController>();
+            var playerState = playerInitiator.playerInstance.GetComponent<NewPlayerMovementController>();
             var inputSource = playerState.Input;
             var health = playerInitiator.playerInstance.GetComponent<HealthBot>();
             var inventory = playerInitiator.playerInstance.GetComponent<Inventory>();
