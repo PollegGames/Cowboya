@@ -7,8 +7,6 @@ public sealed class NewPlayerMovementController : AnimatorBaseAgentController
     [Header("Input")]
     [SerializeField] private string moveActionName = "Move"; // Vector2
 
-    [SerializeField] private PoleMirror2D poleMirror2D;
-
     private PlayerInput _playerInput;
     private InputAction _moveAction;
     private Vector2 _move;
@@ -35,7 +33,6 @@ public sealed class NewPlayerMovementController : AnimatorBaseAgentController
     protected override void Update()
     {
         TryFlip(direction);
-        poleMirror2D.SetFacing(direction > 0);
         // Read input once per frame
         _move = _moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
 

@@ -354,8 +354,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 8
-    y: 87
+    x: 0
+    y: 24
     width: 570
     height: 387
   m_SerializedDataModeController:
@@ -454,8 +454,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Animation\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 8
-    y: 500
+    x: 0
+    y: 24
     width: 956
     height: 448
   m_SerializedDataModeController:
@@ -574,7 +574,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 415}
     m_SelectedIDs: b6050100
     m_LastClickedID: 66998
-    m_ExpandedIDs: 00000000c0d20000c2d20000c4d20000c6d20000c8d20000cad2000078d300008ad30000a0d300001ee9000000ca9a3bffffff7f
+    m_ExpandedIDs: 00000000eece0000f0ce0000f2ce0000f4ce0000f6ce0000f8ce0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -603,7 +603,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000c0d20000c2d20000c4d20000c6d20000c8d20000cad2000000ca9a3bffffff7f
+    m_ExpandedIDs: 00000000eece0000f0ce0000f2ce0000f4ce0000f6ce0000f8ce0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1674,8 +1674,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 579
-    y: 87
+    x: 572
+    y: 24
     width: 705
     height: 387
   m_SerializedDataModeController:
@@ -2352,8 +2352,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Hierarchy\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 965
-    y: 500
+    x: 958
+    y: 24
     width: 319
     height: 448
   m_SerializedDataModeController:
@@ -2370,23 +2370,23 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 3aecf7ff
-      m_LastClickedID: -529350
+      m_SelectedIDs: 
+      m_LastClickedID: 0
       m_ExpandedIDs: 6ceaf7ffa0eaf7ffb4eaf7ffd0eaf7ffe0eaf7ffeeeaf7ff38ebf7ff66ebf7ff76ebf7ffa4ebf7ffb4ebf7ffd0ebf7ffe4ebf7ff00ecf7ff14ecf7ff3aecf7ffaeedf7ffb4cdffff5eeaffff84eaffffd6f5ffffd0f9ffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: Player6
-        m_OriginalName: Player6
+        m_Name: 
+        m_OriginalName: 
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: -529350
+        m_UserData: 0
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 0
+        m_OriginalEventType: 11
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
         m_ClientGUIView: {fileID: 12}
@@ -2418,8 +2418,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1286
-    y: 87
+    x: 1279
+    y: 24
     width: 385
     height: 861
   m_SerializedDataModeController:

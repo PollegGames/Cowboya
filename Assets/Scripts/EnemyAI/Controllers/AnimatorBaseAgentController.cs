@@ -41,7 +41,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         Debug.Log("AnimatorBaseAgentController: Awake called, components initialized.");
     }
 
-
     protected virtual void Update()
     {
         if (isMoving)
