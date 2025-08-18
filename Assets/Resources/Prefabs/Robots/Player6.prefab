@@ -293,7 +293,7 @@ GameObject:
   m_Icon: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8433065265253862054
 Transform:
   m_ObjectHideFlags: 0
@@ -417,7 +417,7 @@ GameObject:
   m_Icon: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5777551822076249676
 Transform:
   m_ObjectHideFlags: 0
@@ -1288,7 +1288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 3816361993170977825}
-  pole: {fileID: 8433065265253862054}
+  pole: {fileID: 0}
   chainLength: 2
   SetForce: 80
   delta: 0.25
@@ -1881,7 +1881,7 @@ Transform:
   m_GameObject: {fileID: 5847166594214520139}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.04, y: 4.53, z: 0}
+  m_LocalPosition: {x: -0.04, y: 4.53, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1961,7 +1961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 5459847082946802603}
-  pole: {fileID: 5777551822076249676}
+  pole: {fileID: 0}
   chainLength: 2
   SetForce: 80
   delta: 0.25
@@ -5198,7 +5198,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9206399113533570874}
-  - component: {fileID: 8274634689585369587}
   - component: {fileID: 5046356896636356325}
   - component: {fileID: 6178835051735462}
   - component: {fileID: 2375878962877187776}
@@ -5243,25 +5242,6 @@ Transform:
   - {fileID: 9206399113078833674}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8274634689585369587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113533570876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4552a9f8bbc5bc745bc65c34ec46700a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  muscles:
-  - bone: {fileID: 9206399112885104982}
-    restRotation: 0
-    force: 700
-  - bone: {fileID: 9206399112436540778}
-    restRotation: 0
-    force: 100
 --- !u!114 &5046356896636356325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5557,7 +5537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ee1fea37eed08c4f8d6108ee96335ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
+  moveSpeed: 0
   animator: {fileID: 479767149910990366}
   bodyReference: {fileID: 9206399112436540782}
   hipRb: {fileID: 9206399112436540778}
