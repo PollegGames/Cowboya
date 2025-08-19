@@ -94,7 +94,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     private void ApplyFacingDirection()
     {
         locomotion.SetFacingDirection(!flipped);
-        legJointLimiter.SetLegRotationLimits(flipped); // true = going left
+        legJointLimiter.SetLegRotationLimits(!flipped); // true = going left
         if (bodyJointLimiter != null)
             bodyJointLimiter.SetBodyRotationLimits(flipped);
 

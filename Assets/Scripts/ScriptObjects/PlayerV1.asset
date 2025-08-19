@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df349e057ff3bb44ca8a73f4dffc07da, type: 3}
   m_Name: PlayerV1
   m_EditorClassIdentifier: 
-  RobotGameObjectPrefab: {fileID: 9206399113533570876, guid: bb522324f1d595f4d8274fc43f8eadcb, type: 3}
+  RobotGameObjectPrefab: {fileID: 4483575737703661435, guid: 16cb714dfe2876842aa43b35482f3a8a, type: 3}
