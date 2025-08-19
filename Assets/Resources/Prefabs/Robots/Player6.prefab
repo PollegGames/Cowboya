@@ -303,7 +303,7 @@ Transform:
   m_GameObject: {fileID: 1425850880656956179}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.06, y: -0.989, z: 0.10000001}
+  m_LocalPosition: {x: -1.06, y: -0.989, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -909,7 +909,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: -0.000000019594609, y: -0.3999969}
+  m_ConnectedAnchor: {x: -0.000000019594747, y: -0.3999997}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -944,7 +944,7 @@ Transform:
   m_GameObject: {fileID: 4047715324004208872}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.96, y: -0.992, z: 0.10000001}
+  m_LocalPosition: {x: 0.96, y: -0.992, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1114,7 +1114,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0, y: -0.67187536}
+  m_ConnectedAnchor: {x: 0, y: -0.67187506}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1415,7 +1415,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.00000001941518, y: -0.4100009}
+  m_ConnectedAnchor: {x: 0.000000019415129, y: -0.40999976}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1709,7 +1709,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0, y: -0.6699999}
+  m_ConnectedAnchor: {x: 0, y: -0.6700002}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3594,7 +3594,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.48}
-  m_ConnectedAnchor: {x: 0.03500229, y: 0.20439993}
+  m_ConnectedAnchor: {x: 0.034999847, y: 0.20439993}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3826,7 +3826,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.35}
-  m_ConnectedAnchor: {x: -0.012001625, y: 0.16999997}
+  m_ConnectedAnchor: {x: -0.011999791, y: 0.17000015}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4283,7 +4283,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.19}
-  m_ConnectedAnchor: {x: 0, y: 0.41800004}
+  m_ConnectedAnchor: {x: 0, y: 0.41799986}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4642,7 +4642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ee1fea37eed08c4f8d6108ee96335ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 0
+  moveSpeed: 16
   animator: {fileID: 479767149910990366}
   bodyReference: {fileID: 9206399112436540782}
   hipRb: {fileID: 9206399112436540778}
@@ -4662,6 +4662,11 @@ MonoBehaviour:
   - {fileID: 9206399112436540779}
   legJointLimiter: {fileID: 0}
   inputSource: {fileID: 4162074314854598404}
+  pIsWalking: IsWalking
+  pIsCrouching: IsCrouching
+  pIsJumping: IsJumping
+  pJumpTrigger: Jump
+  verticalDeadZone: 0.2
 --- !u!114 &2752298816019921060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4678,13 +4683,13 @@ MonoBehaviour:
   hips: {fileID: 9206399112436540782}
   hipsRb: {fileID: 9206399112436540778}
   groundProbe: {fileID: 8356540621759172424}
-  smoothTime: 0.05
-  maxSpeed: 100
+  smoothTime: 0.1
+  maxSpeed: 50
   useGroundNormal: 1
   groundRayLen: 2
   groundMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1024
   externalLeanDeg: 0
   autoBalance: 1
   kp: 0.8

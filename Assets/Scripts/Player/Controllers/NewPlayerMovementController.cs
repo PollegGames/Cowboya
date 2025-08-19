@@ -11,63 +11,98 @@ public sealed class NewPlayerMovementController : AnimatorBaseAgentController
     private IPlayerInput input;
     public IPlayerInput Input;
 
+  [Header("Anim params")]
+    [SerializeField] private string pIsWalking = "IsWalking";
+    [SerializeField] private string pIsCrouching = "IsCrouching";
+    [SerializeField] private string pIsJumping = "IsJumping";
+    [SerializeField] private string pJumpTrigger = "Jump";
+
+    [Header("Tuning")]
+    [SerializeField] private float verticalDeadZone = 0.2f;
+
     private Vector2 _move;
+    private bool jumpLatch; // prevents retrigger while holding up
 
     protected override void Awake()
     {
         base.Awake();
-        if (hipRb == null) hipRb = GetComponent<Rigidbody2D>();
+        if (!hipRb) hipRb = GetComponent<Rigidbody2D>();
 
+        // prefer injected IPlayerInput, else fall back to keyboard/gamepad
         input = inputSource as IPlayerInput;
-        if (input == null)
+        if (input == null && inputSource != null)
             Debug.LogError($"{nameof(NewPlayerMovementController)}: inputSource does not implement IPlayerInput");
     }
 
     protected override void Update()
     {
-        // Read input
-        _move = input != null ? input.Movement : Vector2.zero;
+        ReadInput();
 
-        // Horizontal + vertical intents
+        // horizontal
         SetMovement(_move.x);
-        SetVerticalMovement(_move.y);
-
-        // Animator flags (no physics)
-        animator.SetBool("IsWalking", isMoving);
-        animator.SetBool("IsVerticalWalking", isVerticalMoving);
-
-        // Face where we go
+        animator.SetBool(pIsWalking, Mathf.Abs(direction) > 0.01f);
         TryFlip(direction);
+
+        // vertical → animations only
+        HandleJumpCrouch(_move.y);
     }
 
     private void FixedUpdate()
     {
-        if (isMoving) Move();
-        if (isVerticalMoving) MoveVertical();
+        if (Mathf.Abs(direction) > 0.01f) Move();   // keep base physics for X
+        // never call MoveVertical() → no vertical forces
     }
 
-    public override void SetMovement(float dir)
+    private void ReadInput()
     {
-        base.SetMovement(dir);
-        isMoving = !Mathf.Approximately(direction, 0f);
+        if (input != null)
+        {
+            _move = Vector2.ClampMagnitude(input.Movement, 1f);
+            return;
+        }
+
+        // Fallback: WASD/Arrows and gamepad left stick
+        Vector2 k = Vector2.zero;
+        var kb = Keyboard.current;
+        if (kb != null)
+        {
+            k.x = (kb.aKey.isPressed || kb.leftArrowKey.isPressed ? -1f : 0f)
+                + (kb.dKey.isPressed || kb.rightArrowKey.isPressed ?  1f : 0f);
+            k.y = (kb.sKey.isPressed || kb.downArrowKey.isPressed ? -1f : 0f)
+                + (kb.wKey.isPressed || kb.upArrowKey.isPressed   ?  1f : 0f);
+        }
+        var gp = Gamepad.current != null ? Gamepad.current.leftStick.ReadValue() : Vector2.zero;
+
+        // prefer the stronger input vector
+        _move = (gp.sqrMagnitude > k.sqrMagnitude) ? gp : k;
+        _move = Vector2.ClampMagnitude(_move, 1f);
     }
 
-    public override void SetVerticalMovement(float dir)
+    private void HandleJumpCrouch(float y)
     {
-        verticalDirection = Mathf.Clamp(dir, -1f, 1f);
-        isVerticalMoving = !Mathf.Approximately(verticalDirection, 0f);
+        bool up = y >  verticalDeadZone;
+        bool down = y < -verticalDeadZone;
+
+        // Jump as animation flag
+        if (up && !jumpLatch)
+        {
+            jumpLatch = true;
+            animator.SetBool(pIsJumping, true);
+            if (!string.IsNullOrEmpty(pJumpTrigger)) animator.SetTrigger(pJumpTrigger);
+        }
+        if (!up)
+        {
+            animator.SetBool(pIsJumping, false);
+            jumpLatch = false;
+        }
+
+        // Crouch while held
+        animator.SetBool(pIsCrouching, down);
     }
 
-    // Use Y for vertical motion
-    protected override void MoveVertical()
-    {
-        // animator.SetFloat("VerticalDirection", verticalDirection);
+    // Call from landing animation event
+    public void OnLanded() => animator.SetBool(pIsJumping, false);
 
-        // Vector2 desired = new Vector2(hipRb.linearVelocity.x, verticalDirection * moveSpeed);
-        // Vector2 delta = desired - hipRb.linearVelocity;
-        // Vector2 force = delta * hipRb.mass / Time.fixedDeltaTime;
-        // hipRb.AddForce(force);
-    }
-
-    // Optional: keep base Move as-is. Ensure it uses X velocity only.
+    // Ensure vertical physics never run
+    protected override void MoveVertical() { /* intentionally empty */ }
 }

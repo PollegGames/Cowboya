@@ -12,6 +12,9 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     [SerializeField] private BodyJointLimiter bodyJointLimiter;
     [SerializeField] private RobotStateController robotBehaviour;
 
+    [Header("Facing/Mirroring")]
+    [SerializeField] private PoleMirror2D poleMirror;
+
     [Header("Body Rotation")]
     [SerializeField] private Rigidbody2D bodyReference;
     public Rigidbody2D BodyReference => bodyReference;
@@ -54,6 +57,8 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         {
             Debug.LogError("PlayerMovementController: inputSource does not implement IPlayerInput");
         }
+        // Ensure initial facing is applied to all modules (including PoleMirror2D)
+        ApplyFacingDirection();
     }
 
     private void Update()
@@ -92,6 +97,10 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         legJointLimiter.SetLegRotationLimits(flipped); // true = going left
         if (bodyJointLimiter != null)
             bodyJointLimiter.SetBodyRotationLimits(flipped);
+
+         // Mirror poles (arms, hands, etc.)
+        if (poleMirror != null)
+            poleMirror.SetFacing(!flipped);
     }
 
     private void CalculateAndApplyBodyRotation()
