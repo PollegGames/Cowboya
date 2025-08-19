@@ -94,11 +94,11 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     private void ApplyFacingDirection()
     {
         locomotion.SetFacingDirection(!flipped);
-        legJointLimiter.SetLegRotationLimits(!flipped); // true = going left
+        legJointLimiter.SetLegRotationLimits(!flipped); // true = facing right
         if (bodyJointLimiter != null)
-            bodyJointLimiter.SetBodyRotationLimits(flipped);
+            bodyJointLimiter.SetBodyRotationLimits(!flipped);
 
-         // Mirror poles (arms, hands, etc.)
+        // Mirror poles (arms, hands, etc.)
         if (poleMirror != null)
             poleMirror.SetFacing(!flipped);
     }
