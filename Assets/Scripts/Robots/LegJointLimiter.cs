@@ -7,13 +7,10 @@ public class LegJointLimiter : MonoBehaviour
     public HingeJoint2D leftLegJoint;
     public HingeJoint2D rightLegJoint;
 
-    private float minLeft;
-    private float maxLeft;
-    private float motorSpeedLeft;
-    private float minRight;
-    private float maxRight;
-    private float motorSpeedRight;
-    private bool cached;
+    private float minLeft = 0;
+    private float maxLeft = 180;
+    private float minRight = 0;
+    private float maxRight = 180;
     private bool facingRight = true;
 
     private void Awake()
@@ -24,27 +21,21 @@ public class LegJointLimiter : MonoBehaviour
 
     public void SetLegRotationLimits(bool goingRight)
     {
-        if (!cached)
-            CacheJointLimits();
-
-        if (goingRight == facingRight)
-            return;
-
         facingRight = goingRight;
 
         if (facingRight)
         {
-            ApplyJoint(rightLegJoint, minRight, maxRight, motorSpeedRight);
-            ApplyJoint(leftLegJoint, minLeft, maxLeft, motorSpeedLeft);
+            ApplyJoint(rightLegJoint, minRight, maxRight );
+            ApplyJoint(leftLegJoint, minLeft, maxLeft);
         }
         else
         {
-            ApplyJoint(rightLegJoint, minLeft, maxLeft, motorSpeedLeft);
-            ApplyJoint(leftLegJoint, minRight, maxRight, motorSpeedRight);
+            ApplyJoint(rightLegJoint, -minLeft, -maxLeft);
+            ApplyJoint(leftLegJoint, -minRight, -maxRight);
         }
     }
 
-    private void ApplyJoint(HingeJoint2D joint, float lower, float upper, float speed)
+    private void ApplyJoint(HingeJoint2D joint, float lower, float upper)
     {
         if (joint == null)
             return;
@@ -53,10 +44,6 @@ public class LegJointLimiter : MonoBehaviour
         limits.max = upper;
         joint.limits = limits;
         joint.useLimits = true;
-        var motor = joint.motor;
-        motor.motorSpeed = speed;
-        joint.motor = motor;
-        joint.useMotor = true;
     }
 
     /// <summary>
@@ -66,26 +53,9 @@ public class LegJointLimiter : MonoBehaviour
     {
         leftLegJoint = FindJoint("LeftLowLeg");
         rightLegJoint = FindJoint("RightLowLeg");
-        CacheJointLimits();
     }
 
-    private void CacheJointLimits()
-    {
-        if (leftLegJoint == null || rightLegJoint == null)
-            return;
 
-        var leftLimits = leftLegJoint.limits;
-        minLeft = leftLimits.min;
-        maxLeft = leftLimits.max;
-        motorSpeedLeft = leftLegJoint.motor.motorSpeed;
-
-        var rightLimits = rightLegJoint.limits;
-        minRight = rightLimits.min;
-        maxRight = rightLimits.max;
-        motorSpeedRight = rightLegJoint.motor.motorSpeed;
-
-        cached = true;
-    }
 
     private HingeJoint2D FindJoint(string name)
     {
