@@ -7,6 +7,9 @@ public class LegJointLimiter : MonoBehaviour
     public HingeJoint2D leftLegJoint;
     public HingeJoint2D rightLegJoint;
 
+    private float minLeft;
+    private float maxLeft;
+    private float motorSpeedLeft;
     private float minRight;
     private float maxRight;
     private float motorSpeedRight;
@@ -16,13 +19,13 @@ public class LegJointLimiter : MonoBehaviour
     private void Awake()
     {
         RefreshJoints();
-        CacheRightJoint();
+        SetLegRotationLimits(true);
     }
 
     public void SetLegRotationLimits(bool goingRight)
     {
         if (!cached)
-            CacheRightJoint();
+            CacheJointLimits();
 
         if (goingRight == facingRight)
             return;
@@ -32,11 +35,11 @@ public class LegJointLimiter : MonoBehaviour
         if (facingRight)
         {
             ApplyJoint(rightLegJoint, minRight, maxRight, motorSpeedRight);
-            ApplyJoint(leftLegJoint, -maxRight, -minRight, -motorSpeedRight);
+            ApplyJoint(leftLegJoint, minLeft, maxLeft, motorSpeedLeft);
         }
         else
         {
-            ApplyJoint(rightLegJoint, -maxRight, -minRight, -motorSpeedRight);
+            ApplyJoint(rightLegJoint, minLeft, maxLeft, motorSpeedLeft);
             ApplyJoint(leftLegJoint, minRight, maxRight, motorSpeedRight);
         }
     }
@@ -63,17 +66,24 @@ public class LegJointLimiter : MonoBehaviour
     {
         leftLegJoint = FindJoint("LeftLowLeg");
         rightLegJoint = FindJoint("RightLowLeg");
-        CacheRightJoint();
+        CacheJointLimits();
     }
 
-    private void CacheRightJoint()
+    private void CacheJointLimits()
     {
-        if (rightLegJoint == null)
+        if (leftLegJoint == null || rightLegJoint == null)
             return;
-        var limits = rightLegJoint.limits;
-        minRight = limits.min;
-        maxRight = limits.max;
+
+        var leftLimits = leftLegJoint.limits;
+        minLeft = leftLimits.min;
+        maxLeft = leftLimits.max;
+        motorSpeedLeft = leftLegJoint.motor.motorSpeed;
+
+        var rightLimits = rightLegJoint.limits;
+        minRight = rightLimits.min;
+        maxRight = rightLimits.max;
         motorSpeedRight = rightLegJoint.motor.motorSpeed;
+
         cached = true;
     }
 
