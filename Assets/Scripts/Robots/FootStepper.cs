@@ -202,13 +202,13 @@ public class FootStepper : MonoBehaviour
         onLanded?.Invoke();
     }
 
-    public void Crouch(float upDuration, float downDuration)
+    public void Crouch(float upDuration, float downDuration, Action onArrived = null)
     {
         if (routine != null) StopCoroutine(routine);
-        routine = StartCoroutine(CrouchRoutine(upDuration, downDuration));
+        routine = StartCoroutine(CrouchRoutine(upDuration, downDuration, onArrived));
     }
-    
-      private IEnumerator CrouchRoutine(float upDuration, float downDuration)
+
+    private IEnumerator CrouchRoutine(float upDuration, float downDuration, Action onArrived)
     {
         Transform crouchUp = facingRight ? crouchUpRight : crouchUpLeft;
         Transform crouchDown = facingRight ? crouchDownRight : crouchDownLeft;
@@ -224,7 +224,18 @@ public class FootStepper : MonoBehaviour
         }
         footTarget.position = crouchUp.position;
 
+        // Move down
+        t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / downDuration;
+            footTarget.position = Vector3.Lerp(crouchUp.position, crouchDown.position, t);
+            yield return null;
+        }
+        footTarget.position = crouchDown.position;
+
         routine = null;
+        onArrived?.Invoke();
     }
 
 }
