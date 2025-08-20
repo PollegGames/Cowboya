@@ -1694,6 +1694,10 @@ MonoBehaviour:
   jumpDownRight: {fileID: 7087700552513643694}
   jumpUpLeft: {fileID: 8230157813297553681}
   jumpDownLeft: {fileID: 7548832406037195315}
+  crouchUpRight: {fileID: 7937801949651223672}
+  crouchDownRight: {fileID: 7087700552513643694}
+  crouchUpLeft: {fileID: 8230157813297553681}
+  crouchDownLeft: {fileID: 7548832406037195315}
   footTarget: {fileID: 608097371732426208}
   toPeakDuration: 0.1
   toFarDuration: 0.1
@@ -2577,6 +2581,10 @@ MonoBehaviour:
   jumpDownRight: {fileID: 7087700552513643694}
   jumpUpLeft: {fileID: 8230157813297553681}
   jumpDownLeft: {fileID: 7548832406037195315}
+  crouchUpRight: {fileID: 7937801949651223672}
+  crouchDownRight: {fileID: 7087700552513643694}
+  crouchUpLeft: {fileID: 8230157813297553681}
+  crouchDownLeft: {fileID: 7548832406037195315}
   footTarget: {fileID: 9160219255922100572}
   toPeakDuration: 0.1
   toFarDuration: 0.1
@@ -5318,6 +5326,8 @@ MonoBehaviour:
   rightFoot: {fileID: 7086515708544877790}
   jumpUpDuration: 0.1
   jumpDownDuration: 0.1
+  crouchUpDuration: 0.1
+  crouchDownDuration: 0.1
   isPlayerControlled: 1
   energyCostPerStep: 1
   energyCostPerJump: 5
