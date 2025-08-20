@@ -67,6 +67,10 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: 0.17000015
       objectReference: {fileID: 0}
+    - target: {fileID: 5883253071486982448, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
+      propertyPath: delta
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 6137078262802834594, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: poleMirror
       value: 
@@ -86,6 +90,10 @@ PrefabInstance:
     - target: {fileID: 6938711731392913633, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: m_ConnectedAnchor.y
       value: -0.40000027
+      objectReference: {fileID: 0}
+    - target: {fileID: 9066642679708734232, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.47
       objectReference: {fileID: 0}
     - target: {fileID: 9206399112233741188, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: m_ConnectedAnchor.y
@@ -137,6 +145,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3708153817252930675, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
+    - {fileID: 7968074168510934324, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
+    - {fileID: 3120047799625929265, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 9206399112436540782, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
