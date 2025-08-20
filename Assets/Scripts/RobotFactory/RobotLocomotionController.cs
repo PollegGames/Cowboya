@@ -211,8 +211,19 @@ public class RobotLocomotionController : MonoBehaviour
         robotBehaviour?.ConsumeEnergy(energyCostPerCrouch);
         OnCrouchStarted?.Invoke();
 
-        leftFoot.Crouch(crouchUpDuration, crouchDownDuration);
-        rightFoot.Crouch(crouchUpDuration, crouchDownDuration);
+        int feetFinished = 0;
+        Action onFootFinished = () =>
+        {
+            feetFinished++;
+            if (feetFinished >= 2)
+            {
+                isCrouching = false;
+                OnCrouchEnded?.Invoke();
+            }
+        };
+
+        leftFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
+        rightFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
     }
     #endregion Crouch
 
