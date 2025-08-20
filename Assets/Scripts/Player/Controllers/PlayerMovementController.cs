@@ -77,6 +77,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         CalculateAndApplyBodyRotation();
         HandleMovement();
         HandleJump();
+        HandleCrouch();
     }
 
     private void TryFlip()
@@ -142,6 +143,14 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         if (verticalInput > 0)
         {
             locomotion.Jump();
+        }
+    }
+
+    private void HandleCrouch()
+    {
+        if (verticalInput < 0)
+        {
+            locomotion.Crouch();
         }
     }
 
