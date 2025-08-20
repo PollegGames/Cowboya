@@ -18,7 +18,9 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     [Header("Body Rotation")]
     [SerializeField] private Rigidbody2D bodyReference;
     public Rigidbody2D BodyReference => bodyReference;
-    [SerializeField] private float maximumLerp = 10f;
+
+    [SerializeField, Min(0f)] private float maxLeftTiltDeg  = 20f; 
+    [SerializeField, Min(0f)] private float maxRightTiltDeg = 2f;
 
     [SerializeField] private MonoBehaviour inputSource;
     private IPlayerInput input;
@@ -41,7 +43,6 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     private void Awake()
     {
-        locomotion.OnJumpStarted += HandleJumpStart;
         locomotion.OnJumpEnded += HandleJumpEnd;
 
         if (robotBehaviour == null)
@@ -105,9 +106,20 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     private void CalculateAndApplyBodyRotation()
     {
-        targetRotation = Mathf.Approximately(horizontalInput, 0f)
-            ? 0f
-            : Mathf.Lerp(maximumLerp, -maximumLerp, (horizontalInput + 1f) / 2f);
+        if (Mathf.Approximately(horizontalInput, 0f))
+        {
+            targetRotation = 0f;
+        }
+        else
+        {
+            // Map [-1 .. +1] -> angle where right = negative, left = positive
+            float t = (horizontalInput + 1f) * 0.5f; // -1 -> 0, +1 -> 1
+            float leftDeg  = Mathf.Max(0f, maxLeftTiltDeg);
+            float rightDeg = Mathf.Max(0f, maxRightTiltDeg);
+
+            // Right limit is -rightDeg, left limit is +leftDeg
+            targetRotation = Mathf.Lerp(leftDeg, -rightDeg, t);
+        }
 
         ApplyBodyRotation();
     }
@@ -131,11 +143,6 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         {
             locomotion.Jump();
         }
-    }
-
-    private void HandleJumpStart()
-    {
-        Debug.Log("Jump start");
     }
 
     private void HandleJumpEnd()

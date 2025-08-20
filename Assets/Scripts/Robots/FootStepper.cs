@@ -29,6 +29,14 @@ public class FootStepper : MonoBehaviour
     public Transform jumpUpLeft;
     public Transform jumpDownLeft;
 
+    [Header("Crouch Arc Points - Right")]
+    public Transform crouchUpRight;
+    public Transform crouchDownRight;
+
+    [Header("Crouch Arc Points - Left")]
+    public Transform crouchUpLeft;
+    public Transform crouchDownLeft;
+
     [Header("Foot Target")]
     public Transform footTarget;
 
@@ -192,6 +200,31 @@ public class FootStepper : MonoBehaviour
 
         routine = null;
         onLanded?.Invoke();
+    }
+
+    public void Crouch(float upDuration, float downDuration)
+    {
+        if (routine != null) StopCoroutine(routine);
+        routine = StartCoroutine(CrouchRoutine(upDuration, downDuration));
+    }
+    
+      private IEnumerator CrouchRoutine(float upDuration, float downDuration)
+    {
+        Transform crouchUp = facingRight ? crouchUpRight : crouchUpLeft;
+        Transform crouchDown = facingRight ? crouchDownRight : crouchDownLeft;
+        Vector3 start = footTarget.position;
+
+        // Move up
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / upDuration;
+            footTarget.position = Vector3.Lerp(start, crouchUp.position, t);
+            yield return null;
+        }
+        footTarget.position = crouchUp.position;
+
+        routine = null;
     }
 
 }
