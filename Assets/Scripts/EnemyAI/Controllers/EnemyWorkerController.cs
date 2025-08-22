@@ -68,32 +68,34 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService,
-  IRobotRespawnService respawnService,
-      Transform dropContainer,
-      BatterySpawner batterySpawner = null,
-      bool spawnInitialPickups = true)
+        IRobotRespawnService respawnService,
+        Transform dropContainer,
+        BatterySpawner batterySpawner = null,
+        bool spawnInitialPickups = true)
     {
         this.waypointQueries = waypointQueries;
         this.waypointService = waypointService;
         this.dropContainer = dropContainer;
         this.batterySpawner = batterySpawner;
+
         if (pathFollower == null)
             SetupPathFollower();
+
         waypointService.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
-        if (spawnInitialPickups)
+
+        if (spawnInitialPickups && this.batterySpawner != null && initialBattery == null)
         {
-            if (this.batterySpawner && initialBattery == null)
+            initialBattery = this.batterySpawner.SpawnBattery(bodyReference);
+
+            if (initialBattery != null && inventory != null)
             {
-                initialBattery = this.batterySpawner.SpawnBattery(bodyReference);
-                if (inventory != null && initialBattery != null)
-                {
-                    initialBattery.AssignInventory(inventory);
-                    inventory.SetItem(PickupType.Battery, initialBattery);
-                    if (robotBehaviour != null)
-                        robotBehaviour.Stats.UpdateHealth(10f);
-                }
+                initialBattery.AssignInventory(inventory);
+                inventory.SetItem(PickupType.Battery, initialBattery);
+
+                if (robotBehaviour != null)
+                    robotBehaviour.Stats.UpdateHealth(10f);
             }
         }
     }
