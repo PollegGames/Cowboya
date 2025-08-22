@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(IPlayerInput))]
 public sealed class NewPlayerMovementController : AnimatorBaseAgentController
 {
     [Header("Input")]
@@ -34,7 +34,7 @@ public sealed class NewPlayerMovementController : AnimatorBaseAgentController
             Debug.LogError($"{nameof(NewPlayerMovementController)}: inputSource does not implement IPlayerInput");
     }
 
-    protected override void Update()
+   private void Update()
     {
         ReadInput();
 

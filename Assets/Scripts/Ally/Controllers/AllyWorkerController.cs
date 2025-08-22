@@ -37,9 +37,8 @@ public class AllyWorkerController : AnimatorBaseAgentController
         waypointNotifier.Subscribe(pathFollower);
     }
 
-     protected override void Update()
+     private void Update()
     {
-        base.Update();
         TryFlip(direction);
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
