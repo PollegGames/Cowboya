@@ -5,6 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Controls enemy worker navigation using waypoint-based pathing.
 /// </summary>
+[RequireComponent(typeof(WorkerStateMachine), typeof(RobotMemory))]
 public class EnemyWorkerController : AnimatorBaseAgentController
 {
     [SerializeField] public WorkerStateMachine stateMachine;
@@ -44,7 +45,26 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     {
         animator = GetComponentInChildren<Animator>();
         base.Awake();
-        memory = memoryComponent ?? GetComponent<RobotMemory>();
+
+        if (stateMachine == null)
+            stateMachine = GetComponent<WorkerStateMachine>();
+        if (memoryComponent == null)
+            memoryComponent = GetComponent<RobotMemory>();
+        memory = memoryComponent;
+
+        if (robotBehaviour == null)
+            robotBehaviour = GetComponent<RobotStateController>();
+        if (lowMoralityTriggerHandler == null)
+            lowMoralityTriggerHandler = GetComponent<LowMoralityPlayerTriggerHandler>();
+        if (allyWorkerController == null)
+            allyWorkerController = GetComponent<AllyWorkerController>();
+
+        if (robotBehaviour != null)
+            robotBehaviour.OnStateChanged += HandleStateChange;
+        if (lowMoralityTriggerHandler != null)
+            lowMoralityTriggerHandler.OnLowMoralityPlayerDetected += HandleLowMoralityPlayerDetected;
+        if (allyWorkerController != null)
+            allyWorkerController.enabled = false;
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService,
