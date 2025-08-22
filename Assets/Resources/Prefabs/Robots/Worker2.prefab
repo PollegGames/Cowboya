@@ -4320,6 +4320,8 @@ GameObject:
   - component: {fileID: 2752298816019921060}
   - component: {fileID: 4162074314854598404}
   - component: {fileID: 5306930840585778261}
+  - component: {fileID: 7100000000000000000}
+  - component: {fileID: 7100000000000000001}
   m_Layer: 6
   m_Name: Worker2
   m_TagString: Player
@@ -4704,11 +4706,38 @@ MonoBehaviour:
   - {fileID: 9206399112352681960}
   - {fileID: 9206399112436540779}
   legJointLimiter: {fileID: 0}
+  stateMachine: {fileID: 7100000000000000001}
+  memoryComponent: {fileID: 7100000000000000000}
+  robotBehaviour: {fileID: 0}
   arrivalThresholdX: 2
   arrivalThresholdY: 2
   deadZoneX: 5
   deadZoneY: 5
   updateLoop: 0
+--- !u!114 &7100000000000000000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 906126257589b3140b69badd1f7e1d9e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &7100000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b54eb47c233b40b499499fdc01e9e165, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &9206399113579118250
 GameObject:
   m_ObjectHideFlags: 0
