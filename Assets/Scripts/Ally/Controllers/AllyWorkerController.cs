@@ -44,12 +44,6 @@ public class AllyWorkerController : AnimatorBaseAgentController
             pathFollower?.Update(Time.deltaTime);
     }
 
-    private void FixedUpdate()
-    {
-        if (updateLoop == UpdateLoop.FixedUpdate)
-            pathFollower?.Update(Time.fixedDeltaTime);
-    }
-
     /// <summary>
     /// Sets a waypoint destination for the ally.
     /// </summary>

@@ -8,6 +8,9 @@ public class LevelEndVictoryTrigger : MonoBehaviour
 
     private bool isVictoryDoor = false;
 
+    [Header("Visuals")]
+    [SerializeField] private SpriteRenderer doorSprite;   // assign in Inspector
+    [Range(0f, 1f)] public float disabledAlpha = 0.3f;
     private void Awake()
     {
         if (runStats == null && RunProgressManager.Instance != null)
@@ -28,14 +31,22 @@ public class LevelEndVictoryTrigger : MonoBehaviour
         {
             Debug.LogError("LevelEndVictoryTrigger: PlayerSaveService reference is missing.");
         }
-        
+
         if (doorNext != null)
         {
             isVictoryDoor = doorNext.isVictoryDoor;
         }
+        UpdateVisual();
     }
 
+    private void UpdateVisual()
+    {
+        if (doorSprite == null) return;
 
+        Color c = doorSprite.color;
+        c.a = isVictoryDoor ? 1f : disabledAlpha;
+        doorSprite.color = c;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (doorNext != null)

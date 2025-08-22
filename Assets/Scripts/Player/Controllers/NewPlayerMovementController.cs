@@ -46,13 +46,6 @@ public sealed class NewPlayerMovementController : AnimatorBaseAgentController
         // vertical → animations only
         HandleJumpCrouch(_move.y);
     }
-
-    private void FixedUpdate()
-    {
-        if (Mathf.Abs(direction) > 0.01f) Move();   // keep base physics for X
-        // never call MoveVertical() → no vertical forces
-    }
-
     private void ReadInput()
     {
         if (input != null)

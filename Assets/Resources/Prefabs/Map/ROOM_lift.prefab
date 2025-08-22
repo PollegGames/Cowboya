@@ -5546,8 +5546,12 @@ PrefabInstance:
       value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1681544987393313468, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: m_ForceTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1681544987393313468, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: m_ForceMagnitude
-      value: 10
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 1863622920007051719, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: detectionLayer.m_Bits
@@ -5601,6 +5605,62 @@ PrefabInstance:
       propertyPath: liftShaftController
       value: 
       objectReference: {fileID: 8838979484505048289}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onReturnArrival.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onOutboundArrival.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onReturnArrival.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onOutboundArrival.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onReturnArrival.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8976059850366491805}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onOutboundArrival.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8976059850366491805}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onReturnArrival.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onReturnArrival.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnEntityExitZone
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onOutboundArrival.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onOutboundArrival.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnEntityEnterZone
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onReturnArrival.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LiftController, Game
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onOutboundArrival.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LiftController, Game
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onReturnArrival.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2439669977207644660, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
+      propertyPath: onOutboundArrival.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 2596515256626068334, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: m_Layer
       value: 0
@@ -5715,11 +5775,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6204825933926312236, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: m_ForceMagnitude
-      value: 10
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6766413548410738779, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: m_ForceMagnitude
-      value: 10
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7520282905518153939, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: roomManager
@@ -5731,7 +5791,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7607063913022408888, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: m_ForceMagnitude
-      value: 10
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7712402871251830464, guid: 224012b7b080cbd478e93969a65f779a, type: 3}
       propertyPath: m_VersionIndex
