@@ -106,8 +106,9 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         TryFlip(direction);
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        base.FixedUpdate();
         if (updateLoop == UpdateLoop.FixedUpdate)
             pathFollower?.Update(Time.fixedDeltaTime);
     }
