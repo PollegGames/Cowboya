@@ -10,7 +10,6 @@ public class LiftController : MonoBehaviour
     [Header("References")]
     public MeshRenderer lightRenderer;
     public Collider2D floorCollider;
-    public Rigidbody2D platformRb;
 
     [Header("Movement")]
     public Vector2 moveDirection = Vector2.up;
@@ -38,55 +37,44 @@ public class LiftController : MonoBehaviour
     public UnityEvent onOutboundArrival;
     public UnityEvent onReturnArrival;
 
-    private Vector2 startPos, endPos;
+    // internal
     private LiftState currentState = LiftState.Idle;
-    private Coroutine flashingRoutine;
     private Coroutine checkRoutine;
 
-    private Rigidbody2D rb;
-    private Vector2 prevPosition;
-    private float prevRotation;
-    private readonly HashSet<Rigidbody2D> passengers = new HashSet<Rigidbody2D>();
-    private Vector2 moveTarget;
-    private bool isMoving = false;
+    private Transform lightRoot;          // transform we actually move
+    private Vector3 lightStartPos;
+    private Vector3 lightEndPos;
 
     private int entitiesInside = 0;
 
-    public Vector2 PlatformVelocity { get; private set; }
-
     private void Awake()
     {
-        rb = floorCollider ? floorCollider.attachedRigidbody : platformRb;
-        if (rb == null)
+        if (!lightRenderer)
         {
-            Debug.LogError("LiftController requires a Rigidbody2D reference.", this);
+            Debug.LogError("LiftController requires a MeshRenderer reference.", this);
             return;
         }
-        rb.isKinematic = true;
-        startPos = rb.position;
-        endPos = startPos + moveDirection.normalized * moveDistance;
-        moveTarget = startPos;
-        prevPosition = startPos;
-        prevRotation = rb.rotation;
+
+        lightRoot = lightRenderer.transform;
+        lightStartPos = lightRoot.position;
+        lightEndPos = lightStartPos + (Vector3)(moveDirection.normalized * moveDistance);
+
         UpdateLight();
     }
 
     private void OnEnable()
     {
-        passengers.Clear();
         checkRoutine = StartCoroutine(CheckLoop());
     }
 
     private void OnDisable()
     {
-        passengers.Clear();
-        if (checkRoutine != null)
-            StopCoroutine(checkRoutine);
+        if (checkRoutine != null) StopCoroutine(checkRoutine);
     }
 
     private IEnumerator CheckLoop()
     {
-        var wait = new WaitForSeconds(1f); // configurable interval
+        var wait = new WaitForSeconds(1f);
         while (true)
         {
             EvaluateLiftState();
@@ -102,11 +90,10 @@ public class LiftController : MonoBehaviour
         if (currentState != LiftState.Idle || isLocked || isWall) return;
         if (entitiesInside > 0)
         {
-            currentState = LiftState.Warning; // ✅ Immediately change state
+            currentState = LiftState.Warning;
             StartCoroutine(LiftSequence());
         }
     }
-
 
     private IEnumerator LiftSequence()
     {
@@ -120,109 +107,53 @@ public class LiftController : MonoBehaviour
         yield return new WaitForSeconds(redDelay);
         SetLight(redColor);
 
-        // **New check:** if nobody's aboard, abort
         if (entitiesInside <= 0)
         {
             currentState = LiftState.Idle;
             UpdateLight();
             yield break;
         }
+
         currentState = LiftState.Moving;
         UpdateLight();
 
-        yield return MoveTo(endPos);
+        // move ONLY the light
+        yield return MoveLightTo(lightEndPos);
         onOutboundArrival?.Invoke();
 
         yield return new WaitForSeconds(waitAtTop);
+
         if (moveDirection == Vector2.down)
         {
-            floorCollider.enabled = false;
-            lightRenderer.enabled = false;
+            if (floorCollider) floorCollider.enabled = false;
+            if (lightRenderer) lightRenderer.enabled = false;
         }
 
-        yield return MoveTo(startPos);
+        yield return MoveLightTo(lightStartPos);
         onReturnArrival?.Invoke();
 
-        floorCollider.enabled = true;
-        lightRenderer.enabled = true;
+        if (floorCollider) floorCollider.enabled = true;
+        if (lightRenderer) lightRenderer.enabled = true;
 
         currentState = LiftState.Idle;
         UpdateLight();
     }
 
-    private IEnumerator MoveTo(Vector2 target)
+    private IEnumerator MoveLightTo(Vector3 target)
     {
-        moveTarget = target;
-        isMoving = true;
-        while (isMoving)
+        if (!lightRoot) yield break;
+
+        while (Vector3.Distance(lightRoot.position, target) > 0.01f)
+        {
+            lightRoot.position = Vector3.MoveTowards(
+                lightRoot.position,
+                target,
+                moveSpeed * Time.deltaTime
+            );
             yield return null;
-    }
-
-    private void FixedUpdate()
-    {
-        Vector2 oldPos = rb.position;
-        float oldRot = rb.rotation;
-
-        if (isMoving)
-        {
-            Vector2 newPos = Vector2.MoveTowards(oldPos, moveTarget, moveSpeed * Time.fixedDeltaTime);
-            rb.MovePosition(newPos);
-            rb.MoveRotation(rb.rotation);
-
-            if (Vector2.Distance(newPos, moveTarget) <= 0.0001f)
-            {
-                rb.MovePosition(moveTarget);
-                isMoving = false;
-                passengers.Clear();
-            }
         }
-
-        Vector2 deltaPos = rb.position - oldPos;
-        float deltaRot = rb.rotation - oldRot;
-        PlatformVelocity = deltaPos / Time.fixedDeltaTime;
-
-        foreach (var rider in passengers)
-        {
-            Vector2 riderPos = rider.position + deltaPos;
-            if (deltaRot != 0f)
-            {
-                Vector2 dir = riderPos - rb.position;
-                dir = Quaternion.Euler(0f, 0f, deltaRot) * dir;
-                riderPos = rb.position + dir;
-                rider.MoveRotation(rider.rotation + deltaRot);
-            }
-            rider.MovePosition(riderPos);
-        }
-
-        prevPosition = rb.position;
-        prevRotation = rb.rotation;
+        lightRoot.position = target;
     }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        foreach (var contact in collision.contacts)
-        {
-            if (contact.normal.y > 0.5f && contact.otherCollider == floorCollider)
-            {
-                if (collision.rigidbody != null)
-                    passengers.Add(collision.rigidbody);
-                break;
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.rigidbody != null)
-            passengers.Remove(collision.rigidbody);
-    }
-
-    public void SetLocked(bool locked)
-    {
-        isLocked = locked;
-        EvaluateLiftState();
-    }
-
 
     private IEnumerator FlashingRedIdle()
     {
@@ -251,9 +182,13 @@ public class LiftController : MonoBehaviour
     {
         if (!lightRenderer) return;
         var mat = lightRenderer.material;
-        if (mat.HasProperty(colorProperty))
-            mat.SetColor(colorProperty, color);
-        else
-            mat.color = color;
+        if (mat.HasProperty(colorProperty)) mat.SetColor(colorProperty, color);
+        else mat.color = color;
+    }
+
+    public void SetLocked(bool locked)
+    {
+        isLocked = locked;
+        EvaluateLiftState();
     }
 }
