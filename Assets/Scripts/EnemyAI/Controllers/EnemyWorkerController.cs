@@ -56,6 +56,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         this.waypointQueries = waypointQueries;
         this.waypointService = waypointService;
         this.dropContainer = dropContainer;
+        this.batterySpawner = batterySpawner;
         if (pathFollower == null)
             SetupPathFollower();
         waypointService.Subscribe(pathFollower);
@@ -63,9 +64,9 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
         if (spawnInitialPickups)
         {
-            if (batterySpawner && initialBattery == null)
+            if (this.batterySpawner && initialBattery == null)
             {
-                initialBattery = batterySpawner.SpawnBattery(bodyReference);
+                initialBattery = this.batterySpawner.SpawnBattery(bodyReference);
                 if (inventory != null && initialBattery != null)
                 {
                     initialBattery.AssignInventory(inventory);

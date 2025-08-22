@@ -403,28 +403,19 @@ AnimationClip:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.083333336
-        value: 0
+        time: 0
+        value: 180
         inSlope: 0
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_AngleLimits.m_LowerAngle
-    path: LeftLeg/LeftLowLeg
+    attribute: m_AngleLimits.m_UpperAngle
+    path: LeftLeg/LeftUpLeg/LeftLowLeg
     classID: 233
     script: {fileID: 0}
     flags: 0
@@ -433,28 +424,19 @@ AnimationClip:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.083333336
-        value: 180
+        time: 0
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 180
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_AngleLimits.m_UpperAngle
-    path: LeftLeg/LeftLowLeg
+    attribute: m_AngleLimits.m_LowerAngle
+    path: LeftLeg/LeftUpLeg/LeftLowLeg
     classID: 233
     script: {fileID: 0}
     flags: 0
@@ -539,8 +521,8 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 720831708
-      attribute: 1200211188
+      path: 2771831309
+      attribute: 3851348591
       script: {fileID: 0}
       typeID: 233
       customType: 0
@@ -548,8 +530,8 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 720831708
-      attribute: 3851348591
+      path: 2771831309
+      attribute: 1200211188
       script: {fileID: 0}
       typeID: 233
       customType: 0
@@ -1696,28 +1678,19 @@ AnimationClip:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.083333336
-        value: 0
+        time: 0
+        value: 180
         inSlope: 0
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_AngleLimits.m_LowerAngle
-    path: LeftLeg/LeftLowLeg
+    attribute: m_AngleLimits.m_UpperAngle
+    path: LeftLeg/LeftUpLeg/LeftLowLeg
     classID: 233
     script: {fileID: 0}
     flags: 0
@@ -1726,28 +1699,19 @@ AnimationClip:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.083333336
-        value: 180
+        time: 0
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 180
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_AngleLimits.m_UpperAngle
-    path: LeftLeg/LeftLowLeg
+    attribute: m_AngleLimits.m_LowerAngle
+    path: LeftLeg/LeftUpLeg/LeftLowLeg
     classID: 233
     script: {fileID: 0}
     flags: 0
