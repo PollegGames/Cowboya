@@ -44,6 +44,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     {
         animator = GetComponentInChildren<Animator>();
         base.Awake();
+        memory = memoryComponent ?? GetComponent<RobotMemory>();
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService,
