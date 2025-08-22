@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(Rigidbody2D))]
 public class LiftController : MonoBehaviour
 {
     public enum LiftState { Idle, Warning, Moving }
@@ -12,6 +10,7 @@ public class LiftController : MonoBehaviour
     [Header("References")]
     public MeshRenderer lightRenderer;
     public Collider2D floorCollider;
+    public Rigidbody2D platformRb;
 
     [Header("Movement")]
     public Vector2 moveDirection = Vector2.up;
@@ -57,7 +56,12 @@ public class LiftController : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        rb = floorCollider ? floorCollider.attachedRigidbody : platformRb;
+        if (rb == null)
+        {
+            Debug.LogError("LiftController requires a Rigidbody2D reference.", this);
+            return;
+        }
         rb.isKinematic = true;
         startPos = rb.position;
         endPos = startPos + moveDirection.normalized * moveDistance;
