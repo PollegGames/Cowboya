@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\Game\SceneInitiator.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\AnimatorBaseAgentController.cs" />
     <Compile Include="Assets\Scripts\EnemyAI\Controllers\NewAnimatorBaseAgentController.cs" />
+    <Compile Include="Assets\Scripts\EnemyAI\Controllers\NewEnemyWorkerController.cs" />
     <Compile Include="Assets\Scripts\Map\CameraController.cs" />
     <Compile Include="Assets\Scripts\RobotFactory\HeadTargetController.cs" />
     <Compile Include="Assets\Scripts\FactoryCore\LiftController.cs" />
