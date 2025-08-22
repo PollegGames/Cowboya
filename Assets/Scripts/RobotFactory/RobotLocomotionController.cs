@@ -225,6 +225,17 @@ public class RobotLocomotionController : MonoBehaviour
         leftFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
         rightFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
     }
+
+    /// <summary>
+    /// Returns the robot to a standing position.
+    /// </summary>
+    public void Uncrouch()
+    {
+        leftFoot?.InterruptAndReset();
+        rightFoot?.InterruptAndReset();
+        isCrouching = false;
+        OnCrouchEnded?.Invoke();
+    }
     #endregion Crouch
 
     #region Facing

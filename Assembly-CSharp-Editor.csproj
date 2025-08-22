@@ -107,6 +107,7 @@
     <Compile Include="Assets\Editor\UnitTests\NewPlayerMovementControllerTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\PositionTriggerZoneTests.cs" />
     <Compile Include="Assets\Editor\UnitTests\SecurityBadgePickupTests.cs" />
+    <Compile Include="Assets\Editor\UnitTests\PlayerCrouchTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
