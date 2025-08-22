@@ -208,6 +208,15 @@ public class FootStepper : MonoBehaviour
         routine = StartCoroutine(CrouchRoutine(upDuration, downDuration, onArrived));
     }
 
+    /// <summary>
+    /// Moves the foot from the crouched position back to the start.
+    /// </summary>
+    public void Uncrouch(float upDuration, float downDuration, Action onArrived = null)
+    {
+        if (routine != null) StopCoroutine(routine);
+        routine = StartCoroutine(UncrouchRoutine(upDuration, downDuration, onArrived));
+    }
+
     private IEnumerator CrouchRoutine(float upDuration, float downDuration, Action onArrived)
     {
         Transform crouchUp = facingRight ? crouchUpRight : crouchUpLeft;
@@ -233,6 +242,34 @@ public class FootStepper : MonoBehaviour
             yield return null;
         }
         footTarget.position = crouchDown.position;
+
+        routine = null;
+        onArrived?.Invoke();
+    }
+
+    private IEnumerator UncrouchRoutine(float upDuration, float downDuration, Action onArrived)
+    {
+        Transform crouchUp = facingRight ? crouchUpRight : crouchUpLeft;
+        Transform crouchDown = facingRight ? crouchDownRight : crouchDownLeft;
+        Transform start = facingRight ? startRight : startLeft;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / upDuration;
+            footTarget.position = Vector3.Lerp(crouchDown.position, crouchUp.position, t);
+            yield return null;
+        }
+        footTarget.position = crouchUp.position;
+
+        t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / downDuration;
+            footTarget.position = Vector3.Lerp(crouchUp.position, start.position, t);
+            yield return null;
+        }
+        footTarget.position = start.position;
 
         routine = null;
         onArrived?.Invoke();

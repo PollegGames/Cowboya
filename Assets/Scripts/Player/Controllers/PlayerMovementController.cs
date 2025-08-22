@@ -30,6 +30,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     private float horizontalInput;
     private float verticalInput;
     private float targetRotation;
+    private bool isCrouchingInput;
 
     [SerializeField] private EnergyBot energyBot;
     [SerializeField] private Inventory inventory;
@@ -148,10 +149,16 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     private void HandleCrouch()
     {
-        if (verticalInput < 0)
+        if (verticalInput < 0 && !isCrouchingInput)
         {
             locomotion.Crouch();
         }
+        else if (verticalInput >= 0 && isCrouchingInput)
+        {
+            locomotion.Uncrouch();
+        }
+
+        isCrouchingInput = verticalInput < 0;
     }
 
     private void HandleJumpEnd()
