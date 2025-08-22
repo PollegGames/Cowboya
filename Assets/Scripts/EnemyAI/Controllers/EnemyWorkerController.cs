@@ -25,8 +25,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController
     [SerializeField] private float deadZoneX = 5f;
     [SerializeField] private float deadZoneY = 5f;
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
-
-    private IWaypointNotifier waypointNotifier;
     [SerializeField] private Inventory inventory;
     private BatteryPickup initialBattery;
     private BatterySpawner batterySpawner;
