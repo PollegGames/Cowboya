@@ -1,8 +1,10 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class LiftController : MonoBehaviour
 {
     public enum LiftState { Idle, Warning, Moving }
@@ -37,27 +39,43 @@ public class LiftController : MonoBehaviour
     public UnityEvent onOutboundArrival;
     public UnityEvent onReturnArrival;
 
-    private Vector3 startPos, endPos;
+    private Vector2 startPos, endPos;
     private LiftState currentState = LiftState.Idle;
     private Coroutine flashingRoutine;
     private Coroutine checkRoutine;
 
+    private Rigidbody2D rb;
+    private Vector2 prevPosition;
+    private float prevRotation;
+    private readonly HashSet<Rigidbody2D> passengers = new HashSet<Rigidbody2D>();
+    private Vector2 moveTarget;
+    private bool isMoving = false;
+
     private int entitiesInside = 0;
+
+    public Vector2 PlatformVelocity { get; private set; }
 
     private void Awake()
     {
-        startPos = transform.position;
-        endPos = startPos + (Vector3)(moveDirection.normalized * moveDistance);
+        rb = GetComponent<Rigidbody2D>();
+        rb.isKinematic = true;
+        startPos = rb.position;
+        endPos = startPos + moveDirection.normalized * moveDistance;
+        moveTarget = startPos;
+        prevPosition = startPos;
+        prevRotation = rb.rotation;
         UpdateLight();
     }
 
     private void OnEnable()
     {
+        passengers.Clear();
         checkRoutine = StartCoroutine(CheckLoop());
     }
 
     private void OnDisable()
     {
+        passengers.Clear();
         if (checkRoutine != null)
             StopCoroutine(checkRoutine);
     }
@@ -128,14 +146,71 @@ public class LiftController : MonoBehaviour
         UpdateLight();
     }
 
-    private IEnumerator MoveTo(Vector3 target)
+    private IEnumerator MoveTo(Vector2 target)
     {
-        while (Vector3.Distance(transform.position, target) > 0.01f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+        moveTarget = target;
+        isMoving = true;
+        while (isMoving)
             yield return null;
+    }
+
+    private void FixedUpdate()
+    {
+        Vector2 oldPos = rb.position;
+        float oldRot = rb.rotation;
+
+        if (isMoving)
+        {
+            Vector2 newPos = Vector2.MoveTowards(oldPos, moveTarget, moveSpeed * Time.fixedDeltaTime);
+            rb.MovePosition(newPos);
+            rb.MoveRotation(rb.rotation);
+
+            if (Vector2.Distance(newPos, moveTarget) <= 0.0001f)
+            {
+                rb.MovePosition(moveTarget);
+                isMoving = false;
+                passengers.Clear();
+            }
         }
-        transform.position = target;
+
+        Vector2 deltaPos = rb.position - oldPos;
+        float deltaRot = rb.rotation - oldRot;
+        PlatformVelocity = deltaPos / Time.fixedDeltaTime;
+
+        foreach (var rider in passengers)
+        {
+            Vector2 riderPos = rider.position + deltaPos;
+            if (deltaRot != 0f)
+            {
+                Vector2 dir = riderPos - rb.position;
+                dir = Quaternion.Euler(0f, 0f, deltaRot) * dir;
+                riderPos = rb.position + dir;
+                rider.MoveRotation(rider.rotation + deltaRot);
+            }
+            rider.MovePosition(riderPos);
+        }
+
+        prevPosition = rb.position;
+        prevRotation = rb.rotation;
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        foreach (var contact in collision.contacts)
+        {
+            if (contact.normal.y > 0.5f && contact.otherCollider == floorCollider)
+            {
+                if (collision.rigidbody != null)
+                    passengers.Add(collision.rigidbody);
+                break;
+            }
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.rigidbody != null)
+            passengers.Remove(collision.rigidbody);
     }
 
     public void SetLocked(bool locked)
