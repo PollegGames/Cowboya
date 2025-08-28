@@ -20,11 +20,22 @@ public class StationReservationService : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
         foreach (RobotRole role in Enum.GetValues(typeof(RobotRole)))
             available[role] = new List<BaseMachine>();
     }
 
+    /// <summary>
+    /// Registers a machine with the service so robots can reserve it.
+    /// </summary>
+    /// <param name="machine">The machine to register.</param>
+    /// <param name="role">The role allowed to use the machine.</param>
     public void RegisterMachine(BaseMachine machine, RobotRole role)
     {
         if (machine == null || machines.Contains(machine)) return;
@@ -64,6 +75,11 @@ public class StationReservationService : MonoBehaviour
         NotifyPowerChanged(machine, true);
     }
 
+    /// <summary>
+    /// Updates machine availability when its power state changes.
+    /// </summary>
+    /// <param name="machine">Machine whose power changed.</param>
+    /// <param name="isOn">True if the machine is now powered on.</param>
     public void NotifyPowerChanged(BaseMachine machine, bool isOn)
     {
         var role = machineRoles[machine];
@@ -80,6 +96,11 @@ public class StationReservationService : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Reserves and returns an available machine for the specified role.
+    /// </summary>
+    /// <param name="role">The role requesting a machine.</param>
+    /// <returns>The reserved machine or <c>null</c> if none are available.</returns>
     public BaseMachine ReserveStation(RobotRole role)
     {
         var list = available[role];
@@ -89,6 +110,10 @@ public class StationReservationService : MonoBehaviour
         return machine;
     }
 
+    /// <summary>
+    /// Releases a previously reserved machine, making it available again.
+    /// </summary>
+    /// <param name="machine">The machine to release.</param>
     public void ReleaseStation(BaseMachine machine)
     {
         if (machine == null || !machineRoles.ContainsKey(machine)) return;
