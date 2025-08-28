@@ -8,6 +8,9 @@ public class SecurityBadgeSpawner : MonoBehaviour
 {
     [SerializeField] private SecurityBadgePickup badgePrefab;
 
+    /// <summary>
+    /// Spawns a security badge and attaches it to the provided parent transform.
+    /// </summary>
     public SecurityBadgePickup SpawnBadge(Transform parent)
     {
         if (badgePrefab == null)
@@ -29,7 +32,8 @@ public class SecurityBadgeSpawner : MonoBehaviour
         if (badgeRb == null)
         {
             Debug.LogError("SecurityBadgeSpawner: badgePrefab needs a Rigidbody2D!");
-            return badge;
+            Destroy(badge.gameObject);
+            return null;
         }
 
         // // 3) Ensure the badge has a TargetJoint2D. If the prefab already
