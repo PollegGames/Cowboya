@@ -8,9 +8,13 @@ using System.Linq;
 public class InterestPointManager : MonoBehaviour
 {
     [Header("Interest Points")]
-    public List<Transform> workPoints;
-    public List<Transform> restPoints;
-    public List<Transform> fleePoints;
+    [SerializeField] private List<Transform> workPoints;
+    [SerializeField] private List<Transform> restPoints;
+    [SerializeField] private List<Transform> fleePoints;
+
+    public IReadOnlyList<Transform> WorkPoints => workPoints;
+    public IReadOnlyList<Transform> RestPoints => restPoints;
+    public IReadOnlyList<Transform> FleePoints => fleePoints;
 
     private readonly HashSet<Transform> occupiedPoints = new HashSet<Transform>();
 
