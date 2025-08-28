@@ -56,15 +56,20 @@ public class MapManagerTests
     [Test]
     public void GetStartCellWorldPosition_ReturnsStart()
     {
+        _manager.cellWidth = 40;
+        typeof(MapManager).GetField("gridWidth", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_manager, 10);
+
         var startGO = new GameObject();
         startGO.transform.position = new Vector3(1, 1, 0);
         var props = startGO.AddComponent<RoomProperties>();
         props.usageType = UsageType.Start;
+        props.GridPosition = new Vector2Int(2, 0); // Left half of grid
         var dict = new System.Collections.Generic.Dictionary<Vector2, GameObject> { { Vector2.zero, startGO } };
         typeof(MapManager).GetField("roomInstances", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(_manager, dict);
 
         var pos = _manager.GetStartCellWorldPosition();
-        Assert.AreEqual(startGO.transform.position, pos);
+        var expected = startGO.transform.position + new Vector3(_manager.cellWidth * 0.25f, 0f, 0f);
+        Assert.AreEqual(expected, pos);
     }
 
     [Test]

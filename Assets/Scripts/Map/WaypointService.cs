@@ -226,8 +226,12 @@ public class WaypointService : MonoBehaviour, IWaypointService
             );
             return best;
         }
-
-        return GetFirstRestPoint(exclude);
+        var restPoint = GetFirstRestPoint(exclude);
+        if (restPoint == null)
+        {
+            restPoint = GetStartPoint();
+        }
+        return restPoint;
     }
 
     //Get the center point of a blocked room
@@ -296,7 +300,12 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 && wp != exclude
             )
             .ToList();
-        return blockedRooms.FirstOrDefault();
+        var blocked = blockedRooms.FirstOrDefault();
+        if (blocked == null)
+        {
+            blocked = GetStartPoint();
+        }
+        return blocked;
     }
 
     public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null)

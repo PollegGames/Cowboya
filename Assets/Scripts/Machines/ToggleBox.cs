@@ -3,6 +3,7 @@ using UnityEngine;
 public class ToggleBox : MonoBehaviour
 {
     private bool isActive = false;
+    public bool IsActive => isActive;   
     public float ToggleCost = 1f;
 
     public void Activate() => isActive = true;

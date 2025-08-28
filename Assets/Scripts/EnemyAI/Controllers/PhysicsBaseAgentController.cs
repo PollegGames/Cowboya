@@ -81,7 +81,7 @@ public abstract class PhysicsBaseAgentController : MonoBehaviour, IMover, ILookD
     protected virtual void ApplyFacingDirection()
     {
         locomotion.SetFacingDirection(!flipped);       // true = facing right
-        legJointLimiter.SetLegRotationLimits(flipped); // true = going left
+        legJointLimiter.SetLegRotationLimits(!flipped); // true = going left
         if (bodyJointLimiter != null)
             bodyJointLimiter.SetBodyRotationLimits(flipped);
         if (facingController != null)

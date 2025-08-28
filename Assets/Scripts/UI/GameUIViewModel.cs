@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -24,7 +22,6 @@ public class GameUIViewModel : MonoBehaviour
     private Button resumeButton;
     private Button restartButton;
     private Button mainMenuButton;
-    private readonly List<RoomManager> subscribedRooms = new();
 
     private void Awake()
     {
@@ -103,25 +100,13 @@ public class GameUIViewModel : MonoBehaviour
     }
     private void Start()
     {
-        var startMessage = GameMessages.System.Start;
-        string levelPrefix = string.Empty;
+        var hintManager = FindFirstObjectByType<HintManager>();
 
-        if (RunProgressManager.Instance != null)
+        if (hintManager != null)
         {
-            int index = RunProgressManager.Instance.CurrentLevelIndex;
-            var realLevel = index - 1;
-            levelPrefix = index == 1 ? "Level Tutorial. " : $"Level {realLevel}: ";
-
-            var rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
-            foreach (var room in rooms)
-            {
-                room.PlayerEntered += RefreshMinimapWhenPlayerEnteredRoom;
-                subscribedRooms.Add(room);
-            }
+            hintManager.QueueHint(new GameMessage("Move with [A][D]...", MessageSpeaker.Narrator));
+            hintManager.QueueHint(new GameMessage("Energy powers your actions.", MessageSpeaker.Narrator));
         }
-
-        var msg = new GameMessage(levelPrefix + startMessage.Text, startMessage.Speaker);
-        MessageService.Instance?.ShowMessage(msg);
     }
 
     public void SetPlayer(RobotStateController robot)
@@ -211,11 +196,13 @@ public class GameUIViewModel : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Configures the minimap camera to frame the generated map.
+    /// </summary>
     public void SetMiniMapTexture(MapManager mapManagerInstance)
     {
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
-        float worldWidth = config.gridWidth * mapManagerInstance.cellWidth;
-        float worldHeight = config.gridHeight * mapManagerInstance.cellHeight;
+        Bounds bounds = mapManagerInstance.GetGridWorldBounds();
 
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
@@ -223,17 +210,18 @@ public class GameUIViewModel : MonoBehaviour
             cam.orthographic = true;
             float aspect = (float)miniMapRT.width / miniMapRT.height;
 
-            float orthoSizeHeight = worldHeight / 2f;
-            float orthoSizeWidth = worldWidth / (2f * aspect);
+            float halfH = bounds.size.y * 0.5f;
+            float halfWAsH = (bounds.size.x * 0.5f) / aspect;
+            float padding = 0.05f;
+            cam.orthographicSize = Mathf.Max(halfH, halfWAsH) * (1f + padding);
 
-            // Use *2 for more padding, or remove *2 for tight fit
-            float orthoSize = Mathf.Max(orthoSizeHeight, orthoSizeWidth) * 2f;
-            cam.orthographicSize = orthoSize;
-
-            // Center the camera
-            cam.transform.position = new Vector3(worldWidth / 2f, worldHeight / 2f, -10f);
+            Vector3 pos = bounds.center;
+            pos.z = -10f;
+            cam.transform.position = pos;
+            cam.transform.rotation = Quaternion.identity;
 
             cam.targetTexture = miniMapRT;
+
         }
         StartCoroutine(CaptureRTToUI());
     }
@@ -244,12 +232,6 @@ public class GameUIViewModel : MonoBehaviour
         Debug.Log("Minimap texture refreshed.");
     }
 
-    private void RefreshMinimapWhenPlayerEnteredRoom(RoomManager room)
-    {
-        RefreshMinimapTexture();
-    }
-
-
     private void OnDestroy()
     {
         if (robotBehaviour != null)
@@ -258,14 +240,6 @@ public class GameUIViewModel : MonoBehaviour
             if (robotBehaviour.Stats != null)
             {
                 robotBehaviour.Stats.OnMoralityChanged -= UpdateMoralityLabel;
-            }
-        }
-
-        foreach (var room in subscribedRooms)
-        {
-            if (room != null)
-            {
-                room.PlayerEntered -= RefreshMinimapWhenPlayerEnteredRoom;
             }
         }
     }

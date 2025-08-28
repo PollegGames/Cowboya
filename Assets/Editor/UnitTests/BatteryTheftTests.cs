@@ -21,9 +21,10 @@ public class BatteryTheftTests
         enemyState.Stats = new RobotStats();
         enemyState.Stats.MaxHealth = 100f;
         enemyState.Stats.CurrentHealth = 50f;
-        enemyGO.AddComponent<EnemyStateMachine>();
-        var enemy = enemyGO.AddComponent<EnemyController>();
-        enemy.EnemyStatus = EnemyStatus.Idle;
+        var enemy = enemyGO.AddComponent<EnemyWorkerController>();
+        typeof(EnemyWorkerController)
+            .GetField("robotBehaviour", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(enemy, enemyState);
 
         var batteryGO = new GameObject("battery");
         batteryGO.transform.SetParent(enemyGO.transform);
@@ -48,7 +49,11 @@ public class BatteryTheftTests
 
         battery.OnGrab(hand);
 
-        Assert.AreEqual(50f - 10f, enemyState.Stats.CurrentHealth);
-        Assert.AreEqual(40f + 10f, playerState.Stats.CurrentHealth);
+        var gain = (float)typeof(BatteryPickup)
+            .GetField("healthGain", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(battery);
+
+        Assert.AreEqual(50f - gain, enemyState.Stats.CurrentHealth);
+        Assert.AreEqual(40f + gain, playerState.Stats.CurrentHealth);
     }
 }

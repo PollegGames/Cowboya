@@ -10,16 +10,17 @@ public class MainMenuController : MonoBehaviour
     private Button _sandboxButton;
     private Button _exitButton;
     private AudioSource _audioSource;
-    [SerializeField] private RunProgressManager runProgressManagerPrefab;
+    [SerializeField] private RunProgressManager runProgressManager;
 
     private void Awake()
     {
         _menuRoot = GetComponent<UIDocument>().rootVisualElement;
         _audioSource = GetComponent<AudioSource>();
-        if (RunProgressManager.Instance == null && runProgressManagerPrefab != null)
+        if (RunProgressManager.Instance == null && runProgressManager != null)
         {
-            Instantiate(runProgressManagerPrefab);
+            Instantiate(runProgressManager);
         }
+        runProgressManager = RunProgressManager.Instance;
     }
 
     private void OnEnable()
@@ -55,13 +56,13 @@ public class MainMenuController : MonoBehaviour
         _audioSource?.Play();
         var saveService = FindFirstObjectByType<PlayerSaveService>();
         saveService?.ResetSaveData();
-        runProgressManagerPrefab.LoadFirstLevel();
+        runProgressManager.LoadFirstLevel();
     }
 
     private void OnSandboxClicked(ClickEvent evt)
     {
         _audioSource?.Play();
-        runProgressManagerPrefab.LoadSandBox();
+        runProgressManager.LoadSandBox();
     }
 
     private void OnExitClicked(ClickEvent evt)

@@ -1,8 +1,8 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(MeshRenderer))]
 public class LiftController : MonoBehaviour
 {
     public enum LiftState { Idle, Warning, Moving }
@@ -37,17 +37,28 @@ public class LiftController : MonoBehaviour
     public UnityEvent onOutboundArrival;
     public UnityEvent onReturnArrival;
 
-    private Vector3 startPos, endPos;
+    // internal
     private LiftState currentState = LiftState.Idle;
-    private Coroutine flashingRoutine;
     private Coroutine checkRoutine;
+
+    private Transform lightRoot;          // transform we actually move
+    private Vector3 lightStartPos;
+    private Vector3 lightEndPos;
 
     private int entitiesInside = 0;
 
     private void Awake()
     {
-        startPos = transform.position;
-        endPos = startPos + (Vector3)(moveDirection.normalized * moveDistance);
+        if (!lightRenderer)
+        {
+            Debug.LogError("LiftController requires a MeshRenderer reference.", this);
+            return;
+        }
+
+        lightRoot = lightRenderer.transform;
+        lightStartPos = lightRoot.position;
+        lightEndPos = lightStartPos + (Vector3)(moveDirection.normalized * moveDistance);
+
         UpdateLight();
     }
 
@@ -58,13 +69,12 @@ public class LiftController : MonoBehaviour
 
     private void OnDisable()
     {
-        if (checkRoutine != null)
-            StopCoroutine(checkRoutine);
+        if (checkRoutine != null) StopCoroutine(checkRoutine);
     }
 
     private IEnumerator CheckLoop()
     {
-        var wait = new WaitForSeconds(1f); // configurable interval
+        var wait = new WaitForSeconds(1f);
         while (true)
         {
             EvaluateLiftState();
@@ -80,11 +90,10 @@ public class LiftController : MonoBehaviour
         if (currentState != LiftState.Idle || isLocked || isWall) return;
         if (entitiesInside > 0)
         {
-            currentState = LiftState.Warning; // ✅ Immediately change state
+            currentState = LiftState.Warning;
             StartCoroutine(LiftSequence());
         }
     }
-
 
     private IEnumerator LiftSequence()
     {
@@ -98,52 +107,53 @@ public class LiftController : MonoBehaviour
         yield return new WaitForSeconds(redDelay);
         SetLight(redColor);
 
-        // **New check:** if nobody's aboard, abort
         if (entitiesInside <= 0)
         {
             currentState = LiftState.Idle;
             UpdateLight();
             yield break;
         }
+
         currentState = LiftState.Moving;
         UpdateLight();
 
-        yield return MoveTo(endPos);
+        // move ONLY the light
+        yield return MoveLightTo(lightEndPos);
         onOutboundArrival?.Invoke();
 
         yield return new WaitForSeconds(waitAtTop);
+
         if (moveDirection == Vector2.down)
         {
-            floorCollider.enabled = false;
-            lightRenderer.enabled = false;
+            if (floorCollider) floorCollider.enabled = false;
+            if (lightRenderer) lightRenderer.enabled = false;
         }
 
-        yield return MoveTo(startPos);
+        yield return MoveLightTo(lightStartPos);
         onReturnArrival?.Invoke();
 
-        floorCollider.enabled = true;
-        lightRenderer.enabled = true;
+        if (floorCollider) floorCollider.enabled = true;
+        if (lightRenderer) lightRenderer.enabled = true;
 
         currentState = LiftState.Idle;
         UpdateLight();
     }
 
-    private IEnumerator MoveTo(Vector3 target)
+    private IEnumerator MoveLightTo(Vector3 target)
     {
-        while (Vector3.Distance(transform.position, target) > 0.01f)
+        if (!lightRoot) yield break;
+
+        while (Vector3.Distance(lightRoot.position, target) > 0.01f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            lightRoot.position = Vector3.MoveTowards(
+                lightRoot.position,
+                target,
+                moveSpeed * Time.deltaTime
+            );
             yield return null;
         }
-        transform.position = target;
+        lightRoot.position = target;
     }
-
-    public void SetLocked(bool locked)
-    {
-        isLocked = locked;
-        EvaluateLiftState();
-    }
-
 
     private IEnumerator FlashingRedIdle()
     {
@@ -172,9 +182,13 @@ public class LiftController : MonoBehaviour
     {
         if (!lightRenderer) return;
         var mat = lightRenderer.material;
-        if (mat.HasProperty(colorProperty))
-            mat.SetColor(colorProperty, color);
-        else
-            mat.color = color;
+        if (mat.HasProperty(colorProperty)) mat.SetColor(colorProperty, color);
+        else mat.color = color;
+    }
+
+    public void SetLocked(bool locked)
+    {
+        isLocked = locked;
+        EvaluateLiftState();
     }
 }

@@ -1,12 +1,16 @@
-using UnityEngine;
 using System;
 using System.Collections;
+using UnityEngine;
 
+/// <summary>
+/// Controls enemy worker navigation using waypoint-based pathing.
+/// </summary>
 [RequireComponent(typeof(WorkerStateMachine), typeof(RobotMemory))]
-public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
+public class EnemyWorkerController : AnimatorBaseAgentController
 {
     [SerializeField] public WorkerStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
+    [SerializeField] private RobotStateController robotBehaviour;
 
     private IWorkerStateMachine stateMachineInterface;
     public IRobotMemory memory { get; private set; }
@@ -15,11 +19,17 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
     public IWaypointService waypointService;
     private Action stuckHandler;
 
-    [SerializeField] private RobotStateController robotBehaviour;
+
     [SerializeField] private float arrivalThresholdX = 2f;
     [SerializeField] private float arrivalThresholdY = 2f;
     [SerializeField] private float deadZoneX = 5f;
     [SerializeField] private float deadZoneY = 5f;
+    [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
+    [SerializeField] private Inventory inventory;
+    private BatteryPickup initialBattery;
+    private BatterySpawner batterySpawner;
+    private Transform dropContainer;
+
 
     [SerializeField] private LowMoralityPlayerTriggerHandler lowMoralityTriggerHandler;
     [SerializeField] private AllyWorkerController allyWorkerController;
@@ -29,25 +39,26 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
 
     public bool IsWorkerSpawner { get; private set; }
 
-    [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
-    [SerializeField] private Inventory inventory;
-    private BatteryPickup initialBattery;
-    private BatterySpawner batterySpawner;
-    private Transform dropContainer;
-
     protected override void Awake()
     {
+        animator = GetComponentInChildren<Animator>();
+        base.Awake();
+
         if (stateMachine == null)
             stateMachine = GetComponent<WorkerStateMachine>();
-        stateMachineInterface = stateMachine;
-
         if (memoryComponent == null)
             memoryComponent = GetComponent<RobotMemory>();
         memory = memoryComponent;
 
-        animator = GetComponentInChildren<Animator>();
+        if (robotBehaviour == null)
+            robotBehaviour = GetComponent<RobotStateController>();
+        if (lowMoralityTriggerHandler == null)
+            lowMoralityTriggerHandler = GetComponent<LowMoralityPlayerTriggerHandler>();
+        if (allyWorkerController == null)
+            allyWorkerController = GetComponent<AllyWorkerController>();
 
-        robotBehaviour.OnStateChanged += HandleStateChange;
+        if (robotBehaviour != null)
+            robotBehaviour.OnStateChanged += HandleStateChange;
         if (lowMoralityTriggerHandler != null)
             lowMoralityTriggerHandler.OnLowMoralityPlayerDetected += HandleLowMoralityPlayerDetected;
         if (allyWorkerController != null)
@@ -55,32 +66,51 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService,
-    IRobotRespawnService respawnService,
+        IRobotRespawnService respawnService,
         Transform dropContainer,
         BatterySpawner batterySpawner = null,
         bool spawnInitialPickups = true)
     {
         this.waypointQueries = waypointQueries;
         this.waypointService = waypointService;
+        this.dropContainer = dropContainer;
+        this.batterySpawner = batterySpawner;
+
         if (pathFollower == null)
             SetupPathFollower();
+
         waypointService.Subscribe(pathFollower);
         memory.SetRespawnService(respawnService);
         stateMachine.ChangeState(new Worker_Idle(this, stateMachine, (IWaypointService)waypointQueries));
-        if (spawnInitialPickups)
+
+        if (spawnInitialPickups && this.batterySpawner != null && initialBattery == null)
         {
-            if (batterySpawner && initialBattery == null)
+            initialBattery = this.batterySpawner.SpawnBattery(bodyReference);
+
+            if (initialBattery != null && inventory != null)
             {
-                initialBattery = batterySpawner.SpawnBattery(bodyReference);
-                if (inventory != null && initialBattery != null)
-                {
-                    initialBattery.AssignInventory(inventory);
-                    inventory.SetItem(PickupType.Battery, initialBattery);
-                    if (robotBehaviour != null)
-                        robotBehaviour.Stats.UpdateHealth(10f);
-                }
+                initialBattery.AssignInventory(inventory);
+                inventory.SetItem(PickupType.Battery, initialBattery);
+
+                if (robotBehaviour != null)
+                    robotBehaviour.Stats.UpdateHealth(10f);
             }
         }
+    }
+
+    private void Update()
+    {
+        if (updateLoop == UpdateLoop.Update)
+            pathFollower?.Update(Time.deltaTime);
+
+        TryFlip(direction);
+    }
+
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        if (updateLoop == UpdateLoop.FixedUpdate)
+            pathFollower?.Update(Time.fixedDeltaTime);
     }
 
     private void SetupPathFollower()
@@ -90,7 +120,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
         stuckHandler = HandlePathFollowerStuck;
         pathFollower.OnStuck += stuckHandler;
     }
-
     private void HandlePathFollowerStuck()
     {
         memory.OnStuck(this);
@@ -102,45 +131,29 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
     }
 
     /// <summary>
-    /// Converts this worker from an enemy into an ally.
+    /// Sets a waypoint destination for the enemy worker.
     /// </summary>
-    public void ConvertToAlly()
-    {
-        enabled = false;
-        if (stateMachine != null)
-            stateMachine.enabled = false;
-        if (lowMoralityTriggerHandler != null)
-            lowMoralityTriggerHandler.enabled = false;
-        if (robotBehaviour != null)
-            robotBehaviour.enabled = false;
-        if (memoryComponent != null)
-            memoryComponent.enabled = false;
-        var punchAttack = GetComponent<EnemyPunchAttack>();
-        if (punchAttack != null)
-            punchAttack.enabled = false;
-        var followHandler = GetComponent<FollowPlayerTriggerHandler>();
-        if (followHandler != null)
-            followHandler.enabled = false;
-    }
+    public void SetDestination(RoomWaypoint target, bool includeUnavailable = false) =>
+        pathFollower?.SetDestination(target, includeUnavailable);
 
-    protected override void Update()
-    {
-        base.Update();
-        TryFlip(direction);
-        if (updateLoop == UpdateLoop.Update)
-            pathFollower?.Update(Time.deltaTime);
-    }
 
-    public void OnBatteryStolen(GameObject player)
+
+    public void OnBatteryStolen(GameObject player, float healthGain)
     {
         Debug.Log($"{name} battery stolen by {player.name}");
         robotBehaviour.Stats.UpdateEnergy(robotBehaviour.Stats.CurrentEnergy);
+        robotBehaviour.Stats.UpdateHealth(-healthGain);
     }
 
-    private void FixedUpdate()
+    /// <summary>
+    /// Removes the stolen battery from the inventory and clears the initial reference.
+    /// </summary>
+    public void HandleBatteryStolen()
     {
-        if (updateLoop == UpdateLoop.FixedUpdate)
-            pathFollower?.Update(Time.fixedDeltaTime);
+        if (inventory != null)
+            inventory.RemoveItem(PickupType.Battery);
+
+        initialBattery = null;
     }
 
     private void DropBossLoot()
@@ -156,10 +169,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
             initialBattery = null;
         }
     }
-
-
-    public void SetDestination(RoomWaypoint target, bool includeUnavailable = false) =>
-        pathFollower.SetDestination(target, includeUnavailable);
 
     public bool HasArrivedAtDestination() => pathFollower.HasArrived;
 
@@ -210,12 +219,26 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
         ObjectPool.Instance.Release(gameObject);
     }
 
-    private void DisableAnimator()
+    /// <summary>
+    /// Converts this worker from an enemy into an ally.
+    /// </summary>
+    public void ConvertToAlly()
     {
-        if (animator != null)
-        {
-            animator.enabled = false;
-        }
+        enabled = false;
+        if (stateMachine != null)
+            stateMachine.enabled = false;
+        if (lowMoralityTriggerHandler != null)
+            lowMoralityTriggerHandler.enabled = false;
+        if (robotBehaviour != null)
+            robotBehaviour.enabled = false;
+        if (memoryComponent != null)
+            memoryComponent.enabled = false;
+        var punchAttack = GetComponent<EnemyPunchAttack>();
+        if (punchAttack != null)
+            punchAttack.enabled = false;
+        var followHandler = GetComponent<FollowPlayerTriggerHandler>();
+        if (followHandler != null)
+            followHandler.enabled = false;
     }
 
     private void UpdateBalance(bool enabledBalance)
@@ -267,4 +290,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IPooledObject
             SetupPathFollower();
         }
     }
+
 }
+

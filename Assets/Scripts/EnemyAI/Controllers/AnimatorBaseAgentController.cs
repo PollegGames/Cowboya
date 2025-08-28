@@ -1,8 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// Base class for horizontal and vertical movement.
-/// Used by the player, enemies and allies.
+/// Base class for agents that use an Animator and Rigidbody2D for movement.
+/// Movement and facing are driven through public setters so derived
+/// classes can control the behaviour without player input assumptions.
 /// </summary>
 public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILookDirectionProvider
 {
@@ -14,11 +15,10 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
 
     [Header("Body Reference")]
     [SerializeField] protected Transform bodyReference;
-    [SerializeField] private Rigidbody2D hipRb;
+    [SerializeField] protected Rigidbody2D hipRb;
 
     [Header("Flip Settings")]
-    [SerializeField] private Transform points;
-    [SerializeField] private Transform poles;
+    [SerializeField] private SpriteRenderer[] sprites; // optional assign
     private bool flipped = false;
     private Vector2 lookDirection = Vector2.right;
 
@@ -31,17 +31,19 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     protected bool isVerticalMoving;
     protected float direction;         // Horizontal (-1, 0, 1)
     protected float verticalDirection; // Vertical   (-1, 0, 1)
+
     [Header("Movement & Facing Modules")]
     [SerializeField] protected LegJointLimiter legJointLimiter;
+
     protected virtual void Awake()
     {
         if (legJointLimiter == null)
             legJointLimiter = GetComponent<LegJointLimiter>();
-        Debug.Log("AnimatorBaseAgentController: Awake called, components initialized.");
+        if (sprites == null || sprites.Length == 0)
+            sprites = GetComponentsInChildren<SpriteRenderer>(true);
     }
 
-
-    protected virtual void Update()
+    protected virtual void FixedUpdate()
     {
         if (isMoving)
         {
@@ -60,7 +62,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         {
             animator.SetBool("IsVerticalWalking", false);
         }
-
     }
 
     /// <summary>
@@ -69,9 +70,10 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     public virtual void SetMovement(float direction)
     {
         this.direction = Mathf.Clamp(direction, -1f, 1f);
-        isMoving = direction != 0;
-        if (!Mathf.Approximately(this.direction, 0f))
+        isMoving = !Mathf.Approximately(this.direction, 0f);
+        if (isMoving)
             lookDirection = new Vector2(Mathf.Sign(this.direction), 0f);
+        TryFlip(this.direction);
     }
 
     /// <summary>
@@ -79,11 +81,12 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     /// </summary>
     public virtual void SetVerticalMovement(float direction)
     {
-        this.verticalDirection = Mathf.Clamp(direction, -1f, 1f);
+        verticalDirection = Mathf.Clamp(direction, -1f, 1f);
+        isVerticalMoving = !Mathf.Approximately(verticalDirection, 0f);
     }
 
     /// <summary>
-    /// Handles horizontal physical movement
+    /// Handles horizontal physical movement.
     /// </summary>
     protected virtual void Move()
     {
@@ -122,21 +125,10 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         if ((direction > 0 && flipped) || (direction < 0 && !flipped))
         {
             flipped = !flipped;
-
-            // Adjust points and poles if additional flipping is necessary
-            if (points != null)
-            {
-                Vector3 pointsScale = points.localScale;
-                pointsScale.x *= -1;
-                points.localScale = pointsScale;
-            }
-
-            if (poles != null)
-            {
-                Vector3 polesScale = poles.localScale;
-                polesScale.x *= -1;
-                poles.localScale = polesScale;
-            }
+            if (sprites != null)
+                for (int i = 0; i < sprites.Length; i++)
+                    if (sprites[i]) sprites[i].flipX = flipped;
         }
     }
 }
+

@@ -131,9 +131,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthGain: 10
-  frequency: 5
-  dampingRatio: 0.8
-  maxForce: 1000
+  frequency: 10
+  dampingRatio: 0.9
+  maxForce: 2000
 --- !u!257 &7876967260955353992
 TargetJoint2D:
   m_ObjectHideFlags: 0
@@ -151,9 +151,9 @@ TargetJoint2D:
   m_Anchor: {x: 0, y: 0}
   m_Target: {x: 6.3415685, y: 0.81}
   m_AutoConfigureTarget: 0
-  m_MaxForce: 10000
-  m_DampingRatio: 1
-  m_Frequency: 5
+  m_MaxForce: 2000
+  m_DampingRatio: 0.9
+  m_Frequency: 10
 --- !u!61 &2933447607757072381
 BoxCollider2D:
   m_ObjectHideFlags: 0

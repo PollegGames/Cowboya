@@ -1,50 +1,16 @@
 public static class GameMessages
 {
-    public static class Intro
+    public static class Hints
     {
-        public static GameMessage Welcome => new("Welcome to the factory. Stay hidden.", MessageSpeaker.DrHex);
-        public static GameMessage InstallModules => new("Install your first modules here.", MessageSpeaker.DrHex);
-        public static GameMessage FirstAttack => new("Try your punch on the test robot.", MessageSpeaker.DrHex);
-    }
-
-    public static class Tutorial
-    {
-        public static GameMessage Attack => new("Left click to attack enemies.", MessageSpeaker.Narrator);
-        public static GameMessage Interact => new("Right click to interact with objects and robots.", MessageSpeaker.Narrator);
-        public static GameMessage SaveRobots => new("Save robots — saving all of them opens all the doors.", MessageSpeaker.Narrator);
-        public static GameMessage Badges => new("Defeat security robots — they drop badges that unlock restricted doors.", MessageSpeaker.Narrator);
-        public static GameMessage NextLevel => new("Enter the final door in the last room to reach the next level.", MessageSpeaker.Narrator);
-    }
-
-    public static class Room
-    {
-        public static GameMessage EnterNeutralRoom => new("This is a neutral room. Watch the robots.", MessageSpeaker.Player);
-        public static GameMessage EnterSecurityRoom => new("Security guards are here. Stay sharp.", MessageSpeaker.Player);
-        public static GameMessage ElevatorHint => new("This lift seems functional.", MessageSpeaker.DrHex);
-    }
-
-    public static class Alarm
-    {
-        public static GameMessage AlarmTriggered => new("Alert triggered. Hide or fight!", MessageSpeaker.DrHex);
-        public static GameMessage AlarmCleared => new("Alarm deactivated. Good job.", MessageSpeaker.DrHex);
-    }
-
-    public static class Combat
-    {
-        public static GameMessage LowEnergy => new("I'm losing energy...", MessageSpeaker.Player);
-        public static GameMessage EnemyDefeated => new("One down!", MessageSpeaker.Player);
-    }
-
-    public static class Lift
-    {
-        public static GameMessage GoingUp => new("Going up.", MessageSpeaker.DrHex);
-        public static GameMessage BlockedLift => new("Something's blocking the lift.", MessageSpeaker.Player);
-    }
-
-    public static class POI
-    {
-        public static GameMessage WorkstationFound => new("A workstation... could be useful.", MessageSpeaker.Player);
-        public static GameMessage RestZone => new("Looks like a rest zone for the bots.", MessageSpeaker.Player);
+        public static GameMessage MovementEnergy => new("[WASD] to move. Moving drains energy.", MessageSpeaker.Narrator);
+        public static GameMessage TargetAttack => new("Hold [Right Click] to target. Press [Left Click] to attack.", MessageSpeaker.Narrator);
+        public static GameMessage InteractGrab => new("[Right Click] to interact or grab.", MessageSpeaker.Narrator);
+        public static GameMessage Health => new("Health critical? Find [batteries] to recharge.", MessageSpeaker.Narrator);
+        public static GameMessage MachinesSaving => new("Use [machines] to save progress.", MessageSpeaker.Narrator);
+        public static GameMessage Security => new("Security bots drop [badges] that unlock restricted doors.", MessageSpeaker.Narrator);
+        public static GameMessage Alarm => new("Triggered [alarm]? Hide or fight.", MessageSpeaker.Narrator);
+        public static GameMessage ObjectiveExit => new("Check the [objective] and head to the [exit].", MessageSpeaker.Narrator);
+        public static GameMessage FinalRoomReminder => new("Final room: remember the [exit].", MessageSpeaker.Narrator);
     }
 
     public static class System

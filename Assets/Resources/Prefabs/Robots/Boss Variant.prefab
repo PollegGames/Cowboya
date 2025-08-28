@@ -245,6 +245,10 @@ PrefabInstance:
       value: -2.14
       objectReference: {fileID: 0}
     - target: {fileID: 3419217242892964986, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+      propertyPath: muscles.Array.data[0].force
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 3419217242892964986, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: muscles.Array.data[1].force
       value: 200
       objectReference: {fileID: 0}
@@ -706,19 +710,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7891739421741480506, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: Stats.MaxEnergy
-      value: 100
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 7891739421741480506, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: Stats.MaxHealth
-      value: 50
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7891739421741480506, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
+      propertyPath: Stats.RobotName
+      value: Boss
       objectReference: {fileID: 0}
     - target: {fileID: 7891739421741480506, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: Stats.CurrentEnergy
-      value: 100
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 7891739421741480506, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: Stats.CurrentHealth
-      value: 50
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8152781165024820280, guid: c640cef127bd73741aa83f8927e08ed3, type: 3}
       propertyPath: m_Anchor.x

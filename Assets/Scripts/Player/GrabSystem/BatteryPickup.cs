@@ -7,24 +7,68 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     [SerializeField] private float healthGain = 10f;
 
     [Header("Target Joint Settings")]
-    [Tooltip("How springy the joint movement is.")]
-    [SerializeField] private float frequency = 5f;
-    [Tooltip("How much the joint resists oscillation.")]
-    [SerializeField] private float dampingRatio = 0.8f;
-    [Tooltip("Maximum force the joint can apply.")]
-    [SerializeField] private float maxForce = 1000f;
+    [Tooltip("How springy the joint movement is. Recommended range: 5–15.")]
+    [SerializeField, Range(5f, 15f)] private float frequency = 10f;
+    [Tooltip("How much the joint resists oscillation. Recommended range: 0–1.")]
+    [SerializeField, Range(0f, 1f)] private float dampingRatio = 0.9f;
+    [Tooltip("Maximum force the joint can apply. Recommended range: 500–3000.")]
+    [SerializeField, Range(500f, 3000f)] private float maxForce = 2000f;
+
+    /// <summary>
+    /// How springy the joint movement is.
+    /// </summary>
+    public float Frequency
+    {
+        get => frequency;
+        set
+        {
+            frequency = value;
+            if (joint != null)
+                joint.frequency = frequency;
+        }
+    }
+
+    /// <summary>
+    /// How much the joint resists oscillation.
+    /// </summary>
+    public float DampingRatio
+    {
+        get => dampingRatio;
+        set
+        {
+            dampingRatio = value;
+            if (joint != null)
+                joint.dampingRatio = dampingRatio;
+        }
+    }
+
+    /// <summary>
+    /// Maximum force the joint can apply.
+    /// </summary>
+    public float MaxForce
+    {
+        get => maxForce;
+        set
+        {
+            maxForce = value;
+            if (joint != null)
+                joint.maxForce = maxForce;
+        }
+    }
 
     private Rigidbody2D rb;
     private TargetJoint2D joint;
     private Transform followTarget;
     private bool attached = false;
     private bool wasStolen = false;
+    private float originalGravityScale;
 
     private Inventory ownerInventory;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        originalGravityScale = rb.gravityScale;
         joint = GetComponent<TargetJoint2D>();
         if (joint != null)
         {
@@ -43,6 +87,12 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             return;
 
         joint.target = followTarget.position;
+
+        if (attached)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
     }
 
     public void SetFollowTarget(Transform target)
@@ -87,7 +137,8 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
                 var stateController = enemy.GetComponent<RobotStateController>();
                 if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
                 {
-                    enemy.OnBatteryStolen(player.gameObject);
+                    enemy.OnBatteryStolen(player.gameObject, healthGain);
+                    enemy.HandleBatteryStolen();
                     wasStolen = true;
                 }
             }
@@ -95,6 +146,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         attached = true;
         rb.simulated = true;
+        rb.gravityScale = 0f;
 
         var holderState = grabParent.GetComponentInParent<RobotStateController>();
         if (holderState != null)
@@ -111,6 +163,10 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         if (player != null)
         {
             var hip = player.BodyReference;
+            // Detach from any previous hierarchy so the badge is no longer
+            // parented to an enemy when picked up.
+            transform.SetParent(hip.transform, true);
+
             if (hip != null)
                 SetFollowTarget(hip.transform);
             else
@@ -137,9 +193,12 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             joint.enabled = false;
 
         followTarget = null;
+        transform.SetParent(null, true);
 
         if (rb != null)
         {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = originalGravityScale;
             rb.simulated = true;
         }
         else

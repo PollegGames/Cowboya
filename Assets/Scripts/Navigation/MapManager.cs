@@ -156,6 +156,42 @@ public class MapManager : MonoBehaviour
         gridManager.AssignRoomProperties(roomInstances, cellDataGrid);
     }
 
+    /// <summary>
+    /// Returns the world-space bounds of all renderers under this map.
+    /// </summary>
+    /// <param name="rootOverride">Optional root transform to search under.</param>
+    /// <param name="layerMask">Layer mask for filtering included renderers.</param>
+    /// <returns>Bounds encompassing all included renderers.</returns>
+    public Bounds GetGridWorldBounds(Transform rootOverride = null, int layerMask = ~0)
+    {
+        var root = rootOverride != null ? rootOverride : transform;
+        var renderers = root.GetComponentsInChildren<Renderer>(includeInactive: false);
+
+        bool hasBounds = false;
+        Bounds bounds = default;
+
+        foreach (var r in renderers)
+        {
+            if (((1 << r.gameObject.layer) & layerMask) == 0)
+                continue;
+
+            if (!hasBounds)
+            {
+                bounds = r.bounds;
+                hasBounds = true;
+            }
+            else
+            {
+                bounds.Encapsulate(r.bounds);
+            }
+        }
+
+        if (!hasBounds)
+            bounds = new Bounds(root.position, Vector3.one);
+
+        return bounds;
+    }
+
     // ============================================================================
     //  HELPERS
     // ============================================================================
@@ -197,6 +233,10 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns the world position of the start cell with a slight horizontal offset.
+    /// Rooms on the left half of the grid are nudged right; rooms on the right half are nudged left.
+    /// </summary>
     public Vector3 GetStartCellWorldPosition()
     {
         if (roomInstances == null)
@@ -208,8 +248,13 @@ public class MapManager : MonoBehaviour
             var roomProps = roomObj.GetComponent<RoomProperties>();
             if (roomProps != null && roomProps.usageType == UsageType.Start)
             {
-                // Return the center position of the cell (room)
-                return roomObj.transform.position;
+                Vector3 pos = roomObj.transform.position;
+                float offset = cellWidth * 0.25f;
+                if (roomProps.GridPosition.x < gridWidth / 2f)
+                    pos += new Vector3(offset, 0f, 0f);
+                else
+                    pos += new Vector3(-offset, 0f, 0f);
+                return pos;
             }
         }
         Debug.LogWarning("No start cell found in roomInstances.");

@@ -143,5 +143,5 @@ MonoBehaviour:
   spawnPoint: {fileID: 8997749736368526586}
   exitPoint: {fileID: 8499332300357039189}
   midpointTrigger: {fileID: 7062460611975415160}
-  speed: 1
+  speed: 2
   cubeSpawner: {fileID: 8503681893193485149, guid: 8cd8f2c8095ebfb4ca9b72de761243d7, type: 3}

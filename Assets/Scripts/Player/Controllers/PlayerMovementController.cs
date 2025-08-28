@@ -12,18 +12,25 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     [SerializeField] private BodyJointLimiter bodyJointLimiter;
     [SerializeField] private RobotStateController robotBehaviour;
 
+    [Header("Facing/Mirroring")]
+    [SerializeField] private PoleMirror2D poleMirror;
+
     [Header("Body Rotation")]
     [SerializeField] private Rigidbody2D bodyReference;
     public Rigidbody2D BodyReference => bodyReference;
-    [SerializeField] private float maximumLerp = 10f;
+
+    [SerializeField, Min(0f)] private float maxLeftTiltDeg  = 20f; 
+    [SerializeField, Min(0f)] private float maxRightTiltDeg = 2f;
 
     [SerializeField] private MonoBehaviour inputSource;
     private IPlayerInput input;
 
+    public IPlayerInput Input => input;
     private bool flipped = false;
     private float horizontalInput;
     private float verticalInput;
     private float targetRotation;
+    private bool isCrouchingInput;
 
     [SerializeField] private EnergyBot energyBot;
     [SerializeField] private Inventory inventory;
@@ -37,7 +44,6 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     private void Awake()
     {
-        locomotion.OnJumpStarted += HandleJumpStart;
         locomotion.OnJumpEnded += HandleJumpEnd;
 
         if (robotBehaviour == null)
@@ -53,6 +59,8 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         {
             Debug.LogError("PlayerMovementController: inputSource does not implement IPlayerInput");
         }
+        // Ensure initial facing is applied to all modules (including PoleMirror2D)
+        ApplyFacingDirection();
     }
 
     private void Update()
@@ -70,6 +78,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         CalculateAndApplyBodyRotation();
         HandleMovement();
         HandleJump();
+        HandleCrouch();
     }
 
     private void TryFlip()
@@ -88,16 +97,31 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     private void ApplyFacingDirection()
     {
         locomotion.SetFacingDirection(!flipped);
-        legJointLimiter.SetLegRotationLimits(flipped); // true = going left
+        legJointLimiter.SetLegRotationLimits(!flipped); // true = facing right
         if (bodyJointLimiter != null)
-            bodyJointLimiter.SetBodyRotationLimits(flipped);
+            bodyJointLimiter.SetBodyRotationLimits(!flipped);
+
+        // Mirror poles (arms, hands, etc.)
+        if (poleMirror != null)
+            poleMirror.SetFacing(!flipped);
     }
 
     private void CalculateAndApplyBodyRotation()
     {
-        targetRotation = Mathf.Approximately(horizontalInput, 0f)
-            ? 0f
-            : Mathf.Lerp(maximumLerp, -maximumLerp, (horizontalInput + 1f) / 2f);
+        if (Mathf.Approximately(horizontalInput, 0f))
+        {
+            targetRotation = 0f;
+        }
+        else
+        {
+            // Map [-1 .. +1] -> angle where right = negative, left = positive
+            float t = (horizontalInput + 1f) * 0.5f; // -1 -> 0, +1 -> 1
+            float leftDeg  = Mathf.Max(0f, maxLeftTiltDeg);
+            float rightDeg = Mathf.Max(0f, maxRightTiltDeg);
+
+            // Right limit is -rightDeg, left limit is +leftDeg
+            targetRotation = Mathf.Lerp(leftDeg, -rightDeg, t);
+        }
 
         ApplyBodyRotation();
     }
@@ -112,7 +136,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     private void HandleMovement()
     {
-        locomotion.HandleMovement(horizontalInput,flipped);
+        locomotion.HandleMovement(horizontalInput, flipped);
     }
 
     private void HandleJump()
@@ -123,9 +147,18 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         }
     }
 
-    private void HandleJumpStart()
+    private void HandleCrouch()
     {
-        Debug.Log("Jump start");
+        if (verticalInput < 0 && !isCrouchingInput)
+        {
+            locomotion.Crouch();
+        }
+        else if (verticalInput >= 0 && isCrouchingInput)
+        {
+            locomotion.Uncrouch();
+        }
+
+        isCrouchingInput = verticalInput < 0;
     }
 
     private void HandleJumpEnd()

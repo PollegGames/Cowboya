@@ -51,4 +51,25 @@ public class BatteryPickupTests
         inventory.DropItem(PickupType.Battery);
         Assert.IsFalse(inventory.HasItem(PickupType.Battery));
     }
+
+    [Test]
+    public void Battery_DisablesPhysicsWhileGrabbed()
+    {
+        var batteryGO = new GameObject("battery");
+        var rb = batteryGO.AddComponent<Rigidbody2D>();
+        rb.gravityScale = 2f;
+        batteryGO.AddComponent<TargetJoint2D>();
+        var battery = batteryGO.AddComponent<BatteryPickup>();
+        var hand = new GameObject("hand").transform;
+
+        battery.OnGrab(hand);
+
+        Assert.AreEqual(RigidbodyType2D.Kinematic, rb.bodyType);
+        Assert.AreEqual(0f, rb.gravityScale);
+
+        battery.OnRelease(Vector2.zero);
+
+        Assert.AreEqual(RigidbodyType2D.Dynamic, rb.bodyType);
+        Assert.AreEqual(2f, rb.gravityScale);
+    }
 }

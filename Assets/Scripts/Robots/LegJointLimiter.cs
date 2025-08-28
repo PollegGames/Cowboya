@@ -7,28 +7,35 @@ public class LegJointLimiter : MonoBehaviour
     public HingeJoint2D leftLegJoint;
     public HingeJoint2D rightLegJoint;
 
+    private float minLeft = 0;
+    private float maxLeft = 180;
+    private float minRight = 0;
+    private float maxRight = 180;
+    private bool facingRight = true;
+
     private void Awake()
     {
         RefreshJoints();
+        SetLegRotationLimits(true);
     }
 
     public void SetLegRotationLimits(bool goingRight)
     {
-        if (goingRight)
+        facingRight = goingRight;
+
+        if (facingRight)
         {
-            // Facing right: -180 to 0 for both legs
-            SetJointLimits(rightLegJoint, -180f, 0);
-            SetJointLimits(leftLegJoint, -180f, 0);
+            ApplyJoint(rightLegJoint, minRight, maxRight );
+            ApplyJoint(leftLegJoint, minLeft, maxLeft);
         }
         else
         {
-            // Facing left: 0 to 180 for both legs
-            SetJointLimits(rightLegJoint, 0f, 180);
-            SetJointLimits(leftLegJoint, 0f, 180);
+            ApplyJoint(rightLegJoint, -minLeft, -maxLeft);
+            ApplyJoint(leftLegJoint, -minRight, -maxRight);
         }
     }
 
-    private void SetJointLimits(HingeJoint2D joint, float lower, float upper)
+    private void ApplyJoint(HingeJoint2D joint, float lower, float upper)
     {
         if (joint == null)
             return;
@@ -47,6 +54,8 @@ public class LegJointLimiter : MonoBehaviour
         leftLegJoint = FindJoint("LeftLowLeg");
         rightLegJoint = FindJoint("RightLowLeg");
     }
+
+
 
     private HingeJoint2D FindJoint(string name)
     {

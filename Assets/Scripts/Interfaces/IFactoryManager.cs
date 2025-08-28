@@ -7,6 +7,9 @@ public interface IFactoryManager
 
     void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup, IEnemiesSpawner enemiesSpawner);
     IWaypointService GetWayPointService();
+    /// <summary>
+    /// Gets the world position of the start room, including its horizontal offset.
+    /// </summary>
     Vector3 GetStartCellWorldPosition();
     void SetPlayerInstanceHead(GameObject playerInstance, Transform head);
     void OnRobotSaved();

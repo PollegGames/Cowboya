@@ -31,6 +31,8 @@ public class SceneBootstrapper : MonoBehaviour
         var respawnService = Instantiate(config.respawnServicePrefab);
         var badgeSpawner = Instantiate(config.badgeSpawnerPrefab);
         var batterySpawner = Instantiate(config.batterySpawnerPrefab);
+        var hintManager = Instantiate(config.hintManagerPrefab);
+
         if (SceneController.instance == null)
         {
             Instantiate(config.sceneControllerPrefab);
@@ -56,13 +58,11 @@ public class SceneBootstrapper : MonoBehaviour
                 config.victorySetupPrefab,
                 saveService,
                 badgeSpawner,
-                batterySpawner
+                batterySpawner,
+                hintManager
             );
         }
 
-        if (RunProgressManager.Instance != null && RunProgressManager.Instance.CurrentLevelIndex == 1)
-        {
-            new GameObject("TutorialManager").AddComponent<TutorialManager>();
-        }
+      
     }
 }

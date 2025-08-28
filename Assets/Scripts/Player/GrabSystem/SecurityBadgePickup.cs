@@ -7,12 +7,54 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     public float throwStrength = 5f;
 
     [Header("Target Joint Settings")]
-    [Tooltip("How springy the joint movement is.")]
-    [SerializeField] private float frequency = 5f;
-    [Tooltip("How much the joint resists oscillation.")]
-    [SerializeField] private float dampingRatio = 0.8f;
-    [Tooltip("Maximum force the joint can apply.")]
-    [SerializeField] private float maxForce = 1000f;
+    [Tooltip("How springy the joint movement is. Recommended range: 5–15.")]
+    [SerializeField, Range(5f, 15f)] private float frequency = 10f;
+    [Tooltip("How much the joint resists oscillation. Recommended range: 0–1.")]
+    [SerializeField, Range(0f, 1f)] private float dampingRatio = 0.9f;
+    [Tooltip("Maximum force the joint can apply. Recommended range: 500–3000.")]
+    [SerializeField, Range(500f, 3000f)] private float maxForce = 2000f;
+
+    /// <summary>
+    /// How springy the joint movement is.
+    /// </summary>
+    public float Frequency
+    {
+        get => frequency;
+        set
+        {
+            frequency = value;
+            if (joint != null)
+                joint.frequency = frequency;
+        }
+    }
+
+    /// <summary>
+    /// How much the joint resists oscillation.
+    /// </summary>
+    public float DampingRatio
+    {
+        get => dampingRatio;
+        set
+        {
+            dampingRatio = value;
+            if (joint != null)
+                joint.dampingRatio = dampingRatio;
+        }
+    }
+
+    /// <summary>
+    /// Maximum force the joint can apply.
+    /// </summary>
+    public float MaxForce
+    {
+        get => maxForce;
+        set
+        {
+            maxForce = value;
+            if (joint != null)
+                joint.maxForce = maxForce;
+        }
+    }
 
     Rigidbody2D rb;
     TargetJoint2D joint;
@@ -87,16 +129,18 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     {
         var inventory = grabParent.GetComponentInParent<Inventory>();
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
+        EnemyController enemy = null;
 
         // Detect if we're stealing from an enemy
         if (!wasStolen && transform.parent != null)
         {
-            var enemy = transform.parent.GetComponentInParent<EnemyController>();
+            enemy = transform.parent.GetComponentInParent<EnemyController>();
             if (enemy != null)
             {
                 var stateController = enemy.GetComponent<RobotStateController>();
                 if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
                 {
+                    enemy.OnBadgeStolen(player.gameObject);
                     wasStolen = true;
                 }
             }
@@ -110,6 +154,15 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
                 ownerInventory.RemoveItem(PickupType.SecurityBadge);
             inventory.SetItem(PickupType.SecurityBadge, this);
             ownerInventory = inventory;
+        }
+
+        // Detach from any previous hierarchy so the badge is no longer
+        // parented to an enemy when picked up.
+        transform.SetParent(grabParent.root, true);
+
+        if (wasStolen && enemy != null && player != null)
+        {
+            enemy.HandleBadgeStolen();
         }
 
         if (player != null)
@@ -141,6 +194,9 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         if (joint != null)
             joint.enabled = false;
         followTarget = null;
+
+        // Re-parent to world root so it no longer follows any holder.
+        transform.SetParent(null, worldPositionStays: true);
 
         if (ownerInventory != null)
         {

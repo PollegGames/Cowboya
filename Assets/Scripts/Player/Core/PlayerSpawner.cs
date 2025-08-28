@@ -60,13 +60,16 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
         }
 
         // Locate "Head" under WholeBody
-        Transform head = wholeBody.Find("Head");
+        Transform head = wholeBody.Find("LowTorso/Torso/Body/Head");
         if (head == null)
         {
-            Debug.LogError("Couldn't find 'Head' under 'WholeBody'. Check prefab hierarchy.");
-            return;
+            head = wholeBody.Find("Head");
+            if (head == null)
+            {
+                Debug.LogError("Couldn't find 'Head' under WholeBody. Check prefab hierarchy.");
+                return;
+            }
         }
-
         // Store head transform
         playerHeadTransform = head;
     }

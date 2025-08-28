@@ -12,18 +12,24 @@ public class RobotLocomotionController : MonoBehaviour
     [Header("Jump Settings")]
     [SerializeField] private float jumpUpDuration = 18f;
     [SerializeField] private float jumpDownDuration = 18f;
+    [SerializeField] private float crouchUpDuration = 18f;
+    [SerializeField] private float crouchDownDuration = 18f;
 
     private bool isWalking = false;
     private bool isJumping = false;
+    private bool isCrouching = false;
     private Coroutine walkRoutine;
     public event Action OnJumpStarted;
     public event Action OnJumpEnded;
+    public event Action OnCrouchStarted;
+    public event Action OnCrouchEnded;
     private RobotStateController robotBehaviour;
     private InputSystem_Actions controls;
     [SerializeField] public bool isPlayerControlled = false;
 
     [SerializeField] private float energyCostPerStep = 1f;
     [SerializeField] private float energyCostPerJump = 3f;
+    [SerializeField] private float energyCostPerCrouch = 3f;
     [SerializeField] private bool waitStep = true;
     private bool _flipped = false;
     [SerializeField] private float timeout = 0.5f;
@@ -192,6 +198,45 @@ public class RobotLocomotionController : MonoBehaviour
     }
 
     #endregion
+
+    #region Crouch
+    public void Crouch()
+    {
+        if (isCrouching) return;
+
+        if (!robotBehaviour.CanPerformEnergy(energyCostPerCrouch)) return;
+
+        isCrouching = true;
+        StopWalking();
+        robotBehaviour?.ConsumeEnergy(energyCostPerCrouch);
+        OnCrouchStarted?.Invoke();
+
+        int feetFinished = 0;
+        Action onFootFinished = () =>
+        {
+            feetFinished++;
+            if (feetFinished >= 2)
+            {
+                isCrouching = false;
+                OnCrouchEnded?.Invoke();
+            }
+        };
+
+        leftFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
+        rightFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
+    }
+
+    /// <summary>
+    /// Returns the robot to a standing position.
+    /// </summary>
+    public void Uncrouch()
+    {
+        leftFoot?.InterruptAndReset();
+        rightFoot?.InterruptAndReset();
+        isCrouching = false;
+        OnCrouchEnded?.Invoke();
+    }
+    #endregion Crouch
 
     #region Facing
 
