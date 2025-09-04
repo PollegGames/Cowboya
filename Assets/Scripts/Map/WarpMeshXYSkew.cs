@@ -65,7 +65,8 @@ public class WarpMeshXYSkew : MonoBehaviour
     {
         if (player == null)
         {
-            var head = roomManager.FactoryManager.playerHeadTransform;
+            var head = roomManager.FactoryManager != null ? roomManager.FactoryManager.playerHeadTransform : roomManager.PlayerHead;
+
             if (head != null)
             {
                 player = head;

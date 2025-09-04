@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class RoomManager : MonoBehaviour
 {
     public FactoryManager FactoryManager { get; private set; }
-    public Transform PlayerHead { get; private set; }
+    [SerializeField] public Transform PlayerHead;
 
     [Header("Room Settings")]
     public RoomProperties roomProperties;

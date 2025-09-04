@@ -89,8 +89,11 @@ public class SecurityCamera : MonoBehaviour
 
     private void OnPlayerEnterZone(Collider2D playerCollider)
     {
-        if (player == null)
+        if (player == null && roomManager.FactoryManager != null)
             player = roomManager.FactoryManager.playerHeadTransform;
+
+        if (player == null)
+            player = roomManager.PlayerHead;
 
         if (player != null)
         {

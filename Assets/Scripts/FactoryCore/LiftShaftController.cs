@@ -9,6 +9,8 @@ public class LiftShaftController : MonoBehaviour
     [Header("Controlled Lifts")]
     public List<LiftController> controlledLifts = new List<LiftController>();
 
+    // Options removed (debug-only)
+
     private void Start()
     {
         if (roomManager != null)
@@ -20,15 +22,22 @@ public class LiftShaftController : MonoBehaviour
 
     private void LockLiftWhenWall()
     {
-         // At room init, tell each LiftController whether it's a wall (i.e. no lift available)
+        // Pull flags once (can be false in hand-authored scenes without Map assignment)
+        bool hasUp = roomManager != null && roomManager.roomProperties != null && roomManager.roomProperties.HasLiftUp;
+        bool hasDown = roomManager != null && roomManager.roomProperties != null && roomManager.roomProperties.HasLiftDown;
+
+        // At room init, tell each LiftController whether it's a wall (i.e. no lift available)
         foreach (var lift in controlledLifts)
         {
-            // Determine direction: up if y-positive dot with world up, else down
-            bool isUpLift = Vector2.Dot(lift.moveDirection, Vector2.up) > 0;
+            if (lift == null) continue;
+
+            // Determine direction robustly: consider small floats/unnormalized inputs
+            var dir = lift.moveDirection.sqrMagnitude > 0f ? lift.moveDirection.normalized : Vector2.zero;
+            bool isUpLift = Vector2.Dot(dir, Vector2.up) > 0.5f;
 
             // If room doesn't have that lift, mark as wall
-            bool hasLift = isUpLift ? roomManager.roomProperties.HasLiftUp
-                                     : roomManager.roomProperties.HasLiftDown;
+            bool hasLift = isUpLift ? hasUp : hasDown;
+
             lift.isWall = !hasLift;
 
             // Evaluate initial state (locks, flashing)

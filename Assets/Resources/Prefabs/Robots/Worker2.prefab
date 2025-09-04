@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 5930321030580568443}
   - component: {fileID: 8746706548644203420}
   - component: {fileID: 8631086580911833207}
+  - component: {fileID: 2705158942988550866}
+  - component: {fileID: 2560655906497696992}
   m_Layer: 7
   m_Name: RightLowLeg
   m_TagString: Enemy
@@ -157,7 +159,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: b9d79e838cfaf7442add5608326704e1, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -247,6 +249,38 @@ SpringJoint2D:
   m_Distance: 0.1
   m_DampingRatio: 1
   m_Frequency: 1
+--- !u!114 &2705158942988550866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 36259763570555596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7345ffce4a708cb44bced2e1fe7d6a2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rider: {fileID: 2560655906497696992}
+--- !u!114 &2560655906497696992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 36259763570555596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f23ad19eb410c34b80cb51a860beaaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRb: {fileID: 421763934504975421}
+  minSupportNormalY: 1
+  platformLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  sensors:
+  - {fileID: 2705158942988550866}
 --- !u!1 &1172639047635773895
 GameObject:
   m_ObjectHideFlags: 0
@@ -2465,6 +2499,7 @@ GameObject:
   - component: {fileID: 9206399112436540781}
   - component: {fileID: 5295180869094514354}
   - component: {fileID: 5348351820894392378}
+  - component: {fileID: 5834125369004055189}
   m_Layer: 7
   m_Name: Hips
   m_TagString: Enemy
@@ -2661,6 +2696,26 @@ DistanceJoint2D:
   m_AutoConfigureDistance: 0
   m_Distance: 0.56854653
   m_MaxDistanceOnly: 0
+--- !u!114 &5834125369004055189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399112436540689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f23ad19eb410c34b80cb51a860beaaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRb: {fileID: 9206399112436540778}
+  minSupportNormalY: 1
+  platformLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  sensors:
+  - {fileID: 2705158942988550866}
+  - {fileID: 5274459596998430391}
 --- !u!1 &9206399112591901723
 GameObject:
   m_ObjectHideFlags: 0
@@ -4154,7 +4209,6 @@ GameObject:
   - component: {fileID: 2375878962877187776}
   - component: {fileID: 340242974285803334}
   - component: {fileID: 8782515306010581955}
-  - component: {fileID: 8868752083473424728}
   - component: {fileID: 8027441940180791310}
   - component: {fileID: 6603793096190714630}
   - component: {fileID: 317205533927771976}
@@ -4293,30 +4347,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.2
---- !u!114 &8868752083473424728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9206399113533570876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1ee2b82e1bddaf41862f8549aefd1ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  arcTargetFollower: {fileID: 3617995742919097939}
-  leftArmTarget: {fileID: 3816361993170977825}
-  rightArmTarget: {fileID: 5459847082946802603}
-  leftRestPosition: {fileID: 6624712809901108695}
-  rightRestPosition: {fileID: 2147758059770156043}
-  punchTarget: {fileID: 1084227098665154117}
-  arcControlRight: {fileID: 0}
-  arcControlLeft: {fileID: 0}
-  punchDuration: 0.1
-  returnSpeed: 10
-  leftArmHitbox: {fileID: 6634321455534175459}
-  rightArmHitbox: {fileID: 4850054373524888424}
 --- !u!114 &8027441940180791310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4462,8 +4492,8 @@ MonoBehaviour:
   robotBehaviour: {fileID: 340242974285803334}
   arrivalThresholdX: 2
   arrivalThresholdY: 2
-  deadZoneX: 5
-  deadZoneY: 5
+  deadZoneX: 3
+  deadZoneY: 3
   updateLoop: 0
   inventory: {fileID: 1795599177220237823}
   lowMoralityTriggerHandler: {fileID: 787234331432345980}
@@ -4526,8 +4556,8 @@ MonoBehaviour:
   legJointLimiter: {fileID: 0}
   arrivalThresholdX: 2
   arrivalThresholdY: 2
-  deadZoneX: 5
-  deadZoneY: 5
+  deadZoneX: 3
+  deadZoneY: 3
   updateLoop: 0
 --- !u!114 &7080833100948888711
 MonoBehaviour:
@@ -4576,6 +4606,8 @@ GameObject:
   - component: {fileID: 3319402958632920165}
   - component: {fileID: 9057206949561553978}
   - component: {fileID: 928534147578039984}
+  - component: {fileID: 5274459596998430391}
+  - component: {fileID: 3528032474126173087}
   m_Layer: 7
   m_Name: LeftLowLeg
   m_TagString: Enemy
@@ -4717,7 +4749,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: b9d79e838cfaf7442add5608326704e1, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -4807,6 +4839,38 @@ SpringJoint2D:
   m_Distance: 0.1
   m_DampingRatio: 1
   m_Frequency: 1
+--- !u!114 &5274459596998430391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113579118250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7345ffce4a708cb44bced2e1fe7d6a2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rider: {fileID: 3528032474126173087}
+--- !u!114 &3528032474126173087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113579118250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f23ad19eb410c34b80cb51a860beaaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRb: {fileID: 9206399113579118247}
+  minSupportNormalY: 1
+  platformLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  sensors:
+  - {fileID: 5274459596998430391}
 --- !u!1 &9206399113594718196
 GameObject:
   m_ObjectHideFlags: 0
@@ -5065,6 +5129,10 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3194280299265577377, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3194280299265577377, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
@@ -5126,17 +5194,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 237037214624018287, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
   m_PrefabInstance: {fileID: 883218837833488682}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3617995742919097939 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4500328786175125369, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
-  m_PrefabInstance: {fileID: 883218837833488682}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cde58856f9b29dd47ba04c4ed7c93d63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &3042703559840585813
 PrefabInstance:
   m_ObjectHideFlags: 0

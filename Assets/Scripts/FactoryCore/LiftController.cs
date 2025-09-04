@@ -10,6 +10,8 @@ public class LiftController : MonoBehaviour
     [Header("References")]
     public MeshRenderer lightRenderer;
     public Collider2D floorCollider;
+    [Tooltip("Root GameObject holding AreaEffector2D and 'going up' visuals.")]
+    public GameObject movingObject;
 
     [Header("Movement")]
     public Vector2 moveDirection = Vector2.up;
@@ -59,6 +61,9 @@ public class LiftController : MonoBehaviour
         lightStartPos = lightRoot.position;
         lightEndPos = lightStartPos + (Vector3)(moveDirection.normalized * moveDistance);
 
+        // Ensure moving object starts disabled
+        SetMovingObjectActive(false);
+
         UpdateLight();
     }
 
@@ -82,8 +87,17 @@ public class LiftController : MonoBehaviour
         }
     }
 
-    public void OnEntityEnterZone() => entitiesInside++;
-    public void OnEntityExitZone() => entitiesInside = Mathf.Max(0, entitiesInside - 1);
+    public void OnEntityEnterZone()
+    {
+        entitiesInside++;
+        // Evaluate immediately to avoid waiting for the next scheduled check
+        EvaluateLiftState();
+    }
+
+    public void OnEntityExitZone()
+    {
+        entitiesInside = Mathf.Max(0, entitiesInside - 1);
+    }
 
     public void EvaluateLiftState()
     {
@@ -117,11 +131,17 @@ public class LiftController : MonoBehaviour
         currentState = LiftState.Moving;
         UpdateLight();
 
+        // Enable moving object for outbound movement
+        SetMovingObjectActive(true);
+
         // move ONLY the light
         yield return MoveLightTo(lightEndPos);
         onOutboundArrival?.Invoke();
 
         yield return new WaitForSeconds(waitAtTop);
+
+        // Disable moving object during return movement
+        SetMovingObjectActive(false);
 
         if (moveDirection == Vector2.down)
         {
@@ -184,6 +204,17 @@ public class LiftController : MonoBehaviour
         var mat = lightRenderer.material;
         if (mat.HasProperty(colorProperty)) mat.SetColor(colorProperty, color);
         else mat.color = color;
+    }
+
+    private void SetMovingObjectActive(bool active)
+    {
+        if (movingObject) movingObject.SetActive(active);
+    }
+
+    private void OnValidate()
+    {
+        // Keep it off in edit-time by default
+        SetMovingObjectActive(false);
     }
 
     public void SetLocked(bool locked)
