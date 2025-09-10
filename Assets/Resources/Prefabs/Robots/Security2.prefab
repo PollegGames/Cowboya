@@ -972,7 +972,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: -0.000000017484522, y: -0.39999923}
+  m_ConnectedAnchor: {x: -0.00000001748455, y: -0.3999999}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1177,7 +1177,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0, y: -0.67187506}
+  m_ConnectedAnchor: {x: 0, y: -0.6718756}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1478,7 +1478,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.00000001792167, y: -0.40999997}
+  m_ConnectedAnchor: {x: 0.000000017921675, y: -0.41000012}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1792,7 +1792,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0, y: -0.67000014}
+  m_ConnectedAnchor: {x: 0, y: -0.66999984}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3776,7 +3776,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.48}
-  m_ConnectedAnchor: {x: 0.034999847, y: 0.28140023}
+  m_ConnectedAnchor: {x: 0.03499993, y: 0.2814001}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3991,7 +3991,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.35}
-  m_ConnectedAnchor: {x: -0.0020005153, y: 0.23899996}
+  m_ConnectedAnchor: {x: -0.0020000024, y: 0.23899996}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4448,7 +4448,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.19}
-  m_ConnectedAnchor: {x: 0, y: 0.41799998}
+  m_ConnectedAnchor: {x: 0, y: 0.41799992}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4502,7 +4502,7 @@ Transform:
   m_GameObject: {fileID: 9206399113533570876}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.2130547, y: -2.4036121, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.3, y: 1.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
