@@ -8,11 +8,12 @@ using System.Collections;
 /// and badge spawning services and provides APIs to change state or assign
 /// destinations.
 /// </summary>
-public class EnemyController : PhysicsBaseAgentController, IPooledObject
+public class EnemyController : AnimatorBaseAgentController, IPooledObject
 {
     [SerializeField] private EnemyStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
-    [SerializeField] private Transform bodyReference;
+    // Uses bodyReference from AnimatorBaseAgentController
+    [SerializeField] private BodyJointLimiter bodyJointLimiter;
 
     private IEnemyStateMachine stateMachineInterface;
     public IRobotMemory memory { get; private set; }
@@ -45,6 +46,10 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
 
     protected override void Awake()
     {
+        // Ensure animator is assigned for the animator-driven movement controller
+        animator = GetComponentInChildren<Animator>();
+        if (bodyJointLimiter == null)
+            bodyJointLimiter = GetComponent<BodyJointLimiter>();
         base.Awake();
         if (stateMachine == null)
             stateMachine = GetComponent<EnemyStateMachine>();
@@ -133,8 +138,10 @@ public class EnemyController : PhysicsBaseAgentController, IPooledObject
             pathFollower?.Update(Time.deltaTime);
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        // Drive animator-based locomotion from the base controller
+        base.FixedUpdate();
         if (updateLoop == UpdateLoop.FixedUpdate)
             pathFollower?.Update(Time.fixedDeltaTime);
     }
