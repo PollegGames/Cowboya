@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e0ef7da862e7bd4fa4e81a5ffb051c7, type: 3}
   m_Name: FactoryAlarmStatusLv1
   m_EditorClassIdentifier: 
-  currentAlarmState: 0
+  currentAlarmState: 1
