@@ -31,14 +31,7 @@ public class RobotLocomotionController : MonoBehaviour
     [SerializeField] private bool useAnimatorLegs = false;
     [SerializeField] private Animator animator;
     [SerializeField, Min(0f)] private float inputWalkThreshold = 0.2f;
-    [SerializeField, Min(0f)] private float walkAnimSpeedMin = 0.6f;
-    [SerializeField, Min(0f)] private float walkAnimSpeedMax = 1.2f;
-    [SerializeField, Min(0f)] private float walkAnimSpeedSmoothing = 10f;
-    private float currentAnimSpeed = 0f;
-    [SerializeField] private AnimationCurve walkSpeedCurve = AnimationCurve.Linear(0,0,1,1);
-    private float speedVel;
-    private int walkStateHash;
-    private int walkBackStateHash;
+    [SerializeField, Min(0f)] private float walkCycleSpeed = 1.0f; // Single simple speed
 
     [SerializeField] private float energyCostPerStep = 1f;
     [SerializeField] private float energyCostPerJump = 3f;
@@ -61,8 +54,7 @@ public class RobotLocomotionController : MonoBehaviour
         if (animator == null)
             animator = GetComponent<Animator>();
 
-        walkStateHash = Animator.StringToHash("Base Layer.Walk");
-        walkBackStateHash = Animator.StringToHash("Base Layer.WalkBack");
+        // No advanced hashing/smoothing needed for simple speed mode
     }
 
     private void OnEnable()
@@ -111,21 +103,7 @@ public class RobotLocomotionController : MonoBehaviour
                 {
                     float dir = horizontalInput >= 0 ? 1f : -1f;
                     animator.SetFloat("Direction", dir);
-
-                    // Map input to target speed using curve
-                    float lin = Mathf.InverseLerp(inputWalkThreshold, 1f, inputMag);
-                    float curved = walkSpeedCurve != null ? walkSpeedCurve.Evaluate(Mathf.Clamp01(lin)) : lin;
-                    float targetAnimSpeed = Mathf.Lerp(walkAnimSpeedMin, walkAnimSpeedMax, curved);
-
-                    // Only update speed near cycle boundary for stability
-                    var s = animator.GetCurrentAnimatorStateInfo(0);
-                    bool inWalk = s.fullPathHash == walkStateHash || s.fullPathHash == walkBackStateHash;
-                    float phase = s.normalizedTime - Mathf.Floor(s.normalizedTime);
-                    if (!inWalk || phase < 0.1f)
-                    {
-                        currentAnimSpeed = Mathf.SmoothDamp(currentAnimSpeed, targetAnimSpeed, ref speedVel, 1f / Mathf.Max(0.0001f, walkAnimSpeedSmoothing));
-                        animator.SetFloat("Speed", currentAnimSpeed);
-                    }
+                    animator.SetFloat("Speed", walkCycleSpeed);
                     animator.SetBool("IsWalking", true);
                     animator.SetBool("IsCrouching", false);
                 }
@@ -142,8 +120,7 @@ public class RobotLocomotionController : MonoBehaviour
             {
                 if (animator != null)
                 {
-                    currentAnimSpeed = Mathf.SmoothDamp(currentAnimSpeed, 0f, ref speedVel, 1f / Mathf.Max(0.0001f, walkAnimSpeedSmoothing));
-                    animator.SetFloat("Speed", currentAnimSpeed);
+                    animator.SetFloat("Speed", 0f);
                     animator.SetBool("IsWalking", false);
                 }
             }
