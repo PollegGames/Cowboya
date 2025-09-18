@@ -14,6 +14,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
     [Header("Facing/Mirroring")]
     [SerializeField] private PoleMirror2D poleMirror;
+    [SerializeField] private SpriteFlip2D spriteFlipper;
 
     [Header("Body Rotation")]
     [SerializeField] private Rigidbody2D bodyReference;
@@ -104,6 +105,10 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         // Mirror poles (arms, hands, etc.)
         if (poleMirror != null)
             poleMirror.SetFacing(!flipped);
+
+        // Ensure all sprites flip consistently
+        if (spriteFlipper != null)
+            spriteFlipper.SetFacing(!flipped);
     }
 
     private void CalculateAndApplyBodyRotation()

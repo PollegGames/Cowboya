@@ -1515,8 +1515,8 @@ MonoBehaviour:
   target: {fileID: 608097371732426208}
   pole: {fileID: 2641922349688283432}
   chainLength: 2
-  SetForce: 30
-  delta: 0.2
+  SetForce: 40
+  delta: 0.25
   iterations: 10
   poleMinDistance: 1
   SnapStrength: 1
@@ -2374,8 +2374,8 @@ MonoBehaviour:
   target: {fileID: 9160219255922100572}
   pole: {fileID: 6315316417302259119}
   chainLength: 2
-  SetForce: 30
-  delta: 0.2
+  SetForce: 40
+  delta: 0.25
   iterations: 10
   poleMinDistance: 1
   SnapStrength: 1
@@ -5285,6 +5285,7 @@ GameObject:
   - component: {fileID: 923344538489071977}
   - component: {fileID: 5527916575216506076}
   - component: {fileID: 2961474439911738946}
+  - component: {fileID: 4201234567890123456}
   m_Layer: 6
   m_Name: Player5
   m_TagString: Player
@@ -5429,8 +5430,8 @@ MonoBehaviour:
   isPlayerControlled: 1
   useAnimatorLegs: 1
   animator: {fileID: 2961474439911738946}
-  inputWalkThreshold: 0.35
-  walkCycleSpeed: 1
+  inputWalkThreshold: 0.7
+  walkCycleSpeed: 0.7
   energyCostPerStep: 1
   energyCostPerJump: 5
   energyCostPerCrouch: 3
@@ -5456,6 +5457,7 @@ MonoBehaviour:
   bodyJointLimiter: {fileID: 6603793096190714630}
   robotBehaviour: {fileID: 340242974285803334}
   poleMirror: {fileID: 5527916575216506076}
+  spriteFlipper: {fileID: 4201234567890123456}
   bodyReference: {fileID: 9206399113523174608}
   maxLeftTiltDeg: 20
   maxRightTiltDeg: 2
@@ -5662,6 +5664,12 @@ MonoBehaviour:
   - target: {fileID: 6315316417302259119}
     mirrorZRotation: 0
     rightLocalX: 0
+  - target: {fileID: 8433065265253862054}
+    mirrorZRotation: 1
+    rightLocalX: 0
+  - target: {fileID: 5777551822076249676}
+    mirrorZRotation: 1
+    rightLocalX: 0
   startFacingRight: 1
 --- !u!95 &2961474439911738946
 Animator:
@@ -5685,6 +5693,35 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4201234567890123456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c9b8d4f2a94c5f9a2b3c7d8e1f2345, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  directionProviderComponent: {fileID: 6137078262802834594}
+  sprites:
+  - {fileID: 9206399113276938839}
+  - {fileID: 7086331897419207449}
+  - {fileID: 9206399112591901716}
+  - {fileID: 9206399113579118244}
+  - {fileID: 9206399112157314880}
+  - {fileID: 9206399112713860122}
+  - {fileID: 9206399112872844431}
+  - {fileID: 9206399113594718158}
+  - {fileID: 914351883353996106}
+  - {fileID: 9206399113523174609}
+  - {fileID: 9206399112919556915}
+  - {fileID: 9206399112436540779}
+  includeInactive: 1
+  startFacingRight: 1
+  flipThreshold: 0.1
 --- !u!1 &9206399113579118250
 GameObject:
   m_ObjectHideFlags: 0
