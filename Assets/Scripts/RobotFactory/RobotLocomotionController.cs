@@ -26,6 +26,19 @@ public class RobotLocomotionController : MonoBehaviour
     private RobotStateController robotBehaviour;
     private InputSystem_Actions controls;
     [SerializeField] public bool isPlayerControlled = false;
+    
+    [Header("Animator (Legs Mode)")]
+    [SerializeField] private bool useAnimatorLegs = false;
+    [SerializeField] private Animator animator;
+    [SerializeField, Min(0f)] private float inputWalkThreshold = 0.2f;
+    [SerializeField, Min(0f)] private float walkAnimSpeedMin = 0.6f;
+    [SerializeField, Min(0f)] private float walkAnimSpeedMax = 1.2f;
+    [SerializeField, Min(0f)] private float walkAnimSpeedSmoothing = 10f;
+    private float currentAnimSpeed = 0f;
+    [SerializeField] private AnimationCurve walkSpeedCurve = AnimationCurve.Linear(0,0,1,1);
+    private float speedVel;
+    private int walkStateHash;
+    private int walkBackStateHash;
 
     [SerializeField] private float energyCostPerStep = 1f;
     [SerializeField] private float energyCostPerJump = 3f;
@@ -44,6 +57,12 @@ public class RobotLocomotionController : MonoBehaviour
         {
             controls = new InputSystem_Actions();
         }
+
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
+        walkStateHash = Animator.StringToHash("Base Layer.Walk");
+        walkBackStateHash = Animator.StringToHash("Base Layer.WalkBack");
     }
 
     private void OnEnable()
@@ -63,9 +82,19 @@ public class RobotLocomotionController : MonoBehaviour
     public void HandleMovement(float horizontalInput, bool flipped)
     {
         _flipped = flipped;
-        if (isJumping) return;
+        if (isJumping)
+        {
+            if (useAnimatorLegs && animator != null)
+            {
+                animator.SetFloat("Direction", _flipped ? -1f : 1f);
+                animator.SetFloat("Speed", 0f);
+                animator.SetBool("IsWalking", false);
+            }
+            return;
+        }
 
-        bool walking = Mathf.Abs(horizontalInput) > 0.2f;
+        float inputMag = Mathf.Abs(horizontalInput);
+        bool walking = inputMag > inputWalkThreshold;
 
         if (walking)
         {
@@ -76,12 +105,52 @@ public class RobotLocomotionController : MonoBehaviour
                 SetFacingDirection(!_flipped);
             }
 
-            if (!isWalking)
-                StartWalking();
+            if (useAnimatorLegs)
+            {
+                if (animator != null)
+                {
+                    float dir = horizontalInput >= 0 ? 1f : -1f;
+                    animator.SetFloat("Direction", dir);
+
+                    // Map input to target speed using curve
+                    float lin = Mathf.InverseLerp(inputWalkThreshold, 1f, inputMag);
+                    float curved = walkSpeedCurve != null ? walkSpeedCurve.Evaluate(Mathf.Clamp01(lin)) : lin;
+                    float targetAnimSpeed = Mathf.Lerp(walkAnimSpeedMin, walkAnimSpeedMax, curved);
+
+                    // Only update speed near cycle boundary for stability
+                    var s = animator.GetCurrentAnimatorStateInfo(0);
+                    bool inWalk = s.fullPathHash == walkStateHash || s.fullPathHash == walkBackStateHash;
+                    float phase = s.normalizedTime - Mathf.Floor(s.normalizedTime);
+                    if (!inWalk || phase < 0.1f)
+                    {
+                        currentAnimSpeed = Mathf.SmoothDamp(currentAnimSpeed, targetAnimSpeed, ref speedVel, 1f / Mathf.Max(0.0001f, walkAnimSpeedSmoothing));
+                        animator.SetFloat("Speed", currentAnimSpeed);
+                    }
+                    animator.SetBool("IsWalking", true);
+                    animator.SetBool("IsCrouching", false);
+                }
+            }
+            else
+            {
+                if (!isWalking)
+                    StartWalking();
+            }
         }
-        else if (isWalking)
+        else
         {
-            StopWalking();
+            if (useAnimatorLegs)
+            {
+                if (animator != null)
+                {
+                    currentAnimSpeed = Mathf.SmoothDamp(currentAnimSpeed, 0f, ref speedVel, 1f / Mathf.Max(0.0001f, walkAnimSpeedSmoothing));
+                    animator.SetFloat("Speed", currentAnimSpeed);
+                    animator.SetBool("IsWalking", false);
+                }
+            }
+            else if (isWalking)
+            {
+                StopWalking();
+            }
         }
     }
 
@@ -166,32 +235,49 @@ public class RobotLocomotionController : MonoBehaviour
         if (!robotBehaviour.CanPerformEnergy(energyCostPerJump)) return;
 
         isJumping = true;
-        StopWalking();
+        if (!useAnimatorLegs)
+            StopWalking();
         robotBehaviour?.ConsumeEnergy(energyCostPerJump);
         OnJumpStarted?.Invoke();
 
-        int feetLanded = 0;
-        Action onFootLanded = () =>
+        if (useAnimatorLegs && animator != null)
         {
-            feetLanded++;
-            if (feetLanded >= 2)
-                OnJumpEndedInternal();
-        };
+            animator.SetBool("IsWalking", false);
+            animator.SetBool("IsCrouching", false);
+            animator.SetBool("IsJumping", true);
+            StartCoroutine(JumpSimpleRoutine());
+        }
+        else
+        {
+            int feetLanded = 0;
+            Action onFootLanded = () =>
+            {
+                feetLanded++;
+                if (feetLanded >= 2)
+                    OnJumpEndedInternal();
+            };
 
-        leftFoot.Jump(jumpUpDuration, jumpDownDuration, onFootLanded);
-        rightFoot.Jump(jumpUpDuration, jumpDownDuration, onFootLanded);
+            leftFoot.Jump(jumpUpDuration, jumpDownDuration, onFootLanded);
+            rightFoot.Jump(jumpUpDuration, jumpDownDuration, onFootLanded);
+        }
     }
 
     private void OnJumpEndedInternal()
     {
         isJumping = false;
-        StopWalking();
+        if (!useAnimatorLegs)
+            StopWalking();
 
         if (isPlayerControlled && controls != null)
         {
             float input = controls.Player.Move.ReadValue<Vector2>().x;
             if (Mathf.Abs(input) > 0.2f)
                 HandleMovement(input, _flipped);
+        }
+
+        if (useAnimatorLegs && animator != null)
+        {
+            animator.SetBool("IsJumping", false);
         }
 
         OnJumpEnded?.Invoke();
@@ -207,23 +293,32 @@ public class RobotLocomotionController : MonoBehaviour
         if (!robotBehaviour.CanPerformEnergy(energyCostPerCrouch)) return;
 
         isCrouching = true;
-        StopWalking();
+        if (!useAnimatorLegs)
+            StopWalking();
         robotBehaviour?.ConsumeEnergy(energyCostPerCrouch);
         OnCrouchStarted?.Invoke();
 
-        int feetFinished = 0;
-        Action onFootFinished = () =>
+        if (useAnimatorLegs && animator != null)
         {
-            feetFinished++;
-            if (feetFinished >= 2)
+            animator.SetBool("IsWalking", false);
+            animator.SetBool("IsCrouching", true);
+        }
+        else
+        {
+            int feetFinished = 0;
+            Action onFootFinished = () =>
             {
-                isCrouching = false;
-                OnCrouchEnded?.Invoke();
-            }
-        };
+                feetFinished++;
+                if (feetFinished >= 2)
+                {
+                    isCrouching = false;
+                    OnCrouchEnded?.Invoke();
+                }
+            };
 
-        leftFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
-        rightFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
+            leftFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
+            rightFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
+        }
     }
 
     /// <summary>
@@ -231,9 +326,16 @@ public class RobotLocomotionController : MonoBehaviour
     /// </summary>
     public void Uncrouch()
     {
-        leftFoot?.InterruptAndReset();
-        rightFoot?.InterruptAndReset();
+        if (!useAnimatorLegs)
+        {
+            leftFoot?.InterruptAndReset();
+            rightFoot?.InterruptAndReset();
+        }
         isCrouching = false;
+        if (useAnimatorLegs && animator != null)
+        {
+            animator.SetBool("IsCrouching", false);
+        }
         OnCrouchEnded?.Invoke();
     }
     #endregion Crouch
@@ -247,4 +349,10 @@ public class RobotLocomotionController : MonoBehaviour
     }
 
     #endregion
+    private IEnumerator JumpSimpleRoutine()
+    {
+        float wait = Mathf.Max(0f, jumpUpDuration) + Mathf.Max(0f, jumpDownDuration);
+        yield return new WaitForSeconds(wait);
+        OnJumpEndedInternal();
+    }
 }

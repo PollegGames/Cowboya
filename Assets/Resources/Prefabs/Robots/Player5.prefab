@@ -536,7 +536,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5459847082946802603}
   m_Layer: 6
-  m_Name: RightArmTarget
+  m_Name: TargetRArm
   m_TagString: Player
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -1079,7 +1079,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7353721863927515775}
   m_Layer: 6
-  m_Name: PointsLegs
+  m_Name: Points
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1259,7 +1259,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3816361993170977825}
   m_Layer: 6
-  m_Name: LeftArmTarget
+  m_Name: TargetLArm
   m_TagString: Player
   m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -1692,7 +1692,7 @@ GameObject:
   - component: {fileID: 608097371732426208}
   - component: {fileID: 7086515708544877790}
   m_Layer: 6
-  m_Name: RightFootTarget
+  m_Name: TargetRLeg
   m_TagString: Player
   m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -2643,7 +2643,7 @@ GameObject:
   - component: {fileID: 9160219255922100572}
   - component: {fileID: 7313414750471531143}
   m_Layer: 6
-  m_Name: LeftFootTarget
+  m_Name: TargetLLeg
   m_TagString: Player
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -5284,6 +5284,7 @@ GameObject:
   - component: {fileID: 1795599177220237823}
   - component: {fileID: 923344538489071977}
   - component: {fileID: 5527916575216506076}
+  - component: {fileID: 2961474439911738946}
   m_Layer: 6
   m_Name: Player5
   m_TagString: Player
@@ -5426,6 +5427,12 @@ MonoBehaviour:
   crouchUpDuration: 0.1
   crouchDownDuration: 0.1
   isPlayerControlled: 1
+  useAnimatorLegs: 1
+  animator: {fileID: 2961474439911738946}
+  inputWalkThreshold: 0.35
+  walkAnimSpeedMin: 0.6
+  walkAnimSpeedMax: 1.2
+  walkAnimSpeedSmoothing: 12
   energyCostPerStep: 1
   energyCostPerJump: 5
   energyCostPerCrouch: 3
@@ -5658,6 +5665,28 @@ MonoBehaviour:
     mirrorZRotation: 0
     rightLocalX: 0
   startFacingRight: 1
+--- !u!95 &2961474439911738946
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9206399113533570876}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4c52d8f9d0a6484da6a7b19d19eac9c4, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &9206399113579118250
 GameObject:
   m_ObjectHideFlags: 0
