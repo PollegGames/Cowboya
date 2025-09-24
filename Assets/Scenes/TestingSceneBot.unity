@@ -2880,6 +2880,10 @@ PrefabInstance:
       value: 0.21799988
       objectReference: {fileID: 0}
     - target: {fileID: 2461518573604142914, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
+      propertyPath: walkCycleSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2461518573604142914, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: walkAnimSpeedMax
       value: 1
       objectReference: {fileID: 0}
@@ -2889,7 +2893,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2461518573604142914, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: inputWalkThreshold
-      value: 0.4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2461518573604142914, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: walkAnimSpeedSmoothing
@@ -3029,7 +3033,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5636757838470875837, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6175765597193063975, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6820944555317293332, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: m_ConnectedAnchor.x
@@ -3049,7 +3057,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7403415409301888627, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9206399112352681965, guid: 3d79397f1430ce148a33e5ce5707736b, type: 3}
       propertyPath: m_ConnectedAnchor.x
