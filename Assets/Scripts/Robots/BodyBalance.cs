@@ -40,6 +40,7 @@ public class BodyPart
 
     public void ActivateBalance()
     {
-        bone.MoveRotation(Mathf.LerpAngle(bone.rotation, restRotation, force * Time.deltaTime));
+        float t = Mathf.Clamp01(force * Time.deltaTime);
+        bone.MoveRotation(Mathf.LerpAngle(bone.rotation, restRotation, t));
     }
 }

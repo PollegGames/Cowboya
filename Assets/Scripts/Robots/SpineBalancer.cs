@@ -36,6 +36,9 @@ public sealed class SpineBalancer : MonoBehaviour
     [SerializeField] float tiltLpTau = 0.15f;         // low-pass time constant (s)
     [SerializeField] float maxAutoLean = 12f;         // clamp magnitude (deg)
     [SerializeField] float maxLeanRateDegPerSec = 180f; // clamp rate (deg/s)
+    [Header("Movement Suppression")]
+    [SerializeField, Min(0f)] float leanSuppressionSpeed = 1.5f;
+    [SerializeField, Range(0f, 1f)] float movingAutoBalanceScale = 0.35f;
     float _spineLen;
     Vector3 _vel;
 
@@ -77,6 +80,17 @@ public sealed class SpineBalancer : MonoBehaviour
         // 4) PD command
         float autoCmdDeg = autoBalance ? (-kp * tiltForCtrl) + (-kd * tiltVelDeg) : 0f;
         autoCmdDeg = Mathf.Clamp(autoCmdDeg, -maxAutoLean, +maxAutoLean);
+
+        if (autoBalance && hipsRb != null)
+        {
+            float moveSpeed = Mathf.Abs(hipsRb.linearVelocity.x);
+            if (moveSpeed > Mathf.Epsilon && leanSuppressionSpeed > Mathf.Epsilon)
+            {
+                float suppressionT = Mathf.Clamp01(moveSpeed / leanSuppressionSpeed);
+                float scale = Mathf.Lerp(1f, movingAutoBalanceScale, suppressionT);
+                autoCmdDeg *= scale;
+            }
+        }
 
         // 5) Rate limit the auto-lean output
         float maxStep = maxLeanRateDegPerSec * dt;
