@@ -5299,7 +5299,7 @@ MonoBehaviour:
   useAnimatorLegs: 1
   animator: {fileID: 2961474439911738946}
   inputWalkThreshold: 0
-  walkCycleSpeed: 0.5
+  walkCycleSpeed: 1
   energyCostPerStep: 1
   energyCostPerJump: 5
   energyCostPerCrouch: 3
