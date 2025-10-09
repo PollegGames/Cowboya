@@ -13,14 +13,23 @@ public class GrabHandAttractor : MonoBehaviour
     /// </summary>
     public IGrabbable DetectGrabbable()
     {
-        if (toggleBox.IsActive == false)
+        if (toggleBox != null && toggleBox.IsActive == false)
             return null;
-        Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, detectionRadius, detectionLayer);
+        int mask = detectionLayer.value;
+        if (mask == 0)
+            mask = ~0;
+
+        Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, detectionRadius);
         IGrabbable closestGrabbable = null;
         float closestDistance = float.MaxValue;
 
         foreach (Collider2D col in cols)
         {
+            if ((mask & (1 << col.gameObject.layer)) == 0)
+            {
+                continue;
+            }
+
             IGrabbable grabbable = col.GetComponent<IGrabbable>();
             if (grabbable == null)
             {

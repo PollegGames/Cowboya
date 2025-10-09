@@ -60,15 +60,28 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     TargetJoint2D joint;
     Transform followTarget;
     bool attached = false;
+    RigidbodyType2D originalBodyType;
+    float originalGravityScale;
 
     // Flag to ensure stolen logic only runs once
     bool wasStolen = false;
 
     Inventory ownerInventory;
 
+    void CacheOriginalPhysicsState()
+    {
+        if (rb == null)
+            return;
+
+        originalBodyType = rb.bodyType;
+        originalGravityScale = rb.gravityScale;
+    }
+
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        CacheOriginalPhysicsState();
         joint = GetComponent<TargetJoint2D>();
         if (joint != null)
         {
@@ -127,7 +140,23 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     public void OnGrab(Transform grabParent)
     {
+        if (grabParent == null)
+        {
+            Debug.LogWarning($"{nameof(SecurityBadgePickup)} received a null grab parent.");
+            return;
+        }
+
         var inventory = grabParent.GetComponentInParent<Inventory>();
+        if (inventory == null)
+            inventory = grabParent.GetComponent<Inventory>();
+        if (inventory == null && grabParent.root != null)
+            inventory = grabParent.root.GetComponentInChildren<Inventory>();
+        if (inventory == null)
+        {
+            var candidates = UnityEngine.Object.FindObjectsByType<Inventory>(FindObjectsSortMode.None);
+            if (candidates != null && candidates.Length > 0)
+                inventory = candidates[0];
+        }
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
         EnemyController enemy = null;
 
@@ -147,35 +176,60 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         }
 
         attached = true;
-        rb.simulated = true;
+
+        if (rb == null)
+            rb = GetComponent<Rigidbody2D>();
+
+        if (rb != null)
+        {
+            CacheOriginalPhysicsState();
+            rb.simulated = true;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.gravityScale = 0f;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(SecurityBadgePickup)} on {name} is missing a {nameof(Rigidbody2D)} component during grab.");
+        }
         if (inventory != null)
         {
             if (ownerInventory != null && ownerInventory != inventory)
                 ownerInventory.RemoveItem(PickupType.SecurityBadge);
             inventory.SetItem(PickupType.SecurityBadge, this);
             ownerInventory = inventory;
+#if UNITY_EDITOR
+            if (!ReferenceEquals(inventory.GetItem(PickupType.SecurityBadge), this))
+            {
+                Debug.LogWarning($"{nameof(SecurityBadgePickup)} on {name} failed to register in inventory {inventory.name}.");
+            }
+#endif
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(SecurityBadgePickup)} on {name} could not find an inventory to register with.");
         }
 
         // Detach from any previous hierarchy so the badge is no longer
         // parented to an enemy when picked up.
-        transform.SetParent(grabParent.root, true);
-
-        if (wasStolen && enemy != null && player != null)
-        {
-            enemy.HandleBadgeStolen();
-        }
+        Transform attachmentParent = grabParent.root;
 
         if (player != null)
         {
             var hip = player.BodyReference;
             if (hip != null)
-                SetFollowTarget(hip.transform);
-            else
-                SetFollowTarget(grabParent);
+            {
+                attachmentParent = hip.transform;
+            }
         }
-        else
+
+        transform.SetParent(attachmentParent, true);
+        SetFollowTarget(attachmentParent);
+
+        if (wasStolen && enemy != null && player != null)
         {
-            SetFollowTarget(grabParent);
+            enemy.HandleBadgeStolen();
         }
 
     }
@@ -197,6 +251,14 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
         // Re-parent to world root so it no longer follows any holder.
         transform.SetParent(null, worldPositionStays: true);
+        if (rb != null)
+        {
+            rb.bodyType = originalBodyType;
+            rb.gravityScale = originalGravityScale;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.simulated = true;
+        }
 
         if (ownerInventory != null)
         {

@@ -132,8 +132,16 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     public List<RoomWaypoint> GetActiveWaypointsList() => GetActiveWaypoints(); // alias
 
-    public void BuildAllNeighbors(bool includeUnavailable = false) =>
+    public void BuildAllNeighbors(bool includeUnavailable = false)
+    {
+        if (pathFinder == null)
+        {
+            Debug.LogWarning($"{nameof(WaypointService)} is missing a path finder.");
+            return;
+        }
+
         pathFinder.BuildAllNeighbors(includeUnavailable);
+    }
 
     public RoomWaypoint ClosestWaypointToPlayer { get; private set; }
     #endregion

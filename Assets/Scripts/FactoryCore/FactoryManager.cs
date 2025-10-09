@@ -26,19 +26,32 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     public GameObject playerInstance { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
 
-    public void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup,IEnemiesSpawner enemiesSpawner)
+    public void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup, IEnemiesSpawner enemiesSpawner)
     {
         this.mapManager = mapManager;
         this.waypointService = waypointService;
         this.victorySetup = victorySetup;
 
-        // Reset the alarm to a known state before any room logic or AI is created
         SetupFactoryState();
 
-        mapManager.InitializeGrid();
-        mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager, spawningWorkerManager, enemiesSpawner);
-        waypointService.BuildAllNeighbors(includeUnavailable: true);
+        if (this.mapManager == null)
+        {
+            Debug.LogError("FactoryManager: MapManager reference is required for initialization.");
+            return;
+        }
+
+        if (this.waypointService == null)
+        {
+            Debug.LogWarning("FactoryManager: WaypointService reference was not provided. Navigation data will not be built.");
+        }
+
+        this.mapManager.InitializeGrid();
+        this.mapManager.RegisterFactoryInEachRoom(this, machineWorkerManager, machineSecurityManager, spawningWorkerManager, enemiesSpawner);
+
+        if (this.waypointService != null)
+            this.waypointService.BuildAllNeighbors(includeUnavailable: true);
     }
+
 
 
     private void Update()
@@ -65,7 +78,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         }
         else
         {
-            Debug.LogError("FactoryManager: FactoryAlarmStatus reference is missing.");
+            Debug.LogWarning("FactoryManager: FactoryAlarmStatus reference is missing.");
         }
     }
 
@@ -96,23 +109,40 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 
     public void OnRobotSaved()
     {
-        victorySetup.currentSaved++;
+        if (victorySetup != null)
+        {
+            victorySetup.currentSaved++;
+        }
+        else
+        {
+            Debug.LogWarning("FactoryManager: VictorySetup reference is missing when saving a robot.");
+        }
+
         Debug.Log("Robot SAVED");
         playerStats?.UpdateMorality(1f);
-        // Optionally: Check for victory condition here
-        if (victorySetup.currentSaved >= victorySetup.robotsSavedTarget)
+
+        if (victorySetup != null && factoryAlarmStatus != null && victorySetup.currentSaved >= victorySetup.robotsSavedTarget)
         {
             factoryAlarmStatus.CurrentAlarmState = AlarmState.Revolt;
         }
     }
 
+
     public void OnRobotKilled()
     {
-        victorySetup.currentKilled++;
+        if (victorySetup != null)
+        {
+            victorySetup.currentKilled++;
+        }
+        else
+        {
+            Debug.LogWarning("FactoryManager: VictorySetup reference is missing when killing a robot.");
+        }
+
         Debug.Log("Robot KILLED");
         playerStats?.UpdateMorality(-1f);
-        // Optionally: Check for victory condition here
     }
+
 
     private void HandlePlayerStateChange(RobotState newState)
     {

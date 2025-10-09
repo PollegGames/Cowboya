@@ -49,9 +49,11 @@ public class SceneInitiator : GameInitiator
         {
             this.mapConfig = RunProgressManager.Instance.CurrentConfig;
         }
-        else
+        else if (this.mapConfig == null)
         {
-            Debug.LogError("RunProgressManager instance not found.");
+            // Provide a lightweight default so edit-mode tests do not require
+            // the global RunProgressManager singleton.
+            this.mapConfig = ScriptableObject.CreateInstance<RunMapConfigSO>();
         }
 
         InitializeSceneSpecificObjects();
@@ -70,20 +72,40 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeFactory()
     {
-        if (mapConfig != null)
+        if (factoryManager == null)
         {
-            mapManager.BuildFromConfig(mapConfig);
+            Debug.LogWarning("SceneInitiator: FactoryManager is not assigned; skipping factory initialization.");
+            return;
+        }
+
+        if (mapManager != null)
+        {
+            if (mapConfig != null)
+            {
+                mapManager.BuildFromConfig(mapConfig);
+            }
+            else
+            {
+                Debug.LogWarning("SceneInitiator: Map config is null; skipping map build.");
+            }
         }
         else
         {
-            Debug.LogError("SceneInitiator: Map config is null.");
+            Debug.LogWarning("SceneInitiator: MapManager is not assigned; skipping map build.");
         }
+
         factoryManager.Initialize(mapManager, waypointService, victorySetup, enemiesSpawner);
         Debug.Log("FactoryManager initialized.");
     }
 
     private void InitializePlayer()
     {
+        if (playerInitiator == null || factoryManager == null)
+        {
+            Debug.LogWarning("SceneInitiator: Player dependencies are missing; skipping player initialization.");
+            return;
+        }
+
         Vector3 startPos = factoryManager.GetStartCellWorldPosition();
 
         playerInitiator.SetPlayerStartPosition(startPos);
@@ -102,11 +124,10 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeHintManager()
     {
-         // --- Setup HintManager here ---
-        if (hintManager != null && playerInitiator.playerInstance != null)
+        if (hintManager != null && playerInitiator != null && playerInitiator.playerInstance != null)
         {
             var playerState = playerInitiator.playerInstance.GetComponent<PlayerMovementController>();
-            var inputSource = playerState.Input;
+            var inputSource = playerState != null ? playerState.Input : null;
             var health = playerInitiator.playerInstance.GetComponent<HealthBot>();
             var inventory = playerInitiator.playerInstance.GetComponent<Inventory>();
             hintManager.Setup(inputSource, health, inventory);
@@ -115,28 +136,35 @@ public class SceneInitiator : GameInitiator
 
     private void InitializeEnemies()
     {
-        enemiesSpawner?.SetDropContainer(mapManager.transform);
-        enemiesSpawner?.Initialize(
+        if (enemiesSpawner == null || factoryManager == null)
+        {
+            Debug.LogWarning("SceneInitiator: Enemy setup dependencies are missing; skipping enemy initialization.");
+            return;
+        }
+
+        Transform dropContainer = mapManager != null ? mapManager.transform : null;
+        enemiesSpawner.SetDropContainer(dropContainer);
+        enemiesSpawner.Initialize(
             mapManager,
-             waypointService,
-             gameUIViewModel,
-             respawnService,
-             factoryManager.SecurityManager,
-             securityBadgeSpawner,
-             batterySpawner);
+            waypointService,
+            gameUIViewModel,
+            respawnService,
+            factoryManager.SecurityManager,
+            securityBadgeSpawner,
+            batterySpawner);
         if (mapConfig != null)
         {
-            enemiesSpawner?.CreateWorkers(mapConfig.workersCount);
-            enemiesSpawner?.CreateWorkerSpawners(mapConfig.blockedCount);
-            enemiesSpawner?.CreateSecurityGuards(mapConfig.enemiesCount);
-            enemiesSpawner?.CreateBoss();
+            enemiesSpawner.CreateWorkers(mapConfig.workersCount);
+            enemiesSpawner.CreateWorkerSpawners(mapConfig.blockedCount);
+            enemiesSpawner.CreateSecurityGuards(mapConfig.enemiesCount);
+            enemiesSpawner.CreateBoss();
         }
-        enemiesSpawner?.SpreadEnemies();
+        enemiesSpawner.SpreadEnemies();
     }
 
     private void InitializeSceneController()
     {
-        if (SceneController.instance != null)
+        if (SceneController.instance != null && factoryManager != null)
         {
             sceneController = SceneController.instance;
             sceneController.Initialize(factoryManager);

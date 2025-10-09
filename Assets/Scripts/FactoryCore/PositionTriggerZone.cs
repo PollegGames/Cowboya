@@ -40,12 +40,12 @@ public class PositionTriggerZone : MonoBehaviour
 
     protected virtual void OnEnterZone(Collider2D collider)
     {
-        onEnter.Invoke(collider); // Pass the detected collider
+        onEnter?.Invoke(collider); // Pass the detected collider
     }
 
     protected virtual void OnExitZone()
     {
-        onExit.Invoke();
+        onExit?.Invoke();
     }
 
     private void OnDrawGizmos()

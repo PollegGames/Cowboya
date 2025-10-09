@@ -7,7 +7,16 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class CubeCollector : MonoBehaviour
 {
-    [SerializeField] private CubeUpgradeSO upgradeConfig; 
+    [SerializeField] private CubeUpgradeSO upgradeStore;
+    [SerializeField, HideInInspector] private CubeUpgradeSO upgradeConfig; // legacy serialization support
+
+    private CubeUpgradeSO ActiveUpgradeStore => upgradeStore != null ? upgradeStore : upgradeConfig;
+
+    private void OnValidate()
+    {
+        if (upgradeStore == null && upgradeConfig != null)
+            upgradeStore = upgradeConfig;
+    }
 
     private void Awake()
     {
@@ -20,31 +29,63 @@ public class CubeCollector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other == null) return;
+        if (other == null)
+            return;
 
         var pickup = other.GetComponent<CubePickup>();
         var cube = other.GetComponent<CubeUpgrade>();
-        if (pickup == null || cube == null) return;
+        if (pickup == null || cube == null)
+            return;
 
-        var runStats = RunProgressManager.Instance?.RunStats;
+        StoreUpgrade(cube.UpgradeType);
+        ApplyRunBonuses(cube.UpgradeType);
 
-        if (runStats != null)
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
         {
-            switch (cube.UpgradeType)
-            {
-                case CubeUpgradeType.MaxHealth:
-                    runStats.MaxHealthBonus += upgradeConfig.UpgradeMaxHealthValue; break;
-                case CubeUpgradeType.MaxEnergy:
-                    runStats.MaxEnergyBonus += upgradeConfig.UpgradeMaxEnergyValue; break;
-                case CubeUpgradeType.EnergyRecharge:
-                    runStats.AddEnergyRechargeBonus(upgradeConfig.UpgradeEnergyRechargeValue); break;
-                case CubeUpgradeType.AttackDamage:
-                    runStats.AttackDamageBonus += upgradeConfig.UpgradeAttackDamageValue; break;
-            }
+            UnityEngine.Object.DestroyImmediate(pickup.gameObject);
+            return;
         }
+#endif
+        UnityEngine.Object.Destroy(pickup.gameObject);
+    }
 
-        // Do NOT call ApplyUpgrade(...) and do NOT Capture() here anymore.
-        Destroy(pickup.gameObject);
+    private void StoreUpgrade(CubeUpgradeType upgrade)
+    {
+        var store = ActiveUpgradeStore;
+        if (store != null)
+        {
+            store.Store(upgrade);
+            upgradeStore = store;
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(CubeCollector)} on {name} has no {nameof(CubeUpgradeSO)} assigned.");
+        }
+    }
+
+    private void ApplyRunBonuses(CubeUpgradeType upgrade)
+    {
+        var manager = RunProgressManager.Instance;
+        var runStats = manager != null ? manager.RunStats : null;
+        var store = ActiveUpgradeStore;
+        if (runStats == null || store == null)
+            return;
+
+        switch (upgrade)
+        {
+            case CubeUpgradeType.MaxHealth:
+                runStats.MaxHealthBonus += store.UpgradeMaxHealthValue;
+                break;
+            case CubeUpgradeType.MaxEnergy:
+                runStats.MaxEnergyBonus += store.UpgradeMaxEnergyValue;
+                break;
+            case CubeUpgradeType.EnergyRecharge:
+                runStats.AddEnergyRechargeBonus(store.UpgradeEnergyRechargeValue);
+                break;
+            case CubeUpgradeType.AttackDamage:
+                runStats.AttackDamageBonus += store.UpgradeAttackDamageValue;
+                break;
+        }
     }
 }
-

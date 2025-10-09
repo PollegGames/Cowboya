@@ -12,41 +12,61 @@ public abstract class GameInitiator : MonoBehaviour
     protected EventSystem _mainEventSystem;
     protected CinemachineCamera _cinemachine;
 
-     protected void InitializeSharedObjects()
+    protected void InitializeSharedObjects()
     {
         // Instantiate or ensure the Main Camera exists
         if (_mainCamera == null)
         {
-            var cameraInstance = Instantiate(_mainCameraPrefab);
-            _mainCamera = cameraInstance.GetComponent<Camera>();
-            if (_mainCamera.GetComponent<CinemachineBrain>() == null)
+            if (_mainCameraPrefab != null)
             {
-                _mainCamera.gameObject.AddComponent<CinemachineBrain>();
+                var cameraInstance = Instantiate(_mainCameraPrefab);
+                _mainCamera = cameraInstance.GetComponent<Camera>();
+                if (_mainCamera != null && _mainCamera.GetComponent<CinemachineBrain>() == null)
+                {
+                    _mainCamera.gameObject.AddComponent<CinemachineBrain>();
+                }
+                Debug.Log("Main Camera initialized with Cinemachine Brain.");
             }
-            Debug.Log("Main Camera initialized with Cinemachine Brain.");
+            else
+            {
+                Debug.LogWarning("GameInitiator: Main Camera prefab not assigned; skipping creation.");
+            }
         }
 
         // Instantiate or ensure the Event System exists
         if (_mainEventSystem == null)
         {
-            var eventSystemInstance = Instantiate(_mainEventSystemPrefab);
-            _mainEventSystem = eventSystemInstance.GetComponent<EventSystem>();
-            Debug.Log("Event System initialized.");
+            if (_mainEventSystemPrefab != null)
+            {
+                var eventSystemInstance = Instantiate(_mainEventSystemPrefab);
+                _mainEventSystem = eventSystemInstance.GetComponent<EventSystem>();
+                Debug.Log("Event System initialized.");
+            }
+            else
+            {
+                Debug.LogWarning("GameInitiator: Event System prefab not assigned; skipping creation.");
+            }
         }
 
         // Instantiate the Cinemachine Virtual Camera
         if (_cinemachine == null)
         {
-            var cinemachineInstance = Instantiate(_cinemachinePrefab);
-            _cinemachine = cinemachineInstance.GetComponent<CinemachineCamera>();
-
-            Debug.Log("Cinemachine Virtual Camera initialized.");
+            if (_cinemachinePrefab != null)
+            {
+                var cinemachineInstance = Instantiate(_cinemachinePrefab);
+                _cinemachine = cinemachineInstance.GetComponent<CinemachineCamera>();
+                Debug.Log("Cinemachine Virtual Camera initialized.");
+            }
+            else
+            {
+                Debug.LogWarning("GameInitiator: Cinemachine prefab not assigned; skipping creation.");
+            }
         }
     }
 
-     protected void SetCinemachineTarget(Transform target)
+    protected void SetCinemachineTarget(Transform target)
     {
-        if (_cinemachine != null)
+        if (_cinemachine != null && target != null)
         {
             _cinemachine.Follow = target;
             _cinemachine.LookAt = target;
@@ -54,7 +74,7 @@ public abstract class GameInitiator : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Cinemachine Virtual Camera is not initialized.");
+            Debug.LogWarning("Cinemachine Virtual Camera or target is not initialized.");
         }
     }
 

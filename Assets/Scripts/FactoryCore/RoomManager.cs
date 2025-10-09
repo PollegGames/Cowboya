@@ -36,45 +36,69 @@ public class RoomManager : MonoBehaviour
     {
         FactoryManager = factoryManager;
 
-        // 1) pull the service
-        waypointService = factoryManager.GetWayPointService();
-
-        // 2) register room & its grid cell and register all the door/lift waypoints
-        foreach (var wp in waypoints)
-            wp.parentRoom = this;
-        waypointService.RegisterRoomWaypoints(this, waypoints);
-
-        // 3) register machines in this room
-        foreach (var factoryMachine in factorymMachinesInRoom)
+        if (factoryManager != null)
         {
-            factoryMachine.InitializeWaypointService(waypointService);
-            machineWorkerManager.RegisterMachine(factoryMachine);
-            machineSecurityManager?.RegisterFactoryMachine(factoryMachine);
+            var service = factoryManager.GetWayPointService();
+            if (service != null)
+                waypointService = service;
         }
 
-        // 4) hook up alarm + triggers
-        factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
+        waypoints ??= new List<RoomWaypoint>();
 
-        // 5) register spawning machines
-        foreach (var spawningMachine in spawningMachinesInRoom)
+        if (waypointService != null)
         {
-            spawningMachine.InitializeWaypointService(waypointService);
-            spawningMachine.InitializeSpawner(enemiesSpawner);
-            spawningMachine.InitializeSecurityManager(machineSecurityManager);
-            spawningWorkerManager?.RegisterMachine(spawningMachine);
+            foreach (var wp in waypoints)
+            {
+                if (wp != null)
+                    wp.parentRoom = this;
+            }
+            waypointService.RegisterRoomWaypoints(this, waypoints);
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(RoomManager)} '{name}' has no waypoint service to register with.");
         }
 
-        foreach (var restingMachine in restingMachinesInRoom)
+        if (waypointService != null)
         {
-            restingMachine.InitializeWaypointService(waypointService);
-            machineSecurityManager?.RegisterRestingMachine(restingMachine);
+            foreach (var factoryMachine in factorymMachinesInRoom)
+            {
+                if (factoryMachine == null)
+                    continue;
+                factoryMachine.InitializeWaypointService(waypointService);
+                machineWorkerManager?.RegisterMachine(factoryMachine);
+                machineSecurityManager?.RegisterFactoryMachine(factoryMachine);
+            }
+
+            foreach (var spawningMachine in spawningMachinesInRoom)
+            {
+                if (spawningMachine == null)
+                    continue;
+                spawningMachine.InitializeWaypointService(waypointService);
+                spawningMachine.InitializeSpawner(enemiesSpawner);
+                spawningMachine.InitializeSecurityManager(machineSecurityManager);
+                spawningWorkerManager?.RegisterMachine(spawningMachine);
+            }
+
+            foreach (var restingMachine in restingMachinesInRoom)
+            {
+                if (restingMachine == null)
+                    continue;
+                restingMachine.InitializeWaypointService(waypointService);
+                machineSecurityManager?.RegisterRestingMachine(restingMachine);
+            }
+
+            foreach (var securityMachine in securityMachinesInRoom)
+            {
+                if (securityMachine == null)
+                    continue;
+                securityMachine.InitializeWaypointService(waypointService);
+                machineSecurityManager?.RegisterSecurityMachine(securityMachine);
+            }
         }
 
-        foreach (var securityMachine in securityMachinesInRoom)
-        {
-            securityMachine.InitializeWaypointService(waypointService);
-            machineSecurityManager?.RegisterSecurityMachine(securityMachine);
-        }
+        if (factoryManager != null)
+            factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
     }
 
     private void OnDestroy()
@@ -89,10 +113,22 @@ public class RoomManager : MonoBehaviour
     public void SetWaypointStatus(RoomWaypoint waypoint, bool open)
     {
         waypoint.IsAvailable = open;
-        waypointService.NotifyWaypointStatusChanged(waypoint, open);
+        if (waypointService != null)
+        {
+            waypointService.NotifyWaypointStatusChanged(waypoint, open);
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(RoomManager)} '{name}' cannot notify waypoint changes without a waypoint service.");
+        }
     }
 
-    public List<RoomWaypoint> GetWaypoints() => waypoints;
+    public List<RoomWaypoint> GetWaypoints()
+    {
+        if (waypoints == null)
+            waypoints = new List<RoomWaypoint>();
+        return waypoints;
+    }
     private void Start()
     {
         if (roomProperties == null)

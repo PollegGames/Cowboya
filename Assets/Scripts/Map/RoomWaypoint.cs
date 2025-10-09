@@ -17,7 +17,7 @@ public class RoomWaypoint : MonoBehaviour
 
     // <-- add this:
     /// <summary>All the other RoomWaypoints this one is linked to.</summary>
-    public List<RoomWaypoint> Neighbors { get; private set; }
+    public List<RoomWaypoint> Neighbors { get; private set; } = new List<RoomWaypoint>();
 
     private void Awake()
     {

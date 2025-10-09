@@ -62,13 +62,23 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     private bool attached = false;
     private bool wasStolen = false;
     private float originalGravityScale;
+    private RigidbodyType2D originalBodyType;
 
     private Inventory ownerInventory;
+
+    private void CacheOriginalPhysicsState()
+    {
+        if (rb == null)
+            return;
+
+        originalBodyType = rb.bodyType;
+        originalGravityScale = rb.gravityScale;
+    }
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        originalGravityScale = rb.gravityScale;
+        CacheOriginalPhysicsState();
         joint = GetComponent<TargetJoint2D>();
         if (joint != null)
         {
@@ -126,8 +136,46 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
     public void OnGrab(Transform grabParent)
     {
-        var inventory = grabParent.GetComponentInParent<Inventory>();
+        if (grabParent == null)
+        {
+            Debug.LogWarning($"{nameof(BatteryPickup)} received a null grab parent.");
+            return;
+        }
+
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
+
+        Inventory inventory = null;
+        if (player != null)
+        {
+            inventory = player.GetComponent<Inventory>();
+            if (inventory == null)
+                inventory = player.GetComponentInChildren<Inventory>();
+        }
+
+        if (inventory == null)
+        {
+            inventory = grabParent.GetComponent<Inventory>();
+            if (inventory == null)
+                inventory = grabParent.GetComponentInParent<Inventory>();
+        }
+
+        if (inventory == null && grabParent.root != null)
+        {
+            var root = grabParent.root;
+            inventory = root.GetComponent<Inventory>();
+            if (inventory == null)
+                inventory = root.GetComponentInChildren<Inventory>();
+        }
+
+        if (inventory == null && ownerInventory != null)
+            inventory = ownerInventory;
+
+        if (inventory == null)
+        {
+            var candidates = UnityEngine.Object.FindObjectsByType<Inventory>(FindObjectsSortMode.None);
+            if (candidates != null && candidates.Length > 0)
+                inventory = candidates[0];
+        }
 
         if (!wasStolen && transform.parent != null)
         {
@@ -145,8 +193,23 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         }
 
         attached = true;
-        rb.simulated = true;
-        rb.gravityScale = 0f;
+
+        if (rb == null)
+            rb = GetComponent<Rigidbody2D>();
+
+        if (rb != null)
+        {
+            CacheOriginalPhysicsState();
+            rb.simulated = true;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.gravityScale = 0f;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(BatteryPickup)} on {name} is missing a {nameof(Rigidbody2D)} component during grab.");
+        }
 
         var holderState = grabParent.GetComponentInParent<RobotStateController>();
         if (holderState != null)
@@ -158,22 +221,36 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
                 ownerInventory.RemoveItem(PickupType.Battery);
             inventory.SetItem(PickupType.Battery, this);
             ownerInventory = inventory;
+#if UNITY_EDITOR
+            if (!ReferenceEquals(inventory.GetItem(PickupType.Battery), this))
+            {
+                Debug.LogWarning($"{nameof(BatteryPickup)} on {name} failed to register in inventory {inventory.name}.");
+            }
+#endif
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(BatteryPickup)} on {name} could not find an inventory to register with.");
         }
 
         if (player != null)
         {
             var hip = player.BodyReference;
-            // Detach from any previous hierarchy so the badge is no longer
-            // parented to an enemy when picked up.
-            transform.SetParent(hip.transform, true);
-
             if (hip != null)
-                SetFollowTarget(hip.transform);
+            {
+                var hipTransform = hip.transform;
+                transform.SetParent(hipTransform, true);
+                SetFollowTarget(hipTransform);
+            }
             else
+            {
+                transform.SetParent(grabParent, true);
                 SetFollowTarget(grabParent);
+            }
         }
         else
         {
+            transform.SetParent(grabParent, true);
             SetFollowTarget(grabParent);
         }
     }
@@ -197,8 +274,10 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         if (rb != null)
         {
-            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.bodyType = originalBodyType;
             rb.gravityScale = originalGravityScale;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
             rb.simulated = true;
         }
         else

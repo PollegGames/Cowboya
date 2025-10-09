@@ -80,8 +80,22 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject
         this.waypointNotifier = waypointNotifier;
         if (pathFollower == null)
             SetupPathFollower();
-        waypointNotifier.Subscribe(pathFollower);
-        memory.SetRespawnService(respawnService);
+        if (this.waypointNotifier != null && pathFollower != null)
+            this.waypointNotifier.Subscribe(pathFollower);
+
+        if (memory == null)
+        {
+            if (memoryComponent == null)
+                memoryComponent = GetComponent<RobotMemory>();
+            memory = memoryComponent != null ? memoryComponent : GetComponent<RobotMemory>();
+        }
+
+        if (memory != null && respawnService != null)
+            memory.SetRespawnService(respawnService);
+
+        if (inventory == null)
+            inventory = GetComponent<Inventory>();
+
         this.dropContainer = dropContainer;
         this.securityBadgeSpawner = securityBadgeSpawner;
 
@@ -89,7 +103,8 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject
         {
             if (securityBadgeSpawner && initialBadge == null)
             {
-                initialBadge = securityBadgeSpawner.SpawnBadge(bodyReference);
+                var badgeParent = bodyReference != null ? bodyReference : transform;
+                initialBadge = securityBadgeSpawner.SpawnBadge(badgeParent);
                 if (inventory != null && initialBadge != null)
                 {
                     initialBadge.AssignInventory(inventory);
@@ -226,7 +241,20 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject
 
     public void OnBadgeStolen(GameObject player)
     {
-        Debug.Log($"{name} badge stolen by {player.name}");
+        var thiefName = player != null ? player.name : "unknown";
+        Debug.Log($"{name} badge stolen by {thiefName}");
+
+        if (EnemyStatus != EnemyStatus.Following)
+        {
+            if (alarmStatus != null && waypointQueries != null)
+            {
+                SetFollowerState(alarmStatus);
+            }
+            else
+            {
+                EnemyStatus = EnemyStatus.Following;
+            }
+        }
     }
 
     /// <summary>

@@ -1,0 +1,935 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="91" result="Failed(Child)" total="91" passed="69" failed="22" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-10-09 12:09:13Z" end-time="2025-10-09 12:09:14Z" duration="0.7329951">
+  <test-suite type="TestSuite" id="1137" name="CowBoya" fullname="CowBoya" runstate="Runnable" testcasecount="91" result="Failed" site="Child" start-time="2025-10-09 12:09:13Z" end-time="2025-10-09 12:09:14Z" duration="0.732995" total="91" passed="69" failed="22" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1131" name="Assembly-CSharp-Editor.dll" fullname="C:/Dev/Projects/CowBoya/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="91" result="Failed" site="Child" start-time="2025-10-09 12:09:13Z" end-time="2025-10-09 12:09:14Z" duration="0.726535" total="91" passed="69" failed="22" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="12172" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1001" name="AllyBehaviorTests" fullname="AllyBehaviorTests" classname="AllyBehaviorTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2025-10-09 12:09:13Z" end-time="2025-10-09 12:09:14Z" duration="0.040265" total="5" passed="2" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1005" name="EnemyPunching_LeftArmReturnsToLeftRest" fullname="AllyBehaviorTests.EnemyPunching_LeftArmReturnsToLeftRest" methodname="EnemyPunching_LeftArmReturnsToLeftRest" classname="AllyBehaviorTests" runstate="Runnable" seed="1068183180" result="Failed" start-time="2025-10-09 12:09:13Z" end-time="2025-10-09 12:09:14Z" duration="0.015111" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: less than 0.00999999978f
+  But was:  1.0f
+]]></message>
+            <stack-trace><![CDATA[at AllyBehaviorTests+<EnemyPunching_LeftArmReturnsToLeftRest>d__6.MoveNext () [0x0024f] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\AllyBehaviorTests.cs:212
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0004e] in .\Library\PackageCache\com.unity.test-framework\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1004" name="EnemyPunching_RightArmReturnsToRightRest" fullname="AllyBehaviorTests.EnemyPunching_RightArmReturnsToRightRest" methodname="EnemyPunching_RightArmReturnsToRightRest" classname="AllyBehaviorTests" runstate="Runnable" seed="2075879469" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.013060" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: less than 0.00999999978f
+  But was:  1.0f
+]]></message>
+            <stack-trace><![CDATA[at AllyBehaviorTests+<EnemyPunching_RightArmReturnsToRightRest>d__5.MoveNext () [0x0024f] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\AllyBehaviorTests.cs:173
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0004e] in .\Library\PackageCache\com.unity.test-framework\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1003" name="EnemyPunching_TracksPlayerPosition" fullname="AllyBehaviorTests.EnemyPunching_TracksPlayerPosition" methodname="EnemyPunching_TracksPlayerPosition" classname="AllyBehaviorTests" runstate="Runnable" seed="210432650" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001159" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[  at AllyBehaviorTests.EnemyPunching_TracksPlayerPosition () [0x00039] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\AllyBehaviorTests.cs:113 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1006" name="MachineShutdown_TurnsOffAndRaisesEvents" fullname="AllyBehaviorTests.MachineShutdown_TurnsOffAndRaisesEvents" methodname="MachineShutdown_TurnsOffAndRaisesEvents" classname="AllyBehaviorTests" runstate="Runnable" seed="1815960215" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001393" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1002" name="WaypointNavigation_UsesServiceAndNotifiesListener" fullname="AllyBehaviorTests.WaypointNavigation_UsesServiceAndNotifiesListener" methodname="WaypointNavigation_UsesServiceAndNotifiesListener" classname="AllyBehaviorTests" runstate="Runnable" seed="818790762" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.006949" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1007" name="BatteryPickupTests" fullname="BatteryPickupTests" classname="BatteryPickupTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.014633" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1008" name="Battery_AddsHealthAndAttaches" fullname="BatteryPickupTests.Battery_AddsHealthAndAttaches" methodname="Battery_AddsHealthAndAttaches" classname="BatteryPickupTests" runstate="Runnable" seed="1988333230" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001398" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: <battery (BatteryPickup)>
+  But was:  null
+]]></message>
+            <stack-trace><![CDATA[at BatteryPickupTests.Battery_AddsHealthAndAttaches () [0x000fd] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\BatteryPickupTests.cs:44
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1009" name="Battery_DisablesPhysicsWhileGrabbed" fullname="BatteryPickupTests.Battery_DisablesPhysicsWhileGrabbed" methodname="Battery_DisablesPhysicsWhileGrabbed" classname="BatteryPickupTests" runstate="Runnable" seed="2117362989" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000245" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1010" name="BatteryStealFromEnemyTests" fullname="BatteryStealFromEnemyTests" classname="BatteryStealFromEnemyTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.016921" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1011" name="StealBattery_TransfersInventoryAndDamagesEnemy" fullname="BatteryStealFromEnemyTests.StealBattery_TransfersInventoryAndDamagesEnemy" methodname="StealBattery_TransfersInventoryAndDamagesEnemy" classname="BatteryStealFromEnemyTests" runstate="Runnable" seed="216927205" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003997" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: <battery (BatteryPickup)>
+  But was:  null
+]]></message>
+            <stack-trace><![CDATA[at BatteryStealFromEnemyTests.StealBattery_TransfersInventoryAndDamagesEnemy () [0x00276] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\BatteryStealFromEnemyTests.cs:108
+]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1012" name="BatteryTheftTests" fullname="BatteryTheftTests" classname="BatteryTheftTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.018063" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1013" name="StealingBattery_ReducesEnemyHealth" fullname="BatteryTheftTests.StealingBattery_ReducesEnemyHealth" methodname="StealingBattery_ReducesEnemyHealth" classname="BatteryTheftTests" runstate="Runnable" seed="76317969" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003513" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[enemy battery stolen by player
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1014" name="CellProcessorTests" fullname="CellProcessorTests" classname="CellProcessorTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.020686" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1015" name="ProcessCells_Implemented" fullname="CellProcessorTests.ProcessCells_Implemented" methodname="ProcessCells_Implemented" classname="CellProcessorTests" runstate="Runnable" seed="67723811" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002934" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1016" name="CellPropertiesTests" fullname="CellPropertiesTests" classname="CellPropertiesTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.016498" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1017" name="Properties_DefaultValues" fullname="CellPropertiesTests.Properties_DefaultValues" methodname="Properties_DefaultValues" classname="CellPropertiesTests" runstate="Runnable" seed="1171756061" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000546" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1018" name="CellTests" fullname="CellTests" classname="CellTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.009859" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1019" name="Constructor_InitializesValues" fullname="CellTests.Constructor_InitializesValues" methodname="Constructor_InitializesValues" classname="CellTests" runstate="Runnable" seed="2145318843" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001633" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1020" name="CubeCollectorTests" fullname="CubeCollectorTests" classname="CubeCollectorTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.012930" total="3" passed="1" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1023" name="CollectorIncrementsEnergyRechargeRunStats" fullname="CubeCollectorTests.CollectorIncrementsEnergyRechargeRunStats" methodname="CollectorIncrementsEnergyRechargeRunStats" classname="CubeCollectorTests" runstate="Runnable" seed="1111351850" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002467" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: 5.0f
+  But was:  0.0f
+]]></message>
+            <stack-trace><![CDATA[at CubeCollectorTests.CollectorIncrementsEnergyRechargeRunStats () [0x0013a] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\CubeCollectorTests.cs:123
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1022" name="CollectorIncrementsRunStats" fullname="CubeCollectorTests.CollectorIncrementsRunStats" methodname="CollectorIncrementsRunStats" classname="CubeCollectorTests" runstate="Runnable" seed="1760333976" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000996" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: 10.0f
+  But was:  0.0f
+]]></message>
+            <stack-trace><![CDATA[at CubeCollectorTests.CollectorIncrementsRunStats () [0x0013a] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\CubeCollectorTests.cs:79
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1021" name="CollectorStoresUpgradeFromCube" fullname="CubeCollectorTests.CollectorStoresUpgradeFromCube" methodname="CollectorStoresUpgradeFromCube" classname="CubeCollectorTests" runstate="Runnable" seed="265982017" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000587" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1024" name="CubeUpgradeSOTests" fullname="CubeUpgradeSOTests" classname="CubeUpgradeSOTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.013304" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1025" name="ApplyUpgradeUpdatesEnergyRecharge" fullname="CubeUpgradeSOTests.ApplyUpgradeUpdatesEnergyRecharge" methodname="ApplyUpgradeUpdatesEnergyRecharge" classname="CubeUpgradeSOTests" runstate="Runnable" seed="343820062" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000699" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1026" name="EnemiesSpawnerTests" fullname="EnemiesSpawnerTests" classname="EnemiesSpawnerTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.019567" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1029" name="CreateBoss_CreatesBossInstances" fullname="EnemiesSpawnerTests.CreateBoss_CreatesBossInstances" methodname="CreateBoss_CreatesBossInstances" classname="EnemiesSpawnerTests" runstate="Runnable" seed="1924566046" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000528" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1028" name="CreateEnemies_CreatesInstances" fullname="EnemiesSpawnerTests.CreateEnemies_CreatesInstances" methodname="CreateEnemies_CreatesInstances" classname="EnemiesSpawnerTests" runstate="Runnable" seed="318552203" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000196" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1027" name="Initialize_SetsDependencies" fullname="EnemiesSpawnerTests.Initialize_SetsDependencies" methodname="Initialize_SetsDependencies" classname="EnemiesSpawnerTests" runstate="Runnable" seed="837479572" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000185" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1032" name="SpawnBossAtRandom_CreatesBoss" fullname="EnemiesSpawnerTests.SpawnBossAtRandom_CreatesBoss" methodname="SpawnBossAtRandom_CreatesBoss" classname="EnemiesSpawnerTests" runstate="Runnable" seed="1592944640" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000182" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1031" name="SpawnEnemyAtRandom_CreatesEnemy" fullname="EnemiesSpawnerTests.SpawnEnemyAtRandom_CreatesEnemy" methodname="SpawnEnemyAtRandom_CreatesEnemy" classname="EnemiesSpawnerTests" runstate="Runnable" seed="1092913351" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000184" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1033" name="SpawnInstanceAtRandom_SpawnsObject" fullname="EnemiesSpawnerTests.SpawnInstanceAtRandom_SpawnsObject" methodname="SpawnInstanceAtRandom_SpawnsObject" classname="EnemiesSpawnerTests" runstate="Runnable" seed="1379497384" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000179" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1030" name="SpreadEnemies_ActivatesEnemies" fullname="EnemiesSpawnerTests.SpreadEnemies_ActivatesEnemies" methodname="SpreadEnemies_ActivatesEnemies" classname="EnemiesSpawnerTests" runstate="Runnable" seed="913347056" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000181" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1034" name="EnemyFollowerTests" fullname="EnemyFollowerTests" classname="EnemyFollowerTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.020343" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1035" name="UpdateState_MovesTowardPlayer_NoWaypointServiceSetDestination" fullname="EnemyFollowerTests.UpdateState_MovesTowardPlayer_NoWaypointServiceSetDestination" methodname="UpdateState_MovesTowardPlayer_NoWaypointServiceSetDestination" classname="EnemyFollowerTests" runstate="Runnable" seed="1110859051" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.004166" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: not null
+  But was:  null
+]]></message>
+            <stack-trace><![CDATA[at EnemyFollowerTests.UpdateState_MovesTowardPlayer_NoWaypointServiceSetDestination () [0x00190] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\EnemyFollowerTests.cs:103
+]]></stack-trace>
+          </failure>
+          <output><![CDATA[[BossAttackPlayer] Start chasing the player.
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1036" name="FactoryManagerTests" fullname="FactoryManagerTests" classname="FactoryManagerTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.028398" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1038" name="GetStartCellWorldPosition_ReturnsPosition" fullname="FactoryManagerTests.GetStartCellWorldPosition_ReturnsPosition" methodname="GetStartCellWorldPosition_ReturnsPosition" classname="FactoryManagerTests" runstate="Runnable" seed="1558464333" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003056" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1037" name="Initialize_SetsUpFactory" fullname="FactoryManagerTests.Initialize_SetsUpFactory" methodname="Initialize_SetsUpFactory" classname="FactoryManagerTests" runstate="Runnable" seed="1206119297" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.007747" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[FactoryManager: FactoryAlarmStatus reference is missing.
+Could not generate a valid path between start and end after 20 attempts.
+WaypointService is missing a path finder.
+]]></output>
+        </test-case>
+        <test-case id="1041" name="OnRobotKilled_RaisesEvent" fullname="FactoryManagerTests.OnRobotKilled_RaisesEvent" methodname="OnRobotKilled_RaisesEvent" classname="FactoryManagerTests" runstate="Runnable" seed="962919462" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001178" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Robot KILLED
+]]></output>
+        </test-case>
+        <test-case id="1040" name="OnRobotSaved_RaisesEvent" fullname="FactoryManagerTests.OnRobotSaved_RaisesEvent" methodname="OnRobotSaved_RaisesEvent" classname="FactoryManagerTests" runstate="Runnable" seed="1985945309" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001071" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Robot SAVED
+]]></output>
+        </test-case>
+        <test-case id="1039" name="SetPlayerInstanceHead_AssignsHead" fullname="FactoryManagerTests.SetPlayerInstanceHead_AssignsHead" methodname="SetPlayerInstanceHead_AssignsHead" classname="FactoryManagerTests" runstate="Runnable" seed="897793491" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000573" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1042" name="GrabHandAttractorTests" fullname="GrabHandAttractorTests" classname="GrabHandAttractorTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.016408" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1043" name="DetectGrabbable_DetectsObjectOnLayer" fullname="GrabHandAttractorTests.DetectGrabbable_DetectsObjectOnLayer" methodname="DetectGrabbable_DetectsObjectOnLayer" classname="GrabHandAttractorTests" runstate="Runnable" seed="37441637" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003150" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1044" name="DetectGrabbable_IgnoresWrongLayer" fullname="GrabHandAttractorTests.DetectGrabbable_IgnoresWrongLayer" methodname="DetectGrabbable_IgnoresWrongLayer" classname="GrabHandAttractorTests" runstate="Runnable" seed="1185903309" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000654" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: null
+  But was:  <grabbable (GrabHandAttractorTests/DummyGrabbable)>
+]]></message>
+            <stack-trace><![CDATA[at GrabHandAttractorTests.DetectGrabbable_IgnoresWrongLayer () [0x0006e] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\GrabHandAttractorTests.cs:55
+]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1045" name="GrabSystemTests" fullname="GrabSystemTests" classname="GrabSystemTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.018680" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1046" name="GrabSystem_GrabAndReleaseObject" fullname="GrabSystemTests.GrabSystem_GrabAndReleaseObject" methodname="GrabSystem_GrabAndReleaseObject" classname="GrabSystemTests" runstate="Runnable" seed="461101571" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002241" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+            <stack-trace><![CDATA[at GrabSystemTests.GrabSystem_GrabAndReleaseObject () [0x0010f] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\GrabSystemTests.cs:94
+]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1047" name="GridFactoryTests" fullname="GridFactoryTests" classname="GridFactoryTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.031262" total="5" passed="4" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1051" name="AssignBlockedCells_MarksCells" fullname="GridFactoryTests.AssignBlockedCells_MarksCells" methodname="AssignBlockedCells_MarksCells" classname="GridFactoryTests" runstate="Runnable" seed="2058453165" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003163" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1050" name="AssignPOICells_AssignsPOIs" fullname="GridFactoryTests.AssignPOICells_AssignsPOIs" methodname="AssignPOICells_AssignsPOIs" classname="GridFactoryTests" runstate="Runnable" seed="1102271094" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.004992" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1049" name="AssignStartAndEndCells_SetsCells" fullname="GridFactoryTests.AssignStartAndEndCells_SetsCells" methodname="AssignStartAndEndCells_SetsCells" classname="GridFactoryTests" runstate="Runnable" seed="460730618" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000310" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1048" name="CreateGrid_CreatesCells" fullname="GridFactoryTests.CreateGrid_CreatesCells" methodname="CreateGrid_CreatesCells" classname="GridFactoryTests" runstate="Runnable" seed="1155968986" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000282" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1052" name="SolvePaths_CalculatesPaths" fullname="GridFactoryTests.SolvePaths_CalculatesPaths" methodname="SolvePaths_CalculatesPaths" classname="GridFactoryTests" runstate="Runnable" seed="2118326932" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.006275" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+            <stack-trace><![CDATA[at GridFactoryTests.SolvePaths_CalculatesPaths () [0x00094] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\GridFactoryTests.cs:78
+]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1053" name="GridManagerTests" fullname="GridManagerTests" classname="GridManagerTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.012498" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1057" name="AssignRoomProperties_AssignsProperties" fullname="GridManagerTests.AssignRoomProperties_AssignsProperties" methodname="AssignRoomProperties_AssignsProperties" classname="GridManagerTests" runstate="Runnable" seed="528727951" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001182" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1054" name="CreateAndInitializeGrid_ReturnsGrid" fullname="GridManagerTests.CreateAndInitializeGrid_ReturnsGrid" methodname="CreateAndInitializeGrid_ReturnsGrid" classname="GridManagerTests" runstate="Runnable" seed="2058599293" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000585" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1055" name="GetRandomPointOnGrid_ReturnsPoint" fullname="GridManagerTests.GetRandomPointOnGrid_ReturnsPoint" methodname="GetRandomPointOnGrid_ReturnsPoint" classname="GridManagerTests" runstate="Runnable" seed="1417820278" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000257" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1056" name="ProcessRooms_ProcessesProcessors" fullname="GridManagerTests.ProcessRooms_ProcessesProcessors" methodname="ProcessRooms_ProcessesProcessors" classname="GridManagerTests" runstate="Runnable" seed="885366659" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000542" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1058" name="GridRendererTests" fullname="GridRendererTests" classname="GridRendererTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.016489" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1059" name="Render_CreatesInstances" fullname="GridRendererTests.Render_CreatesInstances" methodname="Render_CreatesInstances" classname="GridRendererTests" runstate="Runnable" seed="1304008714" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003347" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[GridRenderer initialized with parent: New Game Object and prefab mapping: 
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1060" name="HintManagerTests" fullname="HintManagerTests" classname="HintManagerTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.020548" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1064" name="Damage_ShowsHintOnce" fullname="HintManagerTests.Damage_ShowsHintOnce" methodname="Damage_ShowsHintOnce" classname="HintManagerTests" runstate="Runnable" seed="121987173" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.006221" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[SetUp : System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[--SetUp
+  at HintManagerTests.SetUp () [0x0010d] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\HintManagerTests.cs:52 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1063" name="Grab_ShowsHintOnce" fullname="HintManagerTests.Grab_ShowsHintOnce" methodname="Grab_ShowsHintOnce" classname="HintManagerTests" runstate="Runnable" seed="101243861" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000505" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[SetUp : System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[--SetUp
+  at HintManagerTests.SetUp () [0x0010d] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\HintManagerTests.cs:52 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1061" name="Movement_ShowsHintOnce" fullname="HintManagerTests.Movement_ShowsHintOnce" methodname="Movement_ShowsHintOnce" classname="HintManagerTests" runstate="Runnable" seed="738808826" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000384" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[SetUp : System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[--SetUp
+  at HintManagerTests.SetUp () [0x0010d] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\HintManagerTests.cs:52 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1062" name="PrimaryAttack_ShowsHintOnce" fullname="HintManagerTests.PrimaryAttack_ShowsHintOnce" methodname="PrimaryAttack_ShowsHintOnce" classname="HintManagerTests" runstate="Runnable" seed="796905491" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000345" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[SetUp : System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[--SetUp
+  at HintManagerTests.SetUp () [0x0010d] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\HintManagerTests.cs:52 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1065" name="ICellProcessorTests" fullname="ICellProcessorTests" classname="ICellProcessorTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.013371" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1066" name="ProcessCells_ProcessesData" fullname="ICellProcessorTests.ProcessCells_ProcessesData" methodname="ProcessCells_ProcessesData" classname="ICellProcessorTests" runstate="Runnable" seed="629869100" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000388" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1067" name="IRobotNavigationListenerTests" fullname="IRobotNavigationListenerTests" classname="IRobotNavigationListenerTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.015947" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1068" name="OnPathObsoleted_CalledOnChange" fullname="IRobotNavigationListenerTests.OnPathObsoleted_CalledOnChange" methodname="OnPathObsoleted_CalledOnChange" classname="IRobotNavigationListenerTests" runstate="Runnable" seed="393723622" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000584" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1069" name="MapManagerTests" fullname="MapManagerTests" classname="MapManagerTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.025707" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1070" name="BuildFromConfig_AppliesConfig" fullname="MapManagerTests.BuildFromConfig_AppliesConfig" methodname="BuildFromConfig_AppliesConfig" classname="MapManagerTests" runstate="Runnable" seed="1946799096" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000894" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1074" name="GetRandomPOIPosition_ReturnsPosition" fullname="MapManagerTests.GetRandomPOIPosition_ReturnsPosition" methodname="GetRandomPOIPosition_ReturnsPosition" classname="MapManagerTests" runstate="Runnable" seed="2038804630" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002410" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1075" name="GetRandomWorkPosition_ReturnsPosition" fullname="MapManagerTests.GetRandomWorkPosition_ReturnsPosition" methodname="GetRandomWorkPosition_ReturnsPosition" classname="MapManagerTests" runstate="Runnable" seed="1104224455" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000926" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1073" name="GetStartCellWorldPosition_ReturnsStart" fullname="MapManagerTests.GetStartCellWorldPosition_ReturnsStart" methodname="GetStartCellWorldPosition_ReturnsStart" classname="MapManagerTests" runstate="Runnable" seed="232062329" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000495" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1071" name="InitializeGrid_BuildsGrid" fullname="MapManagerTests.InitializeGrid_BuildsGrid" methodname="InitializeGrid_BuildsGrid" classname="MapManagerTests" runstate="Runnable" seed="2126217804" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001121" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Could not generate a valid path between start and end after 20 attempts.
+]]></output>
+        </test-case>
+        <test-case id="1072" name="RegisterFactoryInEachRoom_RegistersFactory" fullname="MapManagerTests.RegisterFactoryInEachRoom_RegistersFactory" methodname="RegisterFactoryInEachRoom_RegistersFactory" classname="MapManagerTests" runstate="Runnable" seed="105171192" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001770" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[RoomManager 'New Game Object' has no waypoint service to register with.
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1076" name="NewPlayerMovementControllerTests" fullname="NewPlayerMovementControllerTests" classname="NewPlayerMovementControllerTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.018790" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1077" name="SetFacing_LegJointLimitsMirror" fullname="NewPlayerMovementControllerTests.SetFacing_LegJointLimitsMirror" methodname="SetFacing_LegJointLimitsMirror" classname="NewPlayerMovementControllerTests" runstate="Runnable" seed="215240339" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003178" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.Reflection.TargetException : Non-static field requires a target]]></message>
+            <stack-trace><![CDATA[  at System.Reflection.RuntimeFieldInfo.SetValue (System.Object obj, System.Object val, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Globalization.CultureInfo culture) [0x0000b] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 
+  at System.Reflection.FieldInfo.SetValue (System.Object obj, System.Object value) [0x00009] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 
+  at NewPlayerMovementControllerTests.SetFacing_LegJointLimitsMirror () [0x000d4] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\NewPlayerMovementControllerTests.cs:39 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+          <output><![CDATA[
+IgnoreFailingMessages:true
+Can't add script behaviour 'IPlayerInput'. The script class can't be abstract!
+
+IgnoreFailingMessages:false
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1078" name="ObjectPoolTests" fullname="ObjectPoolTests" classname="ObjectPoolTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.018347" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1079" name="GetAndRelease_ReusesInstance" fullname="ObjectPoolTests.GetAndRelease_ReusesInstance" methodname="GetAndRelease_ReusesInstance" classname="ObjectPoolTests" runstate="Runnable" seed="739091082" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002917" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1080" name="PathToPOIToWorkProcessorTests" fullname="PathToPOIToWorkProcessorTests" classname="PathToPOIToWorkProcessorTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.017528" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1082" name="ProcessCells_ConnectedPathRemainsPath" fullname="PathToPOIToWorkProcessorTests.ProcessCells_ConnectedPathRemainsPath" methodname="ProcessCells_ConnectedPathRemainsPath" classname="PathToPOIToWorkProcessorTests" runstate="Runnable" seed="664492302" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001052" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1081" name="ProcessCells_IsolatedPathBecomesWork" fullname="PathToPOIToWorkProcessorTests.ProcessCells_IsolatedPathBecomesWork" methodname="ProcessCells_IsolatedPathBecomesWork" classname="PathToPOIToWorkProcessorTests" runstate="Runnable" seed="1040735383" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000258" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1083" name="PickupBoxTests" fullname="PickupBoxTests" classname="PickupBoxTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.017084" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1084" name="PickupBox_GrabAndReleaseAppliesVelocity" fullname="PickupBoxTests.PickupBox_GrabAndReleaseAppliesVelocity" methodname="PickupBox_GrabAndReleaseAppliesVelocity" classname="PickupBoxTests" runstate="Runnable" seed="1507078257" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001055" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1085" name="PlayerCrouchTests" fullname="PlayerCrouchTests" classname="PlayerCrouchTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.015981" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1086" name="HoldAndReleaseCrouch_TriggersStartAndEnd" fullname="PlayerCrouchTests.HoldAndReleaseCrouch_TriggersStartAndEnd" methodname="HoldAndReleaseCrouch_TriggersStartAndEnd" classname="PlayerCrouchTests" runstate="Runnable" seed="1970463968" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003099" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00083] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 
+  at PlayerCrouchTests.HoldAndReleaseCrouch_TriggersStartAndEnd () [0x000bc] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\PlayerCrouchTests.cs:53 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 
+--NullReferenceException
+  at PlayerMovementController.ApplyFacingDirection () [0x00016] in C:\Dev\Projects\CowBoya\Assets\Scripts\Player\Controllers\PlayerMovementController.cs:101 
+  at PlayerMovementController.Awake () [0x00094] in C:\Dev\Projects\CowBoya\Assets\Scripts\Player\Controllers\PlayerMovementController.cs:64 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1087" name="PositionTriggerZoneTests" fullname="PositionTriggerZoneTests" classname="PositionTriggerZoneTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.017948" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1088" name="OnEnterZone_InvokesEvent" fullname="PositionTriggerZoneTests.OnEnterZone_InvokesEvent" methodname="OnEnterZone_InvokesEvent" classname="PositionTriggerZoneTests" runstate="Runnable" seed="391176524" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001440" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[  at PositionTriggerZoneTests.OnEnterZone_InvokesEvent () [0x0000e] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\PositionTriggerZoneTests.cs:26 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1089" name="OnExitZone_InvokesEvent" fullname="PositionTriggerZoneTests.OnExitZone_InvokesEvent" methodname="OnExitZone_InvokesEvent" classname="PositionTriggerZoneTests" runstate="Runnable" seed="926318355" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000394" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[  at PositionTriggerZoneTests.OnExitZone_InvokesEvent () [0x0000e] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\PositionTriggerZoneTests.cs:35 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1090" name="RoomLiftPerFloorProcessorTests" fullname="RoomLiftPerFloorProcessorTests" classname="RoomLiftPerFloorProcessorTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.019398" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1092" name="ProcessCells_NoCandidateOnFloor_LogsError" fullname="RoomLiftPerFloorProcessorTests.ProcessCells_NoCandidateOnFloor_LogsError" methodname="ProcessCells_NoCandidateOnFloor_LogsError" classname="RoomLiftPerFloorProcessorTests" runstate="Runnable" seed="181103581" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001866" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[Expected log did not appear: [Error] No suitable cell found on level 0 to set PathToPOI]]></message>
+          </failure>
+        </test-case>
+        <test-case id="1091" name="ProcessCells_SetsPathOnHighestPriorityCandidate" fullname="RoomLiftPerFloorProcessorTests.ProcessCells_SetsPathOnHighestPriorityCandidate" methodname="ProcessCells_SetsPathOnHighestPriorityCandidate" classname="RoomLiftPerFloorProcessorTests" runstate="Runnable" seed="585594763" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000946" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1093" name="RoomManagerTests" fullname="RoomManagerTests" classname="RoomManagerTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.015529" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1097" name="GetRoomBounds_ReturnsBounds" fullname="RoomManagerTests.GetRoomBounds_ReturnsBounds" methodname="GetRoomBounds_ReturnsBounds" classname="RoomManagerTests" runstate="Runnable" seed="702490490" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000881" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1096" name="GetWaypoints_ReturnsWaypoints" fullname="RoomManagerTests.GetWaypoints_ReturnsWaypoints" methodname="GetWaypoints_ReturnsWaypoints" classname="RoomManagerTests" runstate="Runnable" seed="881991573" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000399" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1094" name="Initialize_SetsFactoryManager" fullname="RoomManagerTests.Initialize_SetsFactoryManager" methodname="Initialize_SetsFactoryManager" classname="RoomManagerTests" runstate="Runnable" seed="496376536" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001020" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[RoomManager 'New Game Object' has no waypoint service to register with.
+]]></output>
+        </test-case>
+        <test-case id="1095" name="SetWaypointStatus_UpdatesWaypoint" fullname="RoomManagerTests.SetWaypointStatus_UpdatesWaypoint" methodname="SetWaypointStatus_UpdatesWaypoint" classname="RoomManagerTests" runstate="Runnable" seed="543338184" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000759" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1098" name="RoomWaypointTests" fullname="RoomWaypointTests" classname="RoomWaypointTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.012463" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1100" name="Neighbors_Initialized" fullname="RoomWaypointTests.Neighbors_Initialized" methodname="Neighbors_Initialized" classname="RoomWaypointTests" runstate="Runnable" seed="1671404817" result="Failed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000611" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Expected: not null
+  But was:  null
+]]></message>
+            <stack-trace><![CDATA[at RoomWaypointTests.Neighbors_Initialized () [0x00001] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\RoomWaypointTests.cs:28
+]]></stack-trace>
+          </failure>
+        </test-case>
+        <test-case id="1099" name="WorldPos_ReturnsPosition" fullname="RoomWaypointTests.WorldPos_ReturnsPosition" methodname="WorldPos_ReturnsPosition" classname="RoomWaypointTests" runstate="Runnable" seed="1177098234" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000295" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1101" name="SceneInitiatorTests" fullname="SceneInitiatorTests" classname="SceneInitiatorTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.023171" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1102" name="Start_InitializesScene" fullname="SceneInitiatorTests.Start_InitializesScene" methodname="Start_InitializesScene" classname="SceneInitiatorTests" runstate="Runnable" seed="703644302" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.005581" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[GameInitiator: Main Camera prefab not assigned; skipping creation.
+GameInitiator: Event System prefab not assigned; skipping creation.
+GameInitiator: Cinemachine prefab not assigned; skipping creation.
+SceneInitiator: FactoryManager is not assigned; skipping factory initialization.
+SceneInitiator: Player dependencies are missing; skipping player initialization.
+SceneInitiator: Enemy setup dependencies are missing; skipping enemy initialization.
+VictorySetup is not assigned.
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1103" name="SecurityBadgePickupTests" fullname="SecurityBadgePickupTests" classname="SecurityBadgePickupTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.017047" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1104" name="Badge_AttachAndReleaseChangesPhysics" fullname="SecurityBadgePickupTests.Badge_AttachAndReleaseChangesPhysics" methodname="Badge_AttachAndReleaseChangesPhysics" classname="SecurityBadgePickupTests" runstate="Runnable" seed="2096785876" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002075" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1105" name="SecurityBadgeTheftTests" fullname="SecurityBadgeTheftTests" classname="SecurityBadgeTheftTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.017064" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1107" name="Initialize_SpawnsNewBadgeAfterSteal" fullname="SecurityBadgeTheftTests.Initialize_SpawnsNewBadgeAfterSteal" methodname="Initialize_SpawnsNewBadgeAfterSteal" classname="SecurityBadgeTheftTests" runstate="Runnable" seed="1712543266" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.003491" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[enemy badge stolen by player
+]]></output>
+        </test-case>
+        <test-case id="1106" name="StealingBadge_StartsChaseOnlyOnce" fullname="SecurityBadgeTheftTests.StealingBadge_StartsChaseOnlyOnce" methodname="StealingBadge_StartsChaseOnlyOnce" classname="SecurityBadgeTheftTests" runstate="Runnable" seed="879360293" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001515" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[enemy badge stolen by player
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1108" name="SecurityCameraTests" fullname="SecurityCameraTests" classname="SecurityCameraTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.018011" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1110" name="PlayerWithHighMoralityDoesNotTriggerWantedState" fullname="SecurityCameraTests.PlayerWithHighMoralityDoesNotTriggerWantedState" methodname="PlayerWithHighMoralityDoesNotTriggerWantedState" classname="SecurityCameraTests" runstate="Runnable" seed="1792897506" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001723" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1109" name="PlayerWithLowMoralityTriggersWantedState" fullname="SecurityCameraTests.PlayerWithLowMoralityTriggersWantedState" methodname="PlayerWithLowMoralityTriggersWantedState" classname="SecurityCameraTests" runstate="Runnable" seed="721109235" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000850" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1111" name="SecurityGuardRestTests" fullname="SecurityGuardRestTests" classname="SecurityGuardRestTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.017086" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1113" name="NoRestPoints_FallbackToStartPoint" fullname="SecurityGuardRestTests.NoRestPoints_FallbackToStartPoint" methodname="NoRestPoints_FallbackToStartPoint" classname="SecurityGuardRestTests" runstate="Runnable" seed="827696723" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000993" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1112" name="NoSecurityPoints_FallbackToRestPoint" fullname="SecurityGuardRestTests.NoSecurityPoints_FallbackToRestPoint" methodname="NoSecurityPoints_FallbackToRestPoint" classname="SecurityGuardRestTests" runstate="Runnable" seed="916487643" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000352" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1114" name="SecurityMachineTests" fullname="SecurityMachineTests" classname="SecurityMachineTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.012924" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1115" name="PowerOff_SendsGuardToRest" fullname="SecurityMachineTests.PowerOff_SendsGuardToRest" methodname="PowerOff_SendsGuardToRest" classname="SecurityMachineTests" runstate="Runnable" seed="290835940" result="Failed" label="Error" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001618" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+            <stack-trace><![CDATA[  at Enemy_GoingToRest.EnterState () [0x0000e] in C:\Dev\Projects\CowBoya\Assets\Scripts\EnemyAI\States\Enemy_GoingToRest.cs:14 
+  at EnemyStateMachine.ChangeState (EnemyState newState) [0x0001a] in C:\Dev\Projects\CowBoya\Assets\Scripts\EnemyAI\Core\EnemyStateMachine.cs:24 
+  at SecurityMachine.SendGuardToRest (EnemyController guard) [0x00015] in C:\Dev\Projects\CowBoya\Assets\Scripts\Machines\SecurityMachine.cs:77 
+  at SecurityMachine.SendCurrentGuardToRest () [0x00001] in C:\Dev\Projects\CowBoya\Assets\Scripts\Machines\SecurityMachine.cs:89 
+  at SecurityMachine.PowerOff () [0x0002b] in C:\Dev\Projects\CowBoya\Assets\Scripts\Machines\SecurityMachine.cs:43 
+  at SecurityMachineTests.PowerOff_SendsGuardToRest () [0x00018] in C:\Dev\Projects\CowBoya\Assets\Editor\UnitTests\SecurityMachineTests.cs:30 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <321eb2db7c6d43ea8fc39b54eaca3452>:0 ]]></stack-trace>
+          </failure>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1116" name="StationReservationServiceTests" fullname="StationReservationServiceTests" classname="StationReservationServiceTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.020028" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1119" name="Events_FireCorrectly" fullname="StationReservationServiceTests.Events_FireCorrectly" methodname="Events_FireCorrectly" classname="StationReservationServiceTests" runstate="Runnable" seed="1392693593" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.006351" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1117" name="RegisterMachine_AddsMachine" fullname="StationReservationServiceTests.RegisterMachine_AddsMachine" methodname="RegisterMachine_AddsMachine" classname="StationReservationServiceTests" runstate="Runnable" seed="1599002677" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000689" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1118" name="ReserveAndReleaseStation_Works" fullname="StationReservationServiceTests.ReserveAndReleaseStation_Works" methodname="ReserveAndReleaseStation_Works" classname="StationReservationServiceTests" runstate="Runnable" seed="1269646295" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000887" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1120" name="WaypointPathFinderTests" fullname="WaypointPathFinderTests" classname="WaypointPathFinderTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.016474" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1121" name="FindWorldPath_NullWaypoint_ReturnsEmpty" fullname="WaypointPathFinderTests.FindWorldPath_NullWaypoint_ReturnsEmpty" methodname="FindWorldPath_NullWaypoint_ReturnsEmpty" classname="WaypointPathFinderTests" runstate="Runnable" seed="1137649172" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002079" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[FindWorldPath called with a null waypoint.
+]]></output>
+        </test-case>
+      </test-suite>
+      <test-suite type="TestFixture" id="1122" name="WaypointServiceTests" fullname="WaypointServiceTests" classname="WaypointServiceTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.019768" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1130" name="BuildAllNeighbors_ForwardsFlag" fullname="WaypointServiceTests.BuildAllNeighbors_ForwardsFlag" methodname="BuildAllNeighbors_ForwardsFlag" classname="WaypointServiceTests" runstate="Runnable" seed="1818178655" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.002142" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1126" name="FindWorldPath_ReturnsPath" fullname="WaypointServiceTests.FindWorldPath_ReturnsPath" methodname="FindWorldPath_ReturnsPath" classname="WaypointServiceTests" runstate="Runnable" seed="1728241151" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000523" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1129" name="GetAllWaypoints_DelegatesToRegistry" fullname="WaypointServiceTests.GetAllWaypoints_DelegatesToRegistry" methodname="GetAllWaypoints_DelegatesToRegistry" classname="WaypointServiceTests" runstate="Runnable" seed="236305769" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000468" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1128" name="GetClosestWaypoint_ReturnsClosest" fullname="WaypointServiceTests.GetClosestWaypoint_ReturnsClosest" methodname="GetClosestWaypoint_ReturnsClosest" classname="WaypointServiceTests" runstate="Runnable" seed="962630149" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.001304" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1127" name="GetLeastUsedFreeWorkPoint_ReturnsPoint" fullname="WaypointServiceTests.GetLeastUsedFreeWorkPoint_ReturnsPoint" methodname="GetLeastUsedFreeWorkPoint_ReturnsPoint" classname="WaypointServiceTests" runstate="Runnable" seed="914603163" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000744" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1125" name="NotifyWaypointStatusChanged_NotifiesRobots" fullname="WaypointServiceTests.NotifyWaypointStatusChanged_NotifiesRobots" methodname="NotifyWaypointStatusChanged_NotifiesRobots" classname="WaypointServiceTests" runstate="Runnable" seed="1629436517" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000578" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1123" name="RegisterRoomWaypoints_StoresWaypoints" fullname="WaypointServiceTests.RegisterRoomWaypoints_StoresWaypoints" methodname="RegisterRoomWaypoints_StoresWaypoints" classname="WaypointServiceTests" runstate="Runnable" seed="1557093307" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000374" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+        </test-case>
+        <test-case id="1124" name="UnregisterRoomWaypoints_RemovesWaypoints" fullname="WaypointServiceTests.UnregisterRoomWaypoints_RemovesWaypoints" methodname="UnregisterRoomWaypoints_RemovesWaypoints" classname="WaypointServiceTests" runstate="Runnable" seed="376325326" result="Passed" start-time="2025-10-09 12:09:14Z" end-time="2025-10-09 12:09:14Z" duration="0.000392" asserts="0">
+          <properties>
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[Saving results to: C:/Users/Rexhi/AppData/LocalLow/DefaultCompany/CowBoya\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
