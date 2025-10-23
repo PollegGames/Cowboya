@@ -1552,9 +1552,9 @@ MonoBehaviour:
   - Master: {fileID: 4332389249945857028}
     Puppet: {fileID: 0}
     PositionStiffness: 120
-    PositionDamping: 40
+    PositionDamping: 70
     RotationStiffness: 200
-    RotationDamping: 28
+    RotationDamping: 65
     Strength: 0.9
     EnablePosition: 1
     EnableRotation: 1
@@ -1563,9 +1563,9 @@ MonoBehaviour:
   - Master: {fileID: 789642260775326245}
     Puppet: {fileID: 0}
     PositionStiffness: 120
-    PositionDamping: 36
+    PositionDamping: 68
     RotationStiffness: 200
-    RotationDamping: 27
+    RotationDamping: 60
     Strength: 0.85
     EnablePosition: 1
     EnableRotation: 1
@@ -1574,9 +1574,9 @@ MonoBehaviour:
   - Master: {fileID: 2559313202928331262}
     Puppet: {fileID: 0}
     PositionStiffness: 120
-    PositionDamping: 36
+    PositionDamping: 60
     RotationStiffness: 200
-    RotationDamping: 27
+    RotationDamping: 55
     Strength: 0.85
     EnablePosition: 1
     EnableRotation: 1
@@ -1585,9 +1585,9 @@ MonoBehaviour:
   - Master: {fileID: 241220219047276419}
     Puppet: {fileID: 0}
     PositionStiffness: 120
-    PositionDamping: 40
+    PositionDamping: 70
     RotationStiffness: 200
-    RotationDamping: 28
+    RotationDamping: 62
     Strength: 0.9
     EnablePosition: 1
     EnableRotation: 1
@@ -1600,7 +1600,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 1
+    EnablePosition: 0
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1611,7 +1611,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 1
+    EnablePosition: 0
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1622,7 +1622,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 1
+    EnablePosition: 0
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1633,7 +1633,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 1
+    EnablePosition: 0
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1684,11 +1684,11 @@ MonoBehaviour:
   - Master: {fileID: 3275784199023943698}
     Puppet: {fileID: 0}
     PositionStiffness: 120
-    PositionDamping: 25
+    PositionDamping: 35
     RotationStiffness: 200
-    RotationDamping: 20
+    RotationDamping: 35
     Strength: 0.7
-    EnablePosition: 1
+    EnablePosition: 0
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 5
