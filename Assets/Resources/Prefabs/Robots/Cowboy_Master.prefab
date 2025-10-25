@@ -981,7 +981,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3529934817637303897}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.00017512633, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.00017634373, w: 1}
   m_LocalPosition: {x: 0.9555073, y: 0.0000016016515, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1451,6 +1451,7 @@ GameObject:
   - component: {fileID: 631164924912554056}
   - component: {fileID: 6322339627798152675}
   - component: {fileID: 1103308588213103094}
+  - component: {fileID: 942791720737770380}
   m_Layer: 9
   m_Name: Cowboy_Master
   m_TagString: Player
@@ -1600,7 +1601,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 0
+    EnablePosition: 1
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1611,7 +1612,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 0
+    EnablePosition: 1
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1622,7 +1623,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 0
+    EnablePosition: 1
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1633,7 +1634,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 20
     Strength: 0.7
-    EnablePosition: 0
+    EnablePosition: 1
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 4
@@ -1688,7 +1689,7 @@ MonoBehaviour:
     RotationStiffness: 200
     RotationDamping: 35
     Strength: 0.7
-    EnablePosition: 0
+    EnablePosition: 1
     EnableRotation: 1
     UseLocalRotation: 1
     Region: 5
@@ -1749,6 +1750,28 @@ MonoBehaviour:
     PuppetColor: {r: 1, g: 0.32, b: 0.26, a: 0.6}
     ComColor: {r: 1, g: 0.85, b: 0.2, a: 0.9}
     SupportColor: {r: 0.2, g: 1, b: 0.45, a: 0.8}
+--- !u!95 &942791720737770380
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4587626726301181995}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 48a5550d17a4cf347a7b7d09efa60d5a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5299142876671928586
 GameObject:
   m_ObjectHideFlags: 0
@@ -2397,7 +2420,7 @@ Transform:
   m_GameObject: {fileID: 7622672690695592424}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7205673, w: 0.69338506}
-  m_LocalPosition: {x: 1.326174, y: 14.058492, z: 0}
+  m_LocalPosition: {x: 1.326174, y: 14.05849, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2845,7 +2868,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9176247688270358314}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.03049479, w: 0.9995349}
+  m_LocalRotation: {x: -0, y: -0, z: 0.03049601, w: 0.99953496}
   m_LocalPosition: {x: 1.018, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
