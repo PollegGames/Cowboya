@@ -104,7 +104,7 @@ namespace CowBoya.Robots
         public bool AutoPopulateOnStart = true;
 
         [Tooltip("Scalar applied to every force and torque. Lower to let the puppet fall, raise to tighten.")]
-        [Range(0f, 2f)]
+        [Range(0f, 4f)]
         public float GlobalStrength = 0.5f;
 
         [Header("Root Anchoring")]
@@ -116,9 +116,17 @@ namespace CowBoya.Robots
 
         public float RootStiffness = 120f;
         public float RootDamping = 32f;
-        [Range(0f, 2f)]
+        [Range(0f, 4f)]
         public float RootStrength = 0.2f;
         public bool AnchorRoot = true;
+
+        [Header("Force Limits")]
+        [Tooltip("Multiplier applied to the positional force clamp relative to stiffness. Raise to allow stronger pulls.")]
+        [Min(0f)]
+        public float PositionForceClampScale = 10f;
+        [Tooltip("Multiplier applied to the rotational torque clamp relative to stiffness. Raise to allow stronger twists.")]
+        [Min(0f)]
+        public float RotationTorqueClampScale = 45f;
 
         [Header("Regional Modulation")]
         public List<RegionStrength> RegionMultipliers = new List<RegionStrength>();
@@ -162,6 +170,29 @@ namespace CowBoya.Robots
         [Range(0f, 2f)]
         public float RecoveryRootScale = 1.4f;
 
+        [Header("Controller Tuning")]
+        [Tooltip("Positional error below this distance (in meters) is ignored to avoid micro jitter corrections.")]
+        [Min(0f)]
+        public float PositionDeadZone = 0.012f;
+
+        [Tooltip("Velocity difference below this threshold (in meters/second) is ignored when inside the position dead zone.")]
+        [Min(0f)]
+        public float PositionVelocityDeadZone = 0.05f;
+
+        [Tooltip("Angular error below this threshold (in degrees) is ignored to avoid micro jitter corrections.")]
+        [Min(0f)]
+        public float RotationDeadZone = 2f;
+
+        [Tooltip("Angular velocity difference below this threshold (in degrees/second) is ignored when inside the rotation dead zone.")]
+        [Min(0f)]
+        public float RotationVelocityDeadZone = 25f;
+
+        [Tooltip("When enabled, master transform linear velocity is subtracted from puppet velocity so forces are based on relative motion.")]
+        public bool UseMasterVelocityFeedForward = true;
+
+        [Tooltip("When enabled, master transform angular velocity is subtracted from puppet angular velocity so torques are based on relative motion.")]
+        public bool UseMasterAngularVelocityFeedForward = true;
+
         [Header("Instrumentation")]
         public DebugSettings Debug = new DebugSettings();
 
@@ -176,6 +207,12 @@ namespace CowBoya.Robots
         private readonly Dictionary<ContactPoint, float> contactTimers = new Dictionary<ContactPoint, float>();
         private readonly List<Rigidbody2D> puppetBodies = new List<Rigidbody2D>();
         private readonly Dictionary<Rigidbody2D, Vector2> previousVelocities = new Dictionary<Rigidbody2D, Vector2>();
+        private readonly Dictionary<Transform, Vector2> previousMasterPositions = new Dictionary<Transform, Vector2>();
+        private readonly Dictionary<Transform, Vector2> masterLinearVelocities = new Dictionary<Transform, Vector2>();
+        private readonly Dictionary<Rigidbody2D, float> previousTargetAngles = new Dictionary<Rigidbody2D, float>();
+        private readonly List<Transform> masterVelocityScratch = new List<Transform>();
+        private readonly List<Transform> masterCleanupScratch = new List<Transform>();
+        private readonly List<Rigidbody2D> targetCleanupScratch = new List<Rigidbody2D>();
 
         private BalanceState currentState = BalanceState.Normal;
         private float stateTimer;
@@ -278,6 +315,7 @@ namespace CowBoya.Robots
             float stateStrength = ResolveStateStrengthScale();
             float clampedStrength = Mathf.Max(GlobalStrength, 0f) * stateStrength;
 
+            UpdateMasterTargetVelocities(dt);
             ApplyBoneForces(clampedStrength);
             float rootScale = ResolveRootStrengthScale();
             ApplyRootAnchor(clampedStrength * rootScale);
@@ -342,6 +380,13 @@ namespace CowBoya.Robots
                 return;
             }
 
+            float positionDeadZoneSq = Mathf.Max(PositionDeadZone * PositionDeadZone, 0f);
+            float positionVelocityDeadZoneSq = Mathf.Max(PositionVelocityDeadZone * PositionVelocityDeadZone, 0f);
+            float rotationDeadZoneAbs = Mathf.Max(RotationDeadZone, 0f);
+            float rotationVelocityDeadZoneAbs = Mathf.Max(RotationVelocityDeadZone, 0f);
+
+            HashSet<Rigidbody2D> activeBodies = null;
+
             foreach (BoneLink link in Links)
             {
                 if (link == null || link.Master == null || link.Puppet == null)
@@ -349,6 +394,7 @@ namespace CowBoya.Robots
                     continue;
                 }
 
+                Rigidbody2D puppetBody = link.Puppet;
                 float linkStrength = Mathf.Max(link.Strength, 0f) * globalStrength;
                 if (linkStrength <= 0f)
                 {
@@ -356,49 +402,80 @@ namespace CowBoya.Robots
                 }
 
                 linkStrength *= ResolveDynamicMultiplier(link.Region);
+                if (linkStrength <= 0f)
+                {
+                    continue;
+                }
+
+                activeBodies ??= new HashSet<Rigidbody2D>();
+                activeBodies.Add(puppetBody);
 
                 if (link.EnablePosition)
                 {
                     Vector2 targetPosition = link.Master.position;
-                    Vector2 currentPosition = link.Puppet.position;
-                    Vector2 currentVelocity = link.Puppet.linearVelocity;
+                    Vector2 currentPosition = puppetBody.position;
+                    Vector2 currentVelocity = puppetBody.linearVelocity;
+                    Vector2 masterVelocity = UseMasterVelocityFeedForward ? GetMasterLinearVelocity(link.Master) : Vector2.zero;
+                    Vector2 relativeVelocity = currentVelocity - masterVelocity;
+                    Vector2 positionError = targetPosition - currentPosition;
 
-                    Vector2 positionForce = (targetPosition - currentPosition) * link.PositionStiffness - currentVelocity * link.PositionDamping;
-                    float maxForce = Mathf.Max(link.PositionStiffness, 0f) * 10f;
-                    if (maxForce > 0f)
+                    bool inPositionDeadZone = positionError.sqrMagnitude <= positionDeadZoneSq;
+                    bool inVelocityDeadZone = relativeVelocity.sqrMagnitude <= positionVelocityDeadZoneSq;
+                    if (!(inPositionDeadZone && inVelocityDeadZone))
                     {
-                        positionForce = Vector2.ClampMagnitude(positionForce, maxForce);
+                        float scaledStiffness = link.PositionStiffness * linkStrength;
+                        float scaledDamping = ComputeScaledDamping(link.PositionStiffness, link.PositionDamping, linkStrength, puppetBody.mass);
+
+                        Vector2 force = positionError * scaledStiffness - relativeVelocity * scaledDamping;
+                        float maxForce = Mathf.Max(scaledStiffness, 0f) * Mathf.Max(PositionForceClampScale, 0f);
+                        if (maxForce > 0f)
+                        {
+                            force = Vector2.ClampMagnitude(force, maxForce);
+                        }
+                        puppetBody.AddForce(force);
                     }
-                    link.Puppet.AddForce(positionForce * linkStrength);
                 }
 
                 if (link.EnableRotation)
                 {
-                    float targetAngle;
-                    if (link.UseLocalRotation)
+                    float targetAngle = ComputeTargetAngle(link);
+                    float currentAngle = puppetBody.rotation;
+                    float angularError = Mathf.DeltaAngle(currentAngle, targetAngle);
+
+                    float targetAngularVelocity = UseMasterAngularVelocityFeedForward ? GetTargetAngularVelocity(link, targetAngle) : 0f;
+                    if (!UseMasterAngularVelocityFeedForward)
                     {
-                        float masterLocalZ = link.Master.localEulerAngles.z;
-                        Transform parent = link.Puppet.transform.parent;
-                        float parentWorldZ = parent != null ? parent.eulerAngles.z : 0f;
-                        targetAngle = parentWorldZ + masterLocalZ;
-                    }
-                    else
-                    {
-                        targetAngle = link.Master.eulerAngles.z;
+                        CacheTargetAngle(link, targetAngle);
                     }
 
-                    float currentAngle = link.Puppet.rotation;
-                    float angularDelta = Mathf.DeltaAngle(currentAngle, targetAngle);
-                    float angularVelocity = link.Puppet.angularVelocity;
+                    float angularVelocity = puppetBody.angularVelocity;
+                    float relativeAngularVelocity = angularVelocity - targetAngularVelocity;
 
-                    float torque = angularDelta * link.RotationStiffness - angularVelocity * link.RotationDamping;
-                    float maxTorque = Mathf.Max(link.RotationStiffness, 0f) * 45f;
-                    if (maxTorque > 0f)
+                    bool inAngleDeadZone = Mathf.Abs(angularError) <= rotationDeadZoneAbs;
+                    bool inAngularVelocityDeadZone = Mathf.Abs(relativeAngularVelocity) <= rotationVelocityDeadZoneAbs;
+                    if (!(inAngleDeadZone && inAngularVelocityDeadZone))
                     {
-                        torque = Mathf.Clamp(torque, -maxTorque, maxTorque);
+                        float scaledStiffness = link.RotationStiffness * linkStrength;
+                        float scaledDamping = ComputeScaledDamping(link.RotationStiffness, link.RotationDamping, linkStrength, puppetBody.inertia);
+
+                        float torque = angularError * scaledStiffness - relativeAngularVelocity * scaledDamping;
+                        float maxTorque = Mathf.Max(scaledStiffness, 0f) * Mathf.Max(RotationTorqueClampScale, 0f);
+                        if (maxTorque > 0f)
+                        {
+                            torque = Mathf.Clamp(torque, -maxTorque, maxTorque);
+                        }
+                        puppetBody.AddTorque(torque);
                     }
-                    link.Puppet.AddTorque(torque * linkStrength);
                 }
+            }
+
+            if (activeBodies != null)
+            {
+                CleanupTargetAngleCache(activeBodies);
+            }
+            else
+            {
+                previousTargetAngles.Clear();
             }
         }
 
@@ -419,10 +496,23 @@ namespace CowBoya.Robots
 
             Vector2 targetPosition = targetTransform.position;
             Vector2 currentPosition = RootBody.position;
+            Vector2 masterVelocity = UseMasterVelocityFeedForward ? GetMasterLinearVelocity(targetTransform) : Vector2.zero;
             Vector2 currentVelocity = RootBody.linearVelocity;
+            Vector2 relativeVelocity = currentVelocity - masterVelocity;
+            Vector2 positionError = targetPosition - currentPosition;
 
-            Vector2 force = (targetPosition - currentPosition) * RootStiffness - currentVelocity * RootDamping;
-            RootBody.AddForce(force * strength);
+            bool inPositionDeadZone = positionError.sqrMagnitude <= Mathf.Max(PositionDeadZone * PositionDeadZone, 0f);
+            bool inVelocityDeadZone = relativeVelocity.sqrMagnitude <= Mathf.Max(PositionVelocityDeadZone * PositionVelocityDeadZone, 0f);
+            if (inPositionDeadZone && inVelocityDeadZone)
+            {
+                return;
+            }
+
+            float scaledStiffness = RootStiffness * strength;
+            float scaledDamping = ComputeScaledDamping(RootStiffness, RootDamping, strength, RootBody.mass);
+
+            Vector2 force = positionError * scaledStiffness - relativeVelocity * scaledDamping;
+            RootBody.AddForce(force);
         }
 
         private float ResolveDynamicMultiplier(BoneRegion region)
@@ -431,6 +521,247 @@ namespace CowBoya.Robots
             multiplier *= ResolveStateRegionMultiplier(region);
             multiplier *= ResolveContactMultiplier(region);
             return multiplier;
+        }
+
+        private void UpdateMasterTargetVelocities(float dt)
+        {
+            masterVelocityScratch.Clear();
+
+            if (Links != null)
+            {
+                for (int i = 0; i < Links.Count; i++)
+                {
+                    BoneLink link = Links[i];
+                    if (link == null || link.Master == null)
+                    {
+                        continue;
+                    }
+
+                    if (!masterVelocityScratch.Contains(link.Master))
+                    {
+                        masterVelocityScratch.Add(link.Master);
+                        UpdateMasterTransform(link.Master, dt);
+                    }
+                }
+            }
+
+            Transform rootTarget = RootTarget != null ? RootTarget : transform;
+            if (rootTarget != null && !masterVelocityScratch.Contains(rootTarget))
+            {
+                masterVelocityScratch.Add(rootTarget);
+                UpdateMasterTransform(rootTarget, dt);
+            }
+
+            CleanupUnusedMasterEntries();
+        }
+
+        private void UpdateMasterTransform(Transform target, float dt)
+        {
+            Vector2 currentPosition = target.position;
+            if (dt > Mathf.Epsilon && previousMasterPositions.TryGetValue(target, out Vector2 previousPosition))
+            {
+                masterLinearVelocities[target] = (currentPosition - previousPosition) / dt;
+            }
+            else
+            {
+                masterLinearVelocities[target] = Vector2.zero;
+            }
+
+            previousMasterPositions[target] = currentPosition;
+        }
+
+        private void CleanupUnusedMasterEntries()
+        {
+            masterCleanupScratch.Clear();
+
+            foreach (KeyValuePair<Transform, Vector2> entry in masterLinearVelocities)
+            {
+                if (!masterVelocityScratch.Contains(entry.Key))
+                {
+                    masterCleanupScratch.Add(entry.Key);
+                }
+            }
+
+            for (int i = 0; i < masterCleanupScratch.Count; i++)
+            {
+                Transform key = masterCleanupScratch[i];
+                masterLinearVelocities.Remove(key);
+                previousMasterPositions.Remove(key);
+            }
+
+            masterCleanupScratch.Clear();
+        }
+
+        private Vector2 GetMasterLinearVelocity(Transform target)
+        {
+            if (target == null)
+            {
+                return Vector2.zero;
+            }
+
+            if (masterLinearVelocities.TryGetValue(target, out Vector2 velocity))
+            {
+                return velocity;
+            }
+
+            return Vector2.zero;
+        }
+
+        private static float ComputeScaledDamping(float baseStiffness, float dampingSetting, float strength, float massOrInertia)
+        {
+            float clampedStrength = Mathf.Max(strength, 0f);
+            float clampedStiffness = Mathf.Max(baseStiffness, 0f);
+            float clampedMass = Mathf.Max(massOrInertia, 0.0001f);
+
+            if (clampedStrength <= 0f || clampedStiffness <= 0f)
+            {
+                return 0f;
+            }
+
+            float baseCritical = 2f * Mathf.Sqrt(clampedStiffness * clampedMass);
+            float ratio = baseCritical > Mathf.Epsilon ? Mathf.Max(dampingSetting, 0f) / baseCritical : 1f;
+
+            float scaledStiffness = clampedStiffness * clampedStrength;
+            float scaledCritical = 2f * Mathf.Sqrt(scaledStiffness * clampedMass);
+            return scaledCritical * Mathf.Max(ratio, 0f);
+        }
+
+        private float ComputeTargetAngle(BoneLink link)
+        {
+            if (link.Master == null)
+            {
+                return 0f;
+            }
+
+            if (!link.UseLocalRotation)
+            {
+                return link.Master.eulerAngles.z;
+            }
+
+            Transform parent = link.Puppet != null ? link.Puppet.transform.parent : null;
+            if (!TryGetParentRotation(parent, out float parentWorldZ))
+            {
+                return link.Master.eulerAngles.z;
+            }
+
+            float masterLocalZ = link.Master.localEulerAngles.z;
+            if (masterLocalZ > 180f)
+            {
+                masterLocalZ -= 360f;
+            }
+
+            return parentWorldZ + masterLocalZ;
+        }
+
+        private bool TryGetParentRotation(Transform parent, out float angle)
+        {
+            angle = 0f;
+
+            if (parent == null)
+            {
+                return false;
+            }
+
+            Rigidbody2D parentBody = parent.GetComponent<Rigidbody2D>();
+            if (parentBody != null)
+            {
+                if (!IsBodyDriven(parentBody))
+                {
+                    return false;
+                }
+
+                angle = parentBody.rotation;
+                return true;
+            }
+
+            if (parent == transform || (PuppetRoot != null && parent == PuppetRoot))
+            {
+                angle = parent.eulerAngles.z;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsBodyDriven(Rigidbody2D body)
+        {
+            if (body == null || Links == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < Links.Count; i++)
+            {
+                BoneLink link = Links[i];
+                if (link == null || link.Puppet != body)
+                {
+                    continue;
+                }
+
+                if (!link.EnableRotation)
+                {
+                    return false;
+                }
+
+                return link.Strength > 0f;
+            }
+
+            return false;
+        }
+
+        private float GetTargetAngularVelocity(BoneLink link, float currentTargetAngle)
+        {
+            Rigidbody2D puppetBody = link.Puppet;
+            if (puppetBody == null)
+            {
+                return 0f;
+            }
+
+            float velocity = 0f;
+            float dt = Time.fixedDeltaTime;
+            if (dt > Mathf.Epsilon && previousTargetAngles.TryGetValue(puppetBody, out float previousAngle))
+            {
+                float delta = Mathf.DeltaAngle(previousAngle, currentTargetAngle);
+                velocity = delta / dt;
+            }
+
+            previousTargetAngles[puppetBody] = currentTargetAngle;
+            return velocity;
+        }
+
+        private void CacheTargetAngle(BoneLink link, float targetAngle)
+        {
+            if (link?.Puppet == null)
+            {
+                return;
+            }
+
+            previousTargetAngles[link.Puppet] = targetAngle;
+        }
+
+        private void CleanupTargetAngleCache(HashSet<Rigidbody2D> activeBodies)
+        {
+            if (previousTargetAngles.Count == 0)
+            {
+                return;
+            }
+
+            targetCleanupScratch.Clear();
+
+            foreach (KeyValuePair<Rigidbody2D, float> entry in previousTargetAngles)
+            {
+                if (!activeBodies.Contains(entry.Key))
+                {
+                    targetCleanupScratch.Add(entry.Key);
+                }
+            }
+
+            for (int i = 0; i < targetCleanupScratch.Count; i++)
+            {
+                previousTargetAngles.Remove(targetCleanupScratch[i]);
+            }
+
+            targetCleanupScratch.Clear();
         }
 
         private float ResolveRegionMultiplier(BoneRegion region)
