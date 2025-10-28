@@ -2,6 +2,8 @@
 
 `MasterPuppetLink` (`Assets/Scripts/Robots/MasterPuppetLink.cs`) is the bridge between an animated **master** skeleton (animation clips, IK, or pose authoring) and a physics-driven **puppet** ragdoll. The component samples the desired pose from the master hierarchy and applies physically plausible forces and torques so the ragdoll chases the animation while still reacting to the world.
 
+> 💡 Looking for a non-physical, direct pose copier? Use `SimplePuppetBinder` (`Assets/Scripts/Robots/SimplePuppetBinder.cs`). It simply matches transform positions/rotations per frame and can auto-populate pairs by name, making it ideal when you just want `head master → head puppet` style synchronization without strength or damping tuning.
+
 ## Roles in the Setup
 - **Master hierarchy** - kinematic transforms that produce the desired pose. In the cowboy prefabs this is the animated `Cowboy_Master`.
 - **Puppet hierarchy** - matching rigidbodies and colliders that make up the active ragdoll (`Cowboy_Puppet`). These must share transform names so they can be paired.
