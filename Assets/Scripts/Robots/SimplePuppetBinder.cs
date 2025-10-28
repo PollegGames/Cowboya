@@ -21,6 +21,15 @@ namespace CowBoya.Robots
             public Rigidbody PuppetBody3D;
             public bool CopyPosition = true;
             public bool CopyRotation = true;
+
+            [NonSerialized]
+            internal Vector3 targetPosition;
+            [NonSerialized]
+            internal Quaternion targetRotation;
+            [NonSerialized]
+            internal bool hasPositionTarget;
+            [NonSerialized]
+            internal bool hasRotationTarget;
         }
 
         [Tooltip("Root transform used to search for master bones when auto populating.")]
@@ -93,34 +102,76 @@ namespace CowBoya.Robots
 
                 if (pair.CopyPosition)
                 {
-                    if (rb2D != null)
+                    Vector3 targetPosition = pair.Master.position;
+                    if (rb2D != null || rb3D != null)
                     {
-                        rb2D.MovePosition(pair.Master.position);
-                    }
-                    else if (rb3D != null)
-                    {
-                        rb3D.MovePosition(pair.Master.position);
+                        pair.targetPosition = targetPosition;
+                        pair.hasPositionTarget = true;
                     }
                     else
                     {
-                        pair.Puppet.position = pair.Master.position;
+                        pair.Puppet.position = targetPosition;
                     }
+                }
+                else
+                {
+                    pair.hasPositionTarget = false;
                 }
 
                 if (pair.CopyRotation)
                 {
                     Quaternion rotation = pair.Master.rotation;
-                    if (rb2D != null)
+                    if (rb2D != null || rb3D != null)
                     {
-                        rb2D.MoveRotation(rotation.eulerAngles.z);
-                    }
-                    else if (rb3D != null)
-                    {
-                        rb3D.MoveRotation(rotation);
+                        pair.targetRotation = rotation;
+                        pair.hasRotationTarget = true;
                     }
                     else
                     {
                         pair.Puppet.rotation = rotation;
+                    }
+                }
+                else
+                {
+                    pair.hasRotationTarget = false;
+                }
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            for (int i = 0; i < Pairs.Count; i++)
+            {
+                BonePair pair = Pairs[i];
+                if (pair == null || pair.Puppet == null)
+                {
+                    continue;
+                }
+
+                Rigidbody2D rb2D = pair.PuppetBody2D;
+                Rigidbody rb3D = pair.PuppetBody3D;
+
+                if (pair.CopyPosition && pair.hasPositionTarget)
+                {
+                    if (rb2D != null)
+                    {
+                        rb2D.MovePosition(pair.targetPosition);
+                    }
+                    else if (rb3D != null)
+                    {
+                        rb3D.MovePosition(pair.targetPosition);
+                    }
+                }
+
+                if (pair.CopyRotation && pair.hasRotationTarget)
+                {
+                    if (rb2D != null)
+                    {
+                        rb2D.MoveRotation(pair.targetRotation.eulerAngles.z);
+                    }
+                    else if (rb3D != null)
+                    {
+                        rb3D.MoveRotation(pair.targetRotation);
                     }
                 }
             }
