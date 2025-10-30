@@ -41,6 +41,7 @@ namespace CowBoya.Robots
             public float RotationDamping = 20f;
             public float Strength = 1f;
             public bool EnablePosition = true;
+            public bool UseJointAnchorPosition = true;
             public bool EnableRotation = true;
             public bool UseLocalRotation = true;
             public BoneRegion Region = BoneRegion.Torso;
@@ -202,6 +203,7 @@ namespace CowBoya.Robots
         public float CurrentTorsoTilt => currentTorsoTilt;
         public float CurrentPelvisHeight => currentPelvisHeight;
 
+        private readonly Dictionary<BoneLink, float> rotationOffsets = new Dictionary<BoneLink, float>();
         private readonly Dictionary<BoneRegion, float> regionStrengthCache = new Dictionary<BoneRegion, float>();
         private readonly Dictionary<BoneRegion, float> regionStateCache = new Dictionary<BoneRegion, float>();
         private readonly Dictionary<ContactPoint, float> contactTimers = new Dictionary<ContactPoint, float>();
@@ -213,6 +215,7 @@ namespace CowBoya.Robots
         private readonly List<Transform> masterVelocityScratch = new List<Transform>();
         private readonly List<Transform> masterCleanupScratch = new List<Transform>();
         private readonly List<Rigidbody2D> targetCleanupScratch = new List<Rigidbody2D>();
+        private static readonly List<AnchoredJoint2D> anchoredJointScratch = new List<AnchoredJoint2D>(4);
 
         private BalanceState currentState = BalanceState.Normal;
         private float stateTimer;
@@ -221,6 +224,7 @@ namespace CowBoya.Robots
         private bool bodiesDirty = true;
         private bool metricsInitialized;
         private bool autoPopulating;
+        private bool rotationOffsetsDirty = true;
 
         private Vector2 currentCenterOfMass;
         private Vector2 currentSupportCenter;
@@ -256,6 +260,7 @@ namespace CowBoya.Robots
 
             RefreshBodiesCache();
             AutoAssignPelvis();
+            MarkRotationOffsetsDirty();
         }
 
         private void OnValidate()
@@ -289,12 +294,20 @@ namespace CowBoya.Robots
 
             bodiesDirty = true;
             AutoAssignPelvis();
+            MarkRotationOffsetsDirty();
         }
 
         [ContextMenu("Auto Populate Links")]
         public void AutoPopulateLinksContextMenu()
         {
             AutoPopulateLinksInternal(true);
+            MarkRotationOffsetsDirty();
+        }
+
+        [ContextMenu("Recalculate Rotation Offsets")]
+        public void RecalculateRotationOffsetsContextMenu()
+        {
+            CaptureRotationOffsets();
         }
 
         private void FixedUpdate()
@@ -340,7 +353,8 @@ namespace CowBoya.Robots
                         continue;
                     }
 
-                    Vector3 puppetPosition = link.Puppet != null ? (Vector3)link.Puppet.position : Vector3.zero;
+                    Vector2 puppetPos2D = GetPuppetReferencePosition(link);
+                    Vector3 puppetPosition = new Vector3(puppetPos2D.x, puppetPos2D.y, 0f);
                     Vector3 masterPosition = link.Master != null ? link.Master.position : puppetPosition;
 
                     Gizmos.color = Debug.PuppetColor;
@@ -371,6 +385,93 @@ namespace CowBoya.Robots
                 Gizmos.DrawSphere(new Vector3(support.x, support.y, 0f), gizmoScale);
                 Gizmos.DrawLine(new Vector3(support.x, support.y, 0f), new Vector3(com.x, com.y, 0f));
             }
+        }
+
+        private Vector2 GetPuppetReferencePosition(BoneLink link)
+        {
+            if (link == null)
+            {
+                return transform.position;
+            }
+
+            if (link.Puppet == null)
+            {
+                return link.Master != null ? (Vector2)link.Master.position : (Vector2)transform.position;
+            }
+
+            if (link.UseJointAnchorPosition && TryGetJointAnchorWorld(link, out Vector2 anchorWorld))
+            {
+                return anchorWorld;
+            }
+
+            return link.Puppet.position;
+        }
+
+        private bool TryGetJointAnchorWorld(BoneLink link, out Vector2 anchorWorld)
+        {
+            anchorWorld = Vector2.zero;
+            if (link == null || link.Puppet == null)
+            {
+                return false;
+            }
+
+            Rigidbody2D body = link.Puppet;
+            Transform bodyTransform = body.transform;
+
+            Rigidbody2D parentBody = null;
+            Transform parent = bodyTransform.parent;
+            if (parent != null)
+            {
+                parentBody = parent.GetComponent<Rigidbody2D>();
+            }
+
+            anchoredJointScratch.Clear();
+            body.GetComponents(anchoredJointScratch);
+
+            AnchoredJoint2D fallbackJoint = null;
+            for (int i = 0; i < anchoredJointScratch.Count; i++)
+            {
+                AnchoredJoint2D joint = anchoredJointScratch[i];
+                if (joint == null || !joint.enabled)
+                {
+                    continue;
+                }
+
+                if (parentBody != null && joint.connectedBody == parentBody)
+                {
+                    anchorWorld = bodyTransform.TransformPoint(joint.anchor);
+                    anchoredJointScratch.Clear();
+                    return true;
+                }
+
+                if (fallbackJoint == null && joint.connectedBody != null)
+                {
+                    fallbackJoint = joint;
+                }
+            }
+
+            if (fallbackJoint != null)
+            {
+                anchorWorld = bodyTransform.TransformPoint(fallbackJoint.anchor);
+                anchoredJointScratch.Clear();
+                return true;
+            }
+
+            for (int i = 0; i < anchoredJointScratch.Count; i++)
+            {
+                AnchoredJoint2D joint = anchoredJointScratch[i];
+                if (joint == null || !joint.enabled)
+                {
+                    continue;
+                }
+
+                anchorWorld = bodyTransform.TransformPoint(joint.anchor);
+                anchoredJointScratch.Clear();
+                return true;
+            }
+
+            anchoredJointScratch.Clear();
+            return false;
         }
 
         private void ApplyBoneForces(float globalStrength)
@@ -413,8 +514,24 @@ namespace CowBoya.Robots
                 if (link.EnablePosition)
                 {
                     Vector2 targetPosition = link.Master.position;
-                    Vector2 currentPosition = puppetBody.position;
+                    Vector2 currentPosition;
                     Vector2 currentVelocity = puppetBody.linearVelocity;
+                    Vector2 anchorWorld = Vector2.zero;
+                    bool usingAnchor = link.UseJointAnchorPosition &&
+                                       TryGetJointAnchorWorld(link, out anchorWorld);
+                    if (usingAnchor)
+                    {
+                        currentPosition = anchorWorld;
+                        Vector2 com = puppetBody.worldCenterOfMass;
+                        Vector2 offset = anchorWorld - com;
+                        float angularVelocityRad = puppetBody.angularVelocity * Mathf.Deg2Rad;
+                        Vector2 tangentialVelocity = new Vector2(-offset.y, offset.x) * angularVelocityRad;
+                        currentVelocity += tangentialVelocity;
+                    }
+                    else
+                    {
+                        currentPosition = puppetBody.position;
+                    }
                     Vector2 masterVelocity = UseMasterVelocityFeedForward ? GetMasterLinearVelocity(link.Master) : Vector2.zero;
                     Vector2 relativeVelocity = currentVelocity - masterVelocity;
                     Vector2 positionError = targetPosition - currentPosition;
@@ -628,29 +745,84 @@ namespace CowBoya.Robots
 
         private float ComputeTargetAngle(BoneLink link)
         {
-            if (link.Master == null)
+            if (link?.Master == null)
             {
                 return 0f;
             }
 
+            float rotationOffset = GetRotationOffset(link);
+
             if (!link.UseLocalRotation)
             {
-                return link.Master.eulerAngles.z;
+                float worldAngle = link.Master.eulerAngles.z;
+                return NormalizeAngle(worldAngle + rotationOffset);
             }
 
             Transform parent = link.Puppet != null ? link.Puppet.transform.parent : null;
             if (!TryGetParentRotation(parent, out float parentWorldZ))
             {
-                return link.Master.eulerAngles.z;
+                float fallbackAngle = link.Master.eulerAngles.z;
+                return NormalizeAngle(fallbackAngle + rotationOffset);
             }
 
-            float masterLocalZ = link.Master.localEulerAngles.z;
-            if (masterLocalZ > 180f)
+            float masterLocalZ = NormalizeAngle(link.Master.localEulerAngles.z);
+
+            return NormalizeAngle(parentWorldZ + masterLocalZ + rotationOffset);
+        }
+
+        private float GetRotationOffset(BoneLink link)
+        {
+            if (link == null || !link.UseLocalRotation)
             {
-                masterLocalZ -= 360f;
+                return 0f;
             }
 
-            return parentWorldZ + masterLocalZ;
+            if (rotationOffsetsDirty)
+            {
+                CaptureRotationOffsets();
+            }
+
+            if (rotationOffsets.TryGetValue(link, out float offset))
+            {
+                return offset;
+            }
+
+            return 0f;
+        }
+
+        private static float NormalizeAngle(float angle)
+        {
+            return Mathf.Repeat(angle + 180f, 360f) - 180f;
+        }
+
+        private void CaptureRotationOffsets()
+        {
+            rotationOffsets.Clear();
+
+            if (Links != null)
+            {
+                for (int i = 0; i < Links.Count; i++)
+                {
+                    BoneLink link = Links[i];
+                    if (link == null || !link.UseLocalRotation || link.Master == null || link.Puppet == null)
+                    {
+                        continue;
+                    }
+
+                    float masterLocal = link.Master.localEulerAngles.z;
+                    float puppetLocal = link.Puppet.transform.localEulerAngles.z;
+                    float offset = Mathf.DeltaAngle(masterLocal, puppetLocal);
+                    rotationOffsets[link] = NormalizeAngle(offset);
+                }
+            }
+
+            rotationOffsetsDirty = false;
+        }
+
+        private void MarkRotationOffsetsDirty()
+        {
+            rotationOffsetsDirty = true;
+            rotationOffsets.Clear();
         }
 
         private bool TryGetParentRotation(Transform parent, out float angle)
@@ -670,13 +842,13 @@ namespace CowBoya.Robots
                     return false;
                 }
 
-                angle = parentBody.rotation;
+                angle = NormalizeAngle(parentBody.rotation);
                 return true;
             }
 
             if (parent == transform || (PuppetRoot != null && parent == PuppetRoot))
             {
-                angle = parent.eulerAngles.z;
+                angle = NormalizeAngle(parent.eulerAngles.z);
                 return true;
             }
 
@@ -927,6 +1099,8 @@ namespace CowBoya.Robots
             {
                 previousVelocities.Remove(toRemove[i]);
             }
+
+            MarkRotationOffsetsDirty();
         }
 
         private void AutoAssignPelvis()
@@ -1509,6 +1683,7 @@ namespace CowBoya.Robots
             newLinks.Sort(CompareLinks);
             Links = newLinks;
             bodiesDirty = true;
+            MarkRotationOffsetsDirty();
             AutoAssignPelvis();
 
 #if UNITY_EDITOR
@@ -1662,6 +1837,7 @@ namespace CowBoya.Robots
 
         private static void ApplyRegionDefaults(BoneLink link)
         {
+            link.UseJointAnchorPosition = true;
             switch (link.Region)
             {
                 case BoneRegion.Root:
