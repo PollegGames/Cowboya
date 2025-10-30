@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5628892268546442217}
+  - component: {fileID: 1436902719251581649}
+  - component: {fileID: 3430543378256634973}
   m_Layer: 0
   m_Name: Cowboy
   m_TagString: Untagged
@@ -33,6 +35,44 @@ Transform:
   - {fileID: 7004719649912191277}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1436902719251581649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7333762615744667720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3d27f98127a43d688656b4cb4956bf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 2410730850863318706}
+  target: {fileID: 217093192913780086}
+  directionParameter: Direction
+  speedParameter: Speed
+  walkBoolParameter: IsWalking
+  baseSpeed: 4
+  directionDeadZone: 0.1
+  useAnimatorSpeed: 1
+--- !u!114 &3430543378256634973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7333762615744667720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43aa4c90de5d45969cec4837a9cbb007, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 2410730850863318706}
+  directionParameter: Direction
+  walkBoolParameter: IsWalking
+  speedParameter: Speed
+  inputDeadZone: 0.1
+  horizontalAction: {fileID: 6743824144194221143, guid: b1c6eb2637dd35449b4721a3880cc95d, type: 3}
 --- !u!1001 &3198077988508372286
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -125,6 +165,11 @@ PrefabInstance:
 --- !u!4 &217093192913780086 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3414467283392557128, guid: f99d380b8b4ab8e4a8560766a16fd327, type: 3}
+  m_PrefabInstance: {fileID: 3198077988508372286}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2410730850863318706 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 942791720737770380, guid: f99d380b8b4ab8e4a8560766a16fd327, type: 3}
   m_PrefabInstance: {fileID: 3198077988508372286}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5645082431074109797

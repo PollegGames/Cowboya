@@ -1573,50 +1573,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MasterRoot: {fileID: 3414467283392557128}
   PuppetRoot: {fileID: 0}
-  AutoPopulateOnAwake: 0
   Pairs:
   - Master: {fileID: 3275784199023943698}
     Puppet: {fileID: 0}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
-    CopyPosition: 1
-    CopyRotation: 1
   - Master: {fileID: 789642260775326245}
     Puppet: {fileID: 0}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
-    CopyPosition: 1
-    CopyRotation: 1
   - Master: {fileID: 241220219047276419}
     Puppet: {fileID: 0}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
-    CopyPosition: 1
-    CopyRotation: 1
   - Master: {fileID: 1641075991903094214}
     Puppet: {fileID: 0}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
-    CopyPosition: 1
-    CopyRotation: 1
   - Master: {fileID: 2388645034201864629}
     Puppet: {fileID: 0}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
-    CopyPosition: 1
-    CopyRotation: 1
   - Master: {fileID: 6277830789518628165}
     Puppet: {fileID: 0}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
-    CopyPosition: 1
-    CopyRotation: 1
   - Master: {fileID: 2574639101805658069}
     Puppet: {fileID: 0}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
-    CopyPosition: 1
-    CopyRotation: 1
 --- !u!1 &5299142876671928586
 GameObject:
   m_ObjectHideFlags: 0
