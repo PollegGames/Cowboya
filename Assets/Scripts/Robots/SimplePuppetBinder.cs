@@ -63,6 +63,11 @@ namespace CowBoya.Robots
 
         private void LateUpdate()
         {
+            Transform masterRoot = MasterRoot != null ? MasterRoot : transform;
+            Transform puppetRoot = PuppetRoot != null ? PuppetRoot : transform;
+            Quaternion masterRootInverseRotation = Quaternion.Inverse(masterRoot.rotation);
+            Quaternion puppetRootRotation = puppetRoot.rotation;
+
             for (int i = 0; i < Pairs.Count; i++)
             {
                 BonePair pair = Pairs[i];
@@ -85,18 +90,10 @@ namespace CowBoya.Robots
                     pair.PuppetBody3D = rb3D;
                 }
 
-                Vector3 targetPosition = pair.Master.position;
-                if (rb2D != null || rb3D != null)
-                {
-                    pair.targetPosition = targetPosition;
-                    pair.hasPositionTarget = true;
-                }
-                else
-                {
-                    pair.Puppet.position = targetPosition;
-                }
+                pair.hasPositionTarget = false;
 
-                Quaternion rotation = pair.Master.rotation;
+                Quaternion localMasterRotation = masterRootInverseRotation * pair.Master.rotation;
+                Quaternion rotation = puppetRootRotation * localMasterRotation;
                 if (rb2D != null || rb3D != null)
                 {
                     pair.targetRotation = rotation;
@@ -121,18 +118,6 @@ namespace CowBoya.Robots
 
                 Rigidbody2D rb2D = pair.PuppetBody2D;
                 Rigidbody rb3D = pair.PuppetBody3D;
-
-                if (pair.hasPositionTarget)
-                {
-                    if (rb2D != null)
-                    {
-                        rb2D.MovePosition(pair.targetPosition);
-                    }
-                    else if (rb3D != null)
-                    {
-                        rb3D.MovePosition(pair.targetPosition);
-                    }
-                }
 
                 if (pair.hasRotationTarget)
                 {
