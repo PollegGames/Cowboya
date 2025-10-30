@@ -19,8 +19,6 @@ namespace CowBoya.Robots
             public Rigidbody2D PuppetBody2D;
             [Tooltip("Optional cached Rigidbody reference on the puppet for smooth moves.")]
             public Rigidbody PuppetBody3D;
-            public bool CopyPosition = true;
-            public bool CopyRotation = true;
 
             [NonSerialized]
             internal Vector3 targetPosition;
@@ -37,9 +35,6 @@ namespace CowBoya.Robots
 
         [Tooltip("Root transform used to search for puppet bones when auto populating.")]
         public Transform PuppetRoot;
-
-        [Tooltip("Automatically populate bone pairs on Awake when the list is empty.")]
-        public bool AutoPopulateOnAwake = true;
 
         [Tooltip("Ordered list of master/puppet transform pairs to keep aligned.")]
         public List<BonePair> Pairs = new List<BonePair>();
@@ -60,7 +55,6 @@ namespace CowBoya.Robots
                 PuppetRoot = transform;
             }
 
-            TryAutoPopulate();
         }
 
         private void Awake()
@@ -68,11 +62,6 @@ namespace CowBoya.Robots
             if (MasterRoot == null)
             {
                 MasterRoot = transform;
-            }
-
-            if (AutoPopulateOnAwake && Pairs.Count == 0)
-            {
-                TryAutoPopulate();
             }
         }
 
@@ -100,40 +89,26 @@ namespace CowBoya.Robots
                     pair.PuppetBody3D = rb3D;
                 }
 
-                if (pair.CopyPosition)
+                Vector3 targetPosition = pair.Master.position;
+                if (rb2D != null || rb3D != null)
                 {
-                    Vector3 targetPosition = pair.Master.position;
-                    if (rb2D != null || rb3D != null)
-                    {
-                        pair.targetPosition = targetPosition;
-                        pair.hasPositionTarget = true;
-                    }
-                    else
-                    {
-                        pair.Puppet.position = targetPosition;
-                    }
+                    pair.targetPosition = targetPosition;
+                    pair.hasPositionTarget = true;
                 }
                 else
                 {
-                    pair.hasPositionTarget = false;
+                    pair.Puppet.position = targetPosition;
                 }
 
-                if (pair.CopyRotation)
+                Quaternion rotation = pair.Master.rotation;
+                if (rb2D != null || rb3D != null)
                 {
-                    Quaternion rotation = pair.Master.rotation;
-                    if (rb2D != null || rb3D != null)
-                    {
-                        pair.targetRotation = rotation;
-                        pair.hasRotationTarget = true;
-                    }
-                    else
-                    {
-                        pair.Puppet.rotation = rotation;
-                    }
+                    pair.targetRotation = rotation;
+                    pair.hasRotationTarget = true;
                 }
                 else
                 {
-                    pair.hasRotationTarget = false;
+                    pair.Puppet.rotation = rotation;
                 }
             }
         }
@@ -151,7 +126,7 @@ namespace CowBoya.Robots
                 Rigidbody2D rb2D = pair.PuppetBody2D;
                 Rigidbody rb3D = pair.PuppetBody3D;
 
-                if (pair.CopyPosition && pair.hasPositionTarget)
+                if (pair.hasPositionTarget)
                 {
                     if (rb2D != null)
                     {
@@ -163,7 +138,7 @@ namespace CowBoya.Robots
                     }
                 }
 
-                if (pair.CopyRotation && pair.hasRotationTarget)
+                if (pair.hasRotationTarget)
                 {
                     if (rb2D != null)
                     {
@@ -177,58 +152,5 @@ namespace CowBoya.Robots
             }
         }
 
-        public void TryAutoPopulate()
-        {
-            Pairs.Clear();
-            masterByName.Clear();
-            masterBuffer.Clear();
-            puppetBuffer.Clear();
-
-            if (MasterRoot == null || PuppetRoot == null)
-            {
-                Debug.LogWarning("SimplePuppetBinder: MasterRoot and PuppetRoot must be assigned for auto populate.", this);
-                return;
-            }
-
-            masterBuffer.AddRange(MasterRoot.GetComponentsInChildren<Transform>(true));
-            puppetBuffer.AddRange(PuppetRoot.GetComponentsInChildren<Transform>(true));
-
-            for (int i = 0; i < masterBuffer.Count; i++)
-            {
-                Transform master = masterBuffer[i];
-                if (!masterByName.ContainsKey(master.name))
-                {
-                    masterByName.Add(master.name, master);
-                }
-            }
-
-            for (int i = 0; i < puppetBuffer.Count; i++)
-            {
-                Transform puppet = puppetBuffer[i];
-                if (!masterByName.TryGetValue(puppet.name, out Transform master))
-                {
-                    continue;
-                }
-
-                Rigidbody2D rb2D = null;
-                puppet.TryGetComponent(out rb2D);
-
-                Rigidbody rb3D = null;
-                puppet.TryGetComponent(out rb3D);
-
-                Pairs.Add(new BonePair
-                {
-                    Master = master,
-                    Puppet = puppet,
-                    PuppetBody2D = rb2D,
-                    PuppetBody3D = rb3D
-                });
-            }
-
-            if (Pairs.Count == 0)
-            {
-                Debug.LogWarning("SimplePuppetBinder: No matching transforms were found during auto populate.", this);
-            }
-        }
     }
 }
