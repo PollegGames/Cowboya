@@ -39,10 +39,6 @@ namespace CowBoya.Robots
         [Tooltip("Ordered list of master/puppet transform pairs to keep aligned.")]
         public List<BonePair> Pairs = new List<BonePair>();
 
-        private readonly Dictionary<string, Transform> masterByName = new Dictionary<string, Transform>();
-        private readonly List<Transform> masterBuffer = new List<Transform>();
-        private readonly List<Transform> puppetBuffer = new List<Transform>();
-
         private void Reset()
         {
             if (MasterRoot == null)

@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 #endif
 
 namespace CowBoya.Robots
@@ -16,7 +17,6 @@ namespace CowBoya.Robots
         [SerializeField] private string directionParameter = "Direction";
         [SerializeField] private string walkBoolParameter = "IsWalking";
         [SerializeField] private string speedParameter = "Speed";
-        [SerializeField] private float inputDeadZone = 0.1f;
 #if ENABLE_LEGACY_INPUT_MANAGER
         [SerializeField] private bool useRawLegacyAxis = true;
 #endif
@@ -38,17 +38,23 @@ namespace CowBoya.Robots
             }
         }
 
-#if ENABLE_INPUT_SYSTEM
         private void OnEnable()
         {
+#if ENABLE_INPUT_SYSTEM
             TryInitializeAction();
             cachedHorizontalAction?.Enable();
+#endif
+            ResetAnimatorMovement();
         }
 
         private void OnDisable()
         {
+#if ENABLE_INPUT_SYSTEM
             cachedHorizontalAction?.Disable();
+#endif
+            ResetAnimatorMovement();
         }
+#if ENABLE_INPUT_SYSTEM
 
         private void TryInitializeAction()
         {
@@ -73,19 +79,18 @@ namespace CowBoya.Robots
                 return;
             }
 
-            if (!TryGetHorizontalInput(out float horizontal))
+            int direction = GetDigitalDirection();
+            if (direction == 0)
             {
-                ApplyAnimatorValues(0f, false);
+                ResetAnimatorMovement();
                 return;
             }
 
-            bool hasInput = Mathf.Abs(horizontal) > inputDeadZone;
-            float direction = hasInput ? Mathf.Sign(horizontal) : 0f;
-            ApplyAnimatorValues(direction, hasInput);
+            ApplyAnimatorValues(direction, true);
 
             if (!string.IsNullOrEmpty(speedParameter))
             {
-                animator.SetFloat(speedParameter, Mathf.Abs(horizontal));
+                animator.SetFloat(speedParameter, 1f);
             }
         }
 
@@ -102,10 +107,30 @@ namespace CowBoya.Robots
             }
         }
 
-        private bool TryGetHorizontalInput(out float horizontal)
+        private void ResetAnimatorMovement()
         {
-            horizontal = 0f;
+            ApplyAnimatorValues(0f, false);
+
+            if (!string.IsNullOrEmpty(speedParameter))
+            {
+                animator.SetFloat(speedParameter, 0f);
+            }
+        }
+
+        private int GetDigitalDirection()
+        {
 #if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null)
+            {
+                bool leftPressed = Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed;
+                bool rightPressed = Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed;
+
+                if (leftPressed != rightPressed)
+                {
+                    return rightPressed ? 1 : -1;
+                }
+            }
+
             if (cachedHorizontalAction == null && horizontalAction != null)
             {
                 TryInitializeAction();
@@ -114,55 +139,118 @@ namespace CowBoya.Robots
 
             if (cachedHorizontalAction != null)
             {
-                try
+                if (cachedHorizontalAction.phase == InputActionPhase.Waiting || cachedHorizontalAction.activeControl == null)
                 {
-                    horizontal = cachedHorizontalAction.ReadValue<float>();
-                    return true;
-                }
-                catch (InvalidOperationException)
-                {
-                    // Fall back to vector reads below.
+                    return 0;
                 }
 
-                try
+                if (TryReadActionValue(out float actionValue))
                 {
-                    horizontal = cachedHorizontalAction.ReadValue<Vector2>().x;
-                    return true;
+                    if (Mathf.Abs(actionValue) > 0.5f)
+                    {
+                        return actionValue > 0f ? 1 : -1;
+                    }
                 }
-                catch (InvalidOperationException)
-                {
-                    // Fall back to object conversion below.
-                }
+            }
+#endif
 
-                object value = cachedHorizontalAction.ReadValueAsObject();
-                switch (value)
+#if ENABLE_INPUT_SYSTEM
+            ReadOnlyArray<Gamepad> gamepads = Gamepad.all;
+            if (gamepads.Count > 0)
+            {
+                for (int i = 0; i < gamepads.Count; i++)
                 {
-                    case float floatValue:
-                        horizontal = floatValue;
-                        return true;
-                    case Vector2 vector2Value:
-                        horizontal = vector2Value.x;
-                        return true;
-                    case Vector3 vector3Value:
-                        horizontal = vector3Value.x;
-                        return true;
-                    default:
-                        if (value != null && float.TryParse(value.ToString(), out float parsed))
-                        {
-                            horizontal = parsed;
-                            return true;
-                        }
-                        break;
+                    Gamepad pad = gamepads[i];
+                    if (pad == null)
+                    {
+                        continue;
+                    }
+
+                    float stick = pad.leftStick.ReadValue().x;
+                    if (Mathf.Abs(stick) > 0.5f)
+                    {
+                        return stick > 0f ? 1 : -1;
+                    }
+
+                    float dpad = pad.dpad.ReadValue().x;
+                    if (Mathf.Abs(dpad) > 0.5f)
+                    {
+                        return dpad > 0f ? 1 : -1;
+                    }
                 }
             }
 #endif
 
 #if ENABLE_LEGACY_INPUT_MANAGER
-            horizontal = useRawLegacyAxis ? Input.GetAxisRaw("Horizontal") : Input.GetAxis("Horizontal");
-            return true;
-#else
-            return false;
+            bool legacyLeft = Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A);
+            bool legacyRight = Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D);
+
+            if (legacyLeft != legacyRight)
+            {
+                return legacyRight ? 1 : -1;
+            }
+
+            float horizontal = useRawLegacyAxis ? Input.GetAxisRaw("Horizontal") : Input.GetAxis("Horizontal");
+            if (Mathf.Abs(horizontal) > 0.5f)
+            {
+                return horizontal > 0f ? 1 : -1;
+            }
 #endif
+
+            return 0;
         }
+
+#if ENABLE_INPUT_SYSTEM
+        private bool TryReadActionValue(out float value)
+        {
+            value = 0f;
+            if (cachedHorizontalAction == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                value = cachedHorizontalAction.ReadValue<float>();
+                return true;
+            }
+            catch (InvalidOperationException)
+            {
+                // Ignore and try other paths.
+            }
+
+            try
+            {
+                value = cachedHorizontalAction.ReadValue<Vector2>().x;
+                return true;
+            }
+            catch (InvalidOperationException)
+            {
+                // Ignore and try object conversion.
+            }
+
+            object rawValue = cachedHorizontalAction.ReadValueAsObject();
+            switch (rawValue)
+            {
+                case float floatValue:
+                    value = floatValue;
+                    return true;
+                case Vector2 vector2Value:
+                    value = vector2Value.x;
+                    return true;
+                case Vector3 vector3Value:
+                    value = vector3Value.x;
+                    return true;
+                default:
+                    if (rawValue != null && float.TryParse(rawValue.ToString(), out float parsed))
+                    {
+                        value = parsed;
+                        return true;
+                    }
+
+                    return false;
+            }
+        }
+#endif
     }
 }

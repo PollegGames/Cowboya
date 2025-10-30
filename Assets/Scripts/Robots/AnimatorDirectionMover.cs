@@ -14,7 +14,6 @@ namespace CowBoya.Robots
         [SerializeField] private string speedParameter = "Speed";
         [SerializeField] private string walkBoolParameter = "IsWalking";
         [SerializeField] private float baseSpeed = 2f;
-        [SerializeField] private float directionDeadZone = 0.1f;
         [SerializeField] private bool useAnimatorSpeed = true;
 
         private Rigidbody2D targetBody2D;
@@ -23,6 +22,7 @@ namespace CowBoya.Robots
         private bool directionParameterFound;
         private bool speedParameterFound;
         private bool walkBoolParameterFound;
+        private float directionDeadZone = 0.1f;
 
         private void Reset()
         {
