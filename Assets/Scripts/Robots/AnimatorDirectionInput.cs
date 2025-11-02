@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.Utilities;
 namespace CowBoya.Robots
 {
     /// <summary>
-    /// Updates animator parameters from player horizontal input, supporting both input backends.
+    /// Updates animator parameters from player movement input, supporting both input backends.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class AnimatorDirectionInput : MonoBehaviour
@@ -17,12 +17,23 @@ namespace CowBoya.Robots
         [SerializeField] private string directionParameter = "Direction";
         [SerializeField] private string walkBoolParameter = "IsWalking";
         [SerializeField] private string speedParameter = "Speed";
+        [SerializeField] private string verticalDirectionParameter = "VerticalDirection";
+        [SerializeField] private string jumpBoolParameter = "IsJumping";
+        [SerializeField] private string crouchBoolParameter = "IsCrouching";
 #if ENABLE_LEGACY_INPUT_MANAGER
         [SerializeField] private bool useRawLegacyAxis = true;
 #endif
 #if ENABLE_INPUT_SYSTEM
         [SerializeField] private InputActionReference horizontalAction;
+        [SerializeField] private InputActionReference verticalAction;
         private InputAction cachedHorizontalAction;
+        private InputAction cachedVerticalAction;
+        private enum AxisComponent
+        {
+            X,
+            Y,
+            Z
+        }
 #endif
 
         private void Reset()
@@ -41,8 +52,9 @@ namespace CowBoya.Robots
         private void OnEnable()
         {
 #if ENABLE_INPUT_SYSTEM
-            TryInitializeAction();
+            TryInitializeActions();
             cachedHorizontalAction?.Enable();
+            cachedVerticalAction?.Enable();
 #endif
             ResetAnimatorMovement();
         }
@@ -51,24 +63,32 @@ namespace CowBoya.Robots
         {
 #if ENABLE_INPUT_SYSTEM
             cachedHorizontalAction?.Disable();
+            cachedVerticalAction?.Disable();
 #endif
             ResetAnimatorMovement();
         }
 #if ENABLE_INPUT_SYSTEM
 
-        private void TryInitializeAction()
+        private void TryInitializeActions()
         {
-            if (horizontalAction == null)
+            cachedHorizontalAction = ResolveAction(horizontalAction);
+            cachedVerticalAction = ResolveAction(verticalAction);
+        }
+
+        private static InputAction ResolveAction(InputActionReference actionReference)
+        {
+            if (actionReference == null)
             {
-                cachedHorizontalAction = null;
-                return;
+                return null;
             }
 
-            cachedHorizontalAction = horizontalAction.action;
-            if (cachedHorizontalAction == null && horizontalAction.asset != null)
+            InputAction action = actionReference.action;
+            if (action == null && actionReference.asset != null)
             {
-                cachedHorizontalAction = horizontalAction.asset.FindAction(horizontalAction.name, throwIfNotFound: false);
+                action = actionReference.asset.FindAction(actionReference.name, throwIfNotFound: false);
             }
+
+            return action;
         }
 #endif
 
@@ -79,22 +99,20 @@ namespace CowBoya.Robots
                 return;
             }
 
-            int direction = GetDigitalDirection();
-            if (direction == 0)
-            {
-                ResetAnimatorMovement();
-                return;
-            }
+            int horizontalDirection = GetHorizontalDigitalDirection();
+            int verticalDirection = GetVerticalDigitalDirection();
+            bool isWalking = horizontalDirection != 0;
 
-            ApplyAnimatorValues(direction, true);
+            ApplyHorizontalAnimatorValues(horizontalDirection, isWalking);
+            ApplyVerticalAnimatorValues(verticalDirection);
 
             if (!string.IsNullOrEmpty(speedParameter))
             {
-                animator.SetFloat(speedParameter, 1f);
+                animator.SetFloat(speedParameter, isWalking ? 1f : 0f);
             }
         }
 
-        private void ApplyAnimatorValues(float direction, bool isWalking)
+        private void ApplyHorizontalAnimatorValues(float direction, bool isWalking)
         {
             if (!string.IsNullOrEmpty(walkBoolParameter))
             {
@@ -107,9 +125,28 @@ namespace CowBoya.Robots
             }
         }
 
+        private void ApplyVerticalAnimatorValues(int verticalDirection)
+        {
+            if (!string.IsNullOrEmpty(verticalDirectionParameter))
+            {
+                animator.SetFloat(verticalDirectionParameter, verticalDirection);
+            }
+
+            if (!string.IsNullOrEmpty(jumpBoolParameter))
+            {
+                animator.SetBool(jumpBoolParameter, verticalDirection > 0);
+            }
+
+            if (!string.IsNullOrEmpty(crouchBoolParameter))
+            {
+                animator.SetBool(crouchBoolParameter, verticalDirection < 0);
+            }
+        }
+
         private void ResetAnimatorMovement()
         {
-            ApplyAnimatorValues(0f, false);
+            ApplyHorizontalAnimatorValues(0f, false);
+            ApplyVerticalAnimatorValues(0);
 
             if (!string.IsNullOrEmpty(speedParameter))
             {
@@ -117,7 +154,7 @@ namespace CowBoya.Robots
             }
         }
 
-        private int GetDigitalDirection()
+        private int GetHorizontalDigitalDirection()
         {
 #if ENABLE_INPUT_SYSTEM
             if (Keyboard.current != null)
@@ -133,7 +170,7 @@ namespace CowBoya.Robots
 
             if (cachedHorizontalAction == null && horizontalAction != null)
             {
-                TryInitializeAction();
+                TryInitializeActions();
                 cachedHorizontalAction?.Enable();
             }
 
@@ -144,7 +181,7 @@ namespace CowBoya.Robots
                     return 0;
                 }
 
-                if (TryReadActionValue(out float actionValue))
+                if (TryReadActionValue(cachedHorizontalAction, AxisComponent.X, out float actionValue))
                 {
                     if (Mathf.Abs(actionValue) > 0.5f)
                     {
@@ -200,18 +237,101 @@ namespace CowBoya.Robots
             return 0;
         }
 
+        private int GetVerticalDigitalDirection()
+        {
 #if ENABLE_INPUT_SYSTEM
-        private bool TryReadActionValue(out float value)
+            if (Keyboard.current != null)
+            {
+                bool upPressed = Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed || Keyboard.current.spaceKey.isPressed;
+                bool downPressed = Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed || Keyboard.current.leftCtrlKey.isPressed;
+
+                if (upPressed != downPressed)
+                {
+                    return upPressed ? 1 : -1;
+                }
+            }
+
+            if (cachedVerticalAction == null && verticalAction != null)
+            {
+                TryInitializeActions();
+                cachedVerticalAction?.Enable();
+            }
+
+            if (cachedVerticalAction != null)
+            {
+                if (cachedVerticalAction.phase == InputActionPhase.Waiting || cachedVerticalAction.activeControl == null)
+                {
+                    return 0;
+                }
+
+                if (TryReadActionValue(cachedVerticalAction, AxisComponent.Y, out float verticalValue))
+                {
+                    if (Mathf.Abs(verticalValue) > 0.5f)
+                    {
+                        return verticalValue > 0f ? 1 : -1;
+                    }
+                }
+            }
+#endif
+
+#if ENABLE_INPUT_SYSTEM
+            ReadOnlyArray<Gamepad> gamepads = Gamepad.all;
+            if (gamepads.Count > 0)
+            {
+                for (int i = 0; i < gamepads.Count; i++)
+                {
+                    Gamepad pad = gamepads[i];
+                    if (pad == null)
+                    {
+                        continue;
+                    }
+
+                    float stick = pad.leftStick.ReadValue().y;
+                    if (Mathf.Abs(stick) > 0.5f)
+                    {
+                        return stick > 0f ? 1 : -1;
+                    }
+
+                    float dpad = pad.dpad.ReadValue().y;
+                    if (Mathf.Abs(dpad) > 0.5f)
+                    {
+                        return dpad > 0f ? 1 : -1;
+                    }
+                }
+            }
+#endif
+
+#if ENABLE_LEGACY_INPUT_MANAGER
+            bool legacyUp = Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.Space);
+            bool legacyDown = Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.LeftControl);
+
+            if (legacyUp != legacyDown)
+            {
+                return legacyUp ? 1 : -1;
+            }
+
+            float vertical = useRawLegacyAxis ? Input.GetAxisRaw("Vertical") : Input.GetAxis("Vertical");
+            if (Mathf.Abs(vertical) > 0.5f)
+            {
+                return vertical > 0f ? 1 : -1;
+            }
+#endif
+
+            return 0;
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        private bool TryReadActionValue(InputAction action, AxisComponent axis, out float value)
         {
             value = 0f;
-            if (cachedHorizontalAction == null)
+            if (action == null)
             {
                 return false;
             }
 
             try
             {
-                value = cachedHorizontalAction.ReadValue<float>();
+                value = action.ReadValue<float>();
                 return true;
             }
             catch (InvalidOperationException)
@@ -221,7 +341,8 @@ namespace CowBoya.Robots
 
             try
             {
-                value = cachedHorizontalAction.ReadValue<Vector2>().x;
+                Vector2 vectorValue = action.ReadValue<Vector2>();
+                value = GetComponent(vectorValue, axis);
                 return true;
             }
             catch (InvalidOperationException)
@@ -229,17 +350,28 @@ namespace CowBoya.Robots
                 // Ignore and try object conversion.
             }
 
-            object rawValue = cachedHorizontalAction.ReadValueAsObject();
+            try
+            {
+                Vector3 vector3Value = action.ReadValue<Vector3>();
+                value = GetComponent(vector3Value, axis);
+                return true;
+            }
+            catch (InvalidOperationException)
+            {
+                // Ignore and try raw conversion.
+            }
+
+            object rawValue = action.ReadValueAsObject();
             switch (rawValue)
             {
                 case float floatValue:
                     value = floatValue;
                     return true;
                 case Vector2 vector2Value:
-                    value = vector2Value.x;
+                    value = GetComponent(vector2Value, axis);
                     return true;
                 case Vector3 vector3Value:
-                    value = vector3Value.x;
+                    value = GetComponent(vector3Value, axis);
                     return true;
                 default:
                     if (rawValue != null && float.TryParse(rawValue.ToString(), out float parsed))
@@ -249,6 +381,24 @@ namespace CowBoya.Robots
                     }
 
                     return false;
+            }
+        }
+
+        private static float GetComponent(Vector2 value, AxisComponent axis)
+        {
+            return axis == AxisComponent.Y ? value.y : value.x;
+        }
+
+        private static float GetComponent(Vector3 value, AxisComponent axis)
+        {
+            switch (axis)
+            {
+                case AxisComponent.Y:
+                    return value.y;
+                case AxisComponent.Z:
+                    return value.z;
+                default:
+                    return value.x;
             }
         }
 #endif

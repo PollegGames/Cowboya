@@ -13,8 +13,6 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     [SerializeField] public RobotStats Stats;
     private bool isGrounded = true;
 
-    [Header("Hips Rigidbody")]
-    [SerializeField] private Rigidbody2D hips;
     private void Awake()
     {
         if (energyBot == null) energyBot = GetComponent<EnergyBot>();
@@ -22,7 +20,6 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
         energyBot.OnEnergyNeeded += HandleEnergyConsumption;
         healthBot.OnHealthChanged += HandleHealthChange;
-        if (hips == null) hips = GetComponentInChildren<Rigidbody2D>();
     }
 
     public bool CanJump()
@@ -39,16 +36,6 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     public bool CanPerformEnergy(float energyCost)
     {
         return Stats.CurrentEnergy > energyCost && CurrentState == RobotState.Alive;
-    }
-
-    public void HandleJump(float jumpForce)
-    {
-        if (!CanJump()) return;
-
-        Debug.Log("PlayerStateController: Jumping with force " + jumpForce);
-        isGrounded = false;
-        hips.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        StartCoroutine(ResetGrounded());
     }
 
     private IEnumerator ResetGrounded()

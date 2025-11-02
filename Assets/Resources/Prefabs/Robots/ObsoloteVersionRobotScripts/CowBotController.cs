@@ -89,7 +89,6 @@ public class CowBotController : MonoBehaviour, IController
     {
         if (!PlayerInput || !robotBehaviour.CanJump()) return;
         {
-            robotBehaviour.HandleJump(jumpForce);
             animator.SetBool(IsJumping, true);
             StartCoroutine(ResetJumpAnimation());
         }
