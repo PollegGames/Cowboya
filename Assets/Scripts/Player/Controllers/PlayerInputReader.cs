@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 public class PlayerInputReader : MonoBehaviour, IPlayerInput
 {
     public Vector2 Movement  { get; private set; }
-    public bool JumpPressed   { get; private set; }
+    public Vector2 Look      { get; private set; }
+    public bool JumpPressed  { get; private set; }
     public bool PrimaryAttack { get; private set; }
 
     public bool LeftGrabDown  { get; private set; }
@@ -23,6 +24,8 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
 
         controls.Player.Move.performed += ctx => Movement = ctx.ReadValue<Vector2>();
         controls.Player.Move.canceled += ctx => Movement = Vector2.zero;
+        controls.Player.Look.performed += ctx => Look = ctx.ReadValue<Vector2>();
+        controls.Player.Look.canceled += ctx => Look = Vector2.zero;
         controls.Player.Jump.started += ctx => JumpPressed = true;
         controls.Player.Jump.canceled += ctx => JumpPressed = false;
         controls.Player.Attack.started += ctx => PrimaryAttack = true;

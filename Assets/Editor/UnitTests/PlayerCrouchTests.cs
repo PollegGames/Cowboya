@@ -8,6 +8,7 @@ public class PlayerCrouchTests
     {
         public Vector2 movement;
         public Vector2 Movement => movement;
+        public Vector2 Look => Vector2.zero;
         public bool JumpPressed => false;
         public bool PrimaryAttack => false;
         public bool LeftGrabDown => false;
