@@ -39,10 +39,6 @@ namespace CowBoya.Robots
         [Tooltip("Ordered list of master/puppet transform pairs to keep aligned.")]
         public List<BonePair> Pairs = new List<BonePair>();
 
-        [Tooltip("Optional degrees-per-second limit when rotating puppet rigidbodies. Zero snaps immediately.")]
-        [Min(0f)]
-        public float RotationLerpSpeed;
-
         private void Reset()
         {
             if (MasterRoot == null)
@@ -127,27 +123,11 @@ namespace CowBoya.Robots
                 {
                     if (rb2D != null)
                     {
-                        float targetAngle = pair.targetRotation.eulerAngles.z;
-                        if (RotationLerpSpeed > 0f)
-                        {
-                            float currentAngle = rb2D.rotation;
-                            float maxStep = RotationLerpSpeed * Time.fixedDeltaTime;
-                            targetAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, maxStep);
-                        }
-
-                        rb2D.MoveRotation(targetAngle);
+                        rb2D.MoveRotation(pair.targetRotation.eulerAngles.z);
                     }
                     else if (rb3D != null)
                     {
-                        Quaternion target = pair.targetRotation;
-                        if (RotationLerpSpeed > 0f)
-                        {
-                            Quaternion current = rb3D.rotation;
-                            float maxDegrees = RotationLerpSpeed * Time.fixedDeltaTime;
-                            target = Quaternion.RotateTowards(current, target, maxDegrees);
-                        }
-
-                        rb3D.MoveRotation(target);
+                        rb3D.MoveRotation(pair.targetRotation);
                     }
                 }
             }
