@@ -52,7 +52,10 @@ public class AlternatingToggle : MonoBehaviour
             ToggleBox toggleBox = facingRight ? rightArmToggleBox : leftArmToggleBox;
             float toggleCost = toggleBox.ToggleCost;
 
-            robotBehaviour.PerformAttackbyEnergy(toggleCost);
+            if (!robotBehaviour.PerformAttackByEnergy(toggleCost))
+            {
+                return;
+            }
 
             toggleRoutine = StartCoroutine(ToggleHoldSequence(armTarget, toggleBox, facingRight));
         }

@@ -89,8 +89,11 @@ public class EnemyPunchAttack : MonoBehaviour
            robotBehaviour != null &&
            robotBehaviour.CanPerformEnergy(damageCost))
         {
+            if (!robotBehaviour.PerformAttackByEnergy(damageCost))
+            {
+                return;
+            }
             lastPunchTime = Time.time;
-            robotBehaviour.PerformAttackbyEnergy(damageCost);
 
             // choose arm based on player side
             bool playerIsOnRight = !targetToFollow.IsFacingRight;

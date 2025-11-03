@@ -25,6 +25,7 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
     private int punchDirectionHash;
     private int punchTriggerHash;
     private Coroutine punchRoutine;
+    private AttackSector currentAttackSector = AttackSector.Right;
 
     private void Awake()
     {
@@ -54,6 +55,7 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
             return;
         }
 
+        currentAttackSector = request.Sector;
         int directionValue = ResolveDirection(request);
         animator.SetInteger(punchDirectionHash, directionValue);
         animator.ResetTrigger(punchTriggerHash);
@@ -94,6 +96,28 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
         return transform.localScale.x >= 0f;
     }
 
+    public AttackSector CurrentAttackSector => currentAttackSector;
+
+    public bool IsCurrentlyFacingRight => IsFacingRight();
+
+    public void AbortActivePunch()
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        if (punchRoutine != null)
+        {
+            StopCoroutine(punchRoutine);
+            punchRoutine = null;
+        }
+
+        animator.ResetTrigger(punchTriggerHash);
+        animator.SetInteger(punchDirectionHash, idleDirectionValue);
+        currentAttackSector = AttackSector.Right;
+    }
+
     private IEnumerator ResetPunchAfterCompletion()
     {
         yield return null;
@@ -122,6 +146,7 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
 
         animator.SetInteger(punchDirectionHash, idleDirectionValue);
         punchRoutine = null;
+        currentAttackSector = AttackSector.Right;
     }
 
     private void OnDisable()
@@ -137,5 +162,7 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
             animator.ResetTrigger(punchTriggerHash);
             animator.SetInteger(punchDirectionHash, idleDirectionValue);
         }
+
+        currentAttackSector = AttackSector.Right;
     }
 }
