@@ -61,7 +61,10 @@ public class AllyPunchAttack : MonoBehaviour
             return;
         }
 
-        robotBehaviour.PerformAttackbyEnergy(damageCost);
+        if (!robotBehaviour.PerformAttackByEnergy(damageCost))
+        {
+            return;
+        }
         cooldownTimer = attackCooldown;
         StartCoroutine(PunchSequence(armTarget, hitbox, facingRight));
     }

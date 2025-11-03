@@ -55,11 +55,36 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         energyBot.RechargingEnergy(-Stats.AttackEnergyCost);
     }
 
+    public bool PerformAttackByEnergy(float energyCost)
+    {
+        if (CurrentState != RobotState.Alive || !Stats.AbleToAttack)
+        {
+            return false;
+        }
+
+        if (Stats == null || energyBot == null)
+        {
+            return false;
+        }
+
+        if (energyCost <= 0f)
+        {
+            return true;
+        }
+
+        if (Stats.CurrentEnergy < energyCost)
+        {
+            return false;
+        }
+
+        energyBot.RechargingEnergy(-energyCost);
+        return true;
+    }
+
+    [Obsolete("Use PerformAttackByEnergy instead.")]
     public void PerformAttackbyEnergy(float energycost)
     {
-        if (CurrentState != RobotState.Alive || !Stats.AbleToAttack) return;
-
-        energyBot.RechargingEnergy(-energycost);
+        PerformAttackByEnergy(energycost);
     }
     private void HandleEnergyConsumption(float energyChange)
     {
