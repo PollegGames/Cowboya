@@ -8,6 +8,7 @@ public class HintManagerTests
     private class DummyInput : MonoBehaviour, IPlayerInput
     {
         public Vector2 Movement { get; set; }
+        public Vector2 Look { get; set; }
         public bool JumpPressed { get; set; }
         public bool PrimaryAttack { get; set; }
         public bool LeftGrabDown { get; set; }

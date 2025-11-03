@@ -7,6 +7,7 @@ public class GrabSystemTests
     private class DummyInput : MonoBehaviour, IPlayerInput
     {
         public Vector2 Movement => Vector2.zero;
+        public Vector2 Look => Vector2.zero;
         public bool JumpPressed => false;
         public bool PrimaryAttack => false;
 

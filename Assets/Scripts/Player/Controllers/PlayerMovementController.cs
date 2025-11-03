@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(RobotLocomotionController), typeof(Inventory))]
@@ -37,11 +38,29 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     [SerializeField] private Inventory inventory;
 
     private Vector2 lookDirection = Vector2.right;
+    private Vector2 aimVector = Vector2.right;
+    private bool aimFromLookInput = false;
+    private AttackSector currentSector = AttackSector.Right;
+
+    /// <summary>
+    /// Invoked when the attack sector changes based on input.
+    /// </summary>
+    public event Action<AttackSector> SectorChanged;
 
     /// <summary>
     /// Gets the current look direction.
     /// </summary>
     public Vector2 LookDirection => lookDirection;
+
+    /// <summary>
+    /// Gets the most recent aiming vector used for sector evaluation.
+    /// </summary>
+    public Vector2 AimVector => aimVector;
+
+    /// <summary>
+    /// Gets the current attack sector derived from input.
+    /// </summary>
+    public AttackSector CurrentSector => currentSector;
 
     private void Awake()
     {
@@ -74,8 +93,27 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
 
             if (Mathf.Abs(horizontalInput) > 0.1f)
                 lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
+
+            Vector2 lookInput = input.Look;
+            if (lookInput.sqrMagnitude > 0.0001f)
+            {
+                aimVector = lookInput;
+                aimFromLookInput = true;
+            }
+            else if (!aimFromLookInput || aimVector.sqrMagnitude <= 0.0001f)
+            {
+                aimVector = lookDirection;
+                aimFromLookInput = false;
+            }
         }
+        else
+        {
+            aimVector = lookDirection;
+            aimFromLookInput = false;
+        }
+
         TryFlip();
+        UpdateAttackSector();
         CalculateAndApplyBodyRotation();
         HandleMovement();
         HandleJump();
@@ -164,6 +202,31 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         }
 
         isCrouchingInput = verticalInput < 0;
+    }
+
+    private void UpdateAttackSector()
+    {
+        AttackSector newSector = DetermineSector(aimVector);
+        if (newSector == currentSector)
+            return;
+
+        currentSector = newSector;
+        SectorChanged?.Invoke(currentSector);
+    }
+
+    private AttackSector DetermineSector(Vector2 vector)
+    {
+        if (vector.sqrMagnitude <= 0.0001f)
+        {
+            return flipped ? AttackSector.Left : AttackSector.Right;
+        }
+
+        if (Mathf.Abs(vector.x) >= Mathf.Abs(vector.y))
+        {
+            return vector.x >= 0f ? AttackSector.Right : AttackSector.Left;
+        }
+
+        return vector.y >= 0f ? AttackSector.Up : AttackSector.Down;
     }
 
     private void HandleJumpEnd()
