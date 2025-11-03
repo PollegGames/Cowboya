@@ -36,12 +36,17 @@ public class PlayerTemplate : RobotTemplate
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
 
-        PlayerPunchAnimator punchAnimator = robotBehaviour.GetComponent<PlayerPunchAnimator>();
-        if (punchAnimator != null)
+        AttackRequestController attackController = robotBehaviour.GetComponent<AttackRequestController>();
+        if (attackController == null)
+        {
+            attackController = robotBehaviour.GetComponentInChildren<AttackRequestController>();
+        }
+
+        if (attackController != null)
         {
             List<Attack> attacks = robotBehaviour.Stats.Attacks ?? new List<Attack>();
             attacks.Clear();
-            attacks.Add(new Attack("Punch", 0, punchAnimator.HandleAttackRequest));
+            attacks.Add(new Attack("Punch", 0, attackController.HandleAttackRequest));
             robotBehaviour.Stats.Attacks = attacks;
         }
         Debug.Log("PlayerStats initialized with health: " + robotBehaviour.Stats.CurrentHealth
