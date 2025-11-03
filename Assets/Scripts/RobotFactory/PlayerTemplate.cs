@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerTemplate", menuName = "Robot/PlayerTemplate")]
@@ -34,6 +35,15 @@ public class PlayerTemplate : RobotTemplate
                 (int)saveData.AttackEnergyCost);
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
+
+        PlayerPunchAnimator punchAnimator = robotBehaviour.GetComponent<PlayerPunchAnimator>();
+        if (punchAnimator != null)
+        {
+            List<Attack> attacks = robotBehaviour.Stats.Attacks ?? new List<Attack>();
+            attacks.Clear();
+            attacks.Add(new Attack("Punch", 0, punchAnimator.HandleAttackRequest));
+            robotBehaviour.Stats.Attacks = attacks;
+        }
         Debug.Log("PlayerStats initialized with health: " + robotBehaviour.Stats.CurrentHealth
         + " and energy: " + robotBehaviour.Stats.CurrentEnergy
         + " and morality: " + robotBehaviour.Stats.Morality
