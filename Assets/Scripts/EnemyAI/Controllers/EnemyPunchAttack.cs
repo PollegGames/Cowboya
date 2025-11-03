@@ -1,63 +1,61 @@
-using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Handles the punching animation for enemies. Uses configured arm targets and
-/// hitboxes to strike the player when they enter the attack zone.
+/// Issues <see cref="AttackRequest"/>s on behalf of an enemy when the player
+/// enters the attack zone.
 /// </summary>
-public class EnemyPunchAttack : MonoBehaviour
+[DisallowMultipleComponent]
+public sealed class EnemyPunchAttack : MonoBehaviour
 {
-    [SerializeField] private FollowPlayerTriggerHandler targetToFollow; // assigned via inspector
-
-    [Header("Punch Targets")]
-    public Transform leftArmTarget;
-    public Transform rightArmTarget;
-    public Transform leftRestPosition;
-    public Transform rightRestPosition;
-    public Transform punchTarget;
-
-    [Header("Arc Control Points")]
-    public Transform arcControlRight;
-    public Transform arcControlLeft;
-
-    [Header("Timing and Speed")]
-    public float punchDuration = 0.2f;
-    public float returnSpeed = 10f;
-    public float attackCooldown = 1f;
-
-    [Header("Attack Hitboxes")]
-    public AttackHitbox leftArmHitbox;
-    public AttackHitbox rightArmHitbox;
-
-    [Header("Attack Settings")]
-    private bool isPunching = false;
-    private float lastPunchTime = 0f;
+    [SerializeField] private FollowPlayerTriggerHandler targetToFollow;
+    [SerializeField] private float attackCooldown = 1f;
+    [SerializeField] private float verticalSectorThreshold = 0.75f;
+    [SerializeField] private FactoryAlarmStatus alarmStatus;
 
     private RobotStateController robotBehaviour;
-
-    [SerializeField] private RobotMemory memory;
-    [SerializeField] private FactoryAlarmStatus alarmStatus;
+    private AttackRequestController attackRequestController;
     private RobotStats playerStats;
-    private bool playerInAttackZone = false;
+    private float lastPunchTime;
+    private bool playerInAttackZone;
+
     private void Awake()
     {
         robotBehaviour = GetComponent<RobotStateController>();
+        attackRequestController = GetComponent<AttackRequestController>();
+        if (attackRequestController == null)
+        {
+            attackRequestController = GetComponentInChildren<AttackRequestController>();
+        }
+
         if (alarmStatus == null)
         {
             alarmStatus = FindFirstObjectByType<FactoryManager>()?.factoryAlarmStatus;
         }
     }
-    private void Start()
+
+    private void OnEnable()
     {
         if (targetToFollow != null)
         {
             targetToFollow.OnPlayerDetectInAttackZoneChanged += HandlePlayerInAttackZoneChange;
         }
+    }
+
+    private void Start()
+    {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             RobotStateController controller = player.GetComponent<RobotStateController>();
             playerStats = controller?.Stats;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (targetToFollow != null)
+        {
+            targetToFollow.OnPlayerDetectInAttackZoneChanged -= HandlePlayerInAttackZoneChange;
         }
     }
 
@@ -68,81 +66,63 @@ public class EnemyPunchAttack : MonoBehaviour
 
     private void Update()
     {
+        if (!CanIssueAttack())
+        {
+            return;
+        }
+
+        Vector3 playerPosition = targetToFollow.PlayerBodyReferencePosition;
+        if (playerPosition == Vector3.zero)
+        {
+            return;
+        }
+
+        if (Time.time < lastPunchTime + attackCooldown)
+        {
+            return;
+        }
+
+        AttackSector sector = ResolveSector(playerPosition);
+        float energyCost = robotBehaviour != null && robotBehaviour.Stats != null
+            ? robotBehaviour.Stats.AttackEnergyCost
+            : 0f;
+
+        Vector2 targetPosition = new Vector2(playerPosition.x, playerPosition.y);
+        AttackRequest request = new AttackRequest(targetPosition, sector, energyCost);
+        if (attackRequestController != null && attackRequestController.TryHandleAttack(request))
+        {
+            lastPunchTime = Time.time;
+        }
+    }
+
+    private bool CanIssueAttack()
+    {
+        if (attackRequestController == null || targetToFollow == null || !playerInAttackZone)
+        {
+            return false;
+        }
+
         if (playerStats != null &&
             playerStats.Morality > 5f &&
             alarmStatus != null &&
             alarmStatus.CurrentAlarmState != AlarmState.Wanted)
         {
-            return; // Guards stand down
+            return false;
         }
 
-        if (!targetToFollow || !punchTarget || isPunching) return;
-
-        if (!playerInAttackZone || targetToFollow.PlayerBodyReferencePosition == Vector3.zero) return;
-
-        // Update the punch target to follow the player
-        punchTarget.position = targetToFollow.transform.position;
-
-        // If target is tracked and cooldown passed
-        float damageCost = rightArmHitbox.DamageCost;
-        if (Time.time >= lastPunchTime + attackCooldown &&
-           robotBehaviour != null &&
-           robotBehaviour.CanPerformEnergy(damageCost))
-        {
-            if (!robotBehaviour.PerformAttackByEnergy(damageCost))
-            {
-                return;
-            }
-            lastPunchTime = Time.time;
-
-            // choose arm based on player side
-            bool playerIsOnRight = !targetToFollow.IsFacingRight;
-            if (playerIsOnRight)
-                StartCoroutine(PunchSequence(rightArmTarget, rightArmHitbox));
-            else
-                StartCoroutine(PunchSequence(leftArmTarget, leftArmHitbox));
-        }
+        return true;
     }
 
-    private IEnumerator PunchSequence(Transform armTarget, AttackHitbox hitbox)
+    private AttackSector ResolveSector(Vector3 playerPosition)
     {
-        isPunching = true;
+        Vector3 origin = transform.position;
+        Vector3 delta = playerPosition - origin;
 
-        Vector3 start = armTarget.position;
-        Vector3 end = punchTarget.position;
-
-        Transform controlPoint = targetToFollow.IsFacingRight ? arcControlRight : arcControlLeft;
-        Vector3 control = controlPoint != null ? controlPoint.position : (start + end) / 2 + Vector3.up * 0.5f;
-
-        Transform restPosition = armTarget == rightArmTarget ? rightRestPosition : leftRestPosition;
-
-        if (hitbox != null) hitbox.Activate();
-
-        float timer = 0f;
-        while (timer < punchDuration)
+        if (Mathf.Abs(delta.y) > verticalSectorThreshold)
         {
-            timer += Time.deltaTime;
-            float t = Mathf.Clamp01(timer / punchDuration);
-            armTarget.position = GetQuadraticBezierPoint(start, control, end, t);
-            yield return null;
+            return delta.y > 0f ? AttackSector.Up : AttackSector.Down;
         }
 
-        yield return new WaitForSeconds(0.05f);
-        if (hitbox != null) hitbox.Deactivate();
-
-        while (Vector3.Distance(armTarget.position, restPosition.position) > 0.01f)
-        {
-            armTarget.position = Vector3.MoveTowards(armTarget.position, restPosition.position, returnSpeed * Time.deltaTime);
-            yield return null;
-        }
-
-        isPunching = false;
-    }
-
-    private Vector3 GetQuadraticBezierPoint(Vector3 a, Vector3 b, Vector3 c, float t)
-    {
-        return Mathf.Pow(1 - t, 2) * a +
-               2 * (1 - t) * t * b +
-               Mathf.Pow(t, 2) * c;
+        return delta.x >= 0f ? AttackSector.Right : AttackSector.Left;
     }
 }

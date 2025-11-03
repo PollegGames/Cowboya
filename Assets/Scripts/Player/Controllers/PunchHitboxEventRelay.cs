@@ -120,16 +120,6 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
             return;
         }
 
-        if (robotStateController != null)
-        {
-            if (!robotStateController.PerformAttackByEnergy(hitbox.DamageCost))
-            {
-                punchAnimator?.AbortActivePunch();
-                DeactivateAllHitboxes();
-                return;
-            }
-        }
-
         hitbox.Activate();
     }
 
@@ -172,6 +162,14 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
         rightArmHitbox?.Deactivate();
         upHitbox?.Deactivate();
         downHitbox?.Deactivate();
+    }
+
+    /// <summary>
+    /// Ensures that no punch hitboxes remain active.
+    /// </summary>
+    public void ForceDeactivateAllHitboxes()
+    {
+        DeactivateAllHitboxes();
     }
 
     private void OnDisable()

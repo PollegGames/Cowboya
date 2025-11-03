@@ -1988,6 +1988,7 @@ GameObject:
   - component: {fileID: 3414467283392557128}
   - component: {fileID: 6322339627798152675}
   - component: {fileID: 314214300890700471}
+  - component: {fileID: 7070707070707070707}
   m_Layer: 6
   m_Name: Cowboy_Puppet
   m_TagString: Player
@@ -2034,10 +2035,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 668aba2e6cab02142aee74e9e5ccfe65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.2
+--- !u!114 &7070707070707070707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4587626726301181995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87b3e98092ee4f4db4d3489e747d1a9b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  robotStateController: {fileID: 0}
+  punchAnimator: {fileID: 0}
+  hitboxRelay: {fileID: 0}
+  animator: {fileID: 0}
+  punchDirectionParameter: PunchDirection
+  punchTriggerParameter: PunchTrigger
+  idleDirectionValue: -1
 --- !u!1 &5299142876671928586
 GameObject:
   m_ObjectHideFlags: 0
