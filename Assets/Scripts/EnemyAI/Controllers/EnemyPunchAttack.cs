@@ -13,7 +13,6 @@ public sealed class EnemyPunchAttack : MonoBehaviour
     [SerializeField] private FactoryAlarmStatus alarmStatus;
 
     private RobotStateController robotBehaviour;
-    private AttackRequestController attackRequestController;
     private RobotStats playerStats;
     private float lastPunchTime;
     private bool playerInAttackZone;
@@ -21,12 +20,6 @@ public sealed class EnemyPunchAttack : MonoBehaviour
     private void Awake()
     {
         robotBehaviour = GetComponent<RobotStateController>();
-        attackRequestController = GetComponent<AttackRequestController>();
-        if (attackRequestController == null)
-        {
-            attackRequestController = GetComponentInChildren<AttackRequestController>();
-        }
-
         if (alarmStatus == null)
         {
             alarmStatus = FindFirstObjectByType<FactoryManager>()?.factoryAlarmStatus;
@@ -64,22 +57,24 @@ public sealed class EnemyPunchAttack : MonoBehaviour
         playerInAttackZone = isInside;
     }
 
-    private void Update()
+    public bool TryBuildAttackRequest(out AttackRequest request)
     {
+        request = default;
+
         if (!CanIssueAttack())
         {
-            return;
+            return false;
         }
 
         Vector3 playerPosition = targetToFollow.PlayerBodyReferencePosition;
         if (playerPosition == Vector3.zero)
         {
-            return;
+            return false;
         }
 
         if (Time.time < lastPunchTime + attackCooldown)
         {
-            return;
+            return false;
         }
 
         AttackSector sector = ResolveSector(playerPosition);
@@ -88,16 +83,14 @@ public sealed class EnemyPunchAttack : MonoBehaviour
             : 0f;
 
         Vector2 targetPosition = new Vector2(playerPosition.x, playerPosition.y);
-        AttackRequest request = new AttackRequest(targetPosition, sector, energyCost);
-        if (attackRequestController != null && attackRequestController.TryHandleAttack(request))
-        {
-            lastPunchTime = Time.time;
-        }
+        request = new AttackRequest(targetPosition, sector, energyCost);
+        lastPunchTime = Time.time;
+        return true;
     }
 
     private bool CanIssueAttack()
     {
-        if (attackRequestController == null || targetToFollow == null || !playerInAttackZone)
+        if (targetToFollow == null || !playerInAttackZone)
         {
             return false;
         }

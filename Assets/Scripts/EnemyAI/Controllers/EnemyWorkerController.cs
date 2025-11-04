@@ -6,7 +6,7 @@ using UnityEngine;
 /// Controls enemy worker navigation using waypoint-based pathing.
 /// </summary>
 [RequireComponent(typeof(WorkerStateMachine), typeof(RobotMemory))]
-public class EnemyWorkerController : AnimatorBaseAgentController
+public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecisionProvider
 {
     [SerializeField] public WorkerStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
@@ -111,6 +111,19 @@ public class EnemyWorkerController : AnimatorBaseAgentController
         base.FixedUpdate();
         if (updateLoop == UpdateLoop.FixedUpdate)
             pathFollower?.Update(Time.fixedDeltaTime);
+    }
+
+    /// <inheritdoc />
+    public Vector2 Movement => new Vector2(direction, verticalDirection);
+
+    /// <inheritdoc />
+    public Vector2 DesiredFacing => LookDirection;
+
+    /// <inheritdoc />
+    public bool TryBuildAttackRequest(out AttackRequest request)
+    {
+        request = default;
+        return false;
     }
 
     private void SetupPathFollower()

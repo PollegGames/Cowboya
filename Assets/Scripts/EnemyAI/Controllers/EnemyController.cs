@@ -8,7 +8,7 @@ using System.Collections;
 /// and badge spawning services and provides APIs to change state or assign
 /// destinations.
 /// </summary>
-public class EnemyController : AnimatorBaseAgentController, IPooledObject
+public class EnemyController : AnimatorBaseAgentController, IPooledObject, IRobotDecisionProvider
 {
     [SerializeField] private EnemyStateMachine stateMachine;
     [SerializeField] private RobotMemory memoryComponent;
@@ -31,6 +31,7 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject
     public Transform BodyReference => bodyReference;
 
     [SerializeField] private EnemyPunchAttack punchAttack;
+    [SerializeField] private AttackRequestController attackRequestController;
     [SerializeField] private Inventory inventory;
 
     private FactoryAlarmStatus alarmStatus;
@@ -62,10 +63,20 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();
 
+        if (punchAttack == null)
+            punchAttack = GetComponent<EnemyPunchAttack>();
+
         robotBehaviour.OnStateChanged += HandleStateChange;
 
         if (inventory == null)
             inventory = GetComponent<Inventory>();
+
+        if (attackRequestController == null)
+        {
+            attackRequestController = GetComponent<AttackRequestController>();
+            if (attackRequestController == null)
+                attackRequestController = GetComponentInChildren<AttackRequestController>();
+        }
     }
 
     public void Initialize(
@@ -151,6 +162,8 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject
         TryFlip(direction);
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
+
+        ProcessAttackDecisions();
     }
 
     protected override void FixedUpdate()
@@ -159,6 +172,31 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject
         base.FixedUpdate();
         if (updateLoop == UpdateLoop.FixedUpdate)
             pathFollower?.Update(Time.fixedDeltaTime);
+    }
+
+    /// <inheritdoc />
+    public Vector2 Movement => new Vector2(direction, verticalDirection);
+
+    /// <inheritdoc />
+    public Vector2 DesiredFacing => LookDirection;
+
+    /// <inheritdoc />
+    public bool TryBuildAttackRequest(out AttackRequest request)
+    {
+        if (punchAttack != null && punchAttack.TryBuildAttackRequest(out request))
+            return true;
+
+        request = default;
+        return false;
+    }
+
+    private void ProcessAttackDecisions()
+    {
+        if (attackRequestController == null)
+            return;
+
+        if (TryBuildAttackRequest(out AttackRequest request))
+            attackRequestController.TryHandleAttack(request);
     }
 
 
