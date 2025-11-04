@@ -27,6 +27,32 @@ public class RobotCombatController : MonoBehaviour
     /// </summary>
     public AttackRequestController AttackController => attackRequestController;
 
+    /// <summary>
+    /// Attempts to execute the provided <paramref name="request"/> using the
+    /// configured <see cref="AttackRequestController"/>.
+    /// </summary>
+    /// <param name="request">Requested attack details.</param>
+    /// <returns>True when the request was accepted.</returns>
+    public bool TryHandleAttack(AttackRequest request)
+    {
+        if (attackRequestController == null)
+        {
+            return false;
+        }
+
+        return attackRequestController.TryHandleAttack(request);
+    }
+
+    /// <summary>
+    /// Executes the provided <paramref name="request"/> disregarding the
+    /// success flag from <see cref="TryHandleAttack(AttackRequest)"/>.
+    /// </summary>
+    /// <param name="request">Requested attack details.</param>
+    public void HandleAttackRequest(AttackRequest request)
+    {
+        attackRequestController?.HandleAttackRequest(request);
+    }
+
     private void Awake()
     {
         if (robotStateController == null)

@@ -13,15 +13,22 @@ public sealed class AttackRequestController : MonoBehaviour
     [SerializeField] private PlayerPunchAnimator punchAnimator;
     [SerializeField] private PunchHitboxEventRelay hitboxRelay;
     [SerializeField] private Animator animator;
+    [SerializeField] private Transform aimOrigin;
 
     [Header("Animator Parameters")]
     [SerializeField] private string punchDirectionParameter = "PunchDirection";
     [SerializeField] private string punchTriggerParameter = "PunchTrigger";
+    [SerializeField] private string punchAimXParameter = "PunchAimX";
+    [SerializeField] private string punchAimYParameter = "PunchAimY";
     [SerializeField] private int idleDirectionValue = -1;
 
     private int punchDirectionHash;
     private int punchTriggerHash;
+    private int punchAimXHash;
+    private int punchAimYHash;
     private bool hashesInitialized;
+    private bool hasPunchAimXParameter;
+    private bool hasPunchAimYParameter;
     private bool attackInProgress;
 
     /// <summary>
@@ -68,11 +75,19 @@ public sealed class AttackRequestController : MonoBehaviour
             }
         }
 
+        if (aimOrigin == null)
+        {
+            aimOrigin = transform;
+        }
+
         if (animator != null)
         {
             punchDirectionHash = Animator.StringToHash(punchDirectionParameter);
             punchTriggerHash = Animator.StringToHash(punchTriggerParameter);
+            hasPunchAimXParameter = TryResolveFloatParameter(punchAimXParameter, out punchAimXHash);
+            hasPunchAimYParameter = TryResolveFloatParameter(punchAimYParameter, out punchAimYHash);
             hashesInitialized = true;
+            ResetAimParameters();
         }
     }
 
@@ -89,6 +104,10 @@ public sealed class AttackRequestController : MonoBehaviour
         attackInProgress = false;
         hitboxRelay?.ForceDeactivateAllHitboxes();
         AttackAborted?.Invoke();
+        if (punchAnimator == null)
+        {
+            ResetAimParameters();
+        }
     }
 
     /// <summary>
@@ -143,7 +162,7 @@ public sealed class AttackRequestController : MonoBehaviour
         else if (animator != null && hashesInitialized)
         {
             animator.ResetTrigger(punchTriggerHash);
-            animator.SetInteger(punchDirectionHash, idleDirectionValue);
+            ResetAimParameters();
         }
 
         hitboxRelay?.ForceDeactivateAllHitboxes();
@@ -203,10 +222,124 @@ public sealed class AttackRequestController : MonoBehaviour
             return;
         }
 
+        Vector2 aimDirection = ResolveAimDirection(request);
+        ApplyAimParameters(aimDirection);
+
         int directionValue = ResolveDirection(request.Sector);
         animator.SetInteger(punchDirectionHash, directionValue);
         animator.ResetTrigger(punchTriggerHash);
         animator.SetTrigger(punchTriggerHash);
+    }
+
+    private Vector2 ResolveAimDirection(AttackRequest request)
+    {
+        Vector2 origin = aimOrigin != null ? (Vector2)aimOrigin.position : (Vector2)transform.position;
+        Vector2 delta = request.TargetPosition - origin;
+
+        if (delta.sqrMagnitude > 0.0001f)
+        {
+            return delta.normalized;
+        }
+
+        return ResolveFallbackDirection(request.Sector);
+    }
+
+    private Vector2 ResolveFallbackDirection(AttackSector sector)
+    {
+        switch (sector)
+        {
+            case AttackSector.Up:
+                return Vector2.up;
+            case AttackSector.Down:
+                return Vector2.down;
+            case AttackSector.Left:
+                return Vector2.left;
+            case AttackSector.Right:
+            default:
+                return Vector2.right;
+        }
+    }
+
+    private Vector2 ResolveDefaultAimDirection()
+    {
+        if (punchAnimator != null)
+        {
+            return punchAnimator.IsCurrentlyFacingRight ? Vector2.right : Vector2.left;
+        }
+
+        float scaleX = transform != null ? transform.lossyScale.x : 1f;
+        if (Mathf.Approximately(scaleX, 0f))
+        {
+            return Vector2.right;
+        }
+
+        return scaleX >= 0f ? Vector2.right : Vector2.left;
+    }
+
+    private void ApplyAimParameters(Vector2 aimDirection)
+    {
+        if (aimDirection.sqrMagnitude <= 0.0001f)
+        {
+            aimDirection = ResolveDefaultAimDirection();
+        }
+
+        if (animator != null)
+        {
+            if (hasPunchAimXParameter)
+            {
+                animator.SetFloat(punchAimXHash, aimDirection.x);
+            }
+
+            if (hasPunchAimYParameter)
+            {
+                animator.SetFloat(punchAimYHash, aimDirection.y);
+            }
+        }
+    }
+
+    private void ResetAimParameters()
+    {
+        if (animator == null || !hashesInitialized)
+        {
+            return;
+        }
+
+        Vector2 resolvedDefault = ResolveDefaultAimDirection();
+
+        if (hasPunchAimXParameter)
+        {
+            animator.SetFloat(punchAimXHash, resolvedDefault.x);
+        }
+
+        if (hasPunchAimYParameter)
+        {
+            animator.SetFloat(punchAimYHash, resolvedDefault.y);
+        }
+
+        animator.SetInteger(punchDirectionHash, idleDirectionValue);
+    }
+
+    private bool TryResolveFloatParameter(string parameterName, out int hash)
+    {
+        hash = 0;
+        if (animator == null || string.IsNullOrEmpty(parameterName))
+        {
+            return false;
+        }
+
+        AnimatorControllerParameter[] parameters = animator.parameters;
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            AnimatorControllerParameter parameter = parameters[i];
+            if (parameter.type == AnimatorControllerParameterType.Float &&
+                string.Equals(parameter.name, parameterName, StringComparison.Ordinal))
+            {
+                hash = Animator.StringToHash(parameterName);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private int ResolveDirection(AttackSector sector)
