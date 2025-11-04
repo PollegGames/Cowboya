@@ -196,7 +196,13 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject, IRobo
             return;
 
         if (TryBuildAttackRequest(out AttackRequest request))
-            attackRequestController.TryHandleAttack(request);
+        {
+            bool accepted = attackRequestController.TryHandleAttack(request);
+            if (accepted)
+            {
+                punchAttack?.HandleAttackAccepted(request);
+            }
+        }
     }
 
 

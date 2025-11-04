@@ -83,6 +83,15 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
     }
 
     /// <summary>
+    /// Activates the hitbox that matches the provided <paramref name="request"/>.
+    /// </summary>
+    /// <param name="request">Details about the attack that should arm a hitbox.</param>
+    public void ActivateHitboxForRequest(AttackRequest request)
+    {
+        ActivateHitbox(ResolveHitboxForSector(request.Sector, ResolveFacingDirection()));
+    }
+
+    /// <summary>
     /// Deactivates the hitbox associated with the currently playing punch.
     /// </summary>
     public void DeactivatePrimaryHitbox()
@@ -172,12 +181,11 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
     private AttackHitbox ResolveHitboxForCurrentSector()
     {
         AttackSector sector = punchAnimator != null ? punchAnimator.CurrentAttackSector : AttackSector.Right;
-        bool facingRight = punchAnimator != null
-            ? punchAnimator.IsCurrentlyFacingRight
-            : (robotStateController != null
-                ? robotStateController.transform.localScale.x >= 0f
-                : transform.lossyScale.x >= 0f);
+        return ResolveHitboxForSector(sector, ResolveFacingDirection());
+    }
 
+    private AttackHitbox ResolveHitboxForSector(AttackSector sector, bool facingRight)
+    {
         switch (sector)
         {
             case AttackSector.Up:
@@ -190,6 +198,21 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
             default:
                 return facingRight ? rightArmHitbox : leftArmHitbox;
         }
+    }
+
+    private bool ResolveFacingDirection()
+    {
+        if (punchAnimator != null)
+        {
+            return punchAnimator.IsCurrentlyFacingRight;
+        }
+
+        if (robotStateController != null)
+        {
+            return robotStateController.transform.localScale.x >= 0f;
+        }
+
+        return transform.lossyScale.x >= 0f;
     }
 
     private AttackHitbox SelectHorizontalHitbox(bool facingRight)
