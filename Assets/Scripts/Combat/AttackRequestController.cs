@@ -101,13 +101,7 @@ public sealed class AttackRequestController : MonoBehaviour
 
     private void OnDisable()
     {
-        attackInProgress = false;
-        hitboxRelay?.ForceDeactivateAllHitboxes();
-        AttackAborted?.Invoke();
-        if (punchAnimator == null)
-        {
-            ResetAimParameters();
-        }
+        AbortActiveAttack();
     }
 
     /// <summary>
