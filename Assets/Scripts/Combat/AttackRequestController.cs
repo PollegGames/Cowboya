@@ -123,7 +123,6 @@ public sealed class AttackRequestController : MonoBehaviour
 
         if (!ConsumeEnergy(request))
         {
-            hitboxRelay?.ForceDeactivateAllHitboxes();
             AbortActiveAttack();
             return false;
         }
