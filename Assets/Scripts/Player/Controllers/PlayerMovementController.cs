@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(RobotLocomotionController), typeof(Inventory))]
-public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
+public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, IRobotDecisionProvider
 {
     [Header("Components")]
     [SerializeField] private RobotLocomotionController locomotion;
@@ -41,6 +41,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
     private Vector2 aimVector = Vector2.right;
     private bool aimFromLookInput = false;
     private AttackSector currentSector = AttackSector.Right;
+
 
     /// <summary>
     /// Invoked when the attack sector changes based on input.
@@ -90,6 +91,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         {
             horizontalInput = input.Movement.x;
             verticalInput = input.Movement.y;
+
 
             if (Mathf.Abs(horizontalInput) > 0.1f)
                 lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
@@ -202,6 +204,54 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider
         }
 
         isCrouchingInput = verticalInput < 0;
+    }
+
+    /// <inheritdoc />
+    public Vector2 Movement => new Vector2(horizontalInput, verticalInput);
+
+    /// <inheritdoc />
+    public Vector2 DesiredFacing
+    {
+        get
+        {
+            if (aimVector.sqrMagnitude > 0.0001f)
+                return aimVector.normalized;
+            if (lookDirection.sqrMagnitude > 0.0001f)
+                return lookDirection.normalized;
+            return Vector2.right;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool TryBuildAttackRequest(out AttackRequest request)
+    {
+        request = default;
+
+        if (input == null || !input.PrimaryAttack || robotBehaviour == null)
+            return false;
+
+        if (robotBehaviour.CurrentState != RobotState.Alive)
+            return false;
+
+        float energyRequired = 0f;
+        if (robotBehaviour.Stats != null)
+            energyRequired = robotBehaviour.Stats.AttackEnergyCost;
+
+        Vector2 targetPosition = DetermineTargetPosition();
+        request = new AttackRequest(targetPosition, currentSector, energyRequired);
+        return true;
+    }
+
+    private Vector2 DetermineTargetPosition()
+    {
+        Vector2 aim = aimVector;
+        if (aim.sqrMagnitude <= 0.0001f)
+            aim = lookDirection;
+
+        if (aim.sqrMagnitude > 0.0001f)
+            return (Vector2)transform.position + aim.normalized;
+
+        return transform.position;
     }
 
     private void UpdateAttackSector()
