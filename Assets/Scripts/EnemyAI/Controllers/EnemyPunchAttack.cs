@@ -105,7 +105,6 @@ public sealed class EnemyPunchAttack : MonoBehaviour
 
         Vector2 targetPosition = new Vector2(playerPosition.x, playerPosition.y);
         request = new AttackRequest(targetPosition, sector, energyCost);
-        lastPunchTime = Time.time;
         return true;
     }
 
@@ -119,6 +118,8 @@ public sealed class EnemyPunchAttack : MonoBehaviour
         {
             return;
         }
+
+        lastPunchTime = Time.time;
 
         if (hitboxDeactivateRoutine != null)
         {
