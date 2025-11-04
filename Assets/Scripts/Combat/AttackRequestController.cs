@@ -117,7 +117,7 @@ public sealed class AttackRequestController : MonoBehaviour
     /// <returns>True when the request was accepted.</returns>
     public bool TryHandleAttack(AttackRequest request)
     {
-        if (attackInProgress)
+        if (ShouldBlockNewRequest())
         {
             return false;
         }
@@ -135,7 +135,10 @@ public sealed class AttackRequestController : MonoBehaviour
         }
 
         TriggerAnimation(request);
-        attackInProgress = true;
+        if (ShouldTrackAttackProgress())
+        {
+            attackInProgress = true;
+        }
         return true;
     }
 
@@ -176,6 +179,21 @@ public sealed class AttackRequestController : MonoBehaviour
     public void NotifyPunchCompleted()
     {
         attackInProgress = false;
+    }
+
+    private bool ShouldBlockNewRequest()
+    {
+        if (!ShouldTrackAttackProgress())
+        {
+            return false;
+        }
+
+        return attackInProgress;
+    }
+
+    private bool ShouldTrackAttackProgress()
+    {
+        return punchAnimator != null;
     }
 
     private bool ConsumeEnergy(AttackRequest request)
