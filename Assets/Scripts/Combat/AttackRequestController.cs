@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -22,6 +23,11 @@ public sealed class AttackRequestController : MonoBehaviour
     private int punchTriggerHash;
     private bool hashesInitialized;
     private bool attackInProgress;
+
+    /// <summary>
+    /// Raised whenever an active punch is aborted or cancelled.
+    /// </summary>
+    public event Action AttackAborted;
 
     private void Awake()
     {
@@ -81,6 +87,8 @@ public sealed class AttackRequestController : MonoBehaviour
     private void OnDisable()
     {
         attackInProgress = false;
+        hitboxRelay?.ForceDeactivateAllHitboxes();
+        AttackAborted?.Invoke();
     }
 
     /// <summary>
@@ -131,12 +139,8 @@ public sealed class AttackRequestController : MonoBehaviour
         if (punchAnimator != null)
         {
             punchAnimator.AbortActivePunch();
-            hitboxRelay?.ForceDeactivateAllHitboxes();
-            attackInProgress = false;
-            return;
         }
-
-        if (animator != null && hashesInitialized)
+        else if (animator != null && hashesInitialized)
         {
             animator.ResetTrigger(punchTriggerHash);
             animator.SetInteger(punchDirectionHash, idleDirectionValue);
@@ -144,6 +148,7 @@ public sealed class AttackRequestController : MonoBehaviour
 
         hitboxRelay?.ForceDeactivateAllHitboxes();
         attackInProgress = false;
+        AttackAborted?.Invoke();
     }
 
     /// <summary>
