@@ -17,6 +17,11 @@ public class AttackHitbox : MonoBehaviour
     public void Activate() => isActive = true;
     public void Deactivate() => isActive = false;
 
+    /// <summary>
+    /// Indicates whether the hitbox is currently active.
+    /// </summary>
+    public bool IsActive => isActive;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!isActive) return;

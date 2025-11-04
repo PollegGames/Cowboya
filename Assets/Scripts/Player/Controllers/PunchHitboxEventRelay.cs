@@ -15,6 +15,7 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
     [Header("Dependencies")]
     [SerializeField] private RobotStateController robotStateController;
     [SerializeField] private PlayerPunchAnimator punchAnimator;
+    [SerializeField] private AttackRequestController attackRequestController;
 
     private void Awake()
     {
@@ -30,6 +31,46 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
             {
                 punchAnimator = GetComponentInChildren<PlayerPunchAnimator>();
             }
+        }
+
+        if (attackRequestController == null)
+        {
+            attackRequestController = GetComponent<AttackRequestController>();
+            if (attackRequestController == null)
+            {
+                attackRequestController = GetComponentInParent<AttackRequestController>();
+            }
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (punchAnimator == null)
+        {
+            punchAnimator = GetComponent<PlayerPunchAnimator>();
+            if (punchAnimator == null)
+            {
+                punchAnimator = GetComponentInChildren<PlayerPunchAnimator>();
+            }
+        }
+
+        if (punchAnimator != null)
+        {
+            punchAnimator.PunchCompleted += HandlePunchCompleted;
+        }
+
+        if (attackRequestController == null)
+        {
+            attackRequestController = GetComponent<AttackRequestController>();
+            if (attackRequestController == null)
+            {
+                attackRequestController = GetComponentInParent<AttackRequestController>();
+            }
+        }
+
+        if (attackRequestController != null)
+        {
+            attackRequestController.AttackAborted += HandleAttackAborted;
         }
     }
 
@@ -169,11 +210,48 @@ public sealed class PunchHitboxEventRelay : MonoBehaviour
     /// </summary>
     public void ForceDeactivateAllHitboxes()
     {
+        LogActiveHitboxes();
         DeactivateAllHitboxes();
     }
 
     private void OnDisable()
     {
+        if (punchAnimator != null)
+        {
+            punchAnimator.PunchCompleted -= HandlePunchCompleted;
+        }
+
+        if (attackRequestController != null)
+        {
+            attackRequestController.AttackAborted -= HandleAttackAborted;
+        }
+
         DeactivateAllHitboxes();
+    }
+
+    private void HandleAttackAborted()
+    {
+        ForceDeactivateAllHitboxes();
+    }
+
+    private void HandlePunchCompleted()
+    {
+        ForceDeactivateAllHitboxes();
+    }
+
+    private void LogActiveHitboxes()
+    {
+        LogHitboxIfActive(leftArmHitbox);
+        LogHitboxIfActive(rightArmHitbox);
+        LogHitboxIfActive(upHitbox);
+        LogHitboxIfActive(downHitbox);
+    }
+
+    private void LogHitboxIfActive(AttackHitbox hitbox)
+    {
+        if (hitbox != null && hitbox.IsActive)
+        {
+            Debug.LogWarning($"[PunchHitboxEventRelay] Hitbox '{hitbox.name}' remained active during forced deactivation.");
+        }
     }
 }
