@@ -21,6 +21,7 @@ public sealed class AttackRequestController : MonoBehaviour
     private int punchDirectionHash;
     private int punchTriggerHash;
     private bool hashesInitialized;
+    private bool attackInProgress;
 
     private void Awake()
     {
@@ -36,6 +37,11 @@ public sealed class AttackRequestController : MonoBehaviour
             {
                 punchAnimator = GetComponentInChildren<PlayerPunchAnimator>();
             }
+        }
+
+        if (punchAnimator != null)
+        {
+            punchAnimator.PunchCompleted += NotifyPunchCompleted;
         }
 
         if (hitboxRelay == null)
@@ -64,6 +70,19 @@ public sealed class AttackRequestController : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (punchAnimator != null)
+        {
+            punchAnimator.PunchCompleted -= NotifyPunchCompleted;
+        }
+    }
+
+    private void OnDisable()
+    {
+        attackInProgress = false;
+    }
+
     /// <summary>
     /// Attempts to execute the provided <paramref name="request"/> on the robot.
     /// </summary>
@@ -71,6 +90,16 @@ public sealed class AttackRequestController : MonoBehaviour
     /// <returns>True when the request was accepted.</returns>
     public bool TryHandleAttack(AttackRequest request)
     {
+        if (attackInProgress)
+        {
+            return false;
+        }
+
+        if (!CanTriggerAnimation())
+        {
+            return false;
+        }
+
         if (!ConsumeEnergy(request))
         {
             hitboxRelay?.ForceDeactivateAllHitboxes();
@@ -79,6 +108,7 @@ public sealed class AttackRequestController : MonoBehaviour
         }
 
         TriggerAnimation(request);
+        attackInProgress = true;
         return true;
     }
 
@@ -102,6 +132,7 @@ public sealed class AttackRequestController : MonoBehaviour
         {
             punchAnimator.AbortActivePunch();
             hitboxRelay?.ForceDeactivateAllHitboxes();
+            attackInProgress = false;
             return;
         }
 
@@ -112,6 +143,15 @@ public sealed class AttackRequestController : MonoBehaviour
         }
 
         hitboxRelay?.ForceDeactivateAllHitboxes();
+        attackInProgress = false;
+    }
+
+    /// <summary>
+    /// Clears the active attack flag when the punch animation completes.
+    /// </summary>
+    public void NotifyPunchCompleted()
+    {
+        attackInProgress = false;
     }
 
     private bool ConsumeEnergy(AttackRequest request)
@@ -133,6 +173,16 @@ public sealed class AttackRequestController : MonoBehaviour
         }
 
         return robotStateController.PerformAttackByEnergy(requiredEnergy);
+    }
+
+    private bool CanTriggerAnimation()
+    {
+        if (punchAnimator != null)
+        {
+            return true;
+        }
+
+        return animator != null && hashesInitialized;
     }
 
     private void TriggerAnimation(AttackRequest request)

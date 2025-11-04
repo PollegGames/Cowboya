@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -26,6 +27,8 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
     private int punchTriggerHash;
     private Coroutine punchRoutine;
     private AttackSector currentAttackSector = AttackSector.Right;
+
+    public event Action PunchCompleted;
 
     private void Awake()
     {
@@ -116,6 +119,7 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
         animator.ResetTrigger(punchTriggerHash);
         animator.SetInteger(punchDirectionHash, idleDirectionValue);
         currentAttackSector = AttackSector.Right;
+        PunchCompleted?.Invoke();
     }
 
     private IEnumerator ResetPunchAfterCompletion()
@@ -147,6 +151,7 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
         animator.SetInteger(punchDirectionHash, idleDirectionValue);
         punchRoutine = null;
         currentAttackSector = AttackSector.Right;
+        PunchCompleted?.Invoke();
     }
 
     private void OnDisable()
@@ -164,5 +169,6 @@ public sealed class PlayerPunchAnimator : MonoBehaviour
         }
 
         currentAttackSector = AttackSector.Right;
+        PunchCompleted?.Invoke();
     }
 }
