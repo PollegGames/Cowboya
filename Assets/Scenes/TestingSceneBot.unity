@@ -435,6 +435,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b5afd8220551884d9e4a5212ab1a9e3, type: 3}
+--- !u!114 &422276510 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4697446937373322051, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
+  m_PrefabInstance: {fileID: 359178226430838634}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &455623471 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 889400409282487824, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
+  m_PrefabInstance: {fileID: 359178226430838634}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &499892245
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -565,6 +581,33 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f0ca364be76020d4aaa0bbb596cc1b71, type: 3}
+--- !u!1 &987663755 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2252902769847219381, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
+  m_PrefabInstance: {fileID: 359178226430838634}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &987663761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987663755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 268c98130d6739248a573a4ccb8351cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::CowboyArmTargetController
+  bodyReference: {fileID: 1217057080}
+  targetTransform: {fileID: 1884689798}
+  leftArmSolverTarget: {fileID: 1404964104}
+  rightArmSolverTarget: {fileID: 455623471}
+  leftArmIkSolver: {fileID: 1952455123}
+  rightArmIkSolver: {fileID: 422276510}
+  followSpeed: 15
+  returnSpeed: 10
+  rotationReturnSpeed: 720
+  sideSwitchThreshold: 0.1
 --- !u!1001 &1150368360
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -641,6 +684,11 @@ PrefabInstance:
 --- !u!4 &1217057080 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3034355644026048187, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
+  m_PrefabInstance: {fileID: 359178226430838634}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1404964104 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5609004513289992716, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
   m_PrefabInstance: {fileID: 359178226430838634}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1468849830
@@ -858,6 +906,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b5afd8220551884d9e4a5212ab1a9e3, type: 3}
+--- !u!4 &1884689798 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6968605693680133306, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
+  m_PrefabInstance: {fileID: 359178226430838634}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1903231896
 GameObject:
   m_ObjectHideFlags: 0
@@ -953,6 +1006,17 @@ MonoBehaviour:
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
   FollowOffset: {x: 0, y: 0, z: -10}
+--- !u!114 &1952455123 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4296522900663111368, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
+  m_PrefabInstance: {fileID: 359178226430838634}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2007338239
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1081,7 +1145,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2252902769847219381, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 987663761}
   m_SourcePrefab: {fileID: 100100000, guid: 700e49ee68b499a40ae28c9839584b75, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
