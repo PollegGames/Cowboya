@@ -6,23 +6,10 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 {
     [Header("Components")]
     [SerializeField] private RobotLocomotionController locomotion;
-    [SerializeField] private BodyBalance bodyBalance;
-    [SerializeField] private float forceUpward = 5f;
-    [SerializeField] private float forceSide = 5f;
-    [SerializeField] private LegJointLimiter legJointLimiter;
-    [SerializeField] private BodyJointLimiter bodyJointLimiter;
     [SerializeField] private RobotStateController robotBehaviour;
-
-    [Header("Facing/Mirroring")]
-    [SerializeField] private PoleMirror2D poleMirror;
-    [SerializeField] private SpriteFlip2D spriteFlipper;
-
-    [Header("Body Rotation")]
+    [Header("Body Reference")]
     [SerializeField] private Rigidbody2D bodyReference;
     public Rigidbody2D BodyReference => bodyReference;
-
-    [SerializeField, Min(0f)] private float maxLeftTiltDeg  = 20f; 
-    [SerializeField, Min(0f)] private float maxRightTiltDeg = 2f;
 
     [SerializeField] private MonoBehaviour inputSource;
     private IPlayerInput input;
@@ -31,7 +18,6 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     private bool flipped = false;
     private float horizontalInput;
     private float verticalInput;
-    private float targetRotation;
     private bool isCrouchingInput;
 
     [SerializeField] private EnergyBot energyBot;
@@ -65,8 +51,6 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 
     private void Awake()
     {
-        locomotion.OnJumpEnded += HandleJumpEnd;
-
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();
 
@@ -116,7 +100,6 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 
         TryFlip();
         UpdateAttackSector();
-        CalculateAndApplyBodyRotation();
         HandleMovement();
         HandleJump();
         HandleCrouch();
@@ -138,45 +121,6 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     private void ApplyFacingDirection()
     {
         locomotion.SetFacingDirection(!flipped);
-        legJointLimiter.SetLegRotationLimits(!flipped); // true = facing right
-        if (bodyJointLimiter != null)
-            bodyJointLimiter.SetBodyRotationLimits(!flipped);
-
-        // Mirror poles (arms, hands, etc.)
-        if (poleMirror != null)
-            poleMirror.SetFacing(!flipped);
-
-        // Ensure all sprites flip consistently
-        if (spriteFlipper != null)
-            spriteFlipper.SetFacing(!flipped);
-    }
-
-    private void CalculateAndApplyBodyRotation()
-    {
-        if (Mathf.Approximately(horizontalInput, 0f))
-        {
-            targetRotation = 0f;
-        }
-        else
-        {
-            // Map [-1 .. +1] -> angle where right = negative, left = positive
-            float t = (horizontalInput + 1f) * 0.5f; // -1 -> 0, +1 -> 1
-            float leftDeg  = Mathf.Max(0f, maxLeftTiltDeg);
-            float rightDeg = Mathf.Max(0f, maxRightTiltDeg);
-
-            // Right limit is -rightDeg, left limit is +leftDeg
-            targetRotation = Mathf.Lerp(leftDeg, -rightDeg, t);
-        }
-
-        ApplyBodyRotation();
-    }
-
-    private void ApplyBodyRotation()
-    {
-        foreach (var muscle in bodyBalance.muscles)
-        {
-            muscle.restRotation = targetRotation;
-        }
     }
 
     private void HandleMovement()
@@ -279,37 +223,16 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         return vector.y >= 0f ? AttackSector.Up : AttackSector.Down;
     }
 
-    private void HandleJumpEnd()
-    {
-        if (bodyReference != null)
-        {
-            Vector2 upwardForce = Vector2.up * forceUpward;
-            float horizontalDirection = flipped ? -1f : 1f;
-            Vector2 horizontalForce = Vector2.right * horizontalDirection * forceSide;
-            Vector2 combinedForce = upwardForce + horizontalForce;
-            bodyReference.AddForce(combinedForce, ForceMode2D.Impulse);
-        }
-    }
-
     private void HandleStateChange(RobotState newState)
     {
-        if (newState == RobotState.Faint)
-        {
-            Faint();
-        }
-        else if (newState == RobotState.Dead)
+        if (newState == RobotState.Dead)
         {
             Die();
-        }
-        else if (newState == RobotState.Alive)
-        {
-            UpdateBalance(true);
         }
     }
 
     public void Faint()
     {
-        UpdateBalance(false);
     }
 
     public void Die()
@@ -320,12 +243,4 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         jointBreaker?.BreakAll();
     }
 
-    private void UpdateBalance(bool enabledBalance)
-    {
-        var balance = GetComponent<BodyBalance>();
-        if (balance != null)
-        {
-            balance.UpdateBalance(enabledBalance);
-        }
-    }
 }

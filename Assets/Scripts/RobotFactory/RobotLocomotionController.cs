@@ -1,335 +1,213 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
+/// <summary>
+/// Streamlined locomotion controller that only drives animator parameters.
+/// </summary>
 public class RobotLocomotionController : MonoBehaviour
 {
-    [Header("Feet Stepper References")]
-    public FootStepper leftFoot;
-    public FootStepper rightFoot;
+    [Header("References")]
+    [SerializeField] private RobotStateController robotBehaviour;
+    [SerializeField] private Animator animator;
 
-    [Header("Jump Settings")]
-    [SerializeField] private float jumpUpDuration = 18f;
-    [SerializeField] private float jumpDownDuration = 18f;
-    [SerializeField] private float crouchUpDuration = 18f;
-    [SerializeField] private float crouchDownDuration = 18f;
+    [Header("Animator Parameters")]
+    [SerializeField] private string directionParameter = "Direction";
+    [SerializeField] private string speedParameter = "Speed";
+    [SerializeField] private string walkBoolParameter = "IsWalking";
+    [SerializeField] private string jumpBoolParameter = "IsJumping";
+    [SerializeField] private string crouchBoolParameter = "IsCrouching";
 
-    private bool isWalking = false;
-    private bool isJumping = false;
-    private bool isCrouching = false;
-    private Coroutine walkRoutine;
+    [Header("Movement Settings")]
+    [SerializeField, Min(0f)] private float inputWalkThreshold = 0.2f;
+    [SerializeField, Min(0f)] private float jumpAnimationDuration = 0.4f;
+    [SerializeField] private float energyCostPerJump = 3f;
+    [SerializeField] private float energyCostPerCrouch = 1f;
+    [SerializeField] public bool isPlayerControlled = false;
+
     public event Action OnJumpStarted;
     public event Action OnJumpEnded;
     public event Action OnCrouchStarted;
     public event Action OnCrouchEnded;
-    private RobotStateController robotBehaviour;
-    private InputSystem_Actions controls;
-    [SerializeField] public bool isPlayerControlled = false;
-    
-    [Header("Animator (Legs Mode)")]
-    [SerializeField] private bool useAnimatorLegs = false;
-    [SerializeField] private Animator animator;
-    [SerializeField, Min(0f)] private float inputWalkThreshold = 0.2f;
-    [SerializeField, Min(0f)] private float walkCycleSpeed = 1.0f; // Single simple speed
 
-    [SerializeField] private float energyCostPerStep = 1f;
-    [SerializeField] private float energyCostPerJump = 3f;
-    [SerializeField] private float energyCostPerCrouch = 3f;
-    [SerializeField] private bool waitStep = true;
-    private bool _flipped = false;
-    [SerializeField] private float timeout = 0.5f;
+    private bool isJumping;
+    private bool isCrouching;
+    private bool facingRight = true;
+    private Coroutine jumpRoutine;
 
     private void Awake()
     {
-        robotBehaviour = GetComponent<RobotStateController>();
         if (robotBehaviour == null)
-            Debug.LogError("RobotLocomotionController: PlayerStateController not found.");
-
-        if (isPlayerControlled)
         {
-            controls = new InputSystem_Actions();
+            robotBehaviour = GetComponent<RobotStateController>();
         }
 
         if (animator == null)
-            animator = GetComponent<Animator>();
-
-        // No advanced hashing/smoothing needed for simple speed mode
-    }
-
-    private void OnEnable()
-    {
-        if (isPlayerControlled && controls != null)
-            controls.Enable();
-    }
-
-    private void OnDisable()
-    {
-        if (isPlayerControlled && controls != null)
-            controls.Disable();
-    }
-
-    #region Movement
-
-    public void HandleMovement(float horizontalInput, bool flipped)
-    {
-        _flipped = flipped;
-        if (isJumping)
         {
-            if (useAnimatorLegs && animator != null)
-            {
-                animator.SetFloat("Direction", _flipped ? -1f : 1f);
-                animator.SetFloat("Speed", 0f);
-                animator.SetBool("IsWalking", false);
-            }
-            return;
-        }
-
-        float inputMag = Mathf.Abs(horizontalInput);
-        bool walking = inputMag > inputWalkThreshold;
-
-        if (walking)
-        {
-            bool shouldFlip = horizontalInput < 0;
-            if (shouldFlip != _flipped)
-            {
-                _flipped = shouldFlip;
-                SetFacingDirection(!_flipped);
-            }
-
-            if (useAnimatorLegs)
-            {
-                if (animator != null)
-                {
-                    float dir = horizontalInput >= 0 ? 1f : -1f;
-                    animator.SetFloat("Direction", dir);
-                    animator.SetFloat("Speed", walkCycleSpeed);
-                    animator.SetBool("IsWalking", true);
-                    animator.SetBool("IsCrouching", false);
-                }
-            }
-            else
-            {
-                if (!isWalking)
-                    StartWalking();
-            }
-        }
-        else
-        {
-            if (useAnimatorLegs)
-            {
-                if (animator != null)
-                {
-                    animator.SetFloat("Speed", 0f);
-                    animator.SetBool("IsWalking", false);
-                }
-            }
-            else if (isWalking)
-            {
-                StopWalking();
-            }
-        }
-    }
-
-    private void StartWalking()
-    {
-        if (isWalking) return;
-
-        isWalking = true;
-        if (walkRoutine != null) StopCoroutine(walkRoutine);
-
-        var footA = _flipped ? rightFoot : leftFoot;
-        var footB = _flipped ? leftFoot : rightFoot;
-
-        walkRoutine = StartCoroutine(StepChain(footA, footB));
-    }
-
-    private void StopWalking()
-    {
-        isWalking = false;
-        if (walkRoutine != null)
-        {
-            StopCoroutine(walkRoutine);
-            walkRoutine = null;
-        }
-
-        rightFoot.InterruptAndReset();
-        leftFoot.InterruptAndReset();
-    }
-
-    private IEnumerator StepChain(FootStepper footA, FootStepper footB)
-    {
-        if (waitStep)
-            yield return WaitUntilWithTimeout(() => footA.IsGrounded && footB.IsGrounded, timeout);
-
-        if (!robotBehaviour.CanPerformEnergy(energyCostPerStep)) yield break;
-
-        while (isWalking)
-        {
-            bool notifiedToBack = false;
-            footA.ToPeak(() => notifiedToBack = true);
-            yield return WaitUntilWithTimeout(() => notifiedToBack, timeout);
-
-            bool notifiedToFar = false;
-            footB.ToBack(() => notifiedToFar = true);
-            yield return WaitUntilWithTimeout(() => notifiedToFar, timeout);
-
-            bool aArrivedFar = false;
-            footA.ToFar(() => aArrivedFar = true);
-
-            if (waitStep)
-                yield return WaitUntilWithTimeout(() => aArrivedFar && footA.IsGrounded, timeout);
-
-            bool aDone = false, bDone = false;
-            footA.ToStartFromFarOrBack(() => aDone = true);
-            footB.ToStartFromFarOrBack(() => bDone = true);
-            yield return WaitUntilWithTimeout(() => aDone && bDone, timeout);
-
-            robotBehaviour?.ConsumeEnergy(energyCostPerStep);
-
-            (footA, footB) = (footB, footA);
-        }
-    }
-
-    private IEnumerator WaitUntilWithTimeout(Func<bool> predicate, float timeout)
-    {
-        float timer = 0f;
-        while (!predicate() && timer < timeout)
-        {
-            timer += Time.deltaTime;
-            yield return null;
-        }
-    }
-
-    #endregion
-
-    #region Jump
-
-    public void Jump()
-    {
-        if (isJumping) return;
-
-        if (!robotBehaviour.CanPerformEnergy(energyCostPerJump)) return;
-
-        isJumping = true;
-        if (!useAnimatorLegs)
-            StopWalking();
-        robotBehaviour?.ConsumeEnergy(energyCostPerJump);
-        OnJumpStarted?.Invoke();
-
-        if (useAnimatorLegs && animator != null)
-        {
-            animator.SetBool("IsWalking", false);
-            animator.SetBool("IsCrouching", false);
-            animator.SetBool("IsJumping", true);
-            StartCoroutine(JumpSimpleRoutine());
-        }
-        else
-        {
-            int feetLanded = 0;
-            Action onFootLanded = () =>
-            {
-                feetLanded++;
-                if (feetLanded >= 2)
-                    OnJumpEndedInternal();
-            };
-
-            leftFoot.Jump(jumpUpDuration, jumpDownDuration, onFootLanded);
-            rightFoot.Jump(jumpUpDuration, jumpDownDuration, onFootLanded);
-        }
-    }
-
-    private void OnJumpEndedInternal()
-    {
-        isJumping = false;
-        if (!useAnimatorLegs)
-            StopWalking();
-
-        if (isPlayerControlled && controls != null)
-        {
-            float input = controls.Player.Move.ReadValue<Vector2>().x;
-            if (Mathf.Abs(input) > 0.2f)
-                HandleMovement(input, _flipped);
-        }
-
-        if (useAnimatorLegs && animator != null)
-        {
-            animator.SetBool("IsJumping", false);
-        }
-
-        OnJumpEnded?.Invoke();
-    }
-
-    #endregion
-
-    #region Crouch
-    public void Crouch()
-    {
-        if (isCrouching) return;
-
-        if (!robotBehaviour.CanPerformEnergy(energyCostPerCrouch)) return;
-
-        isCrouching = true;
-        if (!useAnimatorLegs)
-            StopWalking();
-        robotBehaviour?.ConsumeEnergy(energyCostPerCrouch);
-        OnCrouchStarted?.Invoke();
-
-        if (useAnimatorLegs && animator != null)
-        {
-            animator.SetBool("IsWalking", false);
-            animator.SetBool("IsCrouching", true);
-        }
-        else
-        {
-            int feetFinished = 0;
-            Action onFootFinished = () =>
-            {
-                feetFinished++;
-                if (feetFinished >= 2)
-                {
-                    isCrouching = false;
-                    OnCrouchEnded?.Invoke();
-                }
-            };
-
-            leftFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
-            rightFoot.Crouch(crouchUpDuration, crouchDownDuration, onFootFinished);
+            animator = GetComponentInChildren<Animator>();
         }
     }
 
     /// <summary>
-    /// Returns the robot to a standing position.
+    /// Updates the animator with the current horizontal input.
+    /// </summary>
+    public void HandleMovement(float horizontalInput, bool flipped)
+    {
+        facingRight = !flipped;
+
+        float magnitude = Mathf.Abs(horizontalInput);
+        bool walking = magnitude > inputWalkThreshold;
+        float directionValue = 0f;
+
+        if (walking)
+        {
+            directionValue = horizontalInput >= 0f ? 1f : -1f;
+        }
+
+        ApplyAnimatorMovement(directionValue, walking);
+    }
+
+    private void ApplyAnimatorMovement(float directionValue, bool walking)
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(directionParameter))
+        {
+            animator.SetFloat(directionParameter, directionValue);
+        }
+
+        if (!string.IsNullOrEmpty(speedParameter))
+        {
+            animator.SetFloat(speedParameter, walking ? 1f : 0f);
+        }
+
+        if (!string.IsNullOrEmpty(walkBoolParameter))
+        {
+            animator.SetBool(walkBoolParameter, walking);
+        }
+
+        if (!string.IsNullOrEmpty(crouchBoolParameter) && !walking && !isCrouching)
+        {
+            animator.SetBool(crouchBoolParameter, false);
+        }
+    }
+
+    /// <summary>
+    /// Triggers a jump state on the animator.
+    /// </summary>
+    public void Jump()
+    {
+        if (isJumping || !CanPerformEnergy(energyCostPerJump))
+        {
+            return;
+        }
+
+        ConsumeEnergy(energyCostPerJump);
+        isJumping = true;
+        SetAnimatorBool(jumpBoolParameter, true);
+        OnJumpStarted?.Invoke();
+
+        if (jumpRoutine != null)
+        {
+            StopCoroutine(jumpRoutine);
+        }
+
+        if (jumpAnimationDuration > 0f)
+        {
+            jumpRoutine = StartCoroutine(ResetJumpAfterDelay(jumpAnimationDuration));
+        }
+    }
+
+    private IEnumerator ResetJumpAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        CompleteJump();
+    }
+
+    /// <summary>
+    /// Resets the jump state, typically invoked by an animation event.
+    /// </summary>
+    public void CompleteJump()
+    {
+        if (!isJumping)
+        {
+            return;
+        }
+
+        isJumping = false;
+        SetAnimatorBool(jumpBoolParameter, false);
+        OnJumpEnded?.Invoke();
+    }
+
+    /// <summary>
+    /// Starts a crouch pose.
+    /// </summary>
+    public void Crouch()
+    {
+        if (isCrouching || !CanPerformEnergy(energyCostPerCrouch))
+        {
+            return;
+        }
+
+        ConsumeEnergy(energyCostPerCrouch);
+        isCrouching = true;
+        SetAnimatorBool(crouchBoolParameter, true);
+        OnCrouchStarted?.Invoke();
+    }
+
+    /// <summary>
+    /// Stops crouching.
     /// </summary>
     public void Uncrouch()
     {
-        if (!useAnimatorLegs)
+        if (!isCrouching)
         {
-            leftFoot?.InterruptAndReset();
-            rightFoot?.InterruptAndReset();
+            return;
         }
+
         isCrouching = false;
-        if (useAnimatorLegs && animator != null)
-        {
-            animator.SetBool("IsCrouching", false);
-        }
+        SetAnimatorBool(crouchBoolParameter, false);
         OnCrouchEnded?.Invoke();
     }
-    #endregion Crouch
 
-    #region Facing
-
+    /// <summary>
+    /// Stores the desired facing direction. Actual sprite flipping is handled elsewhere.
+    /// </summary>
     public void SetFacingDirection(bool isRight)
     {
-        leftFoot?.SetFacingDirection(isRight);
-        rightFoot?.SetFacingDirection(isRight);
+        facingRight = isRight;
     }
 
-    #endregion
-    private IEnumerator JumpSimpleRoutine()
+    private bool CanPerformEnergy(float energyCost)
     {
-        float wait = Mathf.Max(0f, jumpUpDuration) + Mathf.Max(0f, jumpDownDuration);
-        yield return new WaitForSeconds(wait);
-        OnJumpEndedInternal();
+        if (robotBehaviour == null || energyCost <= 0f)
+        {
+            return true;
+        }
+
+        return robotBehaviour.CanPerformEnergy(energyCost);
+    }
+
+    private void ConsumeEnergy(float energyCost)
+    {
+        if (robotBehaviour == null || energyCost <= 0f)
+        {
+            return;
+        }
+
+        robotBehaviour.ConsumeEnergy(energyCost);
+    }
+
+    private void SetAnimatorBool(string parameter, bool value)
+    {
+        if (animator == null || string.IsNullOrEmpty(parameter))
+        {
+            return;
+        }
+
+        animator.SetBool(parameter, value);
     }
 }
