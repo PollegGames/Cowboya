@@ -7,18 +7,18 @@ public class GrabSystem : MonoBehaviour
     public float throwStrength = 5f;
 
     [SerializeField] private MonoBehaviour inputSource;
+    [SerializeField] private Inventory inventoryOverride;
     private IPlayerInput input;
 
     private IGrabbable leftHeld;
     private IGrabbable rightHeld;
+    private Inventory cachedInventory;
 
     private void Awake()
     {
-        input = inputSource as IPlayerInput;
+        input = ResolveInputProvider();
         if (input == null)
-        {
-            Debug.LogError("GrabSystem: inputSource does not implement IPlayerInput");
-        }
+            Debug.LogError($"GrabSystem on {name}: no IPlayerInput found. Assign an input source in the inspector.");
     }
 
     private void Update()
@@ -116,34 +116,24 @@ public class GrabSystem : MonoBehaviour
     {
         if (hand == null || held != null) return;
         IGrabbable obj = hand.DetectGrabbable();
-        var inventory = hand.GetComponentInParent<Inventory>();
-        if (obj != null && obj.CanBeGrabbed(inventory))
-        {
-            PickupType? slot = null;
+        if (obj == null)
+            return;
 
-            if (obj is SecurityBadgePickup)
-                slot = PickupType.SecurityBadge;
-            else if (obj is BatteryPickup)
-                slot = PickupType.Battery;
+        Transform grabParent = ResolveGrabParent(hand.transform, obj);
+        var inventory = ResolveInventory(grabParent);
+        if (!obj.CanBeGrabbed(inventory))
+            return;
 
-            if (inventory != null && slot.HasValue && inventory.HasItem(slot.Value))
-                return;
+        PickupType? slot = ResolveInventorySlot(obj);
+        if (slot.HasValue && !IsInventorySlotAvailable(inventory, slot.Value, obj))
+            return;
 
-            obj.OnGrab(hand.transform);
+        obj.OnGrab(grabParent);
 
-            if (inventory != null && slot.HasValue)
-                inventory.SetItem(slot.Value, obj);
+        if (inventory != null && slot.HasValue)
+            inventory.SetItem(slot.Value, obj);
 
-            // Badges or batteries attach to the player's body and should not remain in hand
-            if (obj is SecurityBadgePickup || obj is BatteryPickup)
-            {
-                held = null;
-            }
-            else
-            {
-                held = obj;
-            }
-        }
+        held = IsInventoryOnlyPickup(obj) ? null : obj;
     }
 
     private void Release(GrabHandAttractor hand, ref IGrabbable held)
@@ -160,17 +150,143 @@ public class GrabSystem : MonoBehaviour
             return;
         }
 
-        var inventory = hand.GetComponentInParent<Inventory>();
-        if (inventory != null)
-        {
-            if (held is SecurityBadgePickup)
-                inventory.RemoveItem(PickupType.SecurityBadge);
-            else if (held is BatteryPickup)
-                inventory.RemoveItem(PickupType.Battery);
-        }
+        var inventory = ResolveInventory(hand.transform);
+        PickupType? slot = ResolveInventorySlot(held);
+        if (inventory != null && slot.HasValue)
+            inventory.RemoveItem(slot.Value);
 
         Vector2 throwForce = (Vector2)(hand.transform.right) * strength;
         held.OnRelease(throwForce);
         held = null;
+    }
+
+    private Inventory ResolveInventory(Transform contextTransform)
+    {
+        if (inventoryOverride != null)
+            return inventoryOverride;
+
+        if (cachedInventory != null)
+            return cachedInventory;
+
+        Inventory found = null;
+
+        if (contextTransform != null)
+        {
+            found = contextTransform.GetComponentInParent<Inventory>();
+            if (found == null)
+                found = contextTransform.GetComponent<Inventory>();
+
+            if (found == null && contextTransform.root != null)
+                found = contextTransform.root.GetComponentInChildren<Inventory>();
+        }
+
+        if (found == null)
+        {
+            found = GetComponentInParent<Inventory>();
+            if (found == null)
+                found = GetComponent<Inventory>();
+        }
+
+        if (found == null)
+        {
+            var candidates = UnityEngine.Object.FindObjectsByType<Inventory>(FindObjectsSortMode.None);
+            if (candidates != null && candidates.Length > 0)
+                found = candidates[0];
+        }
+
+        cachedInventory = found;
+        return cachedInventory;
+    }
+
+    private IPlayerInput ResolveInputProvider()
+    {
+        if (inputSource != null)
+        {
+            IPlayerInput direct = inputSource as IPlayerInput;
+            if (direct != null)
+                return direct;
+        }
+
+        MonoBehaviour provider = FindInputProviderOnObject(transform);
+        if (provider != null)
+        {
+            inputSource = provider;
+            return provider as IPlayerInput;
+        }
+
+        return null;
+    }
+
+    private static MonoBehaviour FindInputProviderOnObject(Transform targetTransform)
+    {
+        Transform current = targetTransform;
+        while (current != null)
+        {
+            MonoBehaviour[] behaviours = current.GetComponents<MonoBehaviour>();
+            foreach (MonoBehaviour behaviour in behaviours)
+            {
+                if (behaviour == null)
+                    continue;
+
+                if (behaviour is IPlayerInput)
+                    return behaviour;
+            }
+
+            current = current.parent;
+        }
+
+        return null;
+    }
+
+    private static PickupType? ResolveInventorySlot(IGrabbable grabbable)
+    {
+        if (grabbable is SecurityBadgePickup)
+            return PickupType.SecurityBadge;
+
+        if (grabbable is BatteryPickup)
+            return PickupType.Battery;
+
+        return null;
+    }
+
+    private static bool IsInventoryOnlyPickup(IGrabbable grabbable)
+    {
+        return grabbable is SecurityBadgePickup || grabbable is BatteryPickup;
+    }
+
+    private static bool IsInventorySlotAvailable(Inventory inventory, PickupType slot, IGrabbable candidate)
+    {
+        if (inventory == null)
+            return true;
+
+        var existing = inventory.GetItem(slot);
+        if (existing == null)
+            return true;
+
+        var existingObject = existing as UnityEngine.Object;
+        if (existingObject == null)
+        {
+            inventory.RemoveItem(slot);
+            return true;
+        }
+
+        return ReferenceEquals(existing, candidate);
+    }
+
+    private Transform ResolveGrabParent(Transform handTransform, IGrabbable candidate)
+    {
+        if (!IsInventoryOnlyPickup(candidate))
+            return handTransform;
+
+        PlayerMovementController player = null;
+        if (handTransform != null)
+            player = handTransform.GetComponentInParent<PlayerMovementController>();
+        else
+            player = GetComponentInParent<PlayerMovementController>();
+
+        if (player != null && player.BodyReference != null)
+            return player.BodyReference.transform;
+
+        return handTransform != null ? handTransform.root : transform;
     }
 }

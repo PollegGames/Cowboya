@@ -6,6 +6,14 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     [Header("Throw settings")]
     public float throwStrength = 5f;
 
+    [Header("Attachment")]
+    [Tooltip("Controls how quickly the badge eases toward its follow target when attached.")]
+    [SerializeField, Range(1f, 40f)] private float followLerpSpeed = 20f;
+
+    [Header("Visuals")]
+    [SerializeField, Tooltip("Sorting order applied while the badge is held.")] private int heldSortingOrder = 20;
+    [SerializeField, Tooltip("Sorting order applied when the badge is idle.")] private int idleSortingOrder = 0;
+
     [Header("Target Joint Settings")]
     [Tooltip("How springy the joint movement is. Recommended range: 5–15.")]
     [SerializeField, Range(5f, 15f)] private float frequency = 10f;
@@ -67,6 +75,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     bool wasStolen = false;
 
     Inventory ownerInventory;
+    SpriteRenderer[] spriteRenderers;
 
     void CacheOriginalPhysicsState()
     {
@@ -83,6 +92,8 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         rb = GetComponent<Rigidbody2D>();
         CacheOriginalPhysicsState();
         joint = GetComponent<TargetJoint2D>();
+        CacheSpriteRenderers();
+        ApplySortingOrder(idleSortingOrder);
         if (joint != null)
         {
             // Start disabled — only enable when grabbed
@@ -103,6 +114,13 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
             return;
 
         joint.target = followTarget.position;
+
+        if (attached && rb != null)
+        {
+            Vector2 desired = joint.target;
+            Vector2 next = Vector2.Lerp(rb.position, desired, followLerpSpeed * Time.fixedDeltaTime);
+            rb.MovePosition(next);
+        }
     }
 
     public void SetFollowTarget(Transform target)
@@ -226,6 +244,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
         transform.SetParent(attachmentParent, true);
         SetFollowTarget(attachmentParent);
+        ApplySortingOrder(heldSortingOrder);
 
         if (wasStolen && enemy != null && player != null)
         {
@@ -266,8 +285,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
             ownerInventory = null;
         }
 
-        // // Give it some velocity so it flies off
-        // rb.AddForce(throwForce * throwStrength, ForceMode2D.Impulse);
+        ApplySortingOrder(idleSortingOrder);
     }
 
     /// <summary>
@@ -276,5 +294,26 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     public void AssignInventory(Inventory inventory)
     {
         ownerInventory = inventory;
+    }
+
+    private void CacheSpriteRenderers()
+    {
+        if (spriteRenderers != null)
+            return;
+
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+    }
+
+    private void ApplySortingOrder(int order)
+    {
+        if (spriteRenderers == null || spriteRenderers.Length == 0)
+            return;
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            SpriteRenderer renderer = spriteRenderers[i];
+            if (renderer != null)
+                renderer.sortingOrder = order;
+        }
     }
 }

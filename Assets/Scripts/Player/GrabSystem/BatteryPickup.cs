@@ -6,6 +6,14 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     [Header("Health settings")]
     [SerializeField] private float healthGain = 10f;
 
+    [Header("Attachment")]
+    [Tooltip("Controls how quickly the battery eases toward its follow target when attached.")]
+    [SerializeField, Range(1f, 40f)] private float followLerpSpeed = 20f;
+
+    [Header("Visuals")]
+    [SerializeField, Tooltip("Sorting order applied while the battery is held.")] private int heldSortingOrder = 20;
+    [SerializeField, Tooltip("Sorting order applied when the battery is idle.")] private int idleSortingOrder = 0;
+
     [Header("Target Joint Settings")]
     [Tooltip("How springy the joint movement is. Recommended range: 5–15.")]
     [SerializeField, Range(5f, 15f)] private float frequency = 10f;
@@ -65,6 +73,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     private RigidbodyType2D originalBodyType;
 
     private Inventory ownerInventory;
+    private SpriteRenderer[] spriteRenderers;
 
     private void CacheOriginalPhysicsState()
     {
@@ -80,6 +89,8 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         rb = GetComponent<Rigidbody2D>();
         CacheOriginalPhysicsState();
         joint = GetComponent<TargetJoint2D>();
+        CacheSpriteRenderers();
+        ApplySortingOrder(idleSortingOrder);
         if (joint != null)
         {
             joint.enabled = false;
@@ -102,6 +113,12 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         {
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
+            if (rb != null)
+            {
+                Vector2 desired = joint.target;
+                Vector2 next = Vector2.Lerp(rb.position, desired, followLerpSpeed * Time.fixedDeltaTime);
+                rb.MovePosition(next);
+            }
         }
     }
 
@@ -253,6 +270,8 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             transform.SetParent(grabParent, true);
             SetFollowTarget(grabParent);
         }
+
+        ApplySortingOrder(heldSortingOrder);
     }
 
     public void OnAttract(Vector2 attractPoint)
@@ -290,6 +309,8 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
             ownerInventory.RemoveItem(PickupType.Battery);
             ownerInventory = null;
         }
+
+        ApplySortingOrder(idleSortingOrder);
     }
 
     /// <summary>
@@ -298,5 +319,26 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     public void AssignInventory(Inventory inventory)
     {
         ownerInventory = inventory;
+    }
+
+    private void CacheSpriteRenderers()
+    {
+        if (spriteRenderers != null)
+            return;
+
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+    }
+
+    private void ApplySortingOrder(int order)
+    {
+        if (spriteRenderers == null || spriteRenderers.Length == 0)
+            return;
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            SpriteRenderer renderer = spriteRenderers[i];
+            if (renderer != null)
+                renderer.sortingOrder = order;
+        }
     }
 }

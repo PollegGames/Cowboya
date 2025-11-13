@@ -55,6 +55,10 @@ public class CubePickup : MonoBehaviour, IGrabbable
         }
     }
 
+    [Header("Visuals")]
+    [SerializeField, Tooltip("Sorting order applied while the cube is held.")] private int heldSortingOrder = 20;
+    [SerializeField, Tooltip("Sorting order applied when the cube is idle.")] private int idleSortingOrder = 0;
+
     private Rigidbody2D rb;
     private TargetJoint2D joint;
     private Transform followTarget;
@@ -63,11 +67,14 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
     public event Action<CubePickup> OnGrabbed;
     public event Action<CubePickup> OnReleased;
+    private SpriteRenderer[] spriteRenderers;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         joint = GetComponent<TargetJoint2D>();
+        CacheSpriteRenderers();
+        ApplySortingOrder(idleSortingOrder);
         if (joint != null)
         {
             joint.enabled = false;
@@ -131,6 +138,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
         rb.simulated = true;
 
         SetFollowTarget(grabParent);
+        ApplySortingOrder(heldSortingOrder);
 
         OnGrabbed?.Invoke(this);
     }
@@ -147,12 +155,37 @@ public class CubePickup : MonoBehaviour, IGrabbable
     public void OnRelease(Vector2 throwForce)
     {
         if (joint == null)
+        {
+            ApplySortingOrder(idleSortingOrder);
             return;
+        }
 
         attached = false;
         joint.enabled = false;
         followTarget = null;
 
         OnReleased?.Invoke(this);
+        ApplySortingOrder(idleSortingOrder);
+    }
+
+    private void CacheSpriteRenderers()
+    {
+        if (spriteRenderers != null)
+            return;
+
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+    }
+
+    private void ApplySortingOrder(int order)
+    {
+        if (spriteRenderers == null || spriteRenderers.Length == 0)
+            return;
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            SpriteRenderer renderer = spriteRenderers[i];
+            if (renderer != null)
+                renderer.sortingOrder = order;
+        }
     }
 }
