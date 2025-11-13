@@ -57,6 +57,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -78,6 +80,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -135,7 +138,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0.85372186}
-  m_ConnectedAnchor: {x: -0.053334847, y: -0.5623316}
+  m_ConnectedAnchor: {x: -0.0533324, y: -0.5623319}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -781,8 +784,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7041915025919395613}
-  - component: {fileID: 4850054373524888424}
   - component: {fileID: 2707675755231474368}
+  - component: {fileID: 4850054373524888424}
   m_Layer: 6
   m_Name: HitBox
   m_TagString: Player
@@ -805,21 +808,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 9206399112713860096}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4850054373524888424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2755616261240096776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59a2a8c774bc3b34ab8b58ee263945ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 5
-  pushForce: {x: 150, y: 200}
-  DamageCost: 5
 --- !u!61 &2707675755231474368
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -866,6 +854,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.4208286, y: 1.277004}
   m_EdgeRadius: 0
+--- !u!114 &4850054373524888424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755616261240096776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a2a8c774bc3b34ab8b58ee263945ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 5
+  pushForce: {x: 150, y: 200}
+  DamageCost: 5
 --- !u!1 &2985579913157007098
 GameObject:
   m_ObjectHideFlags: 0
@@ -1160,7 +1163,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: -0.000000019427288, y: -0.4000001}
+  m_ConnectedAnchor: {x: -0.000000019427155, y: -0.39999735}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1932,7 +1935,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.000000019912944, y: -0.40999958}
+  m_ConnectedAnchor: {x: 0.000000019913141, y: -0.4100036}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2246,6 +2249,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2267,6 +2272,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -2383,7 +2389,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0, y: -0.67000026}
+  m_ConnectedAnchor: {x: 0, y: -0.6699999}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3056,6 +3062,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3077,6 +3085,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -3245,6 +3254,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3266,6 +3277,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -3388,6 +3400,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3409,6 +3423,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -3512,7 +3527,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.09941096}
-  m_ConnectedAnchor: {x: -0.028301913, y: 0.37058958}
+  m_ConnectedAnchor: {x: -0.028302953, y: 0.37058952}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3585,6 +3600,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3606,6 +3623,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -3788,6 +3806,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3809,6 +3829,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -3912,7 +3933,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0.5631147}
-  m_ConnectedAnchor: {x: 0.15945013, y: -0.27098435}
+  m_ConnectedAnchor: {x: 0.15944849, y: -0.270984}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3981,6 +4002,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4002,6 +4025,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -4170,6 +4194,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4191,6 +4217,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -4433,6 +4460,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4454,6 +4483,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -4484,7 +4514,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.48}
-  m_ConnectedAnchor: {x: 0.06296288, y: 0.21799988}
+  m_ConnectedAnchor: {x: 0.06296424, y: 0.2180001}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4574,6 +4604,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4595,6 +4627,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -4698,7 +4731,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.4}
-  m_ConnectedAnchor: {x: -0.010000009, y: 0.20999983}
+  m_ConnectedAnchor: {x: -0.010000376, y: 0.21000001}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4802,6 +4835,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4823,6 +4858,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -4926,7 +4962,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0.575184}
-  m_ConnectedAnchor: {x: -0.17166983, y: -0.2534749}
+  m_ConnectedAnchor: {x: -0.17167312, y: -0.2534749}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4991,6 +5027,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5012,6 +5050,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -5115,7 +5154,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: -0.3787503}
-  m_ConnectedAnchor: {x: -0.02799988, y: 0.33295408}
+  m_ConnectedAnchor: {x: -0.02799988, y: 0.3329543}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5262,7 +5301,6 @@ MonoBehaviour:
     CurrentEnergy: 100
     AttackEnergyCost: 5
     EnergyRechargeRate: 1
-  hips: {fileID: 9206399112436540778}
 --- !u!114 &8782515306010581955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5289,22 +5327,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1ba8a2f18b0d3542bee04008ff45c99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftFoot: {fileID: 7313414750471531143}
-  rightFoot: {fileID: 7086515708544877790}
-  jumpUpDuration: 0.1
-  jumpDownDuration: 0.1
-  crouchUpDuration: 0.1
-  crouchDownDuration: 0.1
-  isPlayerControlled: 1
-  useAnimatorLegs: 1
+  robotBehaviour: {fileID: 0}
   animator: {fileID: 2961474439911738946}
+  directionParameter: Direction
+  speedParameter: Speed
+  walkBoolParameter: IsWalking
+  jumpBoolParameter: IsJumping
+  crouchBoolParameter: IsCrouching
   inputWalkThreshold: 0.5
-  walkCycleSpeed: 1
-  energyCostPerStep: 1
+  jumpAnimationDuration: 0.4
   energyCostPerJump: 5
   energyCostPerCrouch: 3
-  waitStep: 1
-  timeout: 0.5
+  isPlayerControlled: 1
 --- !u!114 &6137078262802834594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5318,17 +5352,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locomotion: {fileID: 2461518573604142914}
-  bodyBalance: {fileID: 8274634689585369587}
-  forceUpward: 200
-  forceSide: 150
-  legJointLimiter: {fileID: 3067009131450268787}
-  bodyJointLimiter: {fileID: 6603793096190714630}
   robotBehaviour: {fileID: 340242974285803334}
-  poleMirror: {fileID: 5527916575216506076}
-  spriteFlipper: {fileID: 4201234567890123456}
   bodyReference: {fileID: 9206399113523174608}
-  maxLeftTiltDeg: 20
-  maxRightTiltDeg: 2
   inputSource: {fileID: 9062504079035036979}
   energyBot: {fileID: 6178835051735462}
   inventory: {fileID: 1795599177220237823}
@@ -5358,18 +5383,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1ee2b82e1bddaf41862f8549aefd1ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arcTargetFollower: {fileID: 3617995742919097939}
-  leftArmTarget: {fileID: 3816361993170977825}
-  rightArmTarget: {fileID: 5459847082946802603}
-  leftRestPosition: {fileID: 6624712809901108695}
-  rightRestPosition: {fileID: 2147758059770156043}
-  punchTarget: {fileID: 1084227098665154117}
-  arcControlRight: {fileID: 4553833105972410673}
-  arcControlLeft: {fileID: 3916975082465029214}
-  punchDuration: 0.1
-  returnSpeed: 10
-  leftArmHitbox: {fileID: 6634321455534175459}
-  rightArmHitbox: {fileID: 4850054373524888424}
 --- !u!114 &8918370125487379436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5651,6 +5664,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5672,6 +5687,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -5729,7 +5745,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0.8425161}
-  m_ConnectedAnchor: {x: -0.050002027, y: -0.56627524}
+  m_ConnectedAnchor: {x: -0.050001875, y: -0.56627584}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5898,6 +5914,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5919,6 +5937,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -6084,6 +6103,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6105,6 +6126,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
