@@ -494,8 +494,8 @@ public class CowboyArmTargetController : MonoBehaviour
 
         if (!allowActiveSolver)
         {
-            SetSolverEnabled(leftArmIkSolver, false);
-            SetSolverEnabled(rightArmIkSolver, false);
+            SetSolverEnabled(leftArmIkSolver, leftSolverDefaultEnabled);
+            SetSolverEnabled(rightArmIkSolver, rightSolverDefaultEnabled);
             return;
         }
 
