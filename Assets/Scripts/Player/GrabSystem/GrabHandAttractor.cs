@@ -7,13 +7,34 @@ public class GrabHandAttractor : MonoBehaviour
     public System.Action<IGrabbable> OnObjectDetected;
 
     [SerializeField] ToggleBox toggleBox;
+    [SerializeField] private SpriteRenderer grabIndicator;
+    [SerializeField] private Color activeColor = Color.green;
+    [SerializeField] private Color inactiveColor = new Color(1f, 1f, 1f, 0f);
+
+    private bool indicatorActive;
+    private bool indicatorRequested;
+
+    private void Awake()
+    {
+        if (grabIndicator == null)
+            grabIndicator = GetComponent<SpriteRenderer>();
+        if (grabIndicator == null)
+            grabIndicator = GetComponentInChildren<SpriteRenderer>(true);
+
+        UpdateIndicator();
+    }
+
+    private void Update()
+    {
+        UpdateIndicator();
+    }
 
     /// <summary>
     /// Detects the closest grabbable object within range.
     /// </summary>
     public IGrabbable DetectGrabbable()
     {
-        if (toggleBox != null && toggleBox.IsActive == false)
+        if (!IsDetectionActive())
             return null;
         int mask = detectionLayer.value;
         if (mask == 0)
@@ -60,5 +81,31 @@ public class GrabHandAttractor : MonoBehaviour
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// External callers can request the indicator to show while a grab input is held.
+    /// </summary>
+    /// <param name="active">Requested indicator state.</param>
+    public void SetIndicatorActive(bool active)
+    {
+        if (indicatorRequested == active)
+            return;
+
+        indicatorRequested = active;
+        UpdateIndicator();
+    }
+
+    private bool IsDetectionActive()
+    {
+        return toggleBox == null || toggleBox.IsActive;
+    }
+
+    private void UpdateIndicator()
+    {
+        bool shouldShow = indicatorRequested && IsDetectionActive();
+        indicatorActive = shouldShow;
+        if (grabIndicator != null)
+            grabIndicator.color = shouldShow ? activeColor : inactiveColor;
     }
 }

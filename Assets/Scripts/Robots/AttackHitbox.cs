@@ -4,6 +4,9 @@ public class AttackHitbox : MonoBehaviour
 {
     [SerializeField] public int damage = 10;
     [SerializeField] private Vector2 pushForce = new Vector2(5f, 2f);
+    [SerializeField] private SpriteRenderer hitboxIndicator;
+    [SerializeField] private Color activeColor = Color.red;
+    [SerializeField] private Color inactiveColor = new Color(1f, 1f, 1f, 0f);
 
     public int DamageCost = 5;
     private bool isActive = false;
@@ -12,10 +15,24 @@ public class AttackHitbox : MonoBehaviour
     private void Awake()
     {
         attacker = GetComponentInParent<RobotStateController>();
+        if (hitboxIndicator == null)
+            hitboxIndicator = GetComponent<SpriteRenderer>();
+        if (hitboxIndicator == null)
+            hitboxIndicator = GetComponentInChildren<SpriteRenderer>(true);
+        UpdateIndicator(false);
     }
 
-    public void Activate() => isActive = true;
-    public void Deactivate() => isActive = false;
+    public void Activate()
+    {
+        isActive = true;
+        UpdateIndicator(true);
+    }
+
+    public void Deactivate()
+    {
+        isActive = false;
+        UpdateIndicator(false);
+    }
 
     /// <summary>
     /// Indicates whether the hitbox is currently active.
@@ -50,5 +67,12 @@ public class AttackHitbox : MonoBehaviour
         }
 
         isActive = false;
+        UpdateIndicator(false);
+    }
+
+    private void UpdateIndicator(bool active)
+    {
+        if (hitboxIndicator != null)
+            hitboxIndicator.color = active ? activeColor : inactiveColor;
     }
 }

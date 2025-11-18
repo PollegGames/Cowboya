@@ -35,10 +35,12 @@ public class CowboyArmTargetController : MonoBehaviour
     [SerializeField] private Transform leftHandHoldParent;
     [SerializeField] private Transform rightHandHoldParent;
     [SerializeField] private Inventory inventory;
+    [SerializeField] private bool allowAttackAim = true;
 
     private bool interactHeld;
     private bool interactPressedThisFrame;
     private bool interactReleasedThisFrame;
+    private bool attackHeld;
     private bool preferRightArm = true;
     private IGrabbable heldObject;
     private bool holdingRightHand;
@@ -52,6 +54,7 @@ public class CowboyArmTargetController : MonoBehaviour
     private bool leftSolverDefaultEnabled = true;
     private bool rightSolverDefaultEnabled = true;
     private bool solverDefaultsCaptured;
+    private Transform activeArm;
     private readonly Dictionary<Behaviour, Action<bool>> solverFlipSetters = new Dictionary<Behaviour, Action<bool>>();
 
     private void Awake()
@@ -72,12 +75,14 @@ public class CowboyArmTargetController : MonoBehaviour
         interactHeld = false;
         interactPressedThisFrame = false;
         interactReleasedThisFrame = false;
+        attackHeld = false;
         ReleaseHeldObject(0f);
     }
 
     private void Update()
     {
         bool currentlyHeld = IsRightMouseHeld();
+        attackHeld = allowAttackAim && IsLeftMouseHeld();
         interactPressedThisFrame = !interactHeld && currentlyHeld;
         interactReleasedThisFrame = interactHeld && !currentlyHeld;
         interactHeld = currentlyHeld;
@@ -380,7 +385,7 @@ public class CowboyArmTargetController : MonoBehaviour
     private void LateUpdate()
     {
         bool hasTargets = bodyReference != null && targetTransform != null;
-        bool canDrive = hasTargets && interactHeld;
+        bool canDrive = hasTargets && (interactHeld || attackHeld);
 
         if (hasTargets)
         {
@@ -405,24 +410,27 @@ public class CowboyArmTargetController : MonoBehaviour
         Vector3 destination = targetTransform.position;
 
         bool useRightArm = HasHeldObject() ? holdingRightHand : ShouldUseRightArm();
+        Transform activeArm = useRightArm ? rightArmSolverTarget : leftArmSolverTarget;
+        Transform inactiveArm = useRightArm ? leftArmSolverTarget : rightArmSolverTarget;
 
-        if (useRightArm && rightArmSolverTarget != null)
+        if (activeArm == null && inactiveArm != null)
         {
-            FollowTarget(rightArmSolverTarget, destination);
-            ReturnToRest(leftArmSolverTarget, leftRestLocalPosition, leftRestLocalRotation, leftRestCaptured);
+            // Fallback to whichever arm exists, but still rest the non-active one.
+            activeArm = inactiveArm;
+            inactiveArm = null;
         }
-        else if (!useRightArm && leftArmSolverTarget != null)
+
+        if (activeArm != null)
         {
-            FollowTarget(leftArmSolverTarget, destination);
-            ReturnToRest(rightArmSolverTarget, rightRestLocalPosition, rightRestLocalRotation, rightRestCaptured);
+            FollowTarget(activeArm, destination);
         }
-        else
+
+        if (inactiveArm != null)
         {
-            Transform fallback = rightArmSolverTarget != null ? rightArmSolverTarget : leftArmSolverTarget;
-            if (fallback != null)
-            {
-                FollowTarget(fallback, destination);
-            }
+            ReturnToRest(inactiveArm,
+                inactiveArm == leftArmSolverTarget ? leftRestLocalPosition : rightRestLocalPosition,
+                inactiveArm == leftArmSolverTarget ? leftRestLocalRotation : rightRestLocalRotation,
+                inactiveArm == leftArmSolverTarget ? leftRestCaptured : rightRestCaptured);
         }
     }
 
@@ -463,6 +471,16 @@ public class CowboyArmTargetController : MonoBehaviour
         }
 
         return Input.GetMouseButton(1);
+    }
+
+    private bool IsLeftMouseHeld()
+    {
+        if (Mouse.current != null)
+        {
+            return Mouse.current.leftButton.isPressed;
+        }
+
+        return Input.GetMouseButton(0);
     }
 
     private void CacheSolverDefaults()

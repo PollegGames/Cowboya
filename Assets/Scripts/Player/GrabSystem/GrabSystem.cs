@@ -23,7 +23,12 @@ public class GrabSystem : MonoBehaviour
 
     private void Update()
     {
-        if (input == null) return;
+        if (input == null)
+        {
+            UpdateHandIndicator(leftHand, false);
+            UpdateHandIndicator(rightHand, false);
+            return;
+        }
 
         // LEFT HAND
         if (input.LeftGrabDown)
@@ -78,6 +83,9 @@ public class GrabSystem : MonoBehaviour
             else
                 rightHeld = null;
         }
+
+        UpdateHandIndicator(leftHand, input.LeftGrabDown || input.LeftGrabHeld);
+        UpdateHandIndicator(rightHand, input.RightGrabDown || input.RightGrabHeld);
     }
 
     /// <summary>
@@ -196,6 +204,11 @@ public class GrabSystem : MonoBehaviour
 
         cachedInventory = found;
         return cachedInventory;
+    }
+
+    private static void UpdateHandIndicator(GrabHandAttractor hand, bool active)
+    {
+        hand?.SetIndicatorActive(active);
     }
 
     private IPlayerInput ResolveInputProvider()
