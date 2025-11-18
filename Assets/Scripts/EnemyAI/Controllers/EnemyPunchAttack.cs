@@ -1,9 +1,8 @@
-using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Issues <see cref="AttackRequest"/>s on behalf of an enemy when the player
-/// enters the attack zone.
+/// Issues basic <see cref="AttackRequest"/>s on behalf of an enemy when the player enters the attack zone.
+/// Hitbox activation is intentionally omitted for the simplified combat flow.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class EnemyPunchAttack : MonoBehaviour
@@ -12,14 +11,11 @@ public sealed class EnemyPunchAttack : MonoBehaviour
     [SerializeField] private float attackCooldown = 1f;
     [SerializeField] private float verticalSectorThreshold = 0.75f;
     [SerializeField] private FactoryAlarmStatus alarmStatus;
-    [SerializeField] private PunchHitboxEventRelay hitboxRelay;
-    [SerializeField] private float hitboxActiveDuration = 0.3f;
 
     private RobotStateController robotBehaviour;
     private RobotStats playerStats;
     private float lastPunchTime;
     private bool playerInAttackZone;
-    private Coroutine hitboxDeactivateRoutine;
 
     private void Awake()
     {
@@ -27,15 +23,6 @@ public sealed class EnemyPunchAttack : MonoBehaviour
         if (alarmStatus == null)
         {
             alarmStatus = FindFirstObjectByType<FactoryManager>()?.factoryAlarmStatus;
-        }
-
-        if (hitboxRelay == null)
-        {
-            hitboxRelay = GetComponent<PunchHitboxEventRelay>();
-            if (hitboxRelay == null)
-            {
-                hitboxRelay = GetComponentInChildren<PunchHitboxEventRelay>();
-            }
         }
     }
 
@@ -63,14 +50,6 @@ public sealed class EnemyPunchAttack : MonoBehaviour
         {
             targetToFollow.OnPlayerDetectInAttackZoneChanged -= HandlePlayerInAttackZoneChange;
         }
-
-        if (hitboxDeactivateRoutine != null)
-        {
-            StopCoroutine(hitboxDeactivateRoutine);
-            hitboxDeactivateRoutine = null;
-        }
-
-        hitboxRelay?.ForceDeactivateAllHitboxes();
     }
 
     private void HandlePlayerInAttackZoneChange(bool isInside)
@@ -109,30 +88,11 @@ public sealed class EnemyPunchAttack : MonoBehaviour
     }
 
     /// <summary>
-    /// Ensures the appropriate hitbox is armed when an attack is accepted.
+    /// Tracks cooldown when an attack is accepted. Hitbox wiring will be added with the new combat flow.
     /// </summary>
-    /// <param name="request">The attack request that was successfully issued.</param>
     public void HandleAttackAccepted(AttackRequest request)
     {
-        if (hitboxRelay == null)
-        {
-            return;
-        }
-
         lastPunchTime = Time.time;
-
-        if (hitboxDeactivateRoutine != null)
-        {
-            StopCoroutine(hitboxDeactivateRoutine);
-            hitboxDeactivateRoutine = null;
-        }
-
-        hitboxRelay.ActivateHitboxForRequest(request);
-
-        if (hitboxActiveDuration > 0f)
-        {
-            hitboxDeactivateRoutine = StartCoroutine(DeactivateHitboxAfterDelay(hitboxActiveDuration));
-        }
     }
 
     private bool CanIssueAttack()
@@ -165,11 +125,5 @@ public sealed class EnemyPunchAttack : MonoBehaviour
 
         return delta.x >= 0f ? AttackSector.Right : AttackSector.Left;
     }
-
-    private IEnumerator DeactivateHitboxAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        hitboxRelay?.ForceDeactivateAllHitboxes();
-        hitboxDeactivateRoutine = null;
-    }
 }
+

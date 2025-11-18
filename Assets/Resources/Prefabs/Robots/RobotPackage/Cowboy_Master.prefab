@@ -1496,7 +1496,6 @@ GameObject:
   - component: {fileID: 631164924912554056}
   - component: {fileID: 6322339627798152675}
   - component: {fileID: 942791720737770380}
-  - component: {fileID: -4870000000000003001}
   m_Layer: 9
   m_Name: Cowboy_Master
   m_TagString: Player
@@ -2727,19 +2726,6 @@ Transform:
   m_Father: {fileID: 3412829815912511364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 
---- !u!114 &-4870000000000003001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4587626726301181995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cfb383d5fde427f94b198dfcee3afb1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  animator: {fileID: 0}
   movementController: {fileID: 0}
   punchDirectionParameter: PunchDirection
   punchTriggerParameter: PunchTrigger

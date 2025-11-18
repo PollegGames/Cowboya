@@ -31,7 +31,6 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject, IRobo
     public Transform BodyReference => bodyReference;
 
     [SerializeField] private EnemyPunchAttack punchAttack;
-    [SerializeField] private AttackRequestController attackRequestController;
     [SerializeField] private Inventory inventory;
 
     private FactoryAlarmStatus alarmStatus;
@@ -70,13 +69,6 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject, IRobo
 
         if (inventory == null)
             inventory = GetComponent<Inventory>();
-
-        if (attackRequestController == null)
-        {
-            attackRequestController = GetComponent<AttackRequestController>();
-            if (attackRequestController == null)
-                attackRequestController = GetComponentInChildren<AttackRequestController>();
-        }
     }
 
     public void Initialize(
@@ -163,7 +155,6 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject, IRobo
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
 
-        ProcessAttackDecisions();
     }
 
     protected override void FixedUpdate()
@@ -188,21 +179,6 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject, IRobo
 
         request = default;
         return false;
-    }
-
-    private void ProcessAttackDecisions()
-    {
-        if (attackRequestController == null)
-            return;
-
-        if (TryBuildAttackRequest(out AttackRequest request))
-        {
-            bool accepted = attackRequestController.TryHandleAttack(request);
-            if (accepted)
-            {
-                punchAttack?.HandleAttackAccepted(request);
-            }
-        }
     }
 
 
