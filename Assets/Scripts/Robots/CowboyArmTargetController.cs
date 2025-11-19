@@ -18,7 +18,6 @@ public class CowboyArmTargetController : MonoBehaviour
     [SerializeField] private Transform rightArmSolverTarget;
     [SerializeField] private Behaviour leftArmIkSolver;
     [SerializeField] private Behaviour rightArmIkSolver;
-    [SerializeField] private bool swapArms;
 
     [Header("Motion")]
     [SerializeField] private float followSpeed = 15f;
@@ -26,24 +25,18 @@ public class CowboyArmTargetController : MonoBehaviour
     [SerializeField] private float rotationReturnSpeed = 720f;
     [SerializeField] private float sideSwitchThreshold = 0.1f;
 
-    [Header("Grab Settings")]
-    [SerializeField] private float grabRadius = 0.4f;
-    [SerializeField] private LayerMask grabbableLayers = ~0;
-    [SerializeField] private float throwStrength = 5f;
-    [SerializeField] private Transform leftHandGrabAnchor;
-    [SerializeField] private Transform rightHandGrabAnchor;
-    [SerializeField] private Transform leftHandHoldParent;
-    [SerializeField] private Transform rightHandHoldParent;
-    [SerializeField] private Inventory inventory;
+    [Header("Controllers")]
+    [SerializeField] private CowboyGrabController grabController;
+    [SerializeField] private CowboySimpleAttackController attackController;
     [SerializeField] private bool allowAttackAim = true;
 
     private bool interactHeld;
     private bool interactPressedThisFrame;
     private bool interactReleasedThisFrame;
     private bool attackHeld;
+    private bool attackInputHeld;
     private bool preferRightArm = true;
-    private IGrabbable heldObject;
-    private bool holdingRightHand;
+    private CowboyArmSide? attackActiveArm;
 
     private Vector3 leftRestLocalPosition;
     private Vector3 rightRestLocalPosition;
@@ -54,20 +47,18 @@ public class CowboyArmTargetController : MonoBehaviour
     private bool leftSolverDefaultEnabled = true;
     private bool rightSolverDefaultEnabled = true;
     private bool solverDefaultsCaptured;
-    private Transform activeArm;
     private readonly Dictionary<Behaviour, Action<bool>> solverFlipSetters = new Dictionary<Behaviour, Action<bool>>();
 
     private void Awake()
     {
-        CacheGrabAnchors();
-        CacheInventory();
+        CacheControllers();
     }
 
     private void OnEnable()
     {
-        CacheGrabAnchors();
-        CacheInventory();
+        CacheControllers();
         CacheRestPose();
+        attackController?.DeactivateAll();
     }
 
     private void OnDisable()
@@ -76,18 +67,26 @@ public class CowboyArmTargetController : MonoBehaviour
         interactPressedThisFrame = false;
         interactReleasedThisFrame = false;
         attackHeld = false;
-        ReleaseHeldObject(0f);
+        attackInputHeld = false;
+        attackActiveArm = null;
+        attackController?.DeactivateAll();
+        grabController?.ReleaseAllImmediate();
     }
 
     private void Update()
     {
         bool currentlyHeld = IsRightMouseHeld();
-        attackHeld = allowAttackAim && IsLeftMouseHeld();
+        bool attackInput = IsLeftMouseHeld();
+
+        attackInputHeld = attackInput;
+        attackHeld = allowAttackAim && attackInputHeld;
+
         interactPressedThisFrame = !interactHeld && currentlyHeld;
         interactReleasedThisFrame = interactHeld && !currentlyHeld;
         interactHeld = currentlyHeld;
 
-        UpdateGrabState();
+        HandleGrabInput();
+        HandleAttackInput();
     }
 
     private void CacheRestPose()
@@ -109,78 +108,35 @@ public class CowboyArmTargetController : MonoBehaviour
         CacheSolverDefaults();
     }
 
-    private void UpdateGrabState()
+    private void CacheControllers()
     {
-        if (interactPressedThisFrame && !HasHeldObject())
+        if (grabController == null)
         {
-            TryGrabActiveHand();
+            grabController = GetComponent<CowboyGrabController>();
         }
 
-        if (HasHeldObject() && interactHeld)
+        if (grabController == null)
         {
-            MaintainHold();
+            grabController = GetComponentInParent<CowboyGrabController>();
         }
 
-        if (HasHeldObject() && interactReleasedThisFrame)
+        if (attackController == null)
         {
-            ReleaseHeldObject(throwStrength);
+            attackController = GetComponent<CowboySimpleAttackController>();
+        }
+
+        if (attackController == null)
+        {
+            attackController = GetComponentInParent<CowboySimpleAttackController>();
         }
     }
 
-    private void TryGrabActiveHand()
+    private CowboyArmSide DetermineArmForGrab()
     {
-        bool useRightHand = DetermineRightHandForGrab();
-        Transform anchor = GetGrabAnchor(useRightHand);
-        if (anchor == null)
+        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
+        if (holdingArm.HasValue)
         {
-            return;
-        }
-
-        IGrabbable candidate = DetectGrabbable(anchor.position);
-        if (candidate == null)
-        {
-            return;
-        }
-
-        Inventory currentInventory = GetInventory();
-        if (!candidate.CanBeGrabbed(currentInventory))
-        {
-            return;
-        }
-
-        PickupType? slot = ResolvePickupSlot(candidate);
-        if (slot.HasValue && currentInventory != null && currentInventory.HasItem(slot.Value))
-        {
-            return;
-        }
-
-        Transform parent = GetHoldParent(useRightHand) ?? anchor;
-        candidate.OnGrab(parent);
-
-        if (currentInventory != null && slot.HasValue)
-        {
-            currentInventory.SetItem(slot.Value, candidate);
-        }
-
-        if (IsInventoryOnlyPickup(candidate))
-        {
-            return;
-        }
-
-        heldObject = candidate;
-        holdingRightHand = useRightHand;
-
-        if (interactHeld)
-        {
-            MaintainHold();
-        }
-    }
-
-    private bool DetermineRightHandForGrab()
-    {
-        if (HasHeldObject())
-        {
-            return holdingRightHand;
+            return holdingArm.Value;
         }
 
         if (bodyReference != null && targetTransform != null)
@@ -188,199 +144,93 @@ public class CowboyArmTargetController : MonoBehaviour
             UpdatePreferredSide();
         }
 
-        return ShouldUseRightArm();
+        return ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
     }
 
-    private void MaintainHold()
+    private CowboyArmSide GetCurrentActiveArmSide()
     {
-        if (!HasHeldObject() || !interactHeld)
+        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
+        if (holdingArm.HasValue)
+        {
+            return holdingArm.Value;
+        }
+
+        if (bodyReference != null && targetTransform != null)
+        {
+            UpdatePreferredSide();
+        }
+
+        return ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
+    }
+
+    private void HandleGrabInput()
+    {
+        if (grabController == null)
         {
             return;
         }
 
-        Transform anchor = GetGrabAnchor(holdingRightHand);
-        if (anchor == null)
+        CowboyArmSide armForGrab = DetermineArmForGrab();
+
+        if (interactPressedThisFrame && !grabController.HasHeldObject())
+        {
+            grabController.TryGrab(armForGrab);
+        }
+
+        CowboyArmSide? holdingArm = grabController.GetHoldingArm();
+        if (!holdingArm.HasValue)
         {
             return;
         }
 
-        heldObject.OnAttract(anchor.position);
+        if (interactHeld)
+        {
+            grabController.MaintainHold(holdingArm.Value);
+        }
+
+        if (interactReleasedThisFrame)
+        {
+            grabController.Release(holdingArm.Value);
+        }
     }
 
-    private void ReleaseHeldObject(float strength)
+    private void HandleAttackInput()
     {
-        if (!HasHeldObject())
+        if (attackController == null)
         {
             return;
         }
 
-        Transform reference = GetHoldParent(holdingRightHand) ?? GetGrabAnchor(holdingRightHand);
-        Vector2 throwForce = reference != null ? (Vector2)reference.right * strength : Vector2.zero;
-
-        RemoveInventoryEntry(heldObject);
-        heldObject.OnRelease(throwForce);
-        heldObject = null;
-    }
-
-    private IGrabbable DetectGrabbable(Vector3 origin)
-    {
-        int mask = grabbableLayers.value;
-        if (mask == 0)
+        if (!attackInputHeld)
         {
-            mask = ~0;
-        }
-
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(origin, grabRadius, mask);
-        IGrabbable closest = null;
-        float closestDistance = float.MaxValue;
-
-        foreach (Collider2D collider in colliders)
-        {
-            if (collider == null)
+            if (attackActiveArm.HasValue)
             {
-                continue;
+                attackController.SetArmAttackActive(attackActiveArm.Value, false);
+                attackActiveArm = null;
             }
 
-            IGrabbable grabbable = collider.GetComponent<IGrabbable>();
-            if (grabbable == null)
-            {
-                grabbable = collider.GetComponentInParent<IGrabbable>();
-            }
-
-            if (grabbable == null)
-            {
-                continue;
-            }
-
-            MonoBehaviour behaviour = grabbable as MonoBehaviour;
-            if (behaviour == null)
-            {
-                continue;
-            }
-
-            float distance = Vector2.Distance(origin, behaviour.transform.position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closest = grabbable;
-            }
+            return;
         }
 
-        return closest;
-    }
+        CowboyArmSide desiredArm = GetCurrentActiveArmSide();
 
-    private static PickupType? ResolvePickupSlot(IGrabbable grabbable)
-    {
-        if (grabbable is SecurityBadgePickup)
+        if (!attackActiveArm.HasValue)
         {
-            return PickupType.SecurityBadge;
+            attackController.SetArmAttackActive(desiredArm, true);
+            attackActiveArm = desiredArm;
+            return;
         }
 
-        if (grabbable is BatteryPickup)
-        {
-            return PickupType.Battery;
-        }
-
-        return null;
-    }
-
-    private static bool IsInventoryOnlyPickup(IGrabbable grabbable)
-    {
-        return grabbable is SecurityBadgePickup || grabbable is BatteryPickup;
-    }
-
-    private Transform GetGrabAnchor(bool forRightHand)
-    {
-        return forRightHand
-            ? (rightHandGrabAnchor != null ? rightHandGrabAnchor : rightArmSolverTarget)
-            : (leftHandGrabAnchor != null ? leftHandGrabAnchor : leftArmSolverTarget);
-    }
-
-    private Transform GetHoldParent(bool forRightHand)
-    {
-        return forRightHand
-            ? (rightHandHoldParent != null ? rightHandHoldParent : rightArmSolverTarget)
-            : (leftHandHoldParent != null ? leftHandHoldParent : leftArmSolverTarget);
-    }
-
-    private bool HasHeldObject()
-    {
-        if (heldObject == null)
-        {
-            return false;
-        }
-
-        UnityEngine.Object unityObject = heldObject as UnityEngine.Object;
-        if (unityObject == null)
-        {
-            heldObject = null;
-            return false;
-        }
-
-        return true;
-    }
-
-    private void CacheGrabAnchors()
-    {
-        if (leftHandGrabAnchor == null)
-        {
-            leftHandGrabAnchor = leftArmSolverTarget;
-        }
-
-        if (rightHandGrabAnchor == null)
-        {
-            rightHandGrabAnchor = rightArmSolverTarget;
-        }
-
-        if (leftHandHoldParent == null)
-        {
-            leftHandHoldParent = leftArmSolverTarget;
-        }
-
-        if (rightHandHoldParent == null)
-        {
-            rightHandHoldParent = rightArmSolverTarget;
-        }
-    }
-
-    private void CacheInventory()
-    {
-        if (inventory != null)
+        if (attackActiveArm.Value == desiredArm)
         {
             return;
         }
 
-        inventory = GetComponentInParent<Inventory>();
-        if (inventory == null)
-        {
-            inventory = GetComponent<Inventory>();
-        }
+        attackController.SetArmAttackActive(attackActiveArm.Value, false);
+        attackController.SetArmAttackActive(desiredArm, true);
+        attackActiveArm = desiredArm;
     }
 
-    private Inventory GetInventory()
-    {
-        if (inventory == null)
-        {
-            CacheInventory();
-        }
-
-        return inventory;
-    }
-
-    private void RemoveInventoryEntry(IGrabbable grabbable)
-    {
-        Inventory currentInventory = GetInventory();
-        if (currentInventory == null)
-        {
-            return;
-        }
-
-        PickupType? slot = ResolvePickupSlot(grabbable);
-        if (slot.HasValue)
-        {
-            currentInventory.RemoveItem(slot.Value);
-        }
-    }
 
     private void LateUpdate()
     {
@@ -409,7 +259,9 @@ public class CowboyArmTargetController : MonoBehaviour
 
         Vector3 destination = targetTransform.position;
 
-        bool useRightArm = HasHeldObject() ? holdingRightHand : ShouldUseRightArm();
+        bool useRightArm = grabController != null && grabController.HasHeldObject()
+            ? grabController.GetHoldingArm() == CowboyArmSide.Right
+            : ShouldUseRightArm();
         Transform activeArm = useRightArm ? rightArmSolverTarget : leftArmSolverTarget;
         Transform inactiveArm = useRightArm ? leftArmSolverTarget : rightArmSolverTarget;
 
@@ -517,7 +369,9 @@ public class CowboyArmTargetController : MonoBehaviour
             return;
         }
 
-        bool useRightArm = HasHeldObject() ? holdingRightHand : ShouldUseRightArm();
+        bool useRightArm = grabController != null && grabController.HasHeldObject()
+            ? grabController.GetHoldingArm() == CowboyArmSide.Right
+            : ShouldUseRightArm();
 
         if (useRightArm)
         {
@@ -543,8 +397,7 @@ public class CowboyArmTargetController : MonoBehaviour
 
     private bool ShouldUseRightArm()
     {
-        bool desired = !preferRightArm; // target on left -> use right arm
-        return swapArms ? !desired : desired;
+        return preferRightArm;
     }
 
     private void ApplySolverFlip(bool targetIsRightSide)

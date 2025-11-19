@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2100407492355001472}
   - component: {fileID: 4132247551981841143}
   m_Layer: 6
-  m_Name: HitBox
+  m_Name: LHitBox
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 7188823022608617133}
   - component: {fileID: 7637561497877712922}
   m_Layer: 6
-  m_Name: GrabBox
+  m_Name: LGrabBox
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -248,14 +248,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27cb55c02dacf744f8134321c91d196d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::GrabHandAttractor
-  detectionRadius: 4
+  detectionRadius: 1
   detectionLayer:
     serializedVersion: 2
     m_Bits: 14336
   toggleBox: {fileID: 5945310282292958993}
   grabIndicator: {fileID: 7637561497877712922}
   activeColor: {r: 0, g: 1, b: 0, a: 1}
-  inactiveColor: {r: 1, g: 1, b: 1, a: 0}
+  inactiveColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!212 &7637561497877712922
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -326,7 +326,7 @@ GameObject:
   - component: {fileID: 930665976229812854}
   - component: {fileID: 5945310282292958993}
   m_Layer: 6
-  m_Name: ToggleBox
+  m_Name: LToggleBox
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -419,7 +419,7 @@ GameObject:
   - component: {fileID: 7355040999399552058}
   - component: {fileID: 640722012672716629}
   m_Layer: 6
-  m_Name: GrabBox
+  m_Name: RGrabBox
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -498,14 +498,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27cb55c02dacf744f8134321c91d196d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::GrabHandAttractor
-  detectionRadius: 4
+  detectionRadius: 1
   detectionLayer:
     serializedVersion: 2
     m_Bits: 14336
   toggleBox: {fileID: 5996822218698525770}
   grabIndicator: {fileID: 640722012672716629}
   activeColor: {r: 0, g: 1, b: 0, a: 1}
-  inactiveColor: {r: 1, g: 1, b: 1, a: 0}
+  inactiveColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!212 &640722012672716629
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -577,7 +577,7 @@ GameObject:
   - component: {fileID: 7698228982328499187}
   - component: {fileID: 4673768980712619177}
   m_Layer: 6
-  m_Name: HitBox
+  m_Name: RHitBox
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -732,7 +732,7 @@ GameObject:
   - component: {fileID: 1255044325372460394}
   - component: {fileID: 5996822218698525770}
   m_Layer: 6
-  m_Name: ToggleBox
+  m_Name: RToggleBox
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -865,6 +865,10 @@ PrefabInstance:
       value: Target
       objectReference: {fileID: 0}
     - target: {fileID: 4500328786175125369, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+      propertyPath: radius
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4500328786175125369, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
       propertyPath: circleCenter
       value: 
       objectReference: {fileID: 3034355644026048187}
@@ -991,6 +995,10 @@ PrefabInstance:
     - target: {fileID: 1625170541458106041, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       propertyPath: m_GravityScale
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2082869408042386292, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+      propertyPath: m_Name
+      value: LHand_Bone
       objectReference: {fileID: 0}
     - target: {fileID: 2184832915302779276, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       propertyPath: m_Mass
@@ -1252,6 +1260,10 @@ PrefabInstance:
       propertyPath: m_GravityScale
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 6642640085353748491, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+      propertyPath: m_Name
+      value: RArm_Bone
+      objectReference: {fileID: 0}
     - target: {fileID: 6831664969184138589, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       propertyPath: m_Mass
       value: 0.6155999
@@ -1303,6 +1315,10 @@ PrefabInstance:
     - target: {fileID: 7389953876265953095, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       propertyPath: m_GravityScale
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7402560307170405603, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+      propertyPath: m_Name
+      value: LArm_Bone
       objectReference: {fileID: 0}
     - target: {fileID: 7405181931378891308, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       propertyPath: m_Mass
@@ -1396,6 +1412,10 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: -0.32845917
       objectReference: {fileID: 0}
+    - target: {fileID: 8587709319818625315, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+      propertyPath: m_Name
+      value: RHand_Bone
+      objectReference: {fileID: 0}
     - target: {fileID: 8711134477322502932, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: 0.008773376
@@ -1469,10 +1489,10 @@ PrefabInstance:
       addedObject: {fileID: 2741234567890123456}
     - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4218769169153139673}
+      addedObject: {fileID: 6000000000001234567}
     - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6000000000001234567}
+      addedObject: {fileID: 3449086012132956852}
     - targetCorrespondingSourceObject: {fileID: 7193198907499355765, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4693192777026865334}
@@ -1567,23 +1587,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d586f98c8b434a0aa73f8a138d3be39a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4218769169153139673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1825727325489498760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a707502e8db8b2745aaefe0455c8d79c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::GrabSystem
-  leftHand: {fileID: 7355040999399552058}
-  rightHand: {fileID: 7188823022608617133}
-  throwStrength: 5
-  inputSource: {fileID: 5983936370488938141}
-  inventoryOverride: {fileID: 4892817584082138344}
 --- !u!114 &6000000000001234567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1596,9 +1599,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ea628e132e641dcae39b919880c3e99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftHandHitbox: {fileID: 7698228982328499187}
-  rightHandHitbox: {fileID: 2100407492355001472}
+  leftHandHitbox: {fileID: 2100407492355001472}
+  rightHandHitbox: {fileID: 7698228982328499187}
   useBothHands: 0
+--- !u!114 &3449086012132956852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825727325489498760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62a8d4e432c994d4d811b915d252d533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::CowboyGrabController
+  grabRadius: 1
+  grabbableLayers:
+    serializedVersion: 2
+    m_Bits: 14336
+  throwStrength: 5
+  leftHandGrabAnchor: {fileID: 3485799215110128093}
+  rightHandGrabAnchor: {fileID: 1114406050761874590}
+  leftHandHoldParent: {fileID: 3485799215110128093}
+  rightHandHoldParent: {fileID: 1114406050761874590}
+  inventory: {fileID: 4892817584082138344}
 --- !u!1 &2252902769847219381 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7193198907499355765, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
@@ -1618,25 +1643,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::CowboyArmTargetController
   bodyReference: {fileID: 3034355644026048187}
   targetTransform: {fileID: 6968605693680133306}
-  leftArmSolverTarget: {fileID: 5609004513289992716}
-  rightArmSolverTarget: {fileID: 889400409282487824}
-  leftArmIkSolver: {fileID: 4296522900663111368}
-  rightArmIkSolver: {fileID: 4697446937373322051}
-  swapArms: 0
+  leftArmSolverTarget: {fileID: 889400409282487824}
+  rightArmSolverTarget: {fileID: 5609004513289992716}
+  leftArmIkSolver: {fileID: 4697446937373322051}
+  rightArmIkSolver: {fileID: 4296522900663111368}
   followSpeed: 15
   returnSpeed: 10
   rotationReturnSpeed: 720
   sideSwitchThreshold: 0.1
-  grabRadius: 3
-  grabbableLayers:
-    serializedVersion: 2
-    m_Bits: 14336
-  throwStrength: 5
-  leftHandGrabAnchor: {fileID: 1114406050761874590}
-  rightHandGrabAnchor: {fileID: 3485799215110128093}
-  leftHandHoldParent: {fileID: 1114406050761874590}
-  rightHandHoldParent: {fileID: 3485799215110128093}
-  inventory: {fileID: 4892817584082138344}
+  grabController: {fileID: 3449086012132956852}
+  attackController: {fileID: 6000000000001234567}
   allowAttackAim: 1
 --- !u!4 &2571996912644125469 stripped
 Transform:
@@ -1707,17 +1723,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3550987741538865356, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
   m_PrefabInstance: {fileID: 8975827346578123456}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5983936370488938141 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3430543378256634973, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
-  m_PrefabInstance: {fileID: 8975827346578123456}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1825727325489498760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43aa4c90de5d45969cec4837a9cbb007, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8768979520666320589 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 369619540775736333, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}

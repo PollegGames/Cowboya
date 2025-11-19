@@ -1,8 +1,7 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
-/// Simplified attack driver: holds left mouse to enable hand hitboxes.
+/// Simplified attack driver: exposes per-arm attack toggles.
 /// </summary>
 [DisallowMultipleComponent]
 public class CowboySimpleAttackController : MonoBehaviour
@@ -11,10 +10,9 @@ public class CowboySimpleAttackController : MonoBehaviour
     [SerializeField] private AttackHitbox leftHandHitbox;
     [SerializeField] private AttackHitbox rightHandHitbox;
 
-    [Tooltip("If true, both hands attack together; otherwise only the right hand activates.")]
+    [Tooltip("If true, both hands attack together; otherwise only a single arm fires at a time.")]
     [SerializeField] private bool useBothHands;
 
-    private bool hitboxesActive;
     private bool referencesLogged;
 
     private void OnEnable()
@@ -28,51 +26,29 @@ public class CowboySimpleAttackController : MonoBehaviour
         DeactivateAll();
     }
 
-    private void Update()
+    public void SetArmAttackActive(CowboyArmSide arm, bool active)
     {
-        bool attackHeld = IsLeftMouseHeld();
-        if (attackHeld != hitboxesActive)
-        {
-            SetHitboxesActive(attackHeld);
-        }
-    }
-
-    private bool IsLeftMouseHeld()
-    {
-        if (Mouse.current != null)
-        {
-            return Mouse.current.leftButton.isPressed;
-        }
-
-        return Input.GetMouseButton(0);
-    }
-
-    private void SetHitboxesActive(bool active)
-    {
-        hitboxesActive = active;
         if (!active)
         {
-            DeactivateAll();
+            DeactivateArm(arm);
             return;
         }
 
         if (useBothHands)
         {
-            leftHandHitbox?.Activate();
-        }
-        else
-        {
-            leftHandHitbox?.Deactivate();
+            ActivateArm(CowboyArmSide.Left);
+            ActivateArm(CowboyArmSide.Right);
+            return;
         }
 
-        rightHandHitbox?.Activate();
+        ActivateArm(arm);
+        DeactivateArm(arm == CowboyArmSide.Left ? CowboyArmSide.Right : CowboyArmSide.Left);
     }
 
-    private void DeactivateAll()
+    public void DeactivateAll()
     {
-        hitboxesActive = false;
-        leftHandHitbox?.Deactivate();
-        rightHandHitbox?.Deactivate();
+        DeactivateArm(CowboyArmSide.Left);
+        DeactivateArm(CowboyArmSide.Right);
     }
 
     private void LogMissingReferences()
@@ -94,5 +70,21 @@ public class CowboySimpleAttackController : MonoBehaviour
 
         referencesLogged = true;
     }
-}
 
+    private void ActivateArm(CowboyArmSide arm)
+    {
+        AttackHitbox hitbox = GetHitbox(arm);
+        hitbox?.Activate();
+    }
+
+    private void DeactivateArm(CowboyArmSide arm)
+    {
+        AttackHitbox hitbox = GetHitbox(arm);
+        hitbox?.Deactivate();
+    }
+
+    private AttackHitbox GetHitbox(CowboyArmSide arm)
+    {
+        return arm == CowboyArmSide.Right ? rightHandHitbox : leftHandHitbox;
+    }
+}
