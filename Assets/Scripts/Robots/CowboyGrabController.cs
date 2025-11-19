@@ -12,6 +12,8 @@ public class CowboyGrabController : MonoBehaviour
     [SerializeField] private Transform leftHandHoldParent;
     [SerializeField] private Transform rightHandHoldParent;
     [SerializeField] private Inventory inventory;
+    [SerializeField] private GrabHandAttractor leftHandAttractor;
+    [SerializeField] private GrabHandAttractor rightHandAttractor;
 
     private IGrabbable heldObject;
     private CowboyArmSide holdingArm;
@@ -20,12 +22,14 @@ public class CowboyGrabController : MonoBehaviour
     {
         CacheGrabAnchors();
         CacheInventory();
+        CacheHandAttractors();
     }
 
     private void OnEnable()
     {
         CacheGrabAnchors();
         CacheInventory();
+        CacheHandAttractors();
     }
 
     public bool TryGrab(CowboyArmSide arm)
@@ -69,6 +73,7 @@ public class CowboyGrabController : MonoBehaviour
 
         heldObject = candidate;
         holdingArm = arm;
+        SetHandAttractorState(arm, true);
 
         return true;
     }
@@ -149,6 +154,7 @@ public class CowboyGrabController : MonoBehaviour
         RemoveInventoryEntry(heldObject);
         heldObject.OnRelease(throwForce);
         heldObject = null;
+        SetHandAttractorState(arm, false);
     }
 
     private IGrabbable DetectGrabbable(Vector3 origin)
@@ -253,6 +259,64 @@ public class CowboyGrabController : MonoBehaviour
         {
             rightHandHoldParent = rightHandGrabAnchor;
         }
+    }
+
+    public void SetHandAttractorState(CowboyArmSide arm, bool active)
+    {
+        GrabHandAttractor attractor = GetHandAttractor(arm);
+        if (attractor == null)
+        {
+            return;
+        }
+
+        if (active)
+        {
+            attractor.Activate();
+            return;
+        }
+
+        attractor.Deactivate();
+    }
+
+    public void SetAllHandAttractorsInactive()
+    {
+        leftHandAttractor?.Deactivate();
+        rightHandAttractor?.Deactivate();
+    }
+
+    private GrabHandAttractor GetHandAttractor(CowboyArmSide arm)
+    {
+        CacheHandAttractors();
+        return arm == CowboyArmSide.Right ? rightHandAttractor : leftHandAttractor;
+    }
+
+    private void CacheHandAttractors()
+    {
+        if (leftHandAttractor == null)
+        {
+            leftHandAttractor = ResolveHandAttractor(leftHandGrabAnchor) ?? ResolveHandAttractor(leftHandHoldParent);
+        }
+
+        if (rightHandAttractor == null)
+        {
+            rightHandAttractor = ResolveHandAttractor(rightHandGrabAnchor) ?? ResolveHandAttractor(rightHandHoldParent);
+        }
+    }
+
+    private static GrabHandAttractor ResolveHandAttractor(Transform reference)
+    {
+        if (reference == null)
+        {
+            return null;
+        }
+
+        GrabHandAttractor attractor = reference.GetComponent<GrabHandAttractor>();
+        if (attractor != null)
+        {
+            return attractor;
+        }
+
+        return reference.GetComponentInChildren<GrabHandAttractor>(true);
     }
 
     private void CacheInventory()

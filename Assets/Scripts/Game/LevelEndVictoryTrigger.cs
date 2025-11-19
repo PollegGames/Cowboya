@@ -60,16 +60,22 @@ public class LevelEndVictoryTrigger : MonoBehaviour
             if (isVictoryDoor && isVictory && collision.CompareTag("Player"))
             {
                 RobotStateController controller = collision.GetComponentInParent<RobotStateController>();
-                GrabSystem grabSystem = collision.GetComponentInParent<GrabSystem>();
+                CowboyGrabController grabController = collision.GetComponentInParent<CowboyGrabController>();
                 Inventory inventory = collision.GetComponentInParent<Inventory>();
 
-                if (grabSystem == null)
+                bool clearedHands = false;
+                if (grabController != null)
                 {
-                    Debug.LogWarning("LevelEndVictoryTrigger: GrabSystem component is missing on Player or its parent.");
+                    grabController.ReleaseAllImmediate();
+                    clearedHands = true;
                 }
                 else
                 {
-                    grabSystem.ClearHands();
+                    Debug.LogWarning("LevelEndVictoryTrigger: GrabSystem or CowboyGrabController component is missing on Player or its parent.");
+                }
+
+                if (clearedHands)
+                {
                     inventory?.DropAll();
                 }
 

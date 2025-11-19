@@ -11,9 +11,7 @@ public class GrabHandAttractor : MonoBehaviour
     [SerializeField] private Color activeColor = Color.green;
     [SerializeField] private Color inactiveColor = new Color(1f, 1f, 1f, 0f);
 
-    private bool indicatorActive;
-    private bool indicatorRequested;
-
+    private bool isActive;
     private void Awake()
     {
         if (grabIndicator == null)
@@ -21,12 +19,7 @@ public class GrabHandAttractor : MonoBehaviour
         if (grabIndicator == null)
             grabIndicator = GetComponentInChildren<SpriteRenderer>(true);
 
-        UpdateIndicator();
-    }
-
-    private void Update()
-    {
-        UpdateIndicator();
+        UpdateIndicator(false);
     }
 
     /// <summary>
@@ -83,17 +76,16 @@ public class GrabHandAttractor : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// External callers can request the indicator to show while a grab input is held.
-    /// </summary>
-    /// <param name="active">Requested indicator state.</param>
-    public void SetIndicatorActive(bool active)
+    public void Activate()
     {
-        if (indicatorRequested == active)
-            return;
+        isActive = true;
+        UpdateIndicator(true);
+    }
 
-        indicatorRequested = active;
-        UpdateIndicator();
+    public void Deactivate()
+    {
+        isActive = false;
+        UpdateIndicator(false);
     }
 
     private bool IsDetectionActive()
@@ -101,11 +93,17 @@ public class GrabHandAttractor : MonoBehaviour
         return toggleBox == null || toggleBox.IsActive;
     }
 
-    private void UpdateIndicator()
+    private void UpdateIndicator(bool isActive)
     {
-        bool shouldShow = indicatorRequested && IsDetectionActive();
-        indicatorActive = shouldShow;
+        Color targetColor = isActive ? activeColor : inactiveColor;
         if (grabIndicator != null)
-            grabIndicator.color = shouldShow ? activeColor : inactiveColor;
+        {
+            grabIndicator.color = targetColor;
+            Debug.Log($"GrabHandAttractor color set to {(isActive ? "active" : "inactive")} ({grabIndicator.color}) on {gameObject.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"GrabHandAttractor on {gameObject.name} missing grabIndicator; intended color {(isActive ? "active" : "inactive")} ({targetColor}).");
+        }
     }
 }

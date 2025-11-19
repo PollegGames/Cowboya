@@ -171,15 +171,29 @@ public class CowboyArmTargetController : MonoBehaviour
         }
 
         CowboyArmSide armForGrab = DetermineArmForGrab();
+        bool hasHeldObject = grabController.HasHeldObject();
 
-        if (interactPressedThisFrame && !grabController.HasHeldObject())
+        if (!hasHeldObject)
+        {
+            bool highlightActive = interactHeld || interactPressedThisFrame;
+            grabController.SetHandAttractorState(armForGrab, highlightActive);
+            grabController.SetHandAttractorState(GetOppositeArm(armForGrab), false);
+        }
+
+        if (interactPressedThisFrame && !hasHeldObject)
         {
             grabController.TryGrab(armForGrab);
+            hasHeldObject = grabController.HasHeldObject();
         }
 
         CowboyArmSide? holdingArm = grabController.GetHoldingArm();
         if (!holdingArm.HasValue)
         {
+            if (!interactHeld && !interactPressedThisFrame)
+            {
+                grabController.SetAllHandAttractorsInactive();
+            }
+
             return;
         }
 
@@ -398,6 +412,11 @@ public class CowboyArmTargetController : MonoBehaviour
     private bool ShouldUseRightArm()
     {
         return preferRightArm;
+    }
+
+    private static CowboyArmSide GetOppositeArm(CowboyArmSide arm)
+    {
+        return arm == CowboyArmSide.Right ? CowboyArmSide.Left : CowboyArmSide.Right;
     }
 
     private void ApplySolverFlip(bool targetIsRightSide)
