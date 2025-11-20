@@ -595,7 +595,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Cowboy_Master
+  m_Name: Worker_Animator
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: Direction
@@ -800,7 +800,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: df8c39066c5f2ff4197370c331ceeb5a, type: 2}
+  m_Motion: {fileID: 7400000, guid: b173079a5e167cd4eb8e373a03b904e7, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
