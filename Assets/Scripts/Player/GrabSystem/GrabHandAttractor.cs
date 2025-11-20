@@ -99,11 +99,6 @@ public class GrabHandAttractor : MonoBehaviour
         if (grabIndicator != null)
         {
             grabIndicator.color = targetColor;
-            Debug.Log($"GrabHandAttractor color set to {(isActive ? "active" : "inactive")} ({grabIndicator.color}) on {gameObject.name}");
-        }
-        else
-        {
-            Debug.LogWarning($"GrabHandAttractor on {gameObject.name} missing grabIndicator; intended color {(isActive ? "active" : "inactive")} ({targetColor}).");
         }
     }
 }

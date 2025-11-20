@@ -879,6 +879,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+--- !u!114 &6740539325446433964 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4500328786175125369, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
+  m_PrefabInstance: {fileID: 7205572359169231829}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde58856f9b29dd47ba04c4ed7c93d63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6968605693680133306 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 237037214624018287, guid: cf4d6c388f00cfc48932384bc8a4232e, type: 3}
@@ -1100,6 +1111,10 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: -0.0000017369164
       objectReference: {fileID: 0}
+    - target: {fileID: 3430543378256634973, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+      propertyPath: arcTargetFollower
+      value: 
+      objectReference: {fileID: 6740539325446433964}
     - target: {fileID: 3703569026270958786, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: 0.008907709
@@ -1601,7 +1616,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftHandHitbox: {fileID: 2100407492355001472}
   rightHandHitbox: {fileID: 7698228982328499187}
-  useBothHands: 0
 --- !u!114 &3449086012132956852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1624,6 +1638,8 @@ MonoBehaviour:
   leftHandHoldParent: {fileID: 3485799215110128093}
   rightHandHoldParent: {fileID: 1114406050761874590}
   inventory: {fileID: 4892817584082138344}
+  leftHandAttractor: {fileID: 7188823022608617133}
+  rightHandAttractor: {fileID: 7355040999399552058}
 --- !u!1 &2252902769847219381 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7193198907499355765, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}

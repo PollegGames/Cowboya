@@ -16,7 +16,6 @@ namespace CowBoya.Robots
         [SerializeField] private Animator animator;
         [SerializeField] private string directionParameter = "Direction";
         [SerializeField] private string walkBoolParameter = "IsWalking";
-        [SerializeField] private string speedParameter = "Speed";
         [SerializeField] private string verticalDirectionParameter = "VerticalDirection";
         [SerializeField] private string jumpBoolParameter = "IsJumping";
         [SerializeField] private string crouchBoolParameter = "IsCrouching";
@@ -106,10 +105,6 @@ namespace CowBoya.Robots
             ApplyHorizontalAnimatorValues(horizontalDirection, isWalking);
             ApplyVerticalAnimatorValues(verticalDirection);
 
-            if (!string.IsNullOrEmpty(speedParameter))
-            {
-                animator.SetFloat(speedParameter, isWalking ? 1f : 0f);
-            }
         }
 
         private void ApplyHorizontalAnimatorValues(float direction, bool isWalking)
@@ -147,11 +142,6 @@ namespace CowBoya.Robots
         {
             ApplyHorizontalAnimatorValues(0f, false);
             ApplyVerticalAnimatorValues(0);
-
-            if (!string.IsNullOrEmpty(speedParameter))
-            {
-                animator.SetFloat(speedParameter, 0f);
-            }
         }
 
         private int GetHorizontalDigitalDirection()

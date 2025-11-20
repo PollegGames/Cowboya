@@ -9,10 +9,6 @@ public class CowboySimpleAttackController : MonoBehaviour
     [Header("Hand Hitboxes")]
     [SerializeField] private AttackHitbox leftHandHitbox;
     [SerializeField] private AttackHitbox rightHandHitbox;
-
-    [Tooltip("If true, both hands attack together; otherwise only a single arm fires at a time.")]
-    [SerializeField] private bool useBothHands;
-
     private bool referencesLogged;
 
     private void OnEnable()
@@ -31,13 +27,6 @@ public class CowboySimpleAttackController : MonoBehaviour
         if (!active)
         {
             DeactivateArm(arm);
-            return;
-        }
-
-        if (useBothHands)
-        {
-            ActivateArm(CowboyArmSide.Left);
-            ActivateArm(CowboyArmSide.Right);
             return;
         }
 
@@ -62,12 +51,6 @@ public class CowboySimpleAttackController : MonoBehaviour
         {
             Debug.LogWarning("[CowboySimpleAttackController] Right hand hitbox is not assigned.", this);
         }
-
-        if (useBothHands && leftHandHitbox == null)
-        {
-            Debug.LogWarning("[CowboySimpleAttackController] Left hand hitbox is not assigned but both hands are enabled.", this);
-        }
-
         referencesLogged = true;
     }
 
