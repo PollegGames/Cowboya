@@ -11,7 +11,7 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
     public GameObject playerInstance { get; private set; }
     public RobotStateController playerRobotBehaviour { get; private set; }
     public RobotStats playerRobotInfo { get; private set; }
-    public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
+    public Transform playerHeadTransform { get; private set; } // Head under Cowboy_Puppet/Sprites
 
     public void SetPlayerStartPosition(Vector3 startPosition)
     {
@@ -21,7 +21,7 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
 
     /// <summary>
     /// Instantiates the player robot prefab, initializes its behavior and info,
-    /// then finds the "Head" Transform nested under "WholeBody".
+    /// then finds the "Head" Transform nested under "Cowboy_Puppet".
     /// </summary>
     public void InitializePlayer(ISaveService saveService)
     {
@@ -51,24 +51,24 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
             runStats.Apply(playerRobotInfo, energyBot, attack);
         }
 
-        // Locate "WholeBody" container
-        Transform wholeBody = playerInstance.transform.Find("WholeBody");
-        if (wholeBody == null)
+        // Locate "Cowboy_Puppet" container from Cowboy_Player prefab
+        Transform cowboyPuppet = playerInstance.transform.Find("Cowboy_Puppet");
+        if (cowboyPuppet == null)
         {
-            Debug.LogError("Couldn't find 'WholeBody' on playerInstance. Check prefab hierarchy.");
+            Debug.LogError("PlayerSpawner: Couldn't find 'Cowboy_Puppet' on playerInstance. Check Cowboy_Player prefab hierarchy.");
             return;
         }
 
-        // Locate "Head" under WholeBody
-        Transform head = wholeBody.Find("LowTorso/Torso/Body/Head");
+        // Locate "Head" under the prefab's sprite hierarchy
+        Transform head = playerInstance.transform.Find("Cowboy_Puppet/Sprites/Head");
         if (head == null)
         {
-            head = wholeBody.Find("Head");
-            if (head == null)
-            {
-                Debug.LogError("Couldn't find 'Head' under WholeBody. Check prefab hierarchy.");
-                return;
-            }
+            head = playerInstance.transform.Find("Cowboy_Puppet/Hips_Bone/Cowboy_Master/Sprites/Head");
+        }
+        if (head == null)
+        {
+            Debug.LogError("PlayerSpawner: Couldn't find player head under Cowboy_Puppet/Sprites in Cowboy_Player prefab.");
+            return;
         }
         // Store head transform
         playerHeadTransform = head;
