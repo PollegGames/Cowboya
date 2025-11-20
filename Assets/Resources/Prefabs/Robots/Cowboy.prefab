@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5628892268546442217}
-  - component: {fileID: 3430543378256634973}
   - component: {fileID: 7971617738181131987}
   m_Layer: 0
   m_Name: Cowboy
@@ -35,23 +34,6 @@ Transform:
   - {fileID: 7004719649912191277}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3430543378256634973
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7333762615744667720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43aa4c90de5d45969cec4837a9cbb007, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 2410730850863318706}
-  directionParameter: Direction
-  walkBoolParameter: IsWalking
-  speedParameter: Speed
-  horizontalAction: {fileID: 6743824144194221143, guid: b1c6eb2637dd35449b4721a3880cc95d, type: 3}
 --- !u!114 &7971617738181131987
 MonoBehaviour:
   m_ObjectHideFlags: 0

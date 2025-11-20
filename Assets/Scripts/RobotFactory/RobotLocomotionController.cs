@@ -13,13 +13,13 @@ public class RobotLocomotionController : MonoBehaviour
 
     [Header("Animator Parameters")]
     [SerializeField] private string directionParameter = "Direction";
+    [SerializeField] private string verticalDirectionParameter = "VerticalDirection";
     [SerializeField] private string speedParameter = "Speed";
     [SerializeField] private string walkBoolParameter = "IsWalking";
     [SerializeField] private string jumpBoolParameter = "IsJumping";
     [SerializeField] private string crouchBoolParameter = "IsCrouching";
 
     [Header("Movement Settings")]
-    [SerializeField, Min(0f)] private float inputWalkThreshold = 0.2f;
     [SerializeField, Min(0f)] private float jumpAnimationDuration = 0.4f;
     [SerializeField] private float energyCostPerJump = 3f;
     [SerializeField] private float energyCostPerCrouch = 1f;
@@ -56,7 +56,7 @@ public class RobotLocomotionController : MonoBehaviour
         facingRight = !flipped;
 
         float magnitude = Mathf.Abs(horizontalInput);
-        bool walking = magnitude > inputWalkThreshold;
+        bool walking = magnitude > 0f;
         float directionValue = 0f;
 
         if (walking)
@@ -93,6 +93,8 @@ public class RobotLocomotionController : MonoBehaviour
         {
             animator.SetBool(crouchBoolParameter, false);
         }
+
+        UpdateVerticalDirectionFromState();
     }
 
     /// <summary>
@@ -108,6 +110,7 @@ public class RobotLocomotionController : MonoBehaviour
         ConsumeEnergy(energyCostPerJump);
         isJumping = true;
         SetAnimatorBool(jumpBoolParameter, true);
+        UpdateVerticalDirectionFromState();
         OnJumpStarted?.Invoke();
 
         if (jumpRoutine != null)
@@ -139,6 +142,7 @@ public class RobotLocomotionController : MonoBehaviour
 
         isJumping = false;
         SetAnimatorBool(jumpBoolParameter, false);
+        UpdateVerticalDirectionFromState();
         OnJumpEnded?.Invoke();
     }
 
@@ -155,6 +159,7 @@ public class RobotLocomotionController : MonoBehaviour
         ConsumeEnergy(energyCostPerCrouch);
         isCrouching = true;
         SetAnimatorBool(crouchBoolParameter, true);
+        UpdateVerticalDirectionFromState();
         OnCrouchStarted?.Invoke();
     }
 
@@ -170,6 +175,7 @@ public class RobotLocomotionController : MonoBehaviour
 
         isCrouching = false;
         SetAnimatorBool(crouchBoolParameter, false);
+        UpdateVerticalDirectionFromState();
         OnCrouchEnded?.Invoke();
     }
 
@@ -209,5 +215,26 @@ public class RobotLocomotionController : MonoBehaviour
         }
 
         animator.SetBool(parameter, value);
+    }
+
+    private void UpdateVerticalDirectionFromState()
+    {
+        if (animator == null || string.IsNullOrEmpty(verticalDirectionParameter))
+        {
+            return;
+        }
+
+        int verticalValue = 0;
+
+        if (isJumping)
+        {
+            verticalValue = 1;
+        }
+        else if (isCrouching)
+        {
+            verticalValue = -1;
+        }
+
+        animator.SetFloat(verticalDirectionParameter, verticalValue);
     }
 }

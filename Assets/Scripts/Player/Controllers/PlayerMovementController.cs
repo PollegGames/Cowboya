@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(RobotLocomotionController), typeof(Inventory))]
@@ -12,6 +11,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     public Rigidbody2D BodyReference => bodyReference;
 
     [SerializeField] private MonoBehaviour inputSource;
+    [SerializeField] private Transform aimTarget;
     private IPlayerInput input;
 
     public IPlayerInput Input => input;
@@ -24,30 +24,11 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     [SerializeField] private Inventory inventory;
 
     private Vector2 lookDirection = Vector2.right;
-    private Vector2 aimVector = Vector2.right;
-    private bool aimFromLookInput = false;
-    private AttackSector currentSector = AttackSector.Right;
-
-
-    /// <summary>
-    /// Invoked when the attack sector changes based on input.
-    /// </summary>
-    public event Action<AttackSector> SectorChanged;
 
     /// <summary>
     /// Gets the current look direction.
     /// </summary>
     public Vector2 LookDirection => lookDirection;
-
-    /// <summary>
-    /// Gets the most recent aiming vector used for sector evaluation.
-    /// </summary>
-    public Vector2 AimVector => aimVector;
-
-    /// <summary>
-    /// Gets the current attack sector derived from input.
-    /// </summary>
-    public AttackSector CurrentSector => currentSector;
 
     private void Awake()
     {
@@ -79,27 +60,9 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 
             if (Mathf.Abs(horizontalInput) > 0.1f)
                 lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
-
-            Vector2 lookInput = input.Look;
-            if (lookInput.sqrMagnitude > 0.0001f)
-            {
-                aimVector = lookInput;
-                aimFromLookInput = true;
-            }
-            else if (!aimFromLookInput || aimVector.sqrMagnitude <= 0.0001f)
-            {
-                aimVector = lookDirection;
-                aimFromLookInput = false;
-            }
-        }
-        else
-        {
-            aimVector = lookDirection;
-            aimFromLookInput = false;
         }
 
         TryFlip();
-        UpdateAttackSector();
         HandleMovement();
         HandleJump();
         HandleCrouch();
@@ -158,10 +121,9 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     {
         get
         {
-            if (aimVector.sqrMagnitude > 0.0001f)
-                return aimVector.normalized;
-            if (lookDirection.sqrMagnitude > 0.0001f)
-                return lookDirection.normalized;
+            Vector2 aimDirection = GetAimDirection();
+            if (aimDirection.sqrMagnitude > 0.0001f)
+                return aimDirection.normalized;
             return Vector2.right;
         }
     }
@@ -182,30 +144,21 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
             energyRequired = robotBehaviour.Stats.AttackEnergyCost;
 
         Vector2 targetPosition = DetermineTargetPosition();
-        request = new AttackRequest(targetPosition, currentSector, energyRequired);
+        AttackSector sector = DetermineSector(GetAimDirection());
+        request = new AttackRequest(targetPosition, sector, energyRequired);
         return true;
     }
 
     private Vector2 DetermineTargetPosition()
     {
-        Vector2 aim = aimVector;
-        if (aim.sqrMagnitude <= 0.0001f)
-            aim = lookDirection;
+        if (aimTarget != null)
+            return aimTarget.position;
 
-        if (aim.sqrMagnitude > 0.0001f)
-            return (Vector2)transform.position + aim.normalized;
+        Vector2 aimDirection = GetAimDirection();
+        if (aimDirection.sqrMagnitude > 0.0001f)
+            return (Vector2)transform.position + aimDirection.normalized;
 
         return transform.position;
-    }
-
-    private void UpdateAttackSector()
-    {
-        AttackSector newSector = DetermineSector(aimVector);
-        if (newSector == currentSector)
-            return;
-
-        currentSector = newSector;
-        SectorChanged?.Invoke(currentSector);
     }
 
     private AttackSector DetermineSector(Vector2 vector)
@@ -221,6 +174,28 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         }
 
         return vector.y >= 0f ? AttackSector.Up : AttackSector.Down;
+    }
+
+    private Vector2 GetAimDirection()
+    {
+        if (aimTarget != null)
+        {
+            Vector2 targetOffset = (Vector2)aimTarget.position - (Vector2)transform.position;
+            if (targetOffset.sqrMagnitude > 0.0001f)
+                return targetOffset;
+        }
+
+        if (input != null)
+        {
+            Vector2 lookInput = input.Look;
+            if (lookInput.sqrMagnitude > 0.0001f)
+                return lookInput;
+        }
+
+        if (lookDirection.sqrMagnitude > 0.0001f)
+            return lookDirection;
+
+        return Vector2.right;
     }
 
     private void HandleStateChange(RobotState newState)

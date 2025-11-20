@@ -1494,20 +1494,20 @@ PrefabInstance:
       addedObject: {fileID: 6968605693680133306}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 2741234567890123456}
+    - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8170547941378817707}
     - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
       addedObject: {fileID: 193686182613551049}
-    - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 8213961798005399886, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2741234567890123456}
-    - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+      addedObject: {fileID: 5468697213523987823}
+    - targetCorrespondingSourceObject: {fileID: 8213961798005399886, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6000000000001234567}
-    - targetCorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3449086012132956852}
+      addedObject: {fileID: 8531461874275066794}
     - targetCorrespondingSourceObject: {fileID: 7193198907499355765, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4693192777026865334}
@@ -1522,6 +1522,49 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8126538405683662032, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
   m_PrefabInstance: {fileID: 8975827346578123456}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &967519474766515086 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8213961798005399886, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
+  m_PrefabInstance: {fileID: 8975827346578123456}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5468697213523987823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967519474766515086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ea628e132e641dcae39b919880c3e99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftHandHitbox: {fileID: 2100407492355001472}
+  rightHandHitbox: {fileID: 7698228982328499187}
+--- !u!114 &8531461874275066794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967519474766515086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62a8d4e432c994d4d811b915d252d533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::CowboyGrabController
+  grabRadius: 1
+  grabbableLayers:
+    serializedVersion: 2
+    m_Bits: 14336
+  throwStrength: 5
+  leftHandGrabAnchor: {fileID: 3485799215110128093}
+  rightHandGrabAnchor: {fileID: 1114406050761874590}
+  leftHandHoldParent: {fileID: 3485799215110128093}
+  rightHandHoldParent: {fileID: 1114406050761874590}
+  inventory: {fileID: 4892817584082138344}
+  leftHandAttractor: {fileID: 7188823022608617133}
+  rightHandAttractor: {fileID: 7355040999399552058}
 --- !u!114 &1070615312316343489 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8235708908752276993, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
@@ -1548,6 +1591,18 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7333762615744667720, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
   m_PrefabInstance: {fileID: 8975827346578123456}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2741234567890123456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825727325489498760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d586f98c8b434a0aa73f8a138d3be39a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8170547941378817707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1563,6 +1618,7 @@ MonoBehaviour:
   robotBehaviour: {fileID: 8768979520666320589}
   animator: {fileID: 3313546521264822034}
   directionParameter: Direction
+  verticalDirectionParameter: VerticalDirection
   speedParameter: Speed
   walkBoolParameter: IsWalking
   jumpBoolParameter: IsJumping
@@ -1590,56 +1646,6 @@ MonoBehaviour:
   inputSource: {fileID: 2741234567890123456}
   energyBot: {fileID: 3111911538374892419}
   inventory: {fileID: 4892817584082138344}
---- !u!114 &2741234567890123456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1825727325489498760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d586f98c8b434a0aa73f8a138d3be39a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &6000000000001234567
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1825727325489498760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ea628e132e641dcae39b919880c3e99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftHandHitbox: {fileID: 2100407492355001472}
-  rightHandHitbox: {fileID: 7698228982328499187}
---- !u!114 &3449086012132956852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1825727325489498760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62a8d4e432c994d4d811b915d252d533, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::CowboyGrabController
-  grabRadius: 1
-  grabbableLayers:
-    serializedVersion: 2
-    m_Bits: 14336
-  throwStrength: 5
-  leftHandGrabAnchor: {fileID: 3485799215110128093}
-  rightHandGrabAnchor: {fileID: 1114406050761874590}
-  leftHandHoldParent: {fileID: 3485799215110128093}
-  rightHandHoldParent: {fileID: 1114406050761874590}
-  inventory: {fileID: 4892817584082138344}
-  leftHandAttractor: {fileID: 7188823022608617133}
-  rightHandAttractor: {fileID: 7355040999399552058}
 --- !u!1 &2252902769847219381 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7193198907499355765, guid: c4c7e8c13e0f44ac8b289d71ba680d43, type: 3}
@@ -1667,8 +1673,8 @@ MonoBehaviour:
   returnSpeed: 10
   rotationReturnSpeed: 720
   sideSwitchThreshold: 0.1
-  grabController: {fileID: 3449086012132956852}
-  attackController: {fileID: 6000000000001234567}
+  grabController: {fileID: 0}
+  attackController: {fileID: 0}
   allowAttackAim: 1
 --- !u!4 &2571996912644125469 stripped
 Transform:
