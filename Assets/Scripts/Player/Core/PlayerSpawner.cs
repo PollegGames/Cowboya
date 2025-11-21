@@ -51,26 +51,45 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
             runStats.Apply(playerRobotInfo, energyBot, attack);
         }
 
-        // Locate "Cowboy_Puppet" container from Cowboy_Player prefab
-        Transform cowboyPuppet = playerInstance.transform.Find("Cowboy_Puppet");
-        if (cowboyPuppet == null)
+        Transform resolvedHead = ResolveHeadFromMovementController();
+        if (resolvedHead == null)
         {
-            Debug.LogError("PlayerSpawner: Couldn't find 'Cowboy_Puppet' on playerInstance. Check Cowboy_Player prefab hierarchy.");
+            resolvedHead = FindHeadUsingDefaultPath();
+        }
+
+        if (resolvedHead == null)
+        {
+            Debug.LogError("PlayerSpawner: Couldn't resolve player head transform. Assign it in the inspector or verify the prefab hierarchy.");
             return;
         }
 
-        // Locate "Head" under the prefab's sprite hierarchy
+        playerHeadTransform = resolvedHead;
+    }
+    private Transform ResolveHeadFromMovementController()
+    {
+        var movementController = playerInstance.GetComponent<PlayerMovementController>();
+        if (movementController == null)
+        {
+            Debug.LogWarning("PlayerSpawner: PlayerMovementController not found on player instance.");
+            return null;
+        }
+
+        if (movementController.HeadTransform == null)
+        {
+            Debug.LogWarning("PlayerSpawner: HeadTransform is not assigned on PlayerMovementController.");
+            return null;
+        }
+
+        return movementController.HeadTransform;
+    }
+
+    private Transform FindHeadUsingDefaultPath()
+    {
         Transform head = playerInstance.transform.Find("Cowboy_Puppet/Sprites/Head");
         if (head == null)
         {
             head = playerInstance.transform.Find("Cowboy_Puppet/Hips_Bone/Cowboy_Master/Sprites/Head");
         }
-        if (head == null)
-        {
-            Debug.LogError("PlayerSpawner: Couldn't find player head under Cowboy_Puppet/Sprites in Cowboy_Player prefab.");
-            return;
-        }
-        // Store head transform
-        playerHeadTransform = head;
+        return head;
     }
 }

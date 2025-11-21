@@ -229,7 +229,6 @@ public class GameUIViewModel : MonoBehaviour
     public void RefreshMinimapTexture()
     {
         StartCoroutine(CaptureRTToUI());
-        Debug.Log("Minimap texture refreshed.");
     }
 
     private void OnDestroy()

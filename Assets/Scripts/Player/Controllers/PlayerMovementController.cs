@@ -9,6 +9,9 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     [Header("Body Reference")]
     [SerializeField] private Rigidbody2D bodyReference;
     public Rigidbody2D BodyReference => bodyReference;
+    [Header("Player References")]
+    [SerializeField] private Transform headTransform;
+    public Transform HeadTransform => headTransform;
 
     [SerializeField] private MonoBehaviour inputSource;
     [SerializeField] private Transform aimTarget;
