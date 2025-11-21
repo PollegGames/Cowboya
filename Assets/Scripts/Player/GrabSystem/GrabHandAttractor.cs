@@ -6,7 +6,7 @@ public class GrabHandAttractor : MonoBehaviour
     public LayerMask detectionLayer;
     public System.Action<IGrabbable> OnObjectDetected;
 
-    [SerializeField] ToggleBox toggleBox;
+    [SerializeField] private ToggleBox toggleBox;
     [SerializeField] private SpriteRenderer grabIndicator;
     [SerializeField] private Color activeColor = Color.green;
     [SerializeField] private Color inactiveColor = new Color(1f, 1f, 1f, 0f);
@@ -86,6 +86,20 @@ public class GrabHandAttractor : MonoBehaviour
     {
         isActive = false;
         UpdateIndicator(false);
+    }
+
+    public ToggleBox GetToggleBox()
+    {
+        if (toggleBox == null)
+        {
+            toggleBox = GetComponent<ToggleBox>();
+            if (toggleBox == null)
+            {
+                toggleBox = GetComponentInChildren<ToggleBox>(true);
+            }
+        }
+
+        return toggleBox;
     }
 
     private bool IsDetectionActive()

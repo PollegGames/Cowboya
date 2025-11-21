@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 41544107772198061}
   - component: {fileID: 2047070617099477947}
   - component: {fileID: 429215285151596846}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: WorkerSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -932,7 +932,7 @@ GameObject:
   - component: {fileID: 5788446907477006944}
   - component: {fileID: 8177828809172512778}
   - component: {fileID: 378984984994386386}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: ToggleBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}

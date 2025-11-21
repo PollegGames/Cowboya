@@ -121,7 +121,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4738273901808950007}
   - component: {fileID: 3013432842986833148}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LLegSolver
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -430,7 +430,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4621339585038305926}
   - component: {fileID: 4296522900663111368}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RArmSolver
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -494,7 +494,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6448434172931451811}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LArm_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1278,7 +1278,7 @@ MonoBehaviour:
   grabRadius: 1
   grabbableLayers:
     serializedVersion: 2
-    m_Bits: 14336
+    m_Bits: 47104
   throwStrength: 5
   leftHandGrabAnchor: {fileID: 3485799215110128093}
   rightHandGrabAnchor: {fileID: 1114406050761874590}
@@ -1287,6 +1287,8 @@ MonoBehaviour:
   inventory: {fileID: 4892817584082138344}
   leftHandAttractor: {fileID: 7188823022608617133}
   rightHandAttractor: {fileID: 7355040999399552058}
+  leftHandToggleBox: {fileID: 5945310282292958993}
+  rightHandToggleBox: {fileID: 5996822218698525770}
 --- !u!1 &1023175296133126095
 GameObject:
   m_ObjectHideFlags: 0
@@ -1719,7 +1721,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 980800990847532172}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Head_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2576,7 +2578,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3904384451927857496}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RHand_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2608,7 +2610,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 32596840210249436}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RLegSolver_Target
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2885,7 +2887,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4334185312296869133}
   - component: {fileID: 4697446937373322051}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LArmSolver
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2949,7 +2951,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2571996912644125469}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Hips_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2985,7 +2987,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9165798662850140399}
   - component: {fileID: 7070030356780919905}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Spine_Solver
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3059,7 +3061,7 @@ GameObject:
   - component: {fileID: 2894464590997933270}
   - component: {fileID: 3313546521264822034}
   - component: {fileID: 4693192777026865334}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Cowboy_Master
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3309,7 +3311,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2087084192508145818}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: BodyLow_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3588,7 +3590,7 @@ GameObject:
   - component: {fileID: 6968605693680133306}
   - component: {fileID: 5657812123428391822}
   - component: {fileID: 4500328786175125369}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3692,7 +3694,7 @@ GameObject:
   m_Component:
   - component: {fileID: 523943773877907652}
   - component: {fileID: 5084429705435948037}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RLegSolver
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3933,7 +3935,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5813131677531218145}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LHand_Effector
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3964,7 +3966,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8680376486850864307}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RArm_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3996,7 +3998,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4054088807673545805}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RHand_Effector
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4205,7 +4207,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 247113993355474272}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Torso_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4348,7 +4350,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8644158953547958747}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LFoot_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4380,7 +4382,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 964716215942797556}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LFoot_Effector
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4503,7 +4505,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2932100883236658055}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Spine_Solver_Target
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4534,7 +4536,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7049414889136880941}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LLegSolver_Target
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4787,7 +4789,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1131990860903885594}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RUpLeg_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5310,7 +5312,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5609004513289992716}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RArmSolver_Target
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5452,7 +5454,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6305797126504970326}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RFoot_Effector
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5772,7 +5774,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 239704037233877835}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: RFoot_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5804,7 +5806,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 140870687383369169}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Spine_Effector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6570,7 +6572,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3034355644026048187}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Body_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -6760,7 +6762,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 889400409282487824}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LArmSolver_Target
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -7080,7 +7082,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 130394462993237291}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LHand_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -7673,7 +7675,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9039017654932051622}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: LUpLeg_Bone
   m_TagString: Player
   m_Icon: {fileID: 0}

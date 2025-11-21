@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 41544107772198061}
   - component: {fileID: 429215285151596846}
   - component: {fileID: 3569223515776647200}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: RestingSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,6 +54,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -75,6 +77,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -819,6 +822,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -840,6 +845,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -892,6 +898,7 @@ MonoBehaviour:
   trigger: {fileID: 429215285151596846}
   materialOn: {fileID: 2100000, guid: e4c8fe212ac65394cb2979609eeb3a94, type: 2}
   materialOff: {fileID: 2100000, guid: 57633b0e550a91e4c98965050e121a39, type: 2}
+  sendBackToWorkDelay: 5
 --- !u!1 &1273394523665273949
 GameObject:
   m_ObjectHideFlags: 0
@@ -904,7 +911,7 @@ GameObject:
   - component: {fileID: 5788446907477006944}
   - component: {fileID: 8177828809172512778}
   - component: {fileID: 378984984994386386}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: ToggleBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -946,6 +953,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -967,6 +976,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0

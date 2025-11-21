@@ -14,6 +14,8 @@ public class CowboyGrabController : MonoBehaviour
     [SerializeField] private Inventory inventory;
     [SerializeField] private GrabHandAttractor leftHandAttractor;
     [SerializeField] private GrabHandAttractor rightHandAttractor;
+    [SerializeField] private ToggleBox leftHandToggleBox;
+    [SerializeField] private ToggleBox rightHandToggleBox;
 
     private IGrabbable heldObject;
     private CowboyArmSide holdingArm;
@@ -23,6 +25,7 @@ public class CowboyGrabController : MonoBehaviour
         CacheGrabAnchors();
         CacheInventory();
         CacheHandAttractors();
+        CacheToggleBoxes();
     }
 
     private void OnEnable()
@@ -30,6 +33,7 @@ public class CowboyGrabController : MonoBehaviour
         CacheGrabAnchors();
         CacheInventory();
         CacheHandAttractors();
+        CacheToggleBoxes();
     }
 
     public bool TryGrab(CowboyArmSide arm)
@@ -266,22 +270,33 @@ public class CowboyGrabController : MonoBehaviour
         GrabHandAttractor attractor = GetHandAttractor(arm);
         if (attractor == null)
         {
+            SetToggleBoxState(arm, false);
             return;
         }
 
         if (active)
         {
             attractor.Activate();
+        }
+        else
+        {
+            attractor.Deactivate();
+        }
+
+        if (HasHeldObject(arm))
+        {
+            SetToggleBoxState(arm, false);
             return;
         }
 
-        attractor.Deactivate();
+        SetToggleBoxState(arm, active);
     }
 
     public void SetAllHandAttractorsInactive()
     {
         leftHandAttractor?.Deactivate();
         rightHandAttractor?.Deactivate();
+        SetAllToggleBoxesInactive();
     }
 
     private GrabHandAttractor GetHandAttractor(CowboyArmSide arm)
@@ -317,6 +332,85 @@ public class CowboyGrabController : MonoBehaviour
         }
 
         return reference.GetComponentInChildren<GrabHandAttractor>(true);
+    }
+
+    private void CacheToggleBoxes()
+    {
+        if (leftHandToggleBox == null)
+        {
+            leftHandToggleBox = ResolveToggleBox(leftHandAttractor, leftHandGrabAnchor, leftHandHoldParent);
+        }
+
+        if (rightHandToggleBox == null)
+        {
+            rightHandToggleBox = ResolveToggleBox(rightHandAttractor, rightHandGrabAnchor, rightHandHoldParent);
+        }
+    }
+
+    private ToggleBox GetToggleBox(CowboyArmSide arm)
+    {
+        CacheToggleBoxes();
+        return arm == CowboyArmSide.Right ? rightHandToggleBox : leftHandToggleBox;
+    }
+
+    private static ToggleBox ResolveToggleBox(GrabHandAttractor attractor, Transform grabAnchor, Transform holdParent)
+    {
+        if (attractor != null)
+        {
+            ToggleBox attractorToggle = attractor.GetToggleBox();
+            if (attractorToggle != null)
+            {
+                return attractorToggle;
+            }
+        }
+
+        ToggleBox anchorToggle = FindToggleBox(grabAnchor);
+        if (anchorToggle != null)
+        {
+            return anchorToggle;
+        }
+
+        return FindToggleBox(holdParent);
+    }
+
+    private static ToggleBox FindToggleBox(Transform reference)
+    {
+        if (reference == null)
+        {
+            return null;
+        }
+
+        ToggleBox direct = reference.GetComponent<ToggleBox>();
+        if (direct != null)
+        {
+            return direct;
+        }
+
+        return reference.GetComponentInChildren<ToggleBox>(true);
+    }
+
+    private void SetToggleBoxState(CowboyArmSide arm, bool active)
+    {
+        ToggleBox toggleBox = GetToggleBox(arm);
+        if (toggleBox == null)
+        {
+            return;
+        }
+
+        if (active)
+        {
+            toggleBox.Activate();
+        }
+        else
+        {
+            toggleBox.Deactivate();
+        }
+    }
+
+    private void SetAllToggleBoxesInactive()
+    {
+        SetToggleBoxState(CowboyArmSide.Left, false);
+        SetToggleBoxState(CowboyArmSide.Right, false);
     }
 
     private void CacheInventory()
