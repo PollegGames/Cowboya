@@ -23,12 +23,12 @@ TagManager:
   - BadgeSecurity
   - Battery
   - CubeUpgrade
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - RewardTrigger
+  - ToggleButton
+  - RestingSlot
+  - SecuritySlot
+  - SpawningEnemyPoint
+  - WorkerSlot
   - 
   - 
   - 

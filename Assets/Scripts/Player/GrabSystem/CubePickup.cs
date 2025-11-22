@@ -119,6 +119,12 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
     public void OnGrab(Transform grabParent)
     {
+        if (grabParent == null)
+        {
+            Debug.LogWarning($"{nameof(CubePickup)} received a null grab parent.");
+            return;
+        }
+
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
 
         if (!wasStolen && transform.parent != null)
@@ -137,6 +143,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
         attached = true;
         rb.simulated = true;
 
+        transform.SetParent(grabParent, true);
         SetFollowTarget(grabParent);
         ApplySortingOrder(heldSortingOrder);
 
@@ -154,15 +161,12 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
     public void OnRelease(Vector2 throwForce)
     {
-        if (joint == null)
-        {
-            ApplySortingOrder(idleSortingOrder);
-            return;
-        }
-
         attached = false;
-        joint.enabled = false;
+        if (joint != null)
+            joint.enabled = false;
+
         followTarget = null;
+        transform.SetParent(null, true);
 
         OnReleased?.Invoke(this);
         ApplySortingOrder(idleSortingOrder);
