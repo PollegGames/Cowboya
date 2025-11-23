@@ -35,8 +35,20 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     [Header("Movement & Facing Modules")]
     [SerializeField] protected LegJointLimiter legJointLimiter;
 
+    private Transform movementRoot;
+    private bool warnedMissingHipRb;
+
     protected virtual void Awake()
     {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+
+        hipRb = ResolveRigidbody();
+
+        if (bodyReference == null)
+            bodyReference = hipRb != null ? hipRb.transform : transform;
+        movementRoot = bodyReference != null ? bodyReference : transform;
+
         if (legJointLimiter == null)
             legJointLimiter = GetComponent<LegJointLimiter>();
         if (sprites == null || sprites.Length == 0)
@@ -93,10 +105,17 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         animator.SetBool("IsWalking", true);
         animator.SetFloat("Direction", direction);
 
-        Vector2 desiredVelocity = new Vector2(direction * moveSpeed, hipRb.linearVelocity.y);
-        Vector2 velocityChange = desiredVelocity - hipRb.linearVelocity;
-        Vector2 force = velocityChange * hipRb.mass / Time.fixedDeltaTime;
-        hipRb.AddForce(force);
+        if (hipRb != null)
+        {
+            Vector2 desiredVelocity = new Vector2(direction * moveSpeed, hipRb.linearVelocity.y);
+            Vector2 velocityChange = desiredVelocity - hipRb.linearVelocity;
+            Vector2 force = velocityChange * hipRb.mass / Time.fixedDeltaTime;
+            hipRb.AddForce(force);
+        }
+        else
+        {
+            TranslateWithoutPhysics(new Vector2(direction * moveSpeed, 0f));
+        }
     }
 
     /// <summary>
@@ -107,10 +126,17 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         animator.SetBool("IsVerticalWalking", true);
         animator.SetFloat("VerticalDirection", verticalDirection);
 
-        Vector2 desiredVelocity = new Vector2(verticalDirection * 1f, hipRb.linearVelocity.y);
-        Vector2 velocityChange = desiredVelocity - hipRb.linearVelocity;
-        Vector2 force = velocityChange * hipRb.mass / Time.fixedDeltaTime;
-        hipRb.AddForce(force);
+        if (hipRb != null)
+        {
+            Vector2 desiredVelocity = new Vector2(verticalDirection * 1f, hipRb.linearVelocity.y);
+            Vector2 velocityChange = desiredVelocity - hipRb.linearVelocity;
+            Vector2 force = velocityChange * hipRb.mass / Time.fixedDeltaTime;
+            hipRb.AddForce(force);
+        }
+        else
+        {
+            TranslateWithoutPhysics(new Vector2(0f, verticalDirection * 1f));
+        }
     }
 
     protected virtual void ApplyFacingDirection()
@@ -127,8 +153,35 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
             flipped = !flipped;
             if (sprites != null)
                 for (int i = 0; i < sprites.Length; i++)
-                    if (sprites[i]) sprites[i].flipX = flipped;
+            if (sprites[i]) sprites[i].flipX = flipped;
         }
+    }
+
+    private Rigidbody2D ResolveRigidbody()
+    {
+        if (hipRb == null || !hipRb)
+        {
+            var candidate = GetComponent<Rigidbody2D>();
+            if (candidate == null)
+                candidate = GetComponentInChildren<Rigidbody2D>();
+            hipRb = candidate;
+        }
+        return hipRb;
+    }
+
+    private void TranslateWithoutPhysics(Vector2 velocity)
+    {
+        if (!warnedMissingHipRb)
+        {
+            Debug.LogWarning($"[AnimatorBaseAgentController] '{name}' has no Rigidbody2D assigned; using direct transform translation instead.", this);
+            warnedMissingHipRb = true;
+        }
+
+        if (movementRoot == null || velocity == Vector2.zero)
+            return;
+
+        Vector3 delta = new Vector3(velocity.x, velocity.y, 0f) * Time.fixedDeltaTime;
+        movementRoot.position += delta;
     }
 }
 

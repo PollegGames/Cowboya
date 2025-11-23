@@ -73,7 +73,23 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         for (int i = 0; i < count; i++)
         {
             var go = PoolGet(workerPrefab);
+            if (go == null)
+                continue;
+
             var state = go.GetComponent<RobotStateController>();
+            if (state == null)
+            {
+                Debug.LogError($"[EnemiesSpawner] Worker prefab '{go.name}' is missing RobotStateController.");
+                ObjectPool.Instance.Release(go);
+                continue;
+            }
+
+            if (EnsureWorkerController(go, workerPrefab) == null)
+            {
+                ObjectPool.Instance.Release(go);
+                continue;
+            }
+
             state.Stats = factory.CreateRobot();
             state.Stats.RobotName = $"Worker {i + 1}";
             go.SetActive(false);
@@ -91,7 +107,22 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         for (int i = 0; i < count; i++)
         {
             var go = PoolGet(workerSpawnerPrefab);
+            if (go == null)
+                continue;
+
             var state = go.GetComponent<RobotStateController>();
+            if (state == null)
+            {
+                Debug.LogError($"[EnemiesSpawner] Worker spawner prefab '{go.name}' is missing RobotStateController.");
+                ObjectPool.Instance.Release(go);
+                continue;
+            }
+
+            if (EnsureWorkerController(go, workerSpawnerPrefab) == null)
+            {
+                ObjectPool.Instance.Release(go);
+                continue;
+            }
             state.Stats = factory.CreateRobot();
             state.Stats.RobotName = $"WorkerSpawner {i + 1}";
             go.SetActive(false);
@@ -211,9 +242,18 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         // Workers
         foreach (var w in spawnedWorkers)
         {
+            if (w == null)
+                continue;
+
+            var c = EnsureWorkerController(w, workerPrefab);
+            if (c == null)
+            {
+                Debug.LogError($"[EnemiesSpawner] Worker '{w.name}' has no EnemyWorkerController and cannot be initialized.");
+                continue;
+            }
+
             var p = waypointService.GetWorkOrRestPoint();
             PositionAndWake(w, p.WorldPos);
-            var c = w.GetComponent<EnemyWorkerController>();
             c.Initialize(waypointService, waypointService, respawnService, dropContainer, batterySpawner);
             c.memory.SetLastVisitedPoint(p);
             Debug.Log($"Worker spread to {p.WorldPos} and initialized");
@@ -222,9 +262,18 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         // Worker spawners
         foreach (var ws in spawnedWorkerSpawners)
         {
+            if (ws == null)
+                continue;
+
+            var c = EnsureWorkerController(ws, workerSpawnerPrefab);
+            if (c == null)
+            {
+                Debug.LogError($"[EnemiesSpawner] Worker spawner '{ws.name}' has no EnemyWorkerController and cannot be initialized.");
+                continue;
+            }
+
             var p = waypointService.GetBlockedRoomCenter();
             PositionAndWake(ws, p.WorldPos);
-            var c = ws.GetComponent<EnemyWorkerController>();
             c.SetWorkerSpawnerState();
             c.Initialize(waypointService, waypointService, respawnService,dropContainer, batterySpawner, true);
             c.memory.SetLastVisitedPoint(p);
@@ -270,12 +319,21 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     {
         // Example: spawn a NEW worker at a random work cell
         var go = PoolGet(workerPrefab);
+        if (go == null)
+            return;
+
         var pos = mapManager.GetRandomWorkPosition();
 
         PrepareSkeleton(go);
         PositionAndWake(go, pos);
 
-        var c = go.GetComponent<EnemyWorkerController>();
+        var c = EnsureWorkerController(go, workerPrefab);
+        if (c == null)
+        {
+            Debug.LogError("[EnemiesSpawner] Unable to spawn worker at random because EnemyWorkerController is missing.");
+            ObjectPool.Instance.Release(go);
+            return;
+        }
         c.Initialize(waypointService, waypointService, respawnService, dropContainer, batterySpawner);
 
         var ai = go.GetComponent<ReactiveMachineAI>();
@@ -367,5 +425,20 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     {
         if (securityManager != null)
             securityManager.OnAllMachinesOff -= HandleAllMachinesOff;
+    }
+
+    private EnemyWorkerController EnsureWorkerController(GameObject worker, GameObject sourcePrefab)
+    {
+        if (worker == null)
+            return null;
+
+        var controller = worker.GetComponent<EnemyWorkerController>();
+        if (controller == null)
+        {
+            var prefabName = sourcePrefab != null ? sourcePrefab.name : worker.name;
+            Debug.LogError($"[EnemiesSpawner] Prefab '{prefabName}' is missing an EnemyWorkerController. Please add and configure it in the prefab asset.");
+        }
+
+        return controller;
     }
 }
