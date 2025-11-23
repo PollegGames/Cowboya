@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class AttackHitbox : MonoBehaviour
@@ -11,6 +12,8 @@ public class AttackHitbox : MonoBehaviour
     public int DamageCost = 5;
     private bool isActive = false;
     private RobotStateController attacker;
+
+    public event Action<AttackHitbox> Hit;
 
     private void Awake()
     {
@@ -68,6 +71,7 @@ public class AttackHitbox : MonoBehaviour
 
         isActive = false;
         UpdateIndicator(false);
+        Hit?.Invoke(this);
     }
 
     private void UpdateIndicator(bool active)

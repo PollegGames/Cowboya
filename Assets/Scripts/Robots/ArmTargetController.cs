@@ -35,6 +35,7 @@ public class CowboyArmTargetController : MonoBehaviour
     private bool interactReleasedThisFrame;
     private bool attackHeld;
     private bool attackInputHeld;
+    private bool attackSuppressedUntilRelease;
     private bool preferRightArm = true;
     private CowboyArmSide? attackActiveArm;
 
@@ -59,6 +60,7 @@ public class CowboyArmTargetController : MonoBehaviour
         CacheControllers();
         CacheRestPose();
         attackController?.DeactivateAll();
+        SubscribeToAttackEvents();
     }
 
     private void OnDisable()
@@ -68,9 +70,11 @@ public class CowboyArmTargetController : MonoBehaviour
         interactReleasedThisFrame = false;
         attackHeld = false;
         attackInputHeld = false;
+        attackSuppressedUntilRelease = false;
         attackActiveArm = null;
         attackController?.DeactivateAll();
         grabController?.ReleaseAllImmediate();
+        UnsubscribeFromAttackEvents();
     }
 
     private void Update()
@@ -79,7 +83,12 @@ public class CowboyArmTargetController : MonoBehaviour
         bool attackInput = IsLeftMouseHeld();
 
         attackInputHeld = attackInput;
-        attackHeld = allowAttackAim && attackInputHeld;
+        if (!attackInputHeld)
+        {
+            attackSuppressedUntilRelease = false;
+        }
+
+        attackHeld = allowAttackAim && attackInputHeld && !attackSuppressedUntilRelease;
 
         interactPressedThisFrame = !interactHeld && currentlyHeld;
         interactReleasedThisFrame = interactHeld && !currentlyHeld;
@@ -128,6 +137,23 @@ public class CowboyArmTargetController : MonoBehaviour
         if (attackController == null)
         {
             attackController = GetComponentInParent<CowboySimpleAttackController>();
+        }
+    }
+
+    private void SubscribeToAttackEvents()
+    {
+        UnsubscribeFromAttackEvents();
+        if (attackController != null)
+        {
+            attackController.AttackHit += OnAttackHit;
+        }
+    }
+
+    private void UnsubscribeFromAttackEvents()
+    {
+        if (attackController != null)
+        {
+            attackController.AttackHit -= OnAttackHit;
         }
     }
 
@@ -215,6 +241,17 @@ public class CowboyArmTargetController : MonoBehaviour
             return;
         }
 
+        if (attackSuppressedUntilRelease)
+        {
+            if (attackActiveArm.HasValue)
+            {
+                attackController.SetArmAttackActive(attackActiveArm.Value, false);
+                attackActiveArm = null;
+            }
+
+            return;
+        }
+
         if (!attackInputHeld)
         {
             if (attackActiveArm.HasValue)
@@ -243,6 +280,22 @@ public class CowboyArmTargetController : MonoBehaviour
         attackController.SetArmAttackActive(attackActiveArm.Value, false);
         attackController.SetArmAttackActive(desiredArm, true);
         attackActiveArm = desiredArm;
+    }
+
+    private void OnAttackHit(CowboyArmSide arm)
+    {
+        attackSuppressedUntilRelease = true;
+        attackHeld = false;
+
+        if (attackController != null)
+        {
+            attackController.SetArmAttackActive(arm, false);
+        }
+
+        if (attackActiveArm.HasValue)
+        {
+            attackActiveArm = null;
+        }
     }
 
 

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -11,15 +12,19 @@ public class CowboySimpleAttackController : MonoBehaviour
     [SerializeField] private AttackHitbox rightHandHitbox;
     private bool referencesLogged;
 
+    public event Action<CowboyArmSide> AttackHit;
+
     private void OnEnable()
     {
         DeactivateAll();
         LogMissingReferences();
+        SubscribeToHitboxes();
     }
 
     private void OnDisable()
     {
         DeactivateAll();
+        UnsubscribeFromHitboxes();
     }
 
     public void SetArmAttackActive(CowboyArmSide arm, bool active)
@@ -54,6 +59,33 @@ public class CowboySimpleAttackController : MonoBehaviour
         referencesLogged = true;
     }
 
+    private void SubscribeToHitboxes()
+    {
+        UnsubscribeFromHitboxes();
+        if (leftHandHitbox != null)
+        {
+            leftHandHitbox.Hit += OnHitboxHit;
+        }
+
+        if (rightHandHitbox != null)
+        {
+            rightHandHitbox.Hit += OnHitboxHit;
+        }
+    }
+
+    private void UnsubscribeFromHitboxes()
+    {
+        if (leftHandHitbox != null)
+        {
+            leftHandHitbox.Hit -= OnHitboxHit;
+        }
+
+        if (rightHandHitbox != null)
+        {
+            rightHandHitbox.Hit -= OnHitboxHit;
+        }
+    }
+
     private void ActivateArm(CowboyArmSide arm)
     {
         AttackHitbox hitbox = GetHitbox(arm);
@@ -69,5 +101,36 @@ public class CowboySimpleAttackController : MonoBehaviour
     private AttackHitbox GetHitbox(CowboyArmSide arm)
     {
         return arm == CowboyArmSide.Right ? rightHandHitbox : leftHandHitbox;
+    }
+
+    private void OnHitboxHit(AttackHitbox hitbox)
+    {
+        CowboyArmSide? arm = GetArmForHitbox(hitbox);
+        if (!arm.HasValue)
+        {
+            return;
+        }
+
+        AttackHit?.Invoke(arm.Value);
+    }
+
+    private CowboyArmSide? GetArmForHitbox(AttackHitbox hitbox)
+    {
+        if (hitbox == null)
+        {
+            return null;
+        }
+
+        if (hitbox == leftHandHitbox)
+        {
+            return CowboyArmSide.Left;
+        }
+
+        if (hitbox == rightHandHitbox)
+        {
+            return CowboyArmSide.Right;
+        }
+
+        return null;
     }
 }
