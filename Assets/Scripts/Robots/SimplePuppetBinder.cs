@@ -91,9 +91,12 @@ namespace CowBoya.Robots
                 }
 
                 pair.hasPositionTarget = false;
+                pair.hasRotationTarget = false;
 
                 Quaternion localMasterRotation = masterRootInverseRotation * pair.Master.rotation;
                 Quaternion rotation = puppetRootRotation * localMasterRotation;
+                // Rigs that include a Rigidbody need their targets deferred to FixedUpdate;
+                // transform writes in LateUpdate only stick on bones without physics.
                 if (rb2D != null || rb3D != null)
                 {
                     pair.targetRotation = rotation;
@@ -102,6 +105,22 @@ namespace CowBoya.Robots
                 else
                 {
                     pair.Puppet.rotation = rotation;
+                }
+
+                Vector3 localMasterPosition = masterRootInverseRotation * (pair.Master.position - masterRoot.position);
+                Vector3 position = puppetRoot.position + puppetRootRotation * localMasterPosition;
+                // Only puppets driven by a Rigidbody were drifting away from their masters,
+                // because we used to skip copying the position for those; pure transform rigs
+                // were unaffected. Storing a target for physics-driven bones keeps both paths
+                // in sync.
+                if (rb2D != null || rb3D != null)
+                {
+                    pair.targetPosition = position;
+                    pair.hasPositionTarget = true;
+                }
+                else
+                {
+                    pair.Puppet.position = position;
                 }
             }
         }
@@ -128,6 +147,18 @@ namespace CowBoya.Robots
                     else if (rb3D != null)
                     {
                         rb3D.MoveRotation(pair.targetRotation);
+                    }
+                }
+
+                if (pair.hasPositionTarget)
+                {
+                    if (rb2D != null)
+                    {
+                        rb2D.MovePosition(pair.targetPosition);
+                    }
+                    else if (rb3D != null)
+                    {
+                        rb3D.MovePosition(pair.targetPosition);
                     }
                 }
             }
