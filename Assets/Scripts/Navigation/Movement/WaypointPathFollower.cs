@@ -53,7 +53,9 @@ public class WaypointPathFollower : IRobotNavigationListener
     private void HandleMovement(float deltaTime)
     {
         if (currentPath == null || pathIndex >= currentPath.Count)
+        {
             return;
+        }
 
         Vector3 target = currentPath[pathIndex];
         Vector3 currentPos = body.position;
