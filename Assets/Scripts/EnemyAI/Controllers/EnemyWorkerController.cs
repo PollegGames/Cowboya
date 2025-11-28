@@ -13,7 +13,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     [SerializeField] private RobotStateController robotBehaviour;
 
     private IWorkerStateMachine stateMachineInterface;
-    public IRobotMemory memory { get; protected set; }
+    public IRobotMemory memory { get; private set; }
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     public IWaypointService waypointService;
@@ -102,6 +102,8 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     {
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
+
+        TryFlip(direction);
     }
 
     protected override void FixedUpdate()
@@ -131,7 +133,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
         stuckHandler = HandlePathFollowerStuck;
         pathFollower.OnStuck += stuckHandler;
     }
-
     private void HandlePathFollowerStuck()
     {
         memory.OnStuck(this);
@@ -145,7 +146,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     /// <summary>
     /// Sets a waypoint destination for the enemy worker.
     /// </summary>
-    public virtual void SetDestination(RoomWaypoint target, bool includeUnavailable = false) =>
+    public void SetDestination(RoomWaypoint target, bool includeUnavailable = false) =>
         pathFollower?.SetDestination(target, includeUnavailable);
 
 
@@ -182,7 +183,7 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
         }
     }
 
-    public virtual bool HasArrivedAtDestination() => pathFollower.HasArrived;
+    public bool HasArrivedAtDestination() => pathFollower.HasArrived;
 
     public void OnPathObsoleted(RoomWaypoint blockedWaypoint) =>
         pathFollower.OnPathObsoleted(blockedWaypoint);

@@ -20,7 +20,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     [Header("Flip Settings")]
     [SerializeField] private SpriteRenderer[] sprites; // optional assign
     private bool flipped = false;
-    protected Vector2 lookDirection = Vector2.right;
+    private Vector2 lookDirection = Vector2.right;
 
     /// <summary>
     /// Gets the current look direction.

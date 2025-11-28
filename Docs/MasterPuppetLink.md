@@ -1,16 +1,19 @@
-# SimplePuppetBinder - Master-to-Puppet Rotation Mirroring
+﻿# SimplePuppetBinder - Master-to-Puppet Transform Mirroring
 
-`SimplePuppetBinder` (`Assets/Scripts/Robots/SimplePuppetBinder.cs`) keeps a puppet's pose aligned to an animated master by copying **rotations** for configured transform pairs. Translation is intentionally left alone so you can drive positioning from other movement scripts or hierarchy parenting.
+`SimplePuppetBinder` (`Assets/Scripts/Robots/SimplePuppetBinder.cs`) keeps a physics puppet aligned to an animated master by copying transforms. It is now the active solution in the `Cowboy` prefab (`Assets/Resources/Prefabs/Robots/Cowboy.prefab`), fully replacing the old `MasterPuppetLink` workflow.
+
+> Note: `MasterPuppetLink` has been removed from the project. If you need a force/torque-based active ragdoll in the future, you will need to restore or reimplement that behaviour.
 
 ## How the Binder Works
-- **LateUpdate sampling:** Each frame calculates the master's rotation for every configured `BonePair` and converts it into the puppet's space using the configured `MasterRoot` and `PuppetRoot` (both default to the component's transform when empty). Missing `Rigidbody2D` or `Rigidbody` references on the puppet are cached for smooth physics updates.
-- **FixedUpdate application:** Rotation targets on rigidbody bones are applied using `MoveRotation` (`Rigidbody2D` uses Z Euler angles, `Rigidbody` uses the quaternion). Bones without rigidbodies are rotated immediately during `LateUpdate`.
+- **LateUpdate sampling**: Each frame the binder gathers the world position and rotation from every configured master bone. It also caches any `Rigidbody2D` or `Rigidbody` components attached to the puppet transforms so physics moves remain smooth.
+- **FixedUpdate application**: Cached targets are replayed during physics ticks. When a rigidbody exists the binder calls `MovePosition` and `MoveRotation` so interpolation stays valid. If no rigidbody is present the puppet transform is reassigned directly.
+- **Rotation first**: With the current configuration rotation mirroring is production ready. Position matching still has a pending smoothing pass, so expect small translation offsets on live characters until that work lands.
 
 ## Setting Up Pairs
 1. Add `SimplePuppetBinder` to the master root (for the cowboy this lives on `Cowboy_Master`).
-2. Assign `MasterRoot` and `PuppetRoot` if the defaults are not appropriate for your hierarchy.
-3. Fill the `Pairs` list with matching master and puppet transforms in a consistent top-to-bottom order.
-4. Optionally drag puppet rigidbodies into the pair slots for caching; otherwise, the binder auto-fills them on first update.
+2. Assign `MasterRoot` and `PuppetRoot`. If left empty they default to the component transform, which is fine when the master and puppet hierarchies are direct children.
+3. Populate the `Pairs` list with matching master and puppet transforms. Keep the order consistent from root to leaf so debugging is easier.
+4. Optionally drag any rigidbodies for faster caching; otherwise the binder obtains them automatically the first time each pair updates.
 
 ### Pair Guidelines
 - Match transform names between master and puppet hierarchies to avoid mistakes while authoring the list.
@@ -20,9 +23,14 @@
 ## Debugging Tips
 - Toggle `Gizmos` in the Scene view to inspect transform alignment while the game runs.
 - Enable physics interpolation on puppet rigidbodies if motion looks stuttery.
-- If a bone fails to rotate, double-check that the pair references the correct master/puppet transforms and that any rigidbody is present when needed.
+- When testing positional changes, capture both `LateUpdate` and `FixedUpdate` values in the profiler to confirm targets are being updated as expected.
 
-## Known Behaviours
-- Translation is untouched: keep master and puppet roots co-located or parented appropriately so positions stay aligned.
-- Physics interpolation remains intact because rigidbody rotations are applied through `MoveRotation` during `FixedUpdate`.
-- There is no auto-population helper for `Pairs`; author the list manually to ensure correct mapping.
+## Known Limitations
+- Position targets currently lack easing when the master teleports. Until smoothing is implemented, avoid snapping the master hierarchy in a single frame.
+- No automatic pair population is available yet. Authoring tools or editor scripts will be needed for large rigs.
+- The binder does not apply forces, so external physics impulses are not countered. For ragdoll recovery, additional scripts or a future `MasterPuppetLink` replacement may be required.
+
+## Next Steps
+- Finish the positional smoothing investigation so puppet translations stay perfectly aligned.
+- Evaluate whether lightweight auto-populate utilities would speed up authoring for new characters.
+- Decide if a new physics-driven controller is needed once gameplay demands full ragdoll behaviour again.
