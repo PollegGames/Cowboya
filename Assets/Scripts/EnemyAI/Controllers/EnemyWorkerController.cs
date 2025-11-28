@@ -102,8 +102,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     {
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
-
-        TryFlip(direction);
     }
 
     protected override void FixedUpdate()
@@ -305,4 +303,3 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     }
 
 }
-

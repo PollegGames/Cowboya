@@ -2205,7 +2205,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8518575868892520076}
-  - {fileID: 7042460944159649148}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &926428395600832938
@@ -3174,6 +3173,7 @@ Transform:
   m_Children:
   - {fileID: 4296934220140894421}
   - {fileID: 7167496052472299165}
+  - {fileID: 7042460944159649148}
   m_Father: {fileID: 5745274853959273752}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4865299395680469781
@@ -4361,7 +4361,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &2218925009995055758
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6213,7 +6213,7 @@ Transform:
   - {fileID: 6101132409792038899}
   - {fileID: 6388281107842833342}
   - {fileID: 7395722855166280960}
-  m_Father: {fileID: 5745274853959273752}
+  m_Father: {fileID: 8518575868892520076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8628381173169908439
 MonoBehaviour:

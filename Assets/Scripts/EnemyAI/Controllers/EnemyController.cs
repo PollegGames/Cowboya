@@ -151,7 +151,6 @@ public class EnemyController : AnimatorBaseAgentController, IPooledObject, IRobo
 
     private void Update()
     {
-        TryFlip(direction);
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
 

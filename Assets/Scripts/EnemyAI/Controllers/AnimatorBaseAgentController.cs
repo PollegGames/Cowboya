@@ -17,9 +17,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     [SerializeField] protected Transform bodyReference;
     [SerializeField] protected Rigidbody2D hipRb;
 
-    [Header("Flip Settings")]
-    [SerializeField] private SpriteRenderer[] sprites; // optional assign
-    private bool flipped = false;
     private Vector2 lookDirection = Vector2.right;
 
     /// <summary>
@@ -31,9 +28,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
     protected bool isVerticalMoving;
     protected float direction;         // Horizontal (-1, 0, 1)
     protected float verticalDirection; // Vertical   (-1, 0, 1)
-
-    [Header("Movement & Facing Modules")]
-    [SerializeField] protected LegJointLimiter legJointLimiter;
 
     private Transform movementRoot;
     private bool warnedMissingHipRb;
@@ -48,11 +42,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         if (bodyReference == null)
             bodyReference = hipRb != null ? hipRb.transform : transform;
         movementRoot = bodyReference != null ? bodyReference : transform;
-
-        if (legJointLimiter == null)
-            legJointLimiter = GetComponent<LegJointLimiter>();
-        if (sprites == null || sprites.Length == 0)
-            sprites = GetComponentsInChildren<SpriteRenderer>(true);
     }
 
     protected virtual void FixedUpdate()
@@ -85,7 +74,6 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         isMoving = !Mathf.Approximately(this.direction, 0f);
         if (isMoving)
             lookDirection = new Vector2(Mathf.Sign(this.direction), 0f);
-        TryFlip(this.direction);
     }
 
     /// <summary>
@@ -139,22 +127,8 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
         }
     }
 
-    protected virtual void ApplyFacingDirection()
-    {
-        if (legJointLimiter != null)
-            legJointLimiter.SetLegRotationLimits(flipped);
-    }
-
     protected virtual void TryFlip(float direction)
     {
-        ApplyFacingDirection();
-        if ((direction > 0 && flipped) || (direction < 0 && !flipped))
-        {
-            flipped = !flipped;
-            if (sprites != null)
-                for (int i = 0; i < sprites.Length; i++)
-            if (sprites[i]) sprites[i].flipX = flipped;
-        }
     }
 
     private Rigidbody2D ResolveRigidbody()

@@ -41,7 +41,6 @@ public sealed class NewPlayerMovementController : AnimatorBaseAgentController
         // horizontal
         SetMovement(_move.x);
         animator.SetBool(pIsWalking, Mathf.Abs(direction) > 0.01f);
-        TryFlip(direction);
 
         // vertical → animations only
         HandleJumpCrouch(_move.y);

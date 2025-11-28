@@ -39,7 +39,6 @@ public class AllyWorkerController : AnimatorBaseAgentController
 
      private void Update()
     {
-        TryFlip(direction);
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
     }
