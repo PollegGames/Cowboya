@@ -2181,8 +2181,6 @@ GameObject:
   - component: {fileID: 6401809315403970274}
   - component: {fileID: 6768761467139234178}
   - component: {fileID: 1788545626287636221}
-  - component: {fileID: 47834073116909081}
-  - component: {fileID: 6335463056313009001}
   - component: {fileID: 758698628174055974}
   m_Layer: 7
   m_Name: Spawner3
@@ -2376,8 +2374,6 @@ MonoBehaviour:
   animator: {fileID: 159342441083899244}
   bodyReference: {fileID: 8129104314148306132}
   hipRb: {fileID: 4349025134239535110}
-  sprites: []
-  legJointLimiter: {fileID: 0}
   stateMachine: {fileID: 6768761467139234178}
   memoryComponent: {fileID: 393579632015866257}
   robotBehaviour: {fileID: 6401809315403970274}
@@ -2387,45 +2383,6 @@ MonoBehaviour:
   deadZoneY: 5
   updateLoop: 0
   inventory: {fileID: 3901679018326628933}
-  lowMoralityTriggerHandler: {fileID: 47834073116909081}
-  allyWorkerController: {fileID: 6335463056313009001}
---- !u!114 &47834073116909081
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3479292778027586589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 178ec67020654ef49284b6e39cbb36be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::LowMoralityPlayerTriggerHandler
-  detectZone: {fileID: 5537666953708422962}
-  radius: 10
---- !u!114 &6335463056313009001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3479292778027586589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91c4743f29dfcbb42ab1d8ebd2a1caef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::AllyWorkerController
-  moveSpeed: 3
-  animator: {fileID: 159342441083899244}
-  bodyReference: {fileID: 8129104314148306132}
-  hipRb: {fileID: 4349025134239535110}
-  sprites: []
-  legJointLimiter: {fileID: 0}
-  arrivalThresholdX: 2
-  arrivalThresholdY: 2
-  deadZoneX: 5
-  deadZoneY: 5
-  updateLoop: 0
 --- !u!114 &758698628174055974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6488,14 +6445,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1763260918082279789, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
   m_PrefabInstance: {fileID: 2568238318554542846}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5537666953708422962 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
-  m_PrefabInstance: {fileID: 2568238318554542846}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a492d78718bb644cb1dbc7f66d57986, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

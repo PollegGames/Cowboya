@@ -19,7 +19,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     public IWaypointService waypointService;
     private Action stuckHandler;
 
-
     [SerializeField] private float arrivalThresholdX = 2f;
     [SerializeField] private float arrivalThresholdY = 2f;
     [SerializeField] private float deadZoneX = 5f;
@@ -30,8 +29,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     private BatterySpawner batterySpawner;
     private Transform dropContainer;
 
-    [SerializeField] private LowMoralityPlayerTriggerHandler lowMoralityTriggerHandler;
-    [SerializeField] private AllyWorkerController allyWorkerController;
     private FactoryMachine currentMachine;
 
     public WorkerStatus workerState { get; set; } = WorkerStatus.Idle;
@@ -51,17 +48,9 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
 
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();
-        if (lowMoralityTriggerHandler == null)
-            lowMoralityTriggerHandler = GetComponent<LowMoralityPlayerTriggerHandler>();
-        if (allyWorkerController == null)
-            allyWorkerController = GetComponent<AllyWorkerController>();
 
         if (robotBehaviour != null)
             robotBehaviour.OnStateChanged += HandleStateChange;
-        if (lowMoralityTriggerHandler != null)
-            lowMoralityTriggerHandler.OnLowMoralityPlayerDetected += HandleLowMoralityPlayerDetected;
-        if (allyWorkerController != null)
-            allyWorkerController.enabled = false;
     }
 
     public void Initialize(IWaypointQueries waypointQueries, IWaypointService waypointService,
@@ -237,8 +226,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
         enabled = false;
         if (stateMachine != null)
             stateMachine.enabled = false;
-        if (lowMoralityTriggerHandler != null)
-            lowMoralityTriggerHandler.enabled = false;
         if (robotBehaviour != null)
             robotBehaviour.enabled = false;
         if (memoryComponent != null)
@@ -258,14 +245,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
         {
             bodyBalance.UpdateBalance(enabledBalance);
         }
-    }
-
-    private void HandleLowMoralityPlayerDetected(Transform player)
-    {
-        var previousState = stateMachine.enemyState;
-        var machine = currentMachine;
-        stateMachine.ChangeState(new Worker_FleePlayer(this, stateMachine, waypointService, previousState, player, machine));
-        currentMachine = null;
     }
 
     private void OnDrawGizmos()
