@@ -30,7 +30,6 @@ public class EnemyWorkerController : AnimatorBaseAgentController, IRobotDecision
     private BatterySpawner batterySpawner;
     private Transform dropContainer;
 
-
     [SerializeField] private LowMoralityPlayerTriggerHandler lowMoralityTriggerHandler;
     [SerializeField] private AllyWorkerController allyWorkerController;
     private FactoryMachine currentMachine;
