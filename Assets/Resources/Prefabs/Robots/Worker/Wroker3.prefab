@@ -2180,6 +2180,11 @@ GameObject:
   - component: {fileID: 393579632015866257}
   - component: {fileID: 6401809315403970274}
   - component: {fileID: 758698628174055974}
+  - component: {fileID: 3888384783130253247}
+  - component: {fileID: 3084759943220385380}
+  - component: {fileID: 2232273132763882073}
+  - component: {fileID: 50416280650570067}
+  - component: {fileID: 6388133658049301520}
   m_Layer: 7
   m_Name: Wroker3
   m_TagString: Enemy
@@ -2359,9 +2364,95 @@ MonoBehaviour:
   bodyJointLimiter: {fileID: 0}
   legJointLimiter: {fileID: 0}
   animator: {fileID: 159342441083899244}
-  stateMachine: {fileID: 0}
   robotStateController: {fileID: 6401809315403970274}
   jointBreaker: {fileID: 0}
+--- !u!114 &3888384783130253247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3479292778027586589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab148081b3947484ab0d3ba9c3fb06db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotHeart
+  role: 0
+  overrideStackDepth: 0
+  seedIdleTask: 1
+--- !u!114 &3084759943220385380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3479292778027586589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b782b515f2c0dcc4684933419bbf779d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBrain
+  heart: {fileID: 3888384783130253247}
+  config:
+    role: 0
+    resumeWorkOnMachineOn: 1
+    defaultTimeoutSeconds: 10
+  body: {fileID: 50416280650570067}
+  memory: {fileID: 393579632015866257}
+  taskHandlers: {fileID: 11400000, guid: ab799656829ebdf41a83399ccf7224c0, type: 2}
+  roleTaskHandlers:
+  - Role: 0
+    Handlers: {fileID: 11400000, guid: ab799656829ebdf41a83399ccf7224c0, type: 2}
+--- !u!114 &2232273132763882073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3479292778027586589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBodyMaintenance
+  memory: {fileID: 393579632015866257}
+--- !u!114 &50416280650570067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3479292778027586589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78fc318645d30794c81b0a3637c2d180, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBodyController
+  moveSpeed: 3
+  animator: {fileID: 159342441083899244}
+  bodyReference: {fileID: 8129104314148306132}
+  hipRb: {fileID: 4349025134239535110}
+  arrivalThresholdX: 2
+  arrivalThresholdY: 2
+  deadZoneX: 5
+  deadZoneY: 5
+  updateLoop: 0
+  bodyMaintenance: {fileID: 2232273132763882073}
+  isBoss: 0
+--- !u!114 &6388133658049301520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3479292778027586589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBodyMaintenance
+  memory: {fileID: 393579632015866257}
 --- !u!1 &3726766281537536227
 GameObject:
   m_ObjectHideFlags: 0
