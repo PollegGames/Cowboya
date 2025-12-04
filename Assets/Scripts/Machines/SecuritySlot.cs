@@ -6,11 +6,8 @@ public class SecuritySlot : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var guard = collision.GetComponentInParent<EnemyController>();
-        if (guard == null) return;
-        if (guard.EnemyStatus == EnemyStatus.ReadyToCheckSecurity)
-        {
-            securityMachine.AttachRobot(guard.gameObject);
-        }
+        var brain = collision.GetComponentInParent<RobotBrain>();
+        if (brain == null) return;
+        securityMachine.AttachRobot(brain.gameObject);
     }
 }

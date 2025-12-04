@@ -10,7 +10,7 @@ public class SpawningMachine : BaseMachine
     private MeshRenderer meshRenderer;
 
     public event Action<SpawningMachine, bool> OnMachineStateChanged;
-    public event Action<SpawningMachine, EnemyWorkerController> OnMachineTurningOff;
+    public event Action<SpawningMachine, RobotBrain> OnMachineTurningOff;
 
     [Header("Spawning Settings")]
     [SerializeField] private float spawnInterval = 30f;
@@ -18,10 +18,10 @@ public class SpawningMachine : BaseMachine
 
     private Coroutine spawnCoroutine;
 
-    private EnemyWorkerController currentWorker;
+    private RobotBrain currentWorker;
 
     public bool HasWorker => currentWorker != null;
-    public EnemyWorkerController CurrentWorker => currentWorker;
+    public RobotBrain CurrentWorker => currentWorker;
 
     private IEnemiesSpawner enemiesSpawner;
     private MachineSecurityManager securityManager;
@@ -117,7 +117,7 @@ public class SpawningMachine : BaseMachine
     /// </summary>
     public override void AttachRobot(GameObject robot)
     {
-        var newWorker = robot.GetComponent<EnemyWorkerController>();
+        var newWorker = robot.GetComponent<RobotBrain>();
         if (newWorker == null) return;
 
         if (!isOn)
@@ -134,22 +134,19 @@ public class SpawningMachine : BaseMachine
         }
     }
 
-    private void SetWorkerToSpawn(EnemyWorkerController worker)
+    private void SetWorkerToSpawn(RobotBrain worker)
     {
         if (worker == null) return;
-
-        worker.stateMachine.ChangeState(
-            new Worker_Spawning(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(this, true);
     }
 
     /// <summary>
     /// Helper to send a worker to the rest station state.
     /// </summary>
-    private void SendWorkerToStart(EnemyWorkerController worker)
+    private void SendWorkerToStart(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.stateMachine.ChangeState(
-            new Worker_GoingToRestStation(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(this, false);
     }
 
     public override void ReleaseRobot()

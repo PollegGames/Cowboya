@@ -6,12 +6,8 @@ public class SpawningWorkerSlot : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var enemy = collision.GetComponentInParent<EnemyWorkerController>();
-        if (enemy == null) return;
-        if (enemy.workerState == WorkerStatus.ReadyToSpawnFollowers
-            || enemy.workerState == WorkerStatus.Spawning)
-        {
-            machine.AttachRobot(enemy.gameObject);
-        }
+        var brain = collision.GetComponentInParent<RobotBrain>();
+        if (brain == null) return;
+        machine.AttachRobot(brain.gameObject);
     }
 }

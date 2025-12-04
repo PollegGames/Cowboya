@@ -11,10 +11,10 @@ public class RestingMachine : BaseMachine
     private Coroutine restCountdownCo;
 
     private MeshRenderer meshRenderer;
-    private EnemyWorkerController currentWorker;
+    private RobotBrain currentWorker;
 
     public event Action<RestingMachine, bool> OnMachineStateChanged;
-    public event Action<RestingMachine, EnemyWorkerController> OnMachineTurningOff;
+    public event Action<RestingMachine, RobotBrain> OnMachineTurningOff;
     protected override void Awake()
     {
         base.Awake();
@@ -57,7 +57,7 @@ public class RestingMachine : BaseMachine
 
     public override void AttachRobot(GameObject robot)
     {
-        var worker = robot.GetComponent<EnemyWorkerController>();
+        var worker = robot.GetComponent<RobotBrain>();
         if (worker == null) return;
 
         if (!isOn)
@@ -92,18 +92,16 @@ public class RestingMachine : BaseMachine
         currentWorker = null;
     }
 
-    private void SendWorkerToRest(EnemyWorkerController worker)
+    private void SendWorkerToRest(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.stateMachine.ChangeState(
-            new Worker_Resting(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(this, false);
     }
 
-    private void SendWorkerToWork(EnemyWorkerController worker)
+    private void SendWorkerToWork(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.stateMachine.ChangeState(
-            new Worker_GoingToLeastWorkedStation(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(this, true);
     }
 
     private void SendCurrentWorkerToWork()
@@ -112,7 +110,7 @@ public class RestingMachine : BaseMachine
     }
 
 
-    private void StartRestCountdown(EnemyWorkerController worker)
+    private void StartRestCountdown(RobotBrain worker)
     {
         CancelRestCountdown();
         restCountdownCo = StartCoroutine(RestCountdown(worker));
@@ -126,7 +124,7 @@ public class RestingMachine : BaseMachine
             restCountdownCo = null;
         }
     }
-    private IEnumerator RestCountdown(EnemyWorkerController worker)
+    private IEnumerator RestCountdown(RobotBrain worker)
     {
         float t = 0f;
         while (t < sendBackToWorkDelay)

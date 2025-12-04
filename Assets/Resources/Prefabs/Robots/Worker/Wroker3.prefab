@@ -246,7 +246,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 282631121581157837}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.0015566244, w: 0.9999988}
+  m_LocalRotation: {x: 0, y: 0, z: 0.0015842782, w: 0.99999875}
   m_LocalPosition: {x: 0.73326653, y: -0.00000038256414, z: 0}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -557,7 +557,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.7332663, y: -0.00000054533695}
+  m_ConnectedAnchor: {x: 0.7332664, y: -0.00000052484774}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -591,7 +591,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780558859121276628}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.008247964, w: 0.999966}
+  m_LocalRotation: {x: -0, y: -0, z: 0.00824928, w: 0.999966}
   m_LocalPosition: {x: 1.549, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -733,7 +733,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1005110490637685102}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.0034293956, w: 0.99999416}
+  m_LocalRotation: {x: 0, y: 0, z: -0.003418394, w: 0.99999416}
   m_LocalPosition: {x: 1.5289252, y: 0.0000005962107, z: 0}
   m_LocalScale: {x: 0.9999999, y: 0.9999999, z: 1}
   m_ConstrainProportionsScale: 0
@@ -875,7 +875,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1196386857816968542}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.9999262, w: 0.012149534}
+  m_LocalRotation: {x: 0, y: 0, z: 0.999926, w: 0.012168295}
   m_LocalPosition: {x: 0.6496235, y: 1.4446127, z: 0}
   m_LocalScale: {x: 0.9999999, y: 0.9999999, z: 1}
   m_ConstrainProportionsScale: 0
@@ -907,7 +907,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1242127274304946839}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.007625964, w: 0.9999709}
+  m_LocalRotation: {x: 0, y: 0, z: -0.0076361713, w: 0.99997085}
   m_LocalPosition: {x: 0.5845845, y: -0.00000047902705, z: 0}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1355,7 +1355,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: -0.020864623, y: -0.5629478}
+  m_ConnectedAnchor: {x: -0.020864503, y: -0.56294787}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1821,7 +1821,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.6791095, y: -0.00000026542685}
+  m_ConnectedAnchor: {x: 1.6791092, y: -0.0000002048909}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2179,8 +2179,6 @@ GameObject:
   - component: {fileID: 3901679018326628933}
   - component: {fileID: 393579632015866257}
   - component: {fileID: 6401809315403970274}
-  - component: {fileID: 6768761467139234178}
-  - component: {fileID: 1788545626287636221}
   - component: {fileID: 758698628174055974}
   m_Layer: 7
   m_Name: Wroker3
@@ -2346,43 +2344,6 @@ MonoBehaviour:
     CurrentEnergy: 30
     AttackEnergyCost: 1
     EnergyRechargeRate: 1
---- !u!114 &6768761467139234178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3479292778027586589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b54eb47c233b40b499499fdc01e9e165, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::WorkerStateMachine
---- !u!114 &1788545626287636221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3479292778027586589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 930bf15dd055481faf4689063271a077, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::EnemyWorkerController
-  moveSpeed: 3
-  animator: {fileID: 159342441083899244}
-  bodyReference: {fileID: 8129104314148306132}
-  hipRb: {fileID: 4349025134239535110}
-  stateMachine: {fileID: 6768761467139234178}
-  memoryComponent: {fileID: 393579632015866257}
-  robotBehaviour: {fileID: 6401809315403970274}
-  arrivalThresholdX: 2
-  arrivalThresholdY: 2
-  deadZoneX: 5
-  deadZoneY: 5
-  updateLoop: 0
-  inventory: {fileID: 3901679018326628933}
 --- !u!114 &758698628174055974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2524,7 +2485,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.97774714, y: 0.0000009173526}
+  m_ConnectedAnchor: {x: 0.97774714, y: 0.0000010421498}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2658,7 +2619,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.6994802, y: -1.537276}
+  m_ConnectedAnchor: {x: 0.6994801, y: -1.5372759}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2803,7 +2764,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4047482661032426603}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.003233123, w: 0.99999475}
+  m_LocalRotation: {x: -0, y: -0, z: 0.0032346316, w: 0.9999948}
   m_LocalPosition: {x: 1.197, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3534,7 +3495,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.7218784, y: -0.000000093132215}
+  m_ConnectedAnchor: {x: 1.721879, y: -0.00000020116558}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3954,7 +3915,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.871419, y: -0.000000110423784}
+  m_ConnectedAnchor: {x: 0.87141883, y: -0.00000016071537}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4053,7 +4014,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5984482053418334619}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.99998796, w: 0.0049215895}
+  m_LocalRotation: {x: 0, y: 0, z: -0.9999881, w: 0.004897052}
   m_LocalPosition: {x: 0.69947976, y: -1.537276, z: 0}
   m_LocalScale: {x: 0.9999999, y: 0.9999999, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4216,7 +4177,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.0413431, y: 0.52006036}
+  m_ConnectedAnchor: {x: 0.04134322, y: 0.52006036}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4381,7 +4342,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.5845845, y: -0.000000522472}
+  m_ConnectedAnchor: {x: 0.58458453, y: -0.00000058114534}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5757,7 +5718,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.5348257, y: -0.00000033527604}
+  m_ConnectedAnchor: {x: 1.5348258, y: -0.00000033527604}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5902,7 +5863,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8380353745103559381}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.0017938666, w: 0.99999845}
+  m_LocalRotation: {x: 0, y: 0, z: 0.0017749119, w: 0.99999845}
   m_LocalPosition: {x: 0.97774696, y: 0.00000089858094, z: 0}
   m_LocalScale: {x: 0.9999999, y: 0.9999999, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6249,7 +6210,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8943468594386459265}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.0089051835, w: 0.9999604}
+  m_LocalRotation: {x: -0, y: -0, z: -0.008909093, w: 0.99996036}
   m_LocalPosition: {x: 1.606, y: 0.011, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

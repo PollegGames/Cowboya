@@ -8,8 +8,6 @@ public interface IRobotMemory
 
     void SetRespawnService(IRobotRespawnService service);
     void SetLastVisitedPoint(RoomWaypoint point);
-    void OnStuck(EnemyWorkerController controller);
-    void OnBossStuck(EnemyController controller);
     void RememberPlayerPosition(Vector3 playerPosition);
     void ClearPlayerPosition();
     void RegisterAttack();

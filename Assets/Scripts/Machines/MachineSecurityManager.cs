@@ -18,7 +18,7 @@ public class MachineSecurityManager : MonoBehaviour
     // Tracks *currently ON* machines (any type)
     private readonly HashSet<MonoBehaviour> machinesOn = new();
 
-    private readonly List<ReactiveMachineAI> guards = new();
+    private readonly List<RobotBrain> guards = new();
 
     public event Action OnAllMachinesOff;
 
@@ -61,14 +61,14 @@ public class MachineSecurityManager : MonoBehaviour
         if (IsOn(machine)) machinesOn.Add(machine); else machinesOn.Remove(machine);
     }
 
-    public void RegisterGuard(ReactiveMachineAI guard)
+    public void RegisterGuard(RobotBrain guard)
     {
         if (guard == null || guards.Contains(guard)) return;
         Debug.Log($"Registering guard: {guard.name}");
         guards.Add(guard);
     }
 
-    public void UnregisterGuard(ReactiveMachineAI guard)
+    public void UnregisterGuard(RobotBrain guard)
     {
         if (guard == null) return;
         guards.Remove(guard);
@@ -127,15 +127,14 @@ public class MachineSecurityManager : MonoBehaviour
         Debug.Log($"Dispatching guard for machine: {machine.name}");
         if (machine == null || guards.Count == 0) return;
 
-        ReactiveMachineAI best = null;
+        RobotBrain best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
 
         foreach (var guard in guards)
         {
             if (guard == null) continue;
-            var controller = guard.GetComponent<EnemyController>();
-            if (controller == null || controller.EnemyStatus != EnemyStatus.CheckingSecurity)
+            if (guard == null)
                 continue;
 
             float dist = Vector2.Distance(guard.transform.position, pos);
@@ -146,7 +145,10 @@ public class MachineSecurityManager : MonoBehaviour
             }
         }
 
-        best?.ReactivateFactoryMachine(machine);
+        if (best == null)
+            return;
+
+        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
     }
 
     private void DispatchGuardForRestingMachine(RestingMachine machine)
@@ -154,17 +156,15 @@ public class MachineSecurityManager : MonoBehaviour
         Debug.Log($"Dispatching guard for machine: {machine.name}");
         if (machine == null || guards.Count == 0) return;
 
-        ReactiveMachineAI best = null;
+        RobotBrain best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
 
         foreach (var guard in guards)
         {
             if (guard == null) continue;
-            var controller = guard.GetComponent<EnemyController>();
-            if (controller == null || controller.EnemyStatus != EnemyStatus.CheckingSecurity)
+            if (guard == null)
                 continue;
-
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
             {
@@ -173,7 +173,10 @@ public class MachineSecurityManager : MonoBehaviour
             }
         }
 
-        best?.ReactivateRestingMachine(machine);
+        if (best == null)
+            return;
+
+        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
     }
 
     /// <summary>
@@ -247,5 +250,11 @@ public class MachineSecurityManager : MonoBehaviour
         }
         return false;
     }
-}
 
+    private static void PushBrainIntent(RobotBrain guard, RobotTaskType taskType, object payload, bool isOn)
+    {
+        if (guard == null)
+            return;
+        guard.OnMachineStateChanged(payload, isOn);
+    }
+}

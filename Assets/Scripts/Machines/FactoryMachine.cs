@@ -18,11 +18,11 @@ public class FactoryMachine : BaseMachine
     private bool cubeActive = false;
 
     public event Action<FactoryMachine, bool> OnMachineStateChanged;
-    public event Action<FactoryMachine, EnemyWorkerController> OnMachineTurningOff;
-    private EnemyWorkerController currentWorker;
+    public event Action<FactoryMachine, RobotBrain> OnMachineTurningOff;
+    private RobotBrain currentWorker;
 
     public bool HasWorker => currentWorker != null;
-    public EnemyWorkerController CurrentWorker => currentWorker;
+    public RobotBrain CurrentWorker => currentWorker;
 
     protected override void Awake()
     {
@@ -166,7 +166,7 @@ public class FactoryMachine : BaseMachine
     /// </summary>
     public override void AttachRobot(GameObject robot)
     {
-        var newWorker = robot.GetComponent<EnemyWorkerController>();
+        var newWorker = robot.GetComponent<RobotBrain>();
         if (newWorker == null) return;
         // If the machine is off, send any worker to rest
         if (!isOn)
@@ -200,33 +200,28 @@ public class FactoryMachine : BaseMachine
     /// <summary>
     /// Helper to send a worker to the rest station state.
     /// </summary>
-    private void SendWorkerToRest(EnemyWorkerController worker)
+    private void SendWorkerToRest(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.stateMachine.ChangeState(
-            new Worker_GoingToRestStation(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(this, false);
     }
 
-    private void SendWorkerToWork(EnemyWorkerController worker)
+    private void SendWorkerToWork(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.stateMachine.ChangeState(
-            new Worker_GoingToLeastWorkedStation(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(this, true);
     }
 
-    private void SetWorkerToWork(EnemyWorkerController worker)
+    private void SetWorkerToWork(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.SetCurrentMachine(this);
-        worker.stateMachine.ChangeState(
-            new Worker_IsWork(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(this, true);
     }
 
-    public void SendWorkerBackToWork(EnemyWorkerController worker)
+    public void SendWorkerBackToWork(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.stateMachine.ChangeState(
-            new Worker_GoingToMachine(worker, worker.stateMachine, worker.waypointService, this));
+        worker.OnMachineStateChanged(this, true);
     }
 
     /// <summary>

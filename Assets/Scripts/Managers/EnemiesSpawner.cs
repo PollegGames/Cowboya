@@ -1,21 +1,19 @@
-using UnityEngine;
 using System.Collections.Generic;
-using System;
+using UnityEngine;
 
 public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 {
     [Header("Prefabs")]
     [SerializeField] private GameObject workerPrefab;
-    [SerializeField] private GameObject workerSpawnerPrefab;   // NEW (Worker that acts as a spawner)
-    [SerializeField] private GameObject followerGuardPrefab;   // NEW (Follower AI variant)
-    [SerializeField] private GameObject securityGuardPrefab;   // NEW (Standard security guard)
+    [SerializeField] private GameObject workerSpawnerPrefab;
+    [SerializeField] private GameObject followerGuardPrefab;
+    [SerializeField] private GameObject securityGuardPrefab;
     [SerializeField] private GameObject bossPrefab;
 
     [Header("Hierarchy")]
     [SerializeField] private Transform enemiesParent;
     private Transform dropContainer;
 
-    // Services
     private MapManager mapManager;
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
@@ -24,7 +22,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     private BatterySpawner batterySpawner;
     private GameUIViewModel gameUIViewModel;
 
-    // Spawned instances
     private readonly List<GameObject> spawnedWorkers = new();
     private readonly List<GameObject> spawnedWorkerSpawners = new();
     private readonly List<GameObject> spawnedSecurityGuards = new();
@@ -57,13 +54,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
         if (respawnService is RobotRespawnService service)
             service.Initialize(this);
-
-        Debug.Log("EnemiesSpawner: services initialized.");
     }
-
-    // ------------------------------------------------------------------------
-    // CREATE (allocate but NOT placed/activated)
-    // ------------------------------------------------------------------------
 
     public void CreateWorkers(int count)
     {
@@ -79,13 +70,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             var state = go.GetComponent<RobotStateController>();
             if (state == null)
             {
-                Debug.LogError($"[EnemiesSpawner] Worker prefab '{go.name}' is missing RobotStateController.");
-                ObjectPool.Instance.Release(go);
-                continue;
-            }
-
-            if (EnsureWorkerController(go, workerPrefab) == null)
-            {
                 ObjectPool.Instance.Release(go);
                 continue;
             }
@@ -95,8 +79,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             go.SetActive(false);
             spawnedWorkers.Add(go);
         }
-
-        Debug.Log($"{count} workers created.");
     }
 
     public void CreateWorkerSpawners(int count)
@@ -113,23 +95,15 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             var state = go.GetComponent<RobotStateController>();
             if (state == null)
             {
-                Debug.LogError($"[EnemiesSpawner] Worker spawner prefab '{go.name}' is missing RobotStateController.");
                 ObjectPool.Instance.Release(go);
                 continue;
             }
 
-            if (EnsureWorkerController(go, workerSpawnerPrefab) == null)
-            {
-                ObjectPool.Instance.Release(go);
-                continue;
-            }
             state.Stats = factory.CreateRobot();
             state.Stats.RobotName = $"WorkerSpawner {i + 1}";
             go.SetActive(false);
             spawnedWorkerSpawners.Add(go);
         }
-
-        Debug.Log($"{count} worker spawners created.");
     }
 
     public void CreateSecurityGuards(int count)
@@ -141,13 +115,14 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         {
             var go = PoolGet(securityGuardPrefab);
             var state = go.GetComponent<RobotStateController>();
-            state.Stats = factory.CreateRobot();
-            state.Stats.RobotName = $"Security Guard {i + 1}";
+            if (state != null)
+            {
+                state.Stats = factory.CreateRobot();
+                state.Stats.RobotName = $"Security Guard {i + 1}";
+            }
             go.SetActive(false);
             spawnedSecurityGuards.Add(go);
         }
-
-        Debug.Log($"{count} security guards created.");
     }
 
     public void CreateBoss()
@@ -159,188 +134,102 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         if (locomotion != null) locomotion.isPlayerControlled = false;
 
         var state = bossInstance.GetComponent<RobotStateController>();
-        state.Stats = factory.CreateRobot();
-        state.Stats.RobotName = "BOSS 1";
+        if (state != null)
+        {
+            state.Stats = factory.CreateRobot();
+            state.Stats.RobotName = "BOSS 1";
+        }
 
-        // Place at END if available (kept here so we can immediately show it during Spread)
         RoomWaypoint end = waypointService.GetEndPoint();
         bossInstance.transform.position = (end != null) ? end.WorldPos : Vector3.zero;
-
         bossInstance.SetActive(false);
-        Debug.Log("Boss created.");
     }
+
     public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine)
     {
-        // Use the dedicated prefab if assigned; fallback to securityGuardPrefab’s existing value.
-        var prefab = securityGuardPrefab != null ? securityGuardPrefab : bossPrefab; // last-ditch fallback
+        var prefab = securityGuardPrefab != null ? securityGuardPrefab : bossPrefab;
         if (prefab == null)
         {
             Debug.LogError("[EnemiesSpawner] No security guard prefab assigned.");
             return;
         }
 
-        // Pool, place, init
         var guard = PoolGet(prefab);
         guard.transform.position = spawnPos.WorldPos;
         PrepareSkeleton(guard);
+        InitializeRobot(guard, RobotRole.SecurityGuard, spawnPos);
         guard.SetActive(true);
-
-        // Initialize controller + state
-        var ec = guard.GetComponent<EnemyController>();
-        if (ec != null)
-        {
-            ec.Initialize
-            (waypointService,
-            waypointService,
-            respawnService,
-            dropContainer,
-            securityBadgeSpawner,
-            true);
-            ec.SetSecurityGuardState();
-            ec.memory.SetLastVisitedPoint(spawnPos);
-        }
-
-        // Reactive machine hookup
-        var guardAI = guard.GetComponent<ReactiveMachineAI>();
-        guardAI?.Initialize(waypointService, securityManager);
-        guardAI?.ReactivateSecurityMachine(machine);
-
-        // Track it alongside pre-created guards list so spread/cleanup logic remains coherent
         spawnedSecurityGuards.Add(guard);
-
-        Debug.Log("[EnemiesSpawner] Security guard created & spawned (legacy API).");
     }
 
-    // Followers are typically created and spawned at once (on alarm/reactive events).
     public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus alarmStatus)
     {
         var factory = new EnemyRobotFactory(1);
 
         var go = PoolGet(followerGuardPrefab);
         var state = go.GetComponent<RobotStateController>();
-        state.Stats = factory.CreateRobot();
-        state.Stats.RobotName = $"Follower {spawnedFollowers.Count + 1}";
+        if (state != null)
+        {
+            state.Stats = factory.CreateRobot();
+            state.Stats.RobotName = $"Follower {spawnedFollowers.Count + 1}";
+        }
 
         PositionAndWake(go, spawnPos.WorldPos);
-        InitEnemyController(go);
-        go.GetComponent<EnemyController>()?.SetFollowerState(alarmStatus);
-        go.GetComponent<EnemyController>()?.memory.SetLastVisitedPoint(spawnPos);
-
-        var ai = go.GetComponent<ReactiveMachineAI>();
-        ai?.Initialize(waypointService, securityManager);
+        InitializeRobot(go, RobotRole.SecurityGuard, spawnPos);
 
         spawnedFollowers.Add(go);
-        Debug.Log("Follower guard created & spawned.");
     }
-
-    // ------------------------------------------------------------------------
-    // SPREAD (place, activate, initialize)
-    // ------------------------------------------------------------------------
 
     public void SpreadEnemies()
     {
-        // Workers
         foreach (var w in spawnedWorkers)
         {
             if (w == null)
                 continue;
 
-            var c = EnsureWorkerController(w, workerPrefab);
-            if (c == null)
-            {
-                Debug.LogError($"[EnemiesSpawner] Worker '{w.name}' has no EnemyWorkerController and cannot be initialized.");
-                continue;
-            }
-
             var p = waypointService.GetWorkOrRestPoint();
             PositionAndWake(w, p.WorldPos);
-            c.Initialize(waypointService, waypointService, respawnService, dropContainer, batterySpawner);
-            c.memory.SetLastVisitedPoint(p);
-            Debug.Log($"Worker spread to {p.WorldPos} and initialized");
+            InitializeRobot(w, RobotRole.Worker, p);
         }
 
-        // Worker spawners
         foreach (var ws in spawnedWorkerSpawners)
         {
             if (ws == null)
                 continue;
 
-            var c = EnsureWorkerController(ws, workerSpawnerPrefab);
-            if (c == null)
-            {
-                Debug.LogError($"[EnemiesSpawner] Worker spawner '{ws.name}' has no EnemyWorkerController and cannot be initialized.");
-                continue;
-            }
-
             var p = waypointService.GetBlockedRoomCenter();
             PositionAndWake(ws, p.WorldPos);
-            c.SetWorkerSpawnerState();
-            c.Initialize(waypointService, waypointService, respawnService,dropContainer, batterySpawner, true);
-            c.memory.SetLastVisitedPoint(p);
-            Debug.Log($"Worker spawner spread to {p.WorldPos} and initialized");
+            InitializeRobot(ws, RobotRole.WorkerSpawner, p);
         }
 
-        // Security guards
         foreach (var eg in spawnedSecurityGuards)
         {
             var p = waypointService.GetSecurityOrRestPoint();
             PositionAndWake(eg, p.WorldPos);
-
-            InitEnemyController(eg);
-            var ai = eg.GetComponent<ReactiveMachineAI>();
-            ai?.Initialize(waypointService, securityManager);
-
-            // Release reservation for later reuse
             waypointService.ReleasePOI(p);
-
-            eg.GetComponent<EnemyController>()?.SetSecurityGuardState();
-            eg.GetComponent<EnemyController>()?.memory.SetLastVisitedPoint(p);
-
-            Debug.Log($"Security guard spread to {p.WorldPos} and initialized");
+            InitializeRobot(eg, RobotRole.SecurityGuard, p);
         }
 
-        // Boss
         if (bossInstance != null)
         {
             var p = waypointService.GetEndPoint();
             PositionAndWake(bossInstance, (p != null) ? p.WorldPos : bossInstance.transform.position);
-            InitEnemyController(bossInstance, false);
-            bossInstance.GetComponent<EnemyController>()?.SetBossState();
-            bossInstance.GetComponent<EnemyController>()?.memory.SetLastVisitedPoint(p);
-            Debug.Log("Boss spread and initialized");
+            InitializeRobot(bossInstance, RobotRole.Boss, p);
         }
     }
 
-    // ------------------------------------------------------------------------
-    // ON-DEMAND / RANDOM SPAWN (utility)
-    // ------------------------------------------------------------------------
-
     public void SpawnEnemyAtRandom()
     {
-        // Example: spawn a NEW worker at a random work cell
         var go = PoolGet(workerPrefab);
         if (go == null)
             return;
 
         var pos = mapManager.GetRandomWorkPosition();
-
         PrepareSkeleton(go);
         PositionAndWake(go, pos);
-
-        var c = EnsureWorkerController(go, workerPrefab);
-        if (c == null)
-        {
-            Debug.LogError("[EnemiesSpawner] Unable to spawn worker at random because EnemyWorkerController is missing.");
-            ObjectPool.Instance.Release(go);
-            return;
-        }
-        c.Initialize(waypointService, waypointService, respawnService, dropContainer, batterySpawner);
-
-        var ai = go.GetComponent<ReactiveMachineAI>();
-        ai?.Initialize(waypointService, securityManager);
+        InitializeRobot(go, RobotRole.Worker);
 
         spawnedWorkers.Add(go);
-        Debug.Log($"[EnemiesSpawner] Spawned worker at {pos}.");
     }
 
     public void SpawnBossAtRandom()
@@ -350,32 +239,16 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
         PrepareSkeleton(go);
         PositionAndWake(go, pos);
-        InitEnemyController(go, false);
-        go.GetComponent<EnemyController>()?.SetBossState();
+        InitializeRobot(go, RobotRole.Boss);
 
         bossInstance = go;
-        Debug.Log($"[EnemiesSpawner] Spawned boss at {pos}.");
     }
-
-    // ------------------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------------------
 
     private GameObject PoolGet(GameObject prefab)
     {
         if (prefab == null)
-        {
-            Debug.LogError("[EnemiesSpawner] Missing prefab reference.");
             return null;
-        }
         return ObjectPool.Instance.Get(prefab, enemiesParent);
-    }
-
-    private void InitEnemyController(GameObject go, bool spawnInitialPickups = true)
-    {
-        var ec = go.GetComponent<EnemyController>();
-        if (ec != null)
-            ec.Initialize(waypointService, waypointService, respawnService, dropContainer, securityBadgeSpawner, spawnInitialPickups);
     }
 
     private void PositionAndWake(GameObject go, Vector3 worldPos)
@@ -386,9 +259,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         go.SetActive(true);
     }
 
-    /// <summary>
-    /// Reset joints/limiters for pooled ragdolls before activation.
-    /// </summary>
     private void PrepareSkeleton(GameObject go)
     {
         go.GetComponent<JointBreaker>()?.RestoreAll();
@@ -410,12 +280,14 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     private void HandleAllMachinesOff()
     {
-        var enemies = FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
-        foreach (var enemy in enemies)
+        var hearts = FindObjectsByType<RobotHeart>(FindObjectsSortMode.None);
+        foreach (var heart in hearts)
         {
-            if (enemy != null && enemy.IsBoss)
+            if (heart != null && heart.Role == RobotRole.Boss)
             {
-                enemy.Faint();
+                var state = heart.GetComponent<RobotStateController>();
+                if (state != null)
+                    state.UpdateState(RobotState.Faint);
                 break;
             }
         }
@@ -427,18 +299,23 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             securityManager.OnAllMachinesOff -= HandleAllMachinesOff;
     }
 
-    private EnemyWorkerController EnsureWorkerController(GameObject worker, GameObject sourcePrefab)
+    private void InitializeRobot(GameObject go, RobotRole role, RoomWaypoint lastVisited = null)
     {
-        if (worker == null)
-            return null;
+        if (go == null)
+            return;
 
-        var controller = worker.GetComponent<EnemyWorkerController>();
-        if (controller == null)
+        var maintenance = go.GetComponent<RobotBodyMaintenance>();
+        if (maintenance != null && respawnService != null)
+            maintenance.SetRespawnService(respawnService);
+
+        var heart = go.GetComponent<RobotHeart>();
+        if (heart != null && heart.Role != role)
         {
-            var prefabName = sourcePrefab != null ? sourcePrefab.name : worker.name;
-            Debug.LogError($"[EnemiesSpawner] Prefab '{prefabName}' is missing an EnemyWorkerController. Please add and configure it in the prefab asset.");
+            Debug.LogWarning($"[EnemiesSpawner] RobotHeart on {go.name} has role {heart.Role} but was initialized as {role}.");
         }
 
-        return controller;
+        var memory = go.GetComponent<RobotMemory>();
+        if (memory != null && lastVisited != null)
+            memory.SetLastVisitedPoint(lastVisited);
     }
 }

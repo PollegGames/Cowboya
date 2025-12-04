@@ -33,7 +33,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
     private readonly Dictionary<RoomWaypoint, int> securityUsageCounts = new();
 
     private readonly Dictionary<RoomWaypoint, int> workSpawnersUsageCounts = new();
-    private readonly Dictionary<FactoryMachine, EnemyWorkerController> reservedMachines = new();
+    private readonly Dictionary<FactoryMachine, RobotBrain> reservedMachines = new();
 
     // Listeners
     private readonly HashSet<IRobotNavigationListener> robots = new();
@@ -422,7 +422,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
     #endregion
 
     #region Machine Reservation
-    public FactoryMachine ReserveFreeMachine(RoomManager room, EnemyWorkerController worker)
+    public FactoryMachine ReserveFreeMachine(RoomManager room, RobotBrain worker)
     {
         if (room == null)
             return null;

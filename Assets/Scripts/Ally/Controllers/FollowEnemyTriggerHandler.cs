@@ -42,10 +42,10 @@ public class FollowEnemyTriggerHandler : MonoBehaviour
     {
         if (collider.CompareTag("Enemy"))
         {
-            var enemyControl = collider.transform.root.GetComponent<EnemyController>();
-            if (enemyControl != null)
+            var brain = collider.transform.root.GetComponent<RobotBrain>();
+            if (brain != null && brain.Body != null)
             {
-                enemyBodyReference = enemyControl.BodyReference;
+                enemyBodyReference = brain.Body.transform;
             }
         }
     }

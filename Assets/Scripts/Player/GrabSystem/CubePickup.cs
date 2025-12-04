@@ -129,14 +129,11 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
         if (!wasStolen && transform.parent != null)
         {
-            var enemy = transform.parent.GetComponentInParent<EnemyController>();
-            if (enemy != null)
+            var brain = transform.parent.GetComponentInParent<RobotBrain>();
+            var stateController = brain != null ? brain.GetComponent<RobotStateController>() : null;
+            if (brain != null && stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
             {
-                var stateController = enemy.GetComponent<RobotStateController>();
-                if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
-                {
-                    wasStolen = true;
-                }
+                wasStolen = true;
             }
         }
 

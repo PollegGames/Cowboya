@@ -154,36 +154,14 @@ public class SecurityCamera : MonoBehaviour
         var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
         if (factoryAlarm != null)
         {
-            // 2) Try get the EnemyController (and its memory) from this collider
-            var ec = enemyCollider.GetComponentInParent<EnemyController>();
-            if (ec != null)
+            var brain = enemyCollider.GetComponentInParent<RobotBrain>();
+            var mem = brain != null ? brain.Memory as IRobotMemory : enemyCollider.GetComponentInParent<IRobotMemory>();
+            if (mem != null && !enemiesInZone.Contains(mem))
+                enemiesInZone.Add(mem);
+            if (mem != null && mem.WasRecentlyAttacked)
             {
-                var mem = ec.GetComponent<IRobotMemory>();
-                if (mem != null && !enemiesInZone.Contains(mem))
-                    enemiesInZone.Add(mem);
-                var memory = ec.memory;
-                if (memory != null && memory.WasRecentlyAttacked)
-                {
-                    // 3) If they were recently attacked, raise the alarm
-                    factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
-                    factoryAlarm.LastPlayerPosition = memory.LastKnownPlayerPosition;
-                }
-            }
-
-             // 3) Try get the EnemyWorkerController (and its memory) from this collider
-            var ewc = enemyCollider.GetComponentInParent<EnemyWorkerController>();
-            if (ewc != null)
-            {
-                var mem = ewc.GetComponent<IRobotMemory>();
-                if (mem != null && !enemiesInZone.Contains(mem))
-                    enemiesInZone.Add(mem);
-                var memory = ewc.memory;
-                if (memory != null && memory.WasRecentlyAttacked)
-                {
-                    // 3) If they were recently attacked, raise the alarm
-                    factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
-                    factoryAlarm.LastPlayerPosition = memory.LastKnownPlayerPosition;
-                }
+                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
+                factoryAlarm.LastPlayerPosition = mem.LastKnownPlayerPosition;
             }
         }
     }

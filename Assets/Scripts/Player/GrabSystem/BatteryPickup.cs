@@ -196,16 +196,12 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         if (!wasStolen && transform.parent != null)
         {
-            var enemy = transform.parent.GetComponentInParent<EnemyWorkerController>();
-            if (enemy != null)
+            var brain = transform.parent.GetComponentInParent<RobotBrain>();
+            var stateController = brain != null ? brain.GetComponent<RobotStateController>() : null;
+            if (brain != null && stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
             {
-                var stateController = enemy.GetComponent<RobotStateController>();
-                if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
-                {
-                    enemy.OnBatteryStolen(player.gameObject, healthGain);
-                    enemy.HandleBatteryStolen();
-                    wasStolen = true;
-                }
+                // TODO: notify brain/memory about battery stolen if behavior needed.
+                wasStolen = true;
             }
         }
 

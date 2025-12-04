@@ -16,7 +16,7 @@ public interface IWaypointService : IWaypointNotifier, IWaypointQueries
     RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null);
     RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null);
     void ReleasePOI(RoomWaypoint poi);
-    FactoryMachine ReserveFreeMachine(RoomManager room, EnemyWorkerController worker);
+    FactoryMachine ReserveFreeMachine(RoomManager room, RobotBrain worker);
     void ReleaseMachine(FactoryMachine machine);
     bool IsMachineReserved(FactoryMachine machine);
 }

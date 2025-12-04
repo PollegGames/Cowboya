@@ -8,12 +8,12 @@ public class SecurityMachine : BaseMachine
     [SerializeField] private Material materialOff;
 
     private MeshRenderer meshRenderer;
-    private EnemyController currentGuard;
+    private RobotBrain currentGuardBrain;
 
-    public EnemyController CurrentGuard => currentGuard;
+    public RobotBrain CurrentGuard => currentGuardBrain;
 
     public event Action<SecurityMachine, bool> OnMachineStateChanged;
-    public event Action<SecurityMachine, EnemyController> OnMachineTurningOff;
+    public event Action<SecurityMachine, RobotBrain> OnMachineTurningOff;
 
     protected override void Awake()
     {
@@ -38,7 +38,7 @@ public class SecurityMachine : BaseMachine
     public override void PowerOff()
     {
         if (!isOn) return;
-        var guard = currentGuard;
+        var guard = currentGuardBrain;
         OnMachineTurningOff?.Invoke(this, guard);
         SendCurrentGuardToRest();
         base.PowerOff();
@@ -48,18 +48,18 @@ public class SecurityMachine : BaseMachine
 
     public override void AttachRobot(GameObject robot)
     {
-        var guard = robot.GetComponent<EnemyController>();
-        if (guard == null) return;
+        var guardBrain = robot.GetComponent<RobotBrain>();
+        if (guardBrain == null) return;
 
         if (!isOn)
         {
-            SendGuardToRest(guard);
+            SendGuardToRest(guardBrain);
             return;
         }
 
-        SendGuardToRest(currentGuard);
-        SetGuardToSecurityPost(guard);
-        currentGuard = guard;
+        SendGuardToRest(currentGuardBrain);
+        SetGuardToSecurityPost(guardBrain);
+        currentGuardBrain = guardBrain;
         base.AttachRobot(robot);
     }
 
@@ -70,23 +70,21 @@ public class SecurityMachine : BaseMachine
         base.ReleaseRobot();
     }
 
-    private void SendGuardToRest(EnemyController guard)
+    private void SendGuardToRest(RobotBrain guard)
     {
         if (guard == null) return;
-        var sm = guard.GetComponent<EnemyStateMachine>();
-        sm?.ChangeState(new Enemy_GoingToRest(guard, sm, waypointService));
+        guard.OnMachineStateChanged(this, false);
     }
 
-    private void SetGuardToSecurityPost(EnemyController guard)
+    private void SetGuardToSecurityPost(RobotBrain guard)
     {
         if (guard == null) return;
-        var sm = guard.GetComponent<EnemyStateMachine>();
-        sm?.ChangeState(new Enemy_CheckingSecurity(guard, sm, waypointService));
+        guard.OnMachineStateChanged(this, true);
     }
 
     private void SendCurrentGuardToRest()
     {
-        SendGuardToRest(currentGuard);
-        currentGuard = null;
+        SendGuardToRest(currentGuardBrain);
+        currentGuardBrain = null;
     }
 }

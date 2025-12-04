@@ -6,80 +6,31 @@ using UnityEngine;
 public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
 {
     [Header("Player Memory")]
-    public Vector3 LastKnownPlayerPosition { get; private set; }
-    public float TimeSincePlayerLastSeen { get; private set; }
+    public Vector3 LastKnownPlayerPosition => memoryState.LastKnownPlayerPosition;
+    public float TimeSincePlayerLastSeen => memoryState.TimeSincePlayerLastSeen;
 
     [Header("Aggression Memory")]
-    public bool WasRecentlyAttacked { get; private set; }
-    public float TimeSinceLastAttack { get; private set; }
+    public bool WasRecentlyAttacked => memoryState.WasRecentlyAttacked;
+    public float TimeSinceLastAttack => memoryState.TimeSinceLastAttack;
 
-    private IRobotRespawnService respawnService;
-    public RoomWaypoint LastVisitedPoint { get; private set; }
+    public RoomWaypoint LastVisitedPoint => memoryState.LastVisitedPoint;
+    public RobotMemoryState Snapshot => memoryState;
+
+    private readonly RobotMemoryState memoryState = new RobotMemoryState();
 
     private void Update()
     {
-        // Automatically update timers
-        if (LastKnownPlayerPosition != Vector3.zero)
-            TimeSincePlayerLastSeen += Time.deltaTime;
-
-        if (WasRecentlyAttacked)
-            TimeSinceLastAttack += Time.deltaTime;
+        memoryState.Tick(Time.deltaTime);
     }
+
     public void SetRespawnService(IRobotRespawnService service)
     {
-        respawnService = service;
+        memoryState.SetRespawnService(service);
     }
-
 
     public void SetLastVisitedPoint(RoomWaypoint point)
     {
-        LastVisitedPoint = point;
-    }
-
-    /// <summary>
-    /// Called when EnemyController detects it’s “stuck.” 
-    /// Memory will now tell the spawner to create a brand-new enemy, then destroy this one.
-    /// </summary>
-    public void OnStuck(EnemyWorkerController controller)
-    {
-        Debug.Log($"[EnemyMemory] Enemy stuck at {controller.transform.position}. Requesting respawn.");
-
-        // Use the respawn service BEFORE releasing to pool to avoid
-        // clearing the reference during OnReleaseToPool.
-        if (respawnService == null)
-        {
-            Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
-        }
-        else
-        {
-            respawnService.RespawnWorker();
-        }
-
-        // Return the stuck enemy to the pool after requesting a respawn.
-        ObjectPool.Instance.Release(controller.gameObject);
-    }
-
-    /// <summary>
-    /// Called when EnemyController detects it’s “stuck.” 
-    /// Memory will now tell the spawner to create a brand-new enemy, then destroy this one.
-    /// </summary>
-    public void OnBossStuck(EnemyController controller)
-    {
-        Debug.Log($"[EnemyMemory] Boss stuck at {controller.transform.position}. Requesting respawn.");
-
-        // Use the respawn service BEFORE releasing to pool to avoid
-        // clearing the reference during OnReleaseToPool.
-        if (respawnService == null)
-        {
-            Debug.LogError("[EnemyMemory] Cannot respawn: service is null!");
-        }
-        else
-        {
-            respawnService.RespawnBoss();
-        }
-
-        // Return the stuck boss to the pool after requesting a respawn.
-        ObjectPool.Instance.Release(controller.gameObject);
+        memoryState.SetLastVisitedPoint(point);
     }
 
     /// <summary>
@@ -88,8 +39,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// <param name="playerPosition">Detected player position.</param>
     public void RememberPlayerPosition(Vector3 playerPosition)
     {
-        LastKnownPlayerPosition = playerPosition;
-        TimeSincePlayerLastSeen = 0f;
+        memoryState.RememberPlayerPosition(playerPosition);
     }
 
     /// <summary>
@@ -97,10 +47,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// </summary>
     public void ClearPlayerPosition()
     {
-        if (WasRecentlyAttacked)
-            return;
-        LastKnownPlayerPosition = Vector3.zero;
-        TimeSincePlayerLastSeen = 0f;
+        memoryState.ClearPlayerPosition();
     }
 
     /// <summary>
@@ -108,8 +55,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// </summary>
     public void RegisterAttack()
     {
-        WasRecentlyAttacked = true;
-        TimeSinceLastAttack = 0f;
+        memoryState.RegisterAttack();
     }
 
     /// <summary>
@@ -117,8 +63,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// </summary>
     public void ResetAttackMemory()
     {
-        WasRecentlyAttacked = false;
-        TimeSinceLastAttack = 0f;
+        memoryState.ResetAttackMemory();
     }
 
     /// <summary>
@@ -126,12 +71,7 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// </summary>
     public void OnReleaseToPool()
     {
-        LastKnownPlayerPosition = Vector3.zero;
-        TimeSincePlayerLastSeen = 0f;
-        WasRecentlyAttacked = false;
-        TimeSinceLastAttack = 0f;
-        LastVisitedPoint = null;
-        respawnService = null;
+        memoryState.ResetAll();
     }
 
     /// <summary>
@@ -139,11 +79,12 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     /// </summary>
     public void OnAcquireFromPool()
     {
-        TimeSincePlayerLastSeen = 0f;
-        TimeSinceLastAttack = 0f;
-        if (respawnService == null)
+        memoryState.ResetAll();
+        if (memoryState.RespawnService == null)
         {
-            respawnService = GetComponent<IRobotRespawnService>();
+            var respawn = GetComponent<IRobotRespawnService>();
+            if (respawn != null)
+                memoryState.SetRespawnService(respawn);
         }
     }
 }

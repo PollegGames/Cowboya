@@ -1,0 +1,115 @@
+using UnityEngine;
+
+/// <summary>
+/// Executes movement/physics for a robot. This is the Body pillar that drives locomotion
+/// and reacts to navigation events, while Brain/Heart decide intent.
+/// </summary>
+[RequireComponent(typeof(RobotBodyMaintenance))]
+public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
+{
+    [Header("Navigation")]
+    [SerializeField] private float arrivalThresholdX = 2f;
+    [SerializeField] private float arrivalThresholdY = 2f;
+    [SerializeField] private float deadZoneX = 5f;
+    [SerializeField] private float deadZoneY = 5f;
+    [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
+
+    [SerializeField] private RobotBodyMaintenance bodyMaintenance;
+    [SerializeField] private bool isBoss;
+
+    private WaypointPathFollower pathFollower;
+    private IWaypointQueries waypointQueries;
+    private IWaypointNotifier waypointNotifier;
+    private System.Action stuckHandler;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        if (bodyMaintenance == null)
+            bodyMaintenance = GetComponent<RobotBodyMaintenance>();
+    }
+
+    public void Initialize(
+        IWaypointQueries waypointQueries,
+        IWaypointNotifier waypointNotifier,
+        IRobotRespawnService respawnService)
+    {
+        this.waypointQueries = waypointQueries;
+        this.waypointNotifier = waypointNotifier;
+        if (bodyMaintenance != null && respawnService != null)
+            bodyMaintenance.SetRespawnService(respawnService);
+
+        if (pathFollower == null)
+            SetupPathFollower();
+        if (this.waypointNotifier != null && pathFollower != null)
+            this.waypointNotifier.Subscribe(pathFollower);
+    }
+
+    public void SetIsBoss(bool value)
+    {
+        isBoss = value;
+    }
+
+    private void Update()
+    {
+        if (updateLoop == UpdateLoop.Update)
+            pathFollower?.Update(Time.deltaTime);
+    }
+
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        if (updateLoop == UpdateLoop.FixedUpdate)
+            pathFollower?.Update(Time.fixedDeltaTime);
+    }
+
+    private void SetupPathFollower()
+    {
+        pathFollower = new WaypointPathFollower(bodyReference, this, waypointQueries,
+            arrivalThresholdX, arrivalThresholdY, deadZoneX, deadZoneY);
+        stuckHandler = HandlePathFollowerStuck;
+        pathFollower.OnStuck += stuckHandler;
+    }
+
+    private void HandlePathFollowerStuck()
+    {
+        bodyMaintenance?.OnStuck(this, isBoss);
+    }
+
+    public void SetDestination(RoomWaypoint target, bool includeUnavailable = false) =>
+        pathFollower?.SetDestination(target, includeUnavailable);
+
+    public void SetDestination(Vector3 worldPosition, bool includeUnavailable = false)
+    {
+        if (waypointQueries == null)
+            return;
+        var waypoint = waypointQueries.GetClosestWaypoint(worldPosition, includeUnavailable);
+        if (waypoint != null)
+            pathFollower?.SetDestination(waypoint, includeUnavailable);
+    }
+
+    public bool HasArrivedAtDestination() => pathFollower != null && pathFollower.HasArrived;
+
+    public void OnPathObsoleted(RoomWaypoint blockedWaypoint) =>
+        pathFollower?.OnPathObsoleted(blockedWaypoint);
+
+    public RoomWaypoint GetClosestWaypoint(RoomWaypoint exclude = null) =>
+        pathFollower != null ? pathFollower.GetClosestWaypoint(exclude) : null;
+
+    public void OnReleaseToPool()
+    {
+        if (pathFollower != null)
+        {
+            pathFollower.OnStuck -= stuckHandler;
+            waypointNotifier?.Unsubscribe(pathFollower);
+        }
+        pathFollower = null;
+        stuckHandler = null;
+    }
+
+    public void OnAcquireFromPool()
+    {
+        if (pathFollower == null && waypointQueries != null)
+            SetupPathFollower();
+    }
+}

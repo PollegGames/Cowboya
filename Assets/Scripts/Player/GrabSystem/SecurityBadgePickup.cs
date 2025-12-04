@@ -176,20 +176,17 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
                 inventory = candidates[0];
         }
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
-        EnemyController enemy = null;
+        RobotHeart enemyHeart = null;
 
         // Detect if we're stealing from an enemy
         if (!wasStolen && transform.parent != null)
         {
-            enemy = transform.parent.GetComponentInParent<EnemyController>();
-            if (enemy != null)
+            enemyHeart = transform.parent.GetComponentInParent<RobotHeart>();
+            var stateController = enemyHeart != null ? enemyHeart.GetComponent<RobotStateController>() : null;
+            if (enemyHeart != null && stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
             {
-                var stateController = enemy.GetComponent<RobotStateController>();
-                if (stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
-                {
-                    enemy.OnBadgeStolen(player.gameObject);
-                    wasStolen = true;
-                }
+                // TODO: wire badge-stolen behavior into Brain/handlers.
+                wasStolen = true;
             }
         }
 
@@ -246,10 +243,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         SetFollowTarget(attachmentParent);
         ApplySortingOrder(heldSortingOrder);
 
-        if (wasStolen && enemy != null && player != null)
-        {
-            enemy.HandleBadgeStolen();
-        }
+        // TODO: notify Brain/Memory about badge stolen if needed.
 
     }
 

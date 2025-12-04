@@ -5,7 +5,6 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
     [SerializeField] private BodyJointLimiter bodyJointLimiter;
     [SerializeField] private LegJointLimiter legJointLimiter;
     [SerializeField] private Animator animator;
-    [SerializeField] private EnemyStateMachine stateMachine;
     [SerializeField] private RobotStateController robotStateController;
     [SerializeField] private JointBreaker jointBreaker;
 
@@ -21,8 +20,6 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
             legJointLimiter = GetComponent<LegJointLimiter>();
         if (animator == null)
             animator = GetComponent<Animator>();
-        if (stateMachine == null)
-            stateMachine = GetComponent<EnemyStateMachine>();
         if (robotStateController == null)
             robotStateController = GetComponent<RobotStateController>();
         if (jointBreaker == null)
@@ -83,7 +80,6 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
             animator.Update(0f);
         }
 
-        stateMachine?.ChangeState(null);
         robotStateController?.UpdateState(RobotState.Alive);
     }
 }

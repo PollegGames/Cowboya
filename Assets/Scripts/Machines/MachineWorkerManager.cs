@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Listens to FactoryMachine state changes and redirects workers accordingly.
-/// This script demonstrates the worker–machine interaction logic described in the documentation.
+/// This script demonstrates the worker-machine interaction logic described in the documentation.
 /// </summary>
 public class MachineWorkerManager : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class MachineWorkerManager : MonoBehaviour
     private List<FactoryMachine> machines = new List<FactoryMachine>();
 
     // Track workers waiting on a specific machine
-    private readonly Dictionary<EnemyWorkerController, FactoryMachine> waitingWorkers = new();
+    private readonly Dictionary<RobotBrain, FactoryMachine> waitingWorkers = new();
 
     public void RegisterMachine(FactoryMachine machine)
     {
@@ -30,18 +30,19 @@ public class MachineWorkerManager : MonoBehaviour
             OnMachineTurnedOn(machine);
     }
 
-    private void HandleMachineTurningOff(FactoryMachine machine, EnemyWorkerController worker)
+    private void HandleMachineTurningOff(FactoryMachine machine, RobotBrain worker)
     {
         OnMachineTurnedOff(machine, worker);
     }
 
-    private void OnMachineTurnedOff(FactoryMachine machine, EnemyWorkerController worker)
+    private void OnMachineTurnedOff(FactoryMachine machine, RobotBrain worker)
     {
         if (worker == null)
             return;
 
         // Store that this worker was attached to this machine
         waitingWorkers[worker] = machine;
+        PushBrainIntent(worker, RobotTaskType.Rest, machine, false);
 
         AssignToFirstFreePointAvailable(worker);
     }
@@ -55,6 +56,7 @@ public class MachineWorkerManager : MonoBehaviour
             {
                 var worker = pair.Key;
                 waitingWorkers.Remove(worker);
+                PushBrainIntent(worker, RobotTaskType.WorkAtMachine, machine, true);
                 machine.SendWorkerBackToWork(worker);
             }
         }
@@ -63,9 +65,16 @@ public class MachineWorkerManager : MonoBehaviour
     /// <summary>
     /// Send worker to nearest rest point. Falls back to start room if none free.
     /// </summary>
-    public void AssignToFirstFreePointAvailable(EnemyWorkerController worker)
+    public void AssignToFirstFreePointAvailable(RobotBrain worker)
     {
-        worker.stateMachine.ChangeState(new Worker_GoingToLeastWorkedStation(worker, worker.stateMachine, worker.waypointService));
+        worker.OnMachineStateChanged(null, false);
+    }
+
+    private static void PushBrainIntent(RobotBrain worker, RobotTaskType taskType, object payload, bool isOn)
+    {
+        if (worker == null)
+            return;
+        worker.OnMachineStateChanged(payload, isOn);
     }
 
 }
