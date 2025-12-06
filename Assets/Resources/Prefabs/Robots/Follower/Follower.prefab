@@ -935,6 +935,16 @@ GameObject:
   m_Component:
   - component: {fileID: 8925720685447753308}
   - component: {fileID: 3478008838560188690}
+  - component: {fileID: 4421093297410794618}
+  - component: {fileID: 5995244961177809690}
+  - component: {fileID: 5063167390386217836}
+  - component: {fileID: 2749617419865133381}
+  - component: {fileID: 8254169501617715923}
+  - component: {fileID: 94803746851431767}
+  - component: {fileID: 8211299274638722592}
+  - component: {fileID: 6802799724986707657}
+  - component: {fileID: 5727168351269883916}
+  - component: {fileID: 1660224202335959635}
   m_Layer: 0
   m_Name: Follower
   m_TagString: Untagged
@@ -1026,6 +1036,167 @@ MonoBehaviour:
     Puppet: {fileID: 8909786061085525401}
     PuppetBody2D: {fileID: 0}
     PuppetBody3D: {fileID: 0}
+--- !u!114 &4421093297410794618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6d08824f9467934690b10c4608b9772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::EnergyBot
+  rechargeRate: 2
+  tickDelay: 1
+--- !u!114 &5995244961177809690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0edf6999386443479a3a89cbeb06c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::HealthBot
+  damageFeedback: {fileID: 8194142636594957804}
+  memory: {fileID: 5063167390386217836}
+--- !u!114 &5063167390386217836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 906126257589b3140b69badd1f7e1d9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotMemory
+--- !u!114 &2749617419865133381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b174dc543db813e4ebf8a4dd68405936, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotStateController
+  energyBot: {fileID: 4421093297410794618}
+  healthBot: {fileID: 5995244961177809690}
+  Stats:
+    RobotName: Follower
+    MaxHealth: 30
+    CurrentHealth: 30
+    MaxEnergy: 50
+    CurrentEnergy: 50
+    AttackEnergyCost: 5
+    EnergyRechargeRate: 2
+--- !u!114 &8254169501617715923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0fc7a5ea4be4010be29e4887b018d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::Inventory
+--- !u!114 &94803746851431767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab148081b3947484ab0d3ba9c3fb06db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotHeart
+  role: 3
+  overrideStackDepth: 0
+  seedIdleTask: 1
+--- !u!114 &8211299274638722592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b782b515f2c0dcc4684933419bbf779d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBrain
+  heart: {fileID: 94803746851431767}
+  config:
+    role: 0
+    resumeWorkOnMachineOn: 1
+    defaultTimeoutSeconds: 10
+  body: {fileID: 5727168351269883916}
+  memory: {fileID: 5063167390386217836}
+  taskHandlers: {fileID: 11400000, guid: 6a247282c5d33424389e8af2fef0ec87, type: 2}
+  roleTaskHandlers:
+  - Role: 3
+    Handlers: {fileID: 11400000, guid: 6a247282c5d33424389e8af2fef0ec87, type: 2}
+--- !u!114 &6802799724986707657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBodyMaintenance
+  memory: {fileID: 5063167390386217836}
+--- !u!114 &5727168351269883916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78fc318645d30794c81b0a3637c2d180, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBodyController
+  moveSpeed: 3
+  animator: {fileID: 3185270336847421390}
+  bodyReference: {fileID: 8925720685447753308}
+  hipRb: {fileID: 336793014475126006}
+  arrivalThresholdX: 2
+  arrivalThresholdY: 2
+  deadZoneX: 5
+  deadZoneY: 5
+  updateLoop: 0
+  bodyMaintenance: {fileID: 6802799724986707657}
+  isBoss: 0
+--- !u!114 &1660224202335959635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1049137500927649083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotBodyMaintenance
+  memory: {fileID: 5063167390386217836}
 --- !u!1 &1078141103336894371
 GameObject:
   m_ObjectHideFlags: 0
@@ -4300,7 +4471,7 @@ MonoBehaviour:
   attackZone: {fileID: 7293022507263928001}
   circleCenter: {fileID: 5423274823824284250}
   radius: 2
-  memory: {fileID: 0}
+  memory: {fileID: 5063167390386217836}
 --- !u!1 &6291357191075851414
 GameObject:
   m_ObjectHideFlags: 0

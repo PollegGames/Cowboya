@@ -2179,7 +2179,6 @@ GameObject:
   - component: {fileID: 3901679018326628933}
   - component: {fileID: 393579632015866257}
   - component: {fileID: 6401809315403970274}
-  - component: {fileID: 758698628174055974}
   - component: {fileID: 3888384783130253247}
   - component: {fileID: 3084759943220385380}
   - component: {fileID: 2232273132763882073}
@@ -2349,23 +2348,6 @@ MonoBehaviour:
     CurrentEnergy: 30
     AttackEnergyCost: 1
     EnergyRechargeRate: 1
---- !u!114 &758698628174055974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3479292778027586589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::PooledEnemy
-  bodyJointLimiter: {fileID: 0}
-  legJointLimiter: {fileID: 0}
-  animator: {fileID: 159342441083899244}
-  robotStateController: {fileID: 6401809315403970274}
-  jointBreaker: {fileID: 0}
 --- !u!114 &3888384783130253247
 MonoBehaviour:
   m_ObjectHideFlags: 0
