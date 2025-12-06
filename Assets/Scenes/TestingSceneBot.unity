@@ -3036,6 +3036,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3604072060768366223, guid: 8b5afd8220551884d9e4a5212ab1a9e3, type: 3}
   m_PrefabInstance: {fileID: 2007338239}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &505932654109386070
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -13.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.72
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2028770711997758897, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3629763386926311630, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
+      propertyPath: m_Name
+      value: BossMony
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 44e1caff8543dff4998337e3830d907d, type: 3}
 --- !u!1001 &5586209264856272718
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3105,3 +3162,4 @@ SceneRoots:
   - {fileID: 210198858}
   - {fileID: 5586209264856272718}
   - {fileID: 1953741059}
+  - {fileID: 505932654109386070}
