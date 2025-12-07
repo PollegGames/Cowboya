@@ -1,12 +1,19 @@
 using UnityEngine;
 
+/// <summary>
+/// Pool lifecycle glue for robots using the Heart/Brain/Body/Memory architecture.
+/// Resets physical state and intent when the enemy is recycled.
+/// </summary>
 public class PooledEnemy : MonoBehaviour, IPooledObject
 {
-    [SerializeField] private BodyJointLimiter bodyJointLimiter;
-    [SerializeField] private LegJointLimiter legJointLimiter;
+    [Header("Core")]
+    [SerializeField] private RobotHeart heart;
+    [SerializeField] private RobotBodyController body;
+    [SerializeField] private RobotMemory memory;
+    [SerializeField] private RobotStateController stateController;
+
+    [Header("Visuals & Physics")]
     [SerializeField] private Animator animator;
-    [SerializeField] private RobotStateController robotStateController;
-    [SerializeField] private JointBreaker jointBreaker;
 
     private Transform[] cachedTransforms;
     private Vector3[] defaultPositions;
@@ -14,17 +21,44 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
 
     private void Awake()
     {
-        if (bodyJointLimiter == null)
-            bodyJointLimiter = GetComponent<BodyJointLimiter>();
-        if (legJointLimiter == null)
-            legJointLimiter = GetComponent<LegJointLimiter>();
+        if (heart == null)
+            heart = GetComponent<RobotHeart>();
+        if (body == null)
+            body = GetComponent<RobotBodyController>();
+        if (memory == null)
+            memory = GetComponent<RobotMemory>();
+        if (stateController == null)
+            stateController = GetComponent<RobotStateController>();
         if (animator == null)
             animator = GetComponent<Animator>();
-        if (robotStateController == null)
-            robotStateController = GetComponent<RobotStateController>();
-        if (jointBreaker == null)
-            jointBreaker = GetComponent<JointBreaker>();
 
+        CacheTransforms();
+    }
+
+    public void OnReleaseToPool()
+    {
+        ResetRigidbodies();
+        RestoreTransforms();
+
+        // Avoid carrying intent into the next reuse.
+        if (heart != null)
+            heart.ResetIntentStack(false);
+    }
+
+    public void OnAcquireFromPool()
+    {
+        if (animator != null && animator.isInitialized)
+        {
+            animator.Rebind();
+            animator.Update(0f);
+        }
+
+        if (heart != null)
+            heart.ResetIntentStack();
+    }
+
+    private void CacheTransforms()
+    {
         cachedTransforms = GetComponentsInChildren<Transform>(true);
         defaultPositions = new Vector3[cachedTransforms.Length];
         defaultRotations = new Quaternion[cachedTransforms.Length];
@@ -35,18 +69,19 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
         }
     }
 
-    public void OnReleaseToPool()
+    private void ResetRigidbodies()
     {
         foreach (var rb in GetComponentsInChildren<Rigidbody2D>())
         {
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
         }
+    }
 
-        if (bodyJointLimiter != null)
-            bodyJointLimiter.enabled = false;
-        if (legJointLimiter != null)
-            legJointLimiter.enabled = false;
+    private void RestoreTransforms()
+    {
+        if (cachedTransforms == null || defaultPositions == null || defaultRotations == null)
+            return;
 
         for (int i = 0; i < cachedTransforms.Length; i++)
         {
@@ -56,30 +91,5 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
 
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
-    }
-
-    public void OnAcquireFromPool()
-    {
-        jointBreaker?.RestoreAll();
-
-        if (bodyJointLimiter != null)
-        {
-            bodyJointLimiter.RefreshJoints();
-            bodyJointLimiter.enabled = true;
-        }
-
-        if (legJointLimiter != null)
-        {
-            legJointLimiter.RefreshJoints();
-            legJointLimiter.enabled = true;
-        }
-
-        if (animator != null && animator.isInitialized)
-        {
-            animator.Rebind();
-            animator.Update(0f);
-        }
-
-        robotStateController?.UpdateState(RobotState.Alive);
     }
 }

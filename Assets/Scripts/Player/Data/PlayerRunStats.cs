@@ -37,7 +37,7 @@ public class PlayerRunStats : ScriptableObject
         Morality = source.Morality;
         if (energyBot != null)
         {
-            EnergyRechargeRate = energyBot.rechargeRate;
+            EnergyRechargeRate = energyBot.RechargeRate;
         }
         else
         {
@@ -82,7 +82,7 @@ public class PlayerRunStats : ScriptableObject
 
         if (energyBot != null)
         {
-            energyBot.rechargeRate = EnergyRechargeRate + EnergyRechargeBonus;
+            energyBot.RechargeRate = EnergyRechargeRate + EnergyRechargeBonus;
         }
 
         if (attack != null)

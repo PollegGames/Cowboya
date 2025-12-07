@@ -304,6 +304,18 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         if (go == null)
             return;
 
+        var brain = go.GetComponent<RobotBrain>();
+        if (brain != null)
+        {
+            brain.InitializeServices(waypointService, respawnService);
+            if (role == RobotRole.SecurityGuard && securityManager != null)
+                securityManager.RegisterGuard(brain);
+        }
+
+        var bodyController = go.GetComponent<RobotBodyController>();
+        if (bodyController != null)
+            bodyController.SetIsBoss(role == RobotRole.Boss);
+
         var maintenance = go.GetComponent<RobotBodyMaintenance>();
         if (maintenance != null && respawnService != null)
             maintenance.SetRespawnService(respawnService);
@@ -317,5 +329,19 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var memory = go.GetComponent<RobotMemory>();
         if (memory != null && lastVisited != null)
             memory.SetLastVisitedPoint(lastVisited);
+
+        // Attach a security badge to guards so it can be stolen later.
+        if (role == RobotRole.SecurityGuard && securityBadgeSpawner != null)
+        {
+            Transform anchor = go.transform;
+            var body = go.GetComponent<RobotBodyController>();
+            if (body != null && body.BodyReference != null)
+                anchor = body.BodyReference;
+
+            var badge = securityBadgeSpawner.SpawnBadge(anchor);
+            var inventory = go.GetComponent<Inventory>();
+            if (badge != null && inventory != null)
+                inventory.SetItem(PickupType.SecurityBadge, badge);
+        }
     }
 }

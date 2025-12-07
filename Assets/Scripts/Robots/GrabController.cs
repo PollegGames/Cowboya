@@ -16,12 +16,16 @@ public class CowboyGrabController : MonoBehaviour
     [SerializeField] private GrabHandAttractor rightHandAttractor;
     [SerializeField] private ToggleBox leftHandToggleBox;
     [SerializeField] private ToggleBox rightHandToggleBox;
+    [SerializeField] private RobotStateController robotBehaviour;
+    [SerializeField] private EnergyBot energyBot;
+    [SerializeField] private PlayerBrain playerBrain;
 
     private IGrabbable heldObject;
     private CowboyArmSide holdingArm;
 
     private void Awake()
     {
+        CacheRobotSystems();
         CacheGrabAnchors();
         CacheInventory();
         CacheHandAttractors();
@@ -34,6 +38,7 @@ public class CowboyGrabController : MonoBehaviour
         CacheInventory();
         CacheHandAttractors();
         CacheToggleBoxes();
+        CacheRobotSystems();
     }
 
     public bool TryGrab(CowboyArmSide arm)
@@ -58,6 +63,11 @@ public class CowboyGrabController : MonoBehaviour
 
         PickupType? slot = ResolvePickupSlot(candidate);
         if (slot.HasValue && currentInventory != null && currentInventory.HasItem(slot.Value))
+        {
+            return false;
+        }
+
+        if (!SpendGrabEnergy())
         {
             return false;
         }
@@ -435,6 +445,32 @@ public class CowboyGrabController : MonoBehaviour
         }
 
         return inventory;
+    }
+
+    private void CacheRobotSystems()
+    {
+        if (robotBehaviour == null)
+            robotBehaviour = GetComponent<RobotStateController>();
+        if (energyBot == null)
+            energyBot = GetComponent<EnergyBot>();
+        if (playerBrain == null)
+            playerBrain = GetComponent<PlayerBrain>();
+    }
+
+    private bool SpendGrabEnergy()
+    {
+        CacheRobotSystems();
+
+        if (playerBrain != null)
+            return playerBrain.TrySpendEnergy(EnergyAction.Grab);
+
+        if (energyBot != null)
+            return energyBot.TryConsume(EnergyAction.Grab);
+
+        if (robotBehaviour != null)
+            return robotBehaviour.CanPerformEnergy(EnergyAction.Grab);
+
+        return true;
     }
 
     private void RemoveInventoryEntry(IGrabbable grabbable)

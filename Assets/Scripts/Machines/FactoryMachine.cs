@@ -203,7 +203,10 @@ public class FactoryMachine : BaseMachine
     private void SendWorkerToRest(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.OnMachineStateChanged(this, false);
+        object payload = null;
+        if (waypointService != null)
+            payload = waypointService.GetFirstRestPoint();
+        worker.OnMachineStateChanged(payload ?? this, false);
     }
 
     private void SendWorkerToWork(RobotBrain worker)

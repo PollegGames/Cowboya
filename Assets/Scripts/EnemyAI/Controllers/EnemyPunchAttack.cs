@@ -12,26 +12,31 @@ public sealed class EnemyPunchAttack : MonoBehaviour
     [SerializeField] private float verticalSectorThreshold = 0.75f;
     [SerializeField] private FactoryAlarmStatus alarmStatus;
 
+    [Header("Hostility")]
+    [SerializeField] private float hostilityThreshold = -2f;
+    [SerializeField] private float followerHostilityThreshold = 100f;
+
     private RobotStateController robotBehaviour;
     private RobotStats playerStats;
+    private RobotMemory memory;
+    private RobotBrain brain;
     private float lastPunchTime;
     private bool playerInAttackZone;
 
     private void Awake()
     {
         robotBehaviour = GetComponent<RobotStateController>();
+        memory = GetComponent<RobotMemory>();
+        brain = GetComponent<RobotBrain>();
         if (alarmStatus == null)
-        {
             alarmStatus = FindFirstObjectByType<FactoryManager>()?.factoryAlarmStatus;
-        }
+        ConfigureThresholdByRole();
     }
 
     private void OnEnable()
     {
         if (targetToFollow != null)
-        {
             targetToFollow.OnPlayerDetectInAttackZoneChanged += HandlePlayerInAttackZoneChange;
-        }
     }
 
     private void Start()
@@ -47,14 +52,20 @@ public sealed class EnemyPunchAttack : MonoBehaviour
     private void OnDisable()
     {
         if (targetToFollow != null)
-        {
             targetToFollow.OnPlayerDetectInAttackZoneChanged -= HandlePlayerInAttackZoneChange;
-        }
     }
 
     private void HandlePlayerInAttackZoneChange(bool isInside)
     {
         playerInAttackZone = isInside;
+        if (brain == null)
+            return;
+
+        if (isInside)
+        {
+            Transform player = targetToFollow != null ? targetToFollow.PlayerTransform : null;
+            brain.RequestAttackTarget(player);
+        }
     }
 
     public bool TryBuildAttackRequest(out AttackRequest request)
@@ -62,20 +73,14 @@ public sealed class EnemyPunchAttack : MonoBehaviour
         request = default;
 
         if (!CanIssueAttack())
-        {
             return false;
-        }
 
         Vector3 playerPosition = targetToFollow.PlayerBodyReferencePosition;
         if (playerPosition == Vector3.zero)
-        {
             return false;
-        }
 
         if (Time.time < lastPunchTime + attackCooldown)
-        {
             return false;
-        }
 
         AttackSector sector = ResolveSector(playerPosition);
         float energyCost = robotBehaviour != null && robotBehaviour.Stats != null
@@ -98,19 +103,18 @@ public sealed class EnemyPunchAttack : MonoBehaviour
     private bool CanIssueAttack()
     {
         if (targetToFollow == null || !playerInAttackZone)
-        {
             return false;
-        }
 
-        if (playerStats != null &&
-            playerStats.Morality > 5f &&
-            alarmStatus != null &&
-            alarmStatus.CurrentAlarmState != AlarmState.Wanted)
-        {
-            return false;
-        }
+        if (alarmStatus != null && alarmStatus.CurrentAlarmState == AlarmState.Wanted)
+            return true;
 
-        return true;
+        if (memory != null && memory.WasRecentlyAttacked)
+            return true;
+
+        if (playerStats == null)
+            return true;
+
+        return playerStats.Morality <= hostilityThreshold;
     }
 
     private AttackSector ResolveSector(Vector3 playerPosition)
@@ -119,11 +123,21 @@ public sealed class EnemyPunchAttack : MonoBehaviour
         Vector3 delta = playerPosition - origin;
 
         if (Mathf.Abs(delta.y) > verticalSectorThreshold)
-        {
             return delta.y > 0f ? AttackSector.Up : AttackSector.Down;
-        }
 
         return delta.x >= 0f ? AttackSector.Right : AttackSector.Left;
     }
-}
 
+    private void ConfigureThresholdByRole()
+    {
+        var role = brain != null && brain.Config != null ? brain.Config.Role : RobotRole.SecurityGuard;
+        if (role == RobotRole.Follower)
+        {
+            hostilityThreshold = followerHostilityThreshold;
+        }
+        else if (role == RobotRole.SecurityGuard)
+        {
+            hostilityThreshold = -2f;
+        }
+    }
+}

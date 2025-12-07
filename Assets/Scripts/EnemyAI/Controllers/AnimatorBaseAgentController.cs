@@ -19,6 +19,8 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
 
     private Vector2 lookDirection = Vector2.right;
 
+    public Transform BodyReference => bodyReference;
+
     /// <summary>
     /// Gets the current look direction.
     /// </summary>

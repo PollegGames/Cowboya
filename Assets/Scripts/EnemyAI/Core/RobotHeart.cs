@@ -12,6 +12,7 @@ public class RobotHeart : MonoBehaviour
     [SerializeField] private RobotRole role = RobotRole.Worker;
     [SerializeField] private int overrideStackDepth = 0;
     [SerializeField] private bool seedIdleTask = true;
+    [SerializeField] private bool logTaskChanges = false;
 
     private RobotTaskStack taskStack;
 
@@ -20,9 +21,7 @@ public class RobotHeart : MonoBehaviour
 
     private void Awake()
     {
-        taskStack = new RobotTaskStack(GetStackDepth(), BuildPrecedenceTable());
-        if (seedIdleTask)
-            taskStack.PushOrRefresh(new RobotTask(RobotTaskType.Idle), Time.time);
+        ResetIntentStack(false);
     }
 
     private void Update()
@@ -30,6 +29,19 @@ public class RobotHeart : MonoBehaviour
         if (taskStack == null)
             return;
         if (taskStack.RemoveExpired(Time.time))
+            NotifyTaskChanged();
+    }
+
+    /// <summary>
+    /// Rebuilds the intent stack using the configured precedence rules.
+    /// </summary>
+    /// <param name="notifyListeners">If true, raises OnTaskChanged after the reset.</param>
+    public void ResetIntentStack(bool notifyListeners = true)
+    {
+        taskStack = new RobotTaskStack(GetStackDepth(), BuildPrecedenceTable());
+        if (seedIdleTask)
+            taskStack.PushOrRefresh(new RobotTask(RobotTaskType.Idle), Time.time);
+        if (notifyListeners)
             NotifyTaskChanged();
     }
 
@@ -97,5 +109,35 @@ public class RobotHeart : MonoBehaviour
     private void NotifyTaskChanged()
     {
         OnTaskChanged?.Invoke(CurrentTask);
+        if (logTaskChanges)
+        {
+            Debug.Log($"[RobotHeart] {name} -> {DescribeTask(CurrentTask)}");
+        }
+    }
+
+    private string DescribeTask(RobotTask task)
+    {
+        if (task == null)
+            return "None";
+        string payload = "null";
+        switch (task.Payload)
+        {
+            case RoomWaypoint waypoint:
+                payload = waypoint.name;
+                break;
+            case BaseMachine machine:
+                payload = machine.name;
+                break;
+            case Component component:
+                payload = component.name;
+                break;
+            case null:
+                payload = "null";
+                break;
+            default:
+                payload = task.Payload.ToString();
+                break;
+        }
+        return $"{task.Type} ({payload})";
     }
 }

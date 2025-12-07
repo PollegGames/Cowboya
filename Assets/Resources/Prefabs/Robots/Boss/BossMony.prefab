@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2025712282157874815}
   - component: {fileID: 4207854069768247126}
   - component: {fileID: 965326476522871045}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: UpRLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,7 +121,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7018707732158950337}
   - component: {fileID: 7590254869244924635}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RArmSolver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -188,7 +188,7 @@ GameObject:
   - component: {fileID: 1409595179905931527}
   - component: {fileID: 2587107671184851470}
   - component: {fileID: 2616861214987271557}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -300,7 +300,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.10080177, y: 0.35405156}
+  m_ConnectedAnchor: {x: 0.1008017, y: 0.35405156}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -321,7 +321,7 @@ GameObject:
   - component: {fileID: 5090857696201844644}
   - component: {fileID: 5669482123025648945}
   - component: {fileID: 1724275903094148882}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -433,7 +433,7 @@ GameObject:
   - component: {fileID: 587692963841547748}
   - component: {fileID: 5332514388810699119}
   - component: {fileID: 5158163244897658255}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -547,7 +547,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.73789775, y: 0.0000014982654}
+  m_ConnectedAnchor: {x: 0.73789775, y: 0.00000030617232}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -568,7 +568,7 @@ GameObject:
   - component: {fileID: 672475400909216600}
   - component: {fileID: 5300504853339054756}
   - component: {fileID: 1193484517680789897}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'BodyLow '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -680,7 +680,7 @@ GameObject:
   - component: {fileID: 8847364583310584416}
   - component: {fileID: 4987672347955476820}
   - component: {fileID: 2352810336202352790}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -791,7 +791,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.654603, y: 0.0000035436813}
+  m_ConnectedAnchor: {x: 1.6546031, y: 0.000003541353}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -812,7 +812,7 @@ GameObject:
   - component: {fileID: 9032110842770414955}
   - component: {fileID: 8413017948735889977}
   - component: {fileID: 3063880998664217654}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -923,7 +923,7 @@ GameObject:
   - component: {fileID: 1961970295527209741}
   - component: {fileID: 4426755283961015079}
   - component: {fileID: 6443312214981487201}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1032,7 +1032,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3225530579805921498}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1047,7 +1047,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 817711474213256711}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.9998205, w: 0.018949637}
+  m_LocalRotation: {x: 0, y: 0, z: -0.99982053, w: 0.018948222}
   m_LocalPosition: {x: 0.103247665, y: -0.35414243, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1064,7 +1064,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8060589365095561745}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head_Effector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1097,7 +1097,7 @@ GameObject:
   - component: {fileID: 4600618468472271015}
   - component: {fileID: 5198375057023740123}
   - component: {fileID: 104807606992543863}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'BodyLow '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1206,7 +1206,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3031587079043802484}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1238,7 +1238,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7811221416644539449}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hips
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1275,7 +1275,7 @@ GameObject:
   - component: {fileID: 8352227187047274171}
   - component: {fileID: 1365725635660494545}
   - component: {fileID: 8462473305288510329}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1386,7 +1386,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.666736, y: 0.0000006792834}
+  m_ConnectedAnchor: {x: 1.6667356, y: 0.0000018722494}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1407,7 +1407,7 @@ GameObject:
   - component: {fileID: 6334888890412332013}
   - component: {fileID: 4855104430249093185}
   - component: {fileID: 567047483500167843}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1518,7 +1518,7 @@ GameObject:
   - component: {fileID: 4489998550999889050}
   - component: {fileID: 6699066684687778905}
   - component: {fileID: 5772395772413705442}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BodyUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1735,7 +1735,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8630765712526065707}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1767,7 +1767,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6565999279493574365}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1801,7 +1801,7 @@ GameObject:
   - component: {fileID: 2290623977710028700}
   - component: {fileID: 1637774972993308834}
   - component: {fileID: 7747097817031334347}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BossMoni_Master
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1894,7 +1894,7 @@ GameObject:
   - component: {fileID: 2737376850554573035}
   - component: {fileID: 4922993214350235987}
   - component: {fileID: 26174565772840136}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hips
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2005,7 +2005,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8096576993977842318}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BodyLow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2039,7 +2039,7 @@ GameObject:
   - component: {fileID: 7170975599817175913}
   - component: {fileID: 7605128515285882418}
   - component: {fileID: 642068163468950552}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: UpLLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2150,7 +2150,7 @@ GameObject:
   - component: {fileID: 9008217268528430217}
   - component: {fileID: 3157412813297215506}
   - component: {fileID: 8670988752551356579}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2261,7 +2261,7 @@ GameObject:
   - component: {fileID: 8704891302317345053}
   - component: {fileID: 7541145357861237646}
   - component: {fileID: 1826586827974491805}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'LHand '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2370,7 +2370,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4933961068814652973}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LAem_Solver_Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2404,7 +2404,7 @@ GameObject:
   - component: {fileID: 3647761840902572416}
   - component: {fileID: 2229350746139220407}
   - component: {fileID: 7969012572164390893}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2515,7 +2515,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.0036825, y: 0.0000032049136}
+  m_ConnectedAnchor: {x: 1.0036825, y: 0.0000020128207}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2534,7 +2534,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6254581533089563566}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2577,9 +2577,10 @@ GameObject:
   - component: {fileID: 1598322442020894122}
   - component: {fileID: 6499326095617453643}
   - component: {fileID: 5616405064648756055}
-  m_Layer: 0
+  - component: {fileID: 757712647934146845}
+  m_Layer: 7
   m_Name: BossMony
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2695,6 +2696,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::HealthBot
   damageFeedback: {fileID: 4150757731813430936}
   memory: {fileID: 6360489659453437763}
+  brain: {fileID: 4849546215194926996}
 --- !u!114 &6360489659453437763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2756,6 +2758,7 @@ MonoBehaviour:
   role: 4
   overrideStackDepth: 0
   seedIdleTask: 1
+  logTaskChanges: 0
 --- !u!114 &4849546215194926996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2770,15 +2773,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::RobotBrain
   heart: {fileID: 1096035392043712394}
   config:
-    role: 0
+    role: 4
     resumeWorkOnMachineOn: 1
     defaultTimeoutSeconds: 10
+    restDurationSeconds: 3
+    guardPostDurationSeconds: 300
+    workDurationSeconds: 120
+    reactivateDurationSeconds: 30
   body: {fileID: 6499326095617453643}
   memory: {fileID: 6360489659453437763}
   taskHandlers: {fileID: 11400000, guid: 8c4a06d021ee8454984206e6823669ee, type: 2}
   roleTaskHandlers:
   - Role: 4
     Handlers: {fileID: 11400000, guid: 8c4a06d021ee8454984206e6823669ee, type: 2}
+  waypointServiceBehaviour: {fileID: 0}
+  stateController: {fileID: 7124027368022760294}
 --- !u!114 &1598322442020894122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2828,6 +2837,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::RobotBodyMaintenance
   memory: {fileID: 6360489659453437763}
+--- !u!114 &757712647934146845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629763386926311630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::PooledEnemy
+  heart: {fileID: 1096035392043712394}
+  body: {fileID: 6499326095617453643}
+  memory: {fileID: 6360489659453437763}
+  stateController: {fileID: 7124027368022760294}
+  animator: {fileID: 7747097817031334347}
 --- !u!1 &3636523153973176014
 GameObject:
   m_ObjectHideFlags: 0
@@ -2839,7 +2865,7 @@ GameObject:
   - component: {fileID: 9042901449843093215}
   - component: {fileID: 2165872547990603522}
   - component: {fileID: 6954329621311439592}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'LFoot '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2951,7 +2977,7 @@ GameObject:
   - component: {fileID: 25396953583141938}
   - component: {fileID: 6145932211544978534}
   - component: {fileID: 8871099821794534348}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3063,7 +3089,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.61139804, y: 0.00000008090865}
+  m_ConnectedAnchor: {x: 0.6113981, y: -0.0000011111842}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3085,7 +3111,7 @@ GameObject:
   - component: {fileID: 2697020151447693127}
   - component: {fileID: 6477950874015430417}
   - component: {fileID: 5104709982576685868}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3197,7 +3223,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.103247724, y: -0.35414264}
+  m_ConnectedAnchor: {x: 0.10324769, y: -0.35414264}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3216,7 +3242,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 676545771005687698}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sprites
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3263,7 +3289,7 @@ GameObject:
   - component: {fileID: 6860384888765110432}
   - component: {fileID: 5749925975499505941}
   - component: {fileID: 3378017743954437145}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3374,7 +3400,7 @@ GameObject:
   - component: {fileID: 543712161842665311}
   - component: {fileID: 3507888321155768178}
   - component: {fileID: 8417435403455907532}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'LHand '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3483,7 +3509,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4602278820333239002}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3517,7 +3543,7 @@ GameObject:
   - component: {fileID: 8175380888286572748}
   - component: {fileID: 8794926828143856535}
   - component: {fileID: 2233331550920831221}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hips
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3626,7 +3652,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4033409277226045702}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LFoot_Effector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3641,7 +3667,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4775373121998492177}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.009425751, w: 0.9999556}
+  m_LocalRotation: {x: -0, y: -0, z: -0.0094145145, w: 0.9999557}
   m_LocalPosition: {x: 1.73, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3657,7 +3683,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9056274063539078734}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3690,7 +3716,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5020962806848122835}
   - component: {fileID: 5773598104131655854}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LLegSolver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3754,7 +3780,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7543723411787756841}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RFoot_Effector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3769,7 +3795,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4934099656549663465}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.010936951, w: 0.9999402}
+  m_LocalRotation: {x: -0, y: -0, z: -0.0109445695, w: 0.9999401}
   m_LocalPosition: {x: 1.73, y: 0.01, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3785,7 +3811,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4843921429171290989}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3800,7 +3826,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5054555205825884200}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.0028932393, w: 0.9999958}
+  m_LocalRotation: {x: 0, y: 0, z: -0.0028842033, w: 0.9999959}
   m_LocalPosition: {x: 1.6546032, y: 0.0000035040136, z: 0}
   m_LocalScale: {x: 0.99999976, y: 0.99999976, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3818,7 +3844,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4724395037511569300}
   - component: {fileID: 5820728481711398519}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LArmSolver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3884,7 +3910,7 @@ GameObject:
   - component: {fileID: 2685552244352069333}
   - component: {fileID: 2430828573753176756}
   - component: {fileID: 8275209864808584718}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3993,7 +4019,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5893259567039800658}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4008,7 +4034,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5627061109103046724}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.0000056107333, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.000005626798, w: 1}
   m_LocalPosition: {x: 1.6667356, y: 0.00000043014313, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4025,7 +4051,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 830316106599361004}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4059,7 +4085,7 @@ GameObject:
   - component: {fileID: 2627773680615369097}
   - component: {fileID: 3018682080789805584}
   - component: {fileID: 4787279218124178352}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BodyUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4171,7 +4197,7 @@ GameObject:
   - component: {fileID: 7253085242177608753}
   - component: {fileID: 5892938778212141410}
   - component: {fileID: 1976175198969651671}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4282,7 +4308,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.4372115, y: 0.00000070547685}
+  m_ConnectedAnchor: {x: 1.4372115, y: -0.0000016787089}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4301,7 +4327,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4109817035751573675}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RHand_Effector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4332,7 +4358,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2237597358207580997}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sprites
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4379,7 +4405,7 @@ GameObject:
   - component: {fileID: 5125706261892789101}
   - component: {fileID: 6754135121775671618}
   - component: {fileID: 7839767588136739834}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'RArm '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4490,7 +4516,7 @@ GameObject:
   - component: {fileID: 633585704657899488}
   - component: {fileID: 292092970370336703}
   - component: {fileID: 1428512620080847997}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4601,7 +4627,7 @@ GameObject:
   - component: {fileID: 3783858809631554574}
   - component: {fileID: 2073165698891728062}
   - component: {fileID: 3560904527025354658}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: UpLLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4713,7 +4739,7 @@ GameObject:
   - component: {fileID: 1120787580856425889}
   - component: {fileID: 5384230239474380270}
   - component: {fileID: 6707947907566327234}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4845,7 +4871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8601386465665075624}
   - component: {fileID: 462933902049214455}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RLegSolver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4911,7 +4937,7 @@ GameObject:
   - component: {fileID: 439415985930242188}
   - component: {fileID: 4889320876163639659}
   - component: {fileID: 7962750017026097095}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'LArm '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5023,7 +5049,7 @@ GameObject:
   - component: {fileID: 8914763127017176045}
   - component: {fileID: 5872792552835925647}
   - component: {fileID: 6405813609802222059}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5154,7 +5180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1711159734788544753}
   - component: {fileID: 1182737818694149248}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HeadSolver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5225,7 +5251,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4702451622807557690}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5262,7 +5288,7 @@ GameObject:
   - component: {fileID: 6696671546730105202}
   - component: {fileID: 877963045843823437}
   - component: {fileID: 4027299035611792245}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5374,7 +5400,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.56729895, y: 0.9484012}
+  m_ConnectedAnchor: {x: 0.567299, y: 0.9484}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5393,7 +5419,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7263365353787019146}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LHand_Effector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5426,7 +5452,7 @@ GameObject:
   - component: {fileID: 4902644958542506161}
   - component: {fileID: 5646524574052394093}
   - component: {fileID: 8242968119856649609}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5538,7 +5564,7 @@ GameObject:
   - component: {fileID: 1921489858583390058}
   - component: {fileID: 3877659827247260776}
   - component: {fileID: 4360265832212872673}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BodyLow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5650,7 +5676,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.8135708, y: 0.00000090571126}
+  m_ConnectedAnchor: {x: 0.8135708, y: 0.0000032898972}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5669,7 +5695,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3118055543718806086}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RArmSolver_Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5700,7 +5726,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2487179459152954757}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RLegSolver_Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5733,7 +5759,7 @@ GameObject:
   - component: {fileID: 2479277754384257694}
   - component: {fileID: 7037571406591740387}
   - component: {fileID: 4079157911893045229}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'RArm '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5844,7 +5870,7 @@ GameObject:
   - component: {fileID: 2251991420266232516}
   - component: {fileID: 2821659947989028132}
   - component: {fileID: 5115475974370767946}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hips
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5953,7 +5979,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8623941185637422528}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HeadSolver_Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5986,7 +6012,7 @@ GameObject:
   - component: {fileID: 6990183246529634664}
   - component: {fileID: 2669777584466417653}
   - component: {fileID: 1652032330407744370}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: UpRLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6097,7 +6123,7 @@ GameObject:
   - component: {fileID: 763738699360903867}
   - component: {fileID: 2084057163123542363}
   - component: {fileID: 8290348861441801597}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'LFoot '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6206,7 +6232,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5554908584110664009}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LLegSolver_Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6239,9 +6265,9 @@ GameObject:
   - component: {fileID: 6720655779116877054}
   - component: {fileID: 4150757731813430936}
   - component: {fileID: 2326636307193653351}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BossMoni_Puppet
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6300,7 +6326,7 @@ GameObject:
   - component: {fileID: 2383079899066553894}
   - component: {fileID: 569760652049116466}
   - component: {fileID: 7671308579841577100}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6411,7 +6437,7 @@ GameObject:
   - component: {fileID: 8488879695699828529}
   - component: {fileID: 6198700697012475617}
   - component: {fileID: 1968905235902005229}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'LArm '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6563,6 +6589,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AttackZone
       objectReference: {fileID: 0}
+    - target: {fileID: 2433710667133555906, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: zoneSize.x
       value: 5.76
@@ -6647,6 +6677,10 @@ PrefabInstance:
     - target: {fileID: 2433710667133555906, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: m_Name
       value: DetectZone
+      objectReference: {fileID: 0}
+    - target: {fileID: 2433710667133555906, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: zoneSize.x

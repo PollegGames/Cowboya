@@ -26,6 +26,7 @@ public class JointBreaker : MonoBehaviour
         public bool enabled;
     }
 
+    private readonly List<Joint2D> allJoints2D = new();
     private readonly List<JointInfo> jointInfos = new();
 
     private void Awake()
@@ -39,8 +40,10 @@ public class JointBreaker : MonoBehaviour
         hingeJoints.AddRange(GetComponentsInChildren<HingeJoint2D>());
         fixedJoints.AddRange(GetComponentsInChildren<FixedJoint2D>());
         ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
+        allJoints2D.Clear();
+        allJoints2D.AddRange(GetComponentsInChildren<Joint2D>(true));
 
-        foreach (var joint in GetComponentsInChildren<Joint2D>(true))
+        foreach (var joint in allJoints2D)
         {
             var info = new JointInfo
             {
@@ -66,25 +69,28 @@ public class JointBreaker : MonoBehaviour
 
     public void BreakAll()
     {
-        foreach (var hj in hingeJoints)
-            if (hj != null) hj.breakForce = 0f;
+        foreach (var joint in allJoints2D)
+        {
+            if (joint == null)
+                continue;
 
-        foreach (var fj in fixedJoints)
-            if (fj != null) fj.breakForce = 0f;
+            joint.breakForce = 0f;
+        }
 
         DisableAllSolvers();
     }
 
     public void DestroyAll()
     {
-        foreach (var hj in hingeJoints)
-            if (hj != null) Destroy(hj);
-
-        foreach (var fj in fixedJoints)
-            if (fj != null) Destroy(fj);
+        foreach (var joint in allJoints2D)
+        {
+            if (joint != null)
+                Destroy(joint);
+        }
 
         hingeJoints.Clear();
         fixedJoints.Clear();
+        allJoints2D.Clear();
 
         DisableAllSolvers();
     }
@@ -128,6 +134,8 @@ public class JointBreaker : MonoBehaviour
         fixedJoints.AddRange(GetComponentsInChildren<FixedJoint2D>());
         ikSolvers.Clear();
         ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
+        allJoints2D.Clear();
+        allJoints2D.AddRange(GetComponentsInChildren<Joint2D>(true));
 
         foreach (var solver in ikSolvers)
             if (solver != null)

@@ -14,6 +14,11 @@ public class RobotBrain : MonoBehaviour
     [SerializeField] private RobotMemory memory;
     [SerializeField] private RobotTaskHandlers taskHandlers;
     [SerializeField] private RoleTaskHandlerBinding[] roleTaskHandlers;
+    [SerializeField] private MonoBehaviour waypointServiceBehaviour;
+    [SerializeField] private RobotStateController stateController;
+
+    private IWaypointService waypointService;
+    private IRobotRespawnService respawnService;
 
     private void Awake()
     {
@@ -23,20 +28,39 @@ public class RobotBrain : MonoBehaviour
             body = GetComponent<RobotBodyController>();
         if (memory == null)
             memory = GetComponent<RobotMemory>();
+        if (stateController == null)
+            stateController = GetComponent<RobotStateController>();
         if (taskHandlers == null)
             taskHandlers = ResolveHandlersForRole(heart != null ? heart.Role : RobotRole.Worker);
+        waypointService = waypointServiceBehaviour as IWaypointService;
+        if (waypointService != null && body != null)
+            body.Initialize(waypointService, waypointService, respawnService);
     }
 
     private void OnEnable()
     {
         if (heart != null)
             heart.OnTaskChanged += HandleTaskChanged;
+        if (stateController != null)
+            stateController.OnStateChanged += HandleStateChanged;
     }
 
     private void OnDisable()
     {
         if (heart != null)
             heart.OnTaskChanged -= HandleTaskChanged;
+        if (stateController != null)
+            stateController.OnStateChanged -= HandleStateChanged;
+    }
+
+    public void InitializeServices(IWaypointService waypointService, IRobotRespawnService respawnService)
+    {
+        this.waypointService = waypointService;
+        this.respawnService = respawnService;
+        if (body != null && waypointService != null)
+            body.Initialize(waypointService, waypointService, respawnService);
+        if (memory != null && respawnService != null)
+            memory.SetRespawnService(respawnService);
     }
 
     /// <summary>
@@ -47,13 +71,12 @@ public class RobotBrain : MonoBehaviour
         if (heart == null || config == null)
             return;
 
-        if (!isOn)
+        RobotTask task = BuildTaskForMachine(machine, isOn);
+        if (task != null)
         {
-            heart.TryPushTask(new RobotTask(RobotTaskType.ReactivateMachine, machine, config.GetTimeout(RobotTaskType.ReactivateMachine), config.GetUrgency(RobotTaskType.ReactivateMachine)));
-        }
-        else if (config.ResumeWorkOnMachineOn)
-        {
-            heart.TryPushTask(new RobotTask(RobotTaskType.WorkAtMachine, machine, config.GetTimeout(RobotTaskType.WorkAtMachine), config.GetUrgency(RobotTaskType.WorkAtMachine)));
+            if (!isOn && heart.CurrentTask != null && heart.CurrentTask.Type == RobotTaskType.WorkAtMachine)
+                heart.CompleteCurrentTask();
+            heart.TryPushTask(task);
         }
     }
 
@@ -74,6 +97,44 @@ public class RobotBrain : MonoBehaviour
     public RobotBodyController Body => body;
     public RobotMemory Memory => memory;
     public RobotBrainConfig Config => config;
+    public IWaypointService WaypointService => waypointService;
+
+    public void RequestAttackTarget(Transform target)
+    {
+        if (heart == null || config == null)
+            return;
+        var task = new RobotTask(
+            RobotTaskType.AttackTarget,
+            target,
+            config.GetTimeout(RobotTaskType.AttackTarget),
+            config.GetUrgency(RobotTaskType.AttackTarget));
+        heart.TryPushTask(task);
+    }
+
+    public void OnDamageTaken(int damage)
+    {
+        if (memory != null)
+            memory.RegisterAttack();
+
+        if (stateController != null)
+        {
+            if (stateController.CurrentState == RobotState.Dead || stateController.CurrentState == RobotState.Faint)
+            {
+                HandleStateChanged(stateController.CurrentState);
+            }
+        }
+    }
+
+    private void HandleStateChanged(RobotState newState)
+    {
+        if (heart == null)
+            return;
+
+        if (newState == RobotState.Dead || newState == RobotState.Faint)
+        {
+            heart.ResetIntentStack(false);
+        }
+    }
 
     private bool TryFallbackHandle(RobotTask task)
     {
@@ -103,6 +164,104 @@ public class RobotBrain : MonoBehaviour
         }
     }
 
+    private RobotTask BuildTaskForMachine(object machine, bool isOn)
+    {
+        RobotTaskType? type = ResolveTaskType(machine, isOn);
+        if (!type.HasValue)
+            return null;
+
+        object payload = ResolvePayload(machine, type.Value, isOn);
+        float? timeout = config.GetTimeout(type.Value);
+        int urgency = config.GetUrgency(type.Value);
+        return new RobotTask(type.Value, payload, timeout, urgency);
+    }
+
+    private RobotTaskType? ResolveTaskType(object machine, bool isOn)
+    {
+        if (machine is SecurityMachine)
+            return isOn ? RobotTaskType.GuardPost : RobotTaskType.ReactivateMachine;
+
+        if (machine is RestingMachine)
+            return isOn ? RobotTaskType.WorkAtMachine : RobotTaskType.Rest;
+
+        if (machine is FactoryMachine)
+            return isOn ? RobotTaskType.WorkAtMachine : RobotTaskType.Rest;
+
+        if (machine is SpawningMachine)
+            return isOn ? RobotTaskType.WorkAtMachine : RobotTaskType.Rest;
+
+        if (machine is RoomWaypoint)
+            return isOn ? RobotTaskType.WorkAtMachine : RobotTaskType.Rest;
+
+        if (!isOn)
+        {
+            if (heart != null && heart.Role == RobotRole.Worker)
+                return RobotTaskType.Rest;
+            return RobotTaskType.ReactivateMachine;
+        }
+
+        if (config.ResumeWorkOnMachineOn)
+            return RobotTaskType.WorkAtMachine;
+
+        return null;
+    }
+
+    private object ResolvePayload(object machine, RobotTaskType type, bool isOn)
+    {
+        switch (type)
+        {
+            case RobotTaskType.WorkAtMachine:
+                if (machine is RestingMachine && waypointService != null)
+                {
+                    var workPoint = waypointService.GetLeastUsedFreeWorkPoint();
+                    if (workPoint != null)
+                        return workPoint;
+                }
+                if (machine == null && waypointService != null)
+                {
+                    var poi = waypointService.GetWorkOrRestPoint();
+                    if (poi != null)
+                        return poi;
+                }
+                break;
+            case RobotTaskType.Rest:
+                if (machine is FactoryMachine && waypointService != null)
+                {
+                    var restPoint = waypointService.GetFirstRestPoint();
+                    if (restPoint != null)
+                        return restPoint;
+                }
+                if (machine == null && waypointService != null)
+                {
+                    var restPoint = waypointService.GetFirstRestPoint();
+                    if (restPoint != null)
+                        return restPoint;
+                }
+                break;
+            case RobotTaskType.GuardPost:
+                if (machine == null && waypointService != null)
+                {
+                    var guardPoint = waypointService.GetFirstFreeSecurityPoint();
+                    if (guardPoint != null)
+                        return guardPoint;
+                }
+                break;
+            case RobotTaskType.ReactivateMachine:
+                if (machine == null && waypointService != null)
+                {
+                    var startPoint = waypointService.GetStartPoint();
+                    if (startPoint != null)
+                        return startPoint;
+                }
+                break;
+        }
+
+        if (machine == null && memory != null && memory.LastVisitedPoint != null)
+            return memory.LastVisitedPoint;
+
+        return machine;
+    }
+
     private bool TryMoveToPayload(object payload)
     {
         if (payload is RoomWaypoint waypoint && waypoint != null)
@@ -119,6 +278,10 @@ public class RobotBrain : MonoBehaviour
                 body.SetDestination(target);
                 return true;
             }
+
+            // If the machine does not expose a RoomWaypoint, still move toward its position.
+            body.SetDestination(machine.transform.position);
+            return true;
         }
 
         if (payload is Vector3 v3)
@@ -147,6 +310,7 @@ public class RobotBrain : MonoBehaviour
         }
         return null;
     }
+
 }
 
 [System.Serializable]
@@ -171,8 +335,19 @@ public class RobotBrainConfig
 
     public float? GetTimeout(RobotTaskType type)
     {
-        // Can be expanded per role/task later.
-        return defaultTimeoutSeconds > 0f ? Time.time + defaultTimeoutSeconds : (float?)null;
+        switch (type)
+        {
+            case RobotTaskType.Rest:
+                return restDurationSeconds > 0f ? Time.time + restDurationSeconds : (float?)null;
+            case RobotTaskType.GuardPost:
+                return guardPostDurationSeconds > 0f ? Time.time + guardPostDurationSeconds : (float?)null;
+            case RobotTaskType.WorkAtMachine:
+                return workDurationSeconds > 0f ? Time.time + workDurationSeconds : (float?)null;
+            case RobotTaskType.ReactivateMachine:
+                return reactivateDurationSeconds > 0f ? Time.time + reactivateDurationSeconds : (float?)null;
+            default:
+                return defaultTimeoutSeconds > 0f ? Time.time + defaultTimeoutSeconds : (float?)null;
+        }
     }
 
     public int GetUrgency(RobotTaskType type)
@@ -180,4 +355,9 @@ public class RobotBrainConfig
         // Placeholder urgency mapping; refine by role/task.
         return type == RobotTaskType.ReactivateMachine ? 80 : 50;
     }
+
+    [SerializeField] private float restDurationSeconds = 3f;
+    [SerializeField] private float guardPostDurationSeconds = 300f;
+    [SerializeField] private float workDurationSeconds = 120f;
+    [SerializeField] private float reactivateDurationSeconds = 30f;
 }

@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 /// The arm that is selected is based on the horizontal offset of the target relative to the body reference and hands return to
 /// their default pose as soon as the button is released.
 /// </summary>
-public class CowboyArmTargetController : MonoBehaviour
+public class ArmTargetController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform bodyReference;
@@ -25,19 +25,23 @@ public class CowboyArmTargetController : MonoBehaviour
     [SerializeField] private float rotationReturnSpeed = 720f;
     [SerializeField] private float sideSwitchThreshold = 0.1f;
 
-    [Header("Controllers")]
-    [SerializeField] private CowboyGrabController grabController;
-    [SerializeField] private CowboySimpleAttackController attackController;
-    [SerializeField] private bool allowAttackAim = true;
+[Header("Controllers")]
+[SerializeField] private CowboyGrabController grabController;
+[SerializeField] private CowboySimpleAttackController attackController;
+[SerializeField] private bool allowAttackAim = true;
+[Header("Energy")]
+[SerializeField] private PlayerBrain playerBrain;
+[SerializeField] private RobotStateController stateController;
 
     private bool interactHeld;
     private bool interactPressedThisFrame;
     private bool interactReleasedThisFrame;
     private bool attackHeld;
     private bool attackInputHeld;
-    private bool attackSuppressedUntilRelease;
-    private bool preferRightArm = true;
-    private CowboyArmSide? attackActiveArm;
+private bool attackSuppressedUntilRelease;
+private bool preferRightArm = true;
+private CowboyArmSide? attackActiveArm;
+private bool attackEnergySpentThisPress;
 
     private Vector3 leftRestLocalPosition;
     private Vector3 rightRestLocalPosition;
@@ -72,6 +76,7 @@ public class CowboyArmTargetController : MonoBehaviour
         attackInputHeld = false;
         attackSuppressedUntilRelease = false;
         attackActiveArm = null;
+        attackEnergySpentThisPress = false;
         attackController?.DeactivateAll();
         grabController?.ReleaseAllImmediate();
         UnsubscribeFromAttackEvents();
@@ -86,6 +91,7 @@ public class CowboyArmTargetController : MonoBehaviour
         if (!attackInputHeld)
         {
             attackSuppressedUntilRelease = false;
+            attackEnergySpentThisPress = false;
         }
 
         attackHeld = allowAttackAim && attackInputHeld && !attackSuppressedUntilRelease;
@@ -137,6 +143,26 @@ public class CowboyArmTargetController : MonoBehaviour
         if (attackController == null)
         {
             attackController = GetComponentInParent<CowboySimpleAttackController>();
+        }
+
+        if (playerBrain == null)
+        {
+            playerBrain = GetComponent<PlayerBrain>();
+        }
+
+        if (playerBrain == null)
+        {
+            playerBrain = GetComponentInParent<PlayerBrain>();
+        }
+
+        if (stateController == null)
+        {
+            stateController = GetComponent<RobotStateController>();
+        }
+
+        if (stateController == null)
+        {
+            stateController = GetComponentInParent<RobotStateController>();
         }
     }
 
@@ -267,8 +293,15 @@ public class CowboyArmTargetController : MonoBehaviour
 
         if (!attackActiveArm.HasValue)
         {
+            if (!attackEnergySpentThisPress && !TrySpendEnergyForAttack())
+            {
+                attackSuppressedUntilRelease = true;
+                return;
+            }
+
             attackController.SetArmAttackActive(desiredArm, true);
             attackActiveArm = desiredArm;
+            attackEnergySpentThisPress = true;
             return;
         }
 
@@ -470,6 +503,31 @@ public class CowboyArmTargetController : MonoBehaviour
     private static CowboyArmSide GetOppositeArm(CowboyArmSide arm)
     {
         return arm == CowboyArmSide.Right ? CowboyArmSide.Left : CowboyArmSide.Right;
+    }
+
+    private bool TrySpendEnergyForAttack()
+    {
+        if (stateController == null || stateController.CurrentState != RobotState.Alive)
+        {
+            return false;
+        }
+
+        if (stateController.Stats == null)
+        {
+            return false;
+        }
+
+        float energyCost = stateController.Stats.AttackEnergyCost;
+
+        if (energyCost <= 0f)
+        {
+            return false;
+        }
+
+        if (playerBrain != null)
+            return playerBrain.TrySpendEnergy(EnergyAction.Attack, 0f, energyCost);
+
+        return false;
     }
 
     private void ApplySolverFlip(bool targetIsRightSide)

@@ -50,7 +50,6 @@ namespace CowBoya.Robots
             {
                 PuppetRoot = transform;
             }
-
         }
 
         private void Awake()
@@ -105,7 +104,6 @@ namespace CowBoya.Robots
                 {
                     pair.Puppet.rotation = rotation;
                 }
-
             }
         }
 
@@ -133,9 +131,7 @@ namespace CowBoya.Robots
                         rb3D.MoveRotation(pair.targetRotation);
                     }
                 }
-
             }
         }
-
     }
 }

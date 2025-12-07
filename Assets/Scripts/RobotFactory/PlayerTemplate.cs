@@ -36,16 +36,9 @@ public class PlayerTemplate : RobotTemplate
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
 
-        List<Attack> attacks = new List<Attack>();
         if (robotBehaviour.Stats != null)
         {
-            robotBehaviour.Stats.Attacks = attacks;
-        }
-
-        PlayerAttackController playerAttackController = robotBehaviour.GetComponent<PlayerAttackController>();
-        if (playerAttackController != null)
-        {
-            playerAttackController.InitializeAttacks(attacks);
+            robotBehaviour.Stats.Attacks = new List<Attack>();
         }
         Debug.Log("PlayerStats initialized with health: " + robotBehaviour.Stats.CurrentHealth
         + " and energy: " + robotBehaviour.Stats.CurrentEnergy

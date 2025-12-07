@@ -20,6 +20,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     private Transform playerBodyReference;
 
     public Vector3 PlayerBodyReferencePosition => playerBodyReference != null ? playerBodyReference.position : Vector3.zero;
+    public Transform PlayerTransform => playerBodyReference;
 
     [SerializeField] private RobotMemory memory;
 

@@ -11,7 +11,6 @@ public class GrabHandAttractor : MonoBehaviour
     [SerializeField] private Color activeColor = Color.green;
     [SerializeField] private Color inactiveColor = new Color(1f, 1f, 1f, 0f);
 
-    private bool isActive;
     private void Awake()
     {
         if (grabIndicator == null)
@@ -78,13 +77,11 @@ public class GrabHandAttractor : MonoBehaviour
 
     public void Activate()
     {
-        isActive = true;
         UpdateIndicator(true);
     }
 
     public void Deactivate()
     {
-        isActive = false;
         UpdateIndicator(false);
     }
 

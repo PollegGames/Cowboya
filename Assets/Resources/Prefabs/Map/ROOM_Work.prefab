@@ -4098,61 +4098,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7047981207480481909}
     m_Modifications:
-    - target: {fileID: 41544107772198061, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_Color.a
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 542146199199913260, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_Name
       value: WorkingDesk
       objectReference: {fileID: 0}
     - target: {fileID: 1403945648289567780, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: trigger
-      value: 
-      objectReference: {fileID: 4133442061849238339}
-    - target: {fileID: 1403945648289567780, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: materialOn
-      value: 
-      objectReference: {fileID: 2100000, guid: 467ce051cbbcd4c48a2b25903b45b7d5, type: 2}
-    - target: {fileID: 1403945648289567780, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: materialOff
-      value: 
-      objectReference: {fileID: 2100000, guid: 53ec3f936f3b0bf4dba7d803fd9c03a2, type: 2}
-    - target: {fileID: 1403945648289567780, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: factoryAlarmStatus
-      value: 
-      objectReference: {fileID: 11400000, guid: ce6d93aba8639b74f8e3f0b7ef4b3919, type: 2}
-    - target: {fileID: 1403945648289567780, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: cubeConveyorController
       value: 
       objectReference: {fileID: 6757885727604863804}
-    - target: {fileID: 3036150070442820856, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 2.14
-      objectReference: {fileID: 0}
-    - target: {fileID: 3036150070442820856, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3036150070442820856, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -2.04
-      objectReference: {fileID: 0}
-    - target: {fileID: 3865668901669927916, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 467ce051cbbcd4c48a2b25903b45b7d5, type: 2}
     - target: {fileID: 4568954887781084499, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 5226794923736213634, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_VersionIndex
-      value: 16398
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 5788446907477006944, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_Color.a
-      value: 1
+    - target: {fileID: 5226794923736213634, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
+      propertyPath: m_VersionIndex
+      value: 16401
+      objectReference: {fileID: 0}
+    - target: {fileID: 6416570240696173683, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4194,9 +4162,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
-    - target: {fileID: 7810815151187080829, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
+    - target: {fileID: 7200897456640363171, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4214,11 +4182,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc6912bfceb5dff4dbd2c9c32421adfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!61 &4133442061849238339 stripped
-BoxCollider2D:
-  m_CorrespondingSourceObject: {fileID: 429215285151596846, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-  m_PrefabInstance: {fileID: 4370759522471352941}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6730483614755004952 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7047981207480481909, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}

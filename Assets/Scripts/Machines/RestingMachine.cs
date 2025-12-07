@@ -7,7 +7,7 @@ public class RestingMachine : BaseMachine
 {
     [SerializeField] private Material materialOn;
     [SerializeField] private Material materialOff;
-    [SerializeField] private float sendBackToWorkDelay = 5f;
+    [SerializeField] private float sendBackToWorkDelay = 3f;
     private Coroutine restCountdownCo;
 
     private MeshRenderer meshRenderer;
@@ -101,7 +101,14 @@ public class RestingMachine : BaseMachine
     private void SendWorkerToWork(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.OnMachineStateChanged(this, true);
+        object payload = null;
+        if (waypointService != null)
+        {
+            payload = waypointService.GetLeastUsedFreeWorkPoint();
+            if (payload == null)
+                payload = waypointService.GetWorkOrRestPoint();
+        }
+        worker.OnMachineStateChanged(payload ?? this, true);
     }
 
     private void SendCurrentWorkerToWork()

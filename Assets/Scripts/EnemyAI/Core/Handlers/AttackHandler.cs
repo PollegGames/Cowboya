@@ -18,6 +18,13 @@ public class AttackHandler : ScriptableRobotTaskHandler
             return;
         }
 
+        var stateController = brain.GetComponent<RobotStateController>();
+        float energyCost = stateController != null && stateController.Stats != null
+            ? stateController.Stats.AttackEnergyCost
+            : 0f;
+        if (stateController != null && energyCost > 0f && !stateController.PerformAttackByEnergy(energyCost))
+            return;
+
         Vector2 targetPosition;
         if (payload is Transform t && t != null)
             targetPosition = t.position;

@@ -9,6 +9,8 @@ public class RobotLocomotionController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private RobotStateController robotBehaviour;
+    [SerializeField] private EnergyBot energyBot;
+    [SerializeField] private PlayerBrain playerBrain;
     [SerializeField] private Animator animator;
 
     [Header("Animator Parameters")]
@@ -42,10 +44,22 @@ public class RobotLocomotionController : MonoBehaviour
             robotBehaviour = GetComponent<RobotStateController>();
         }
 
+        if (energyBot == null)
+        {
+            energyBot = GetComponent<EnergyBot>();
+        }
+
+        if (playerBrain == null)
+        {
+            playerBrain = GetComponent<PlayerBrain>();
+        }
+
         if (animator == null)
         {
             animator = GetComponentInChildren<Animator>();
         }
+
+        PushCostsToEnergyBot();
     }
 
     /// <summary>
@@ -62,6 +76,7 @@ public class RobotLocomotionController : MonoBehaviour
         if (walking)
         {
             directionValue = horizontalInput >= 0f ? 1f : -1f;
+            SpendEnergy(EnergyAction.Walk, Time.deltaTime);
         }
 
         ApplyAnimatorMovement(directionValue, walking);
@@ -102,12 +117,16 @@ public class RobotLocomotionController : MonoBehaviour
     /// </summary>
     public void Jump()
     {
-        if (isJumping || !CanPerformEnergy(energyCostPerJump))
+        if (isJumping || !HasEnergyFor(EnergyAction.Jump))
         {
             return;
         }
 
-        ConsumeEnergy(energyCostPerJump);
+        if (!SpendEnergy(EnergyAction.Jump))
+        {
+            return;
+        }
+
         isJumping = true;
         SetAnimatorBool(jumpBoolParameter, true);
         UpdateVerticalDirectionFromState();
@@ -151,12 +170,16 @@ public class RobotLocomotionController : MonoBehaviour
     /// </summary>
     public void Crouch()
     {
-        if (isCrouching || !CanPerformEnergy(energyCostPerCrouch))
+        if (isCrouching || !HasEnergyFor(EnergyAction.Crouch))
         {
             return;
         }
 
-        ConsumeEnergy(energyCostPerCrouch);
+        if (!SpendEnergy(EnergyAction.Crouch))
+        {
+            return;
+        }
+
         isCrouching = true;
         SetAnimatorBool(crouchBoolParameter, true);
         UpdateVerticalDirectionFromState();
@@ -185,26 +208,6 @@ public class RobotLocomotionController : MonoBehaviour
     public void SetFacingDirection(bool isRight)
     {
         facingRight = isRight;
-    }
-
-    private bool CanPerformEnergy(float energyCost)
-    {
-        if (robotBehaviour == null || energyCost <= 0f)
-        {
-            return true;
-        }
-
-        return robotBehaviour.CanPerformEnergy(energyCost);
-    }
-
-    private void ConsumeEnergy(float energyCost)
-    {
-        if (robotBehaviour == null || energyCost <= 0f)
-        {
-            return;
-        }
-
-        robotBehaviour.ConsumeEnergy(energyCost);
     }
 
     private void SetAnimatorBool(string parameter, bool value)
@@ -236,5 +239,38 @@ public class RobotLocomotionController : MonoBehaviour
         }
 
         animator.SetFloat(verticalDirectionParameter, verticalValue);
+    }
+
+    private bool HasEnergyFor(EnergyAction action)
+    {
+        if (energyBot != null)
+            return energyBot.HasEnergyForAction(action);
+
+        if (robotBehaviour != null)
+            return robotBehaviour.CanPerformEnergy(action);
+
+        return true;
+    }
+
+    private bool SpendEnergy(EnergyAction action, float deltaTime = 0f)
+    {
+        if (playerBrain != null)
+            return playerBrain.TrySpendEnergy(action, deltaTime);
+
+        if (energyBot != null)
+            return energyBot.TryConsume(action, deltaTime);
+
+        return true;
+    }
+
+    private void PushCostsToEnergyBot()
+    {
+        if (energyBot == null)
+        {
+            return;
+        }
+
+        energyBot.SetActionCost(EnergyAction.Jump, energyCostPerJump);
+        energyBot.SetActionCost(EnergyAction.Crouch, energyCostPerCrouch);
     }
 }

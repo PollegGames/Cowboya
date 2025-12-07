@@ -39,13 +39,20 @@ MachineWorkerManager --> workers use WaypointService to find rest points
 MachineSecurityManager --> guards reactivate machines
 ```
 
-## Enemy AI
-Enemy behaviour is implemented with state machines.
-- Controllers in `EnemyAI/Controllers` drive animation and actions.
-- States under `EnemyAI/States` represent behaviour like patrolling or attacking.
-- `WorkerStateMachine` & `EnemyStateMachine` manage transitions.
+## Robot AI
+Robots (workers, guards, etc.) share the Brain/Heart/Body/Memory architecture (see `RobotAI_HeartBrainMemoryBody.md`).
+- **Brain**: single entry point for world events (machines, alarms, managers); decides which task to push.
+- **Heart**: runs the task stack/queue (e.g., `WorkAtMachine`, `GoToRest`, `ReactivateMachine`, `GuardPost`) and tells the Body what to execute.
+- **Body**: moves/animates/handles interactions; reports completion back to the Heart.
+- **Memory**: stores factual data to support Brain/Heart decisions.
 
-Enemies often use `WaypointService` to navigate to targets and can receive orders from machine managers when machines change state.
+Machines only emit state + target points; they never move robots. Managers route those events to Brains:
+- **MachineWorkerManager**: listens to machine ON/OFF and forwards to the assigned worker Brain (see `WorkerMachineFlow.md`).
+- **MachineSecurityManager**: listens to machine OFF and forwards reactivation requests to a chosen guard Brain (see `SecurityGuardMachineFlow.md`).
+
+Cycles:
+- Worker: `WorkAtMachine` (ON) → machine OFF → `GoToRest` → machine ON → `WorkAtMachine`.
+- Guard: default `GuardPost` → machine OFF → `ReactivateMachine` → machine ON → `GuardPost`.
 
 ## Player
 Player scripts manage controls, stats and interaction.

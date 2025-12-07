@@ -1,26 +1,32 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-public class Hinge2DIkSolver : MonoBehaviour {
+public class Hinge2DIkSolver : MonoBehaviour
+{
     public static float reflectionForce = 0.5f;
     public Transform target;
     public Transform pole;
     public int chainLength = 2;
     public float SetForce = 75;
-    private float _force;
+    private float forceValue;
     private float dforce;
-    public float force {
-        get {
-            if (SetForce != _force) {
+    public float force
+    {
+        get
+        {
+            if (SetForce != forceValue)
+            {
                 force = SetForce;
             }
-            return _force;
+            return forceValue;
         }
-        set {
-            _force = value;
+        set
+        {
+            forceValue = value;
             SetForce = value;
             dforce = 1f / (value * value);
         }
     }
+
     public float delta = 0.25f;
     public int iterations = 10;
     public float poleMinDistance = 1;
@@ -32,27 +38,25 @@ public class Hinge2DIkSolver : MonoBehaviour {
     private Vector2[] positions;
     private float[] bonesLength;
     private AnchoredJoint2D[] bones;
-
     private Rigidbody2D[] bonesR;
     private Transform[] bonesT;
-    private Vector2[] StartDir;
-
+    private Vector2[] startDir;
     private float[] angleOffset;
     private float completeLength = 0;
     private Transform root;
     private Rigidbody2D rootrb;
     private bool isReinitializing;
-
     public bool active = true;
-
-    public delegate void OnSolve ();
+    public delegate void OnSolve();
     public OnSolve CallBackOnSolve;
 
     /// <summary>
     /// Rebuilds cached joints and transforms and runs the solver once.
     /// </summary>
-    public void Reinitialize() {
-        if (isReinitializing) {
+    public void Reinitialize()
+    {
+        if (isReinitializing)
+        {
             return;
         }
         isReinitializing = true;
@@ -61,7 +65,7 @@ public class Hinge2DIkSolver : MonoBehaviour {
         bones = null;
         bonesT = null;
         bonesR = null;
-        StartDir = null;
+        startDir = null;
         bonesLength = null;
         avAngles = null;
         angleOffset = null;
@@ -69,304 +73,311 @@ public class Hinge2DIkSolver : MonoBehaviour {
         root = null;
         rootrb = null;
 
-        init();
+        Init();
         Solve();
 
         isReinitializing = false;
     }
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         Reinitialize();
     }
 
-    void init () {
+    private void Init()
+    {
         positions = new Vector2[chainLength + 1];
         bones = new AnchoredJoint2D[chainLength + 1];
         bonesT = new Transform[chainLength + 1];
         bonesR = new Rigidbody2D[chainLength + 1];
-        StartDir = new Vector2[chainLength + 1];
+        startDir = new Vector2[chainLength + 1];
         bonesLength = new float[chainLength];
         avAngles = new float[chainLength];
         angleOffset = new float[chainLength];
         completeLength = 0;
-        var current = GetComponent<AnchoredJoint2D> ();
-        if (target) {
-            var controller = target.GetComponent<IKController> ();
-            if (!controller) {
-                controller = target.gameObject.AddComponent<IKController> ();
+        var current = GetComponent<AnchoredJoint2D>();
+        if (target)
+        {
+            var controller = target.GetComponent<IKController>();
+            if (!controller)
+            {
+                controller = target.gameObject.AddComponent<IKController>();
             }
-            controller.Init (this);
+            controller.Init(this);
         }
 
-        for (int i = chainLength; i >= 0; i--) {
+        for (int i = chainLength; i >= 0; i--)
+        {
             bones[i] = current;
             bonesT[i] = current.transform;
             bonesR[i] = current.attachedRigidbody;
-            if (i == chainLength) {
-                StartDir[i] = (Vector2) target.position - getBonePos (i);
-            } else {
-                var dir = getBonePos (i + 1) - getBonePos (i);
-                StartDir[i] = dir;
+            if (i == chainLength)
+            {
+                startDir[i] = (Vector2)target.position - GetBonePos(i);
+            }
+            else
+            {
+                var dir = GetBonePos(i + 1) - GetBonePos(i);
+                startDir[i] = dir;
                 bonesLength[i] = dir.magnitude;
                 completeLength += bonesLength[i];
             }
-            current = current.connectedBody.GetComponent<AnchoredJoint2D> ();
+            current = current.connectedBody.GetComponent<AnchoredJoint2D>();
         }
         root = bones[0].connectedBody.transform;
         rootrb = root.GetComponent<Rigidbody2D>();
-        if (!rootrb) {
+        if (!rootrb)
+        {
             rootrb = root.GetComponentInParent<Rigidbody2D>();
         }
-        if (!rootrb) {
+        if (!rootrb)
+        {
             Debug.LogError("Hinge2DIkSolver: Root object is missing a Rigidbody2D. Solver disabled.", this);
             enabled = false;
         }
 
-        for (int i = 1; i <= chainLength; i++) {
-            avAngles[i - 1] = PlainMath.AngleBetween (getBonePos (i), root.position);
-            angleOffset[i - 1] = PlainMath.AngleFromDirection (getBonePosVR2 (i - 1) - getBonePosVR2 (i)) - root.eulerAngles.z;
-            //Debug.Log(angleOffset[i - 1] + " , " + bonesT[i].name + "  ::  " + root.eulerAngles.z + " :: " + bonesT[i].eulerAngles.z);
-            //Debug.Log(AngleFromDirection((Vector2)root.position - getBonePos(i)) + " , " + bonesT[i].na);
+        for (int i = 1; i <= chainLength; i++)
+        {
+            avAngles[i - 1] = PlainMath.AngleBetween(GetBonePos(i), root.position);
+            angleOffset[i - 1] = PlainMath.AngleFromDirection(GetBonePosVR2(i - 1) - GetBonePosVR2(i)) - root.eulerAngles.z;
         }
-        //Debug.Log(root + " , " + rootrb);
     }
 
-    private bool IsValidBone(int index) {
+    private bool IsValidBone(int index)
+    {
         return bonesT != null && bones != null && index >= 0 &&
             index < bonesT.Length && bonesT[index] != null && bones[index] != null;
     }
 
-    private Vector2 getBonePos (int index) {
-        if (!IsValidBone(index)) {
+    private Vector2 GetBonePos(int index)
+    {
+        if (!IsValidBone(index))
+        {
             Reinitialize();
-            if (!IsValidBone(index)) {
+            if (!IsValidBone(index))
+            {
                 return Vector2.zero;
             }
         }
         return bonesT[index].rotation * bones[index].anchor + bonesT[index].position;
     }
 
-    private Vector2 getBonePosVR2 (int index) {
-        if (!IsValidBone(index)) {
+    private Vector2 GetBonePosVR2(int index)
+    {
+        if (!IsValidBone(index))
+        {
             Reinitialize();
-            if (!IsValidBone(index)) {
+            if (!IsValidBone(index))
+            {
                 return Vector2.zero;
             }
         }
-        return bones[index].anchor + (Vector2) bonesT[index].position;
+        return bones[index].anchor + (Vector2)bonesT[index].position;
     }
-    private Vector2 BonePosToPos (int index, Vector2 pos) {
-        // convert anchor world pos, to anchor.transform world pos.
-        return pos + (Vector2) (bonesT[index].rotation * bones[index].anchor);
-    }
-    private void LateUpdate () {
-        //basically nothing would really change every frame so wh
-        if (Time.frameCount % updateEveryXFrames == 0) {
-            Solve ();
+
+    private void LateUpdate()
+    {
+        if (Time.frameCount % updateEveryXFrames == 0)
+        {
+            Solve();
         }
     }
 
-    private void FixedUpdate () {
-        if (active) {
-            ApplyByTorque ();
-            ApplyPositions ();
+    private void FixedUpdate()
+    {
+        if (active)
+        {
+            ApplyByTorque();
+            ApplyPositions();
         }
     }
-    void Solve () {
+
+    private void Solve()
+    {
         if (target == null)
             return;
         if (bonesLength.Length != chainLength)
-            init ();
-        if (CallBackOnSolve != null) {
-            CallBackOnSolve.Invoke ();
-        }
-        // nothing much to say here
+            Init();
+        CallBackOnSolve?.Invoke();
+
         Vector2 targetPos = target.position;
-        for (int i = 0; i < chainLength + 1; i++) {
-            if (!IsValidBone(i)) {
+        for (int i = 0; i < chainLength + 1; i++)
+        {
+            if (!IsValidBone(i))
+            {
                 return;
             }
-            positions[i] = getBonePos (i);
+            positions[i] = GetBonePos(i);
         }
 
-        // calculate the desireble position if the target is outside reach
         var direction = positions[0] - targetPos;
-        if (direction.sqrMagnitude > completeLength * completeLength) {
-            for (int i = 1; i < chainLength + 1; i++) {
+        if (direction.sqrMagnitude > completeLength * completeLength)
+        {
+            for (int i = 1; i < chainLength + 1; i++)
+            {
                 positions[i] = positions[i - 1] - direction.normalized * bonesLength[i - 1];
             }
-        } else {
-            // in here we want to "get back" to the origin starting poss,
-            // just to mentain some basic form.
-            for (int i = 0; i < chainLength; i++) {
-                positions[i + 1] = Vector3.Lerp (positions[i + 1],
-                    positions[i] + StartDir[i], SnapStrength);
+        }
+        else
+        {
+            for (int i = 0; i < chainLength; i++)
+            {
+                positions[i + 1] = Vector3.Lerp(positions[i + 1],
+                    positions[i] + startDir[i], SnapStrength);
             }
 
-            // the old good calculation for inverse ik, for 3d but with 2d vectors.
-            // same stuff.
-            for (int k = 0; k < iterations; k++) {
-                // first step lets assume we are onto the target
+            for (int k = 0; k < iterations; k++)
+            {
                 positions[chainLength] = targetPos;
-                for (int i = chainLength - 1; i > 0; i--) {
-                    //second step lets calculate out way from each position toward wahtever direction we are in currently.
+                for (int i = chainLength - 1; i > 0; i--)
+                {
                     positions[i] = positions[i + 1] + (positions[i] - positions[i + 1]).normalized * bonesLength[i];
                 }
 
-                for (int i = 1; i < chainLength + 1; i++) {
-                    //this step, lets make sure our bones are actually not stranded off from the root positiion.
+                for (int i = 1; i < chainLength + 1; i++)
+                {
                     var dir = positions[i] - positions[i - 1];
                     positions[i] = positions[i - 1] + dir.normalized * bonesLength[i - 1];
                 }
 
-                // if we are close enough lets get out
-                if ((targetPos - positions[chainLength]).sqrMagnitude < delta * delta) {
+                if ((targetPos - positions[chainLength]).sqrMagnitude < delta * delta)
+                {
                     break;
                 }
             }
 
-            if (pole) {
-                // if there is pole we want to make sure we are facing it.
+            if (pole)
+            {
                 Vector2 polePos = (pole.position - root.position) * 100 + root.position;
-                for (int i = 1; i < chainLength; i++) {
+                for (int i = 1; i < chainLength; i++)
+                {
                     var dir = positions[i + 1] - positions[i - 1];
-                    // we want to get the closest point in the line between pos - 1, + 1, to out current position
-                    // then we will know in what direction the pole, and the currenct pose facing relative to the line
-                    var closest = PlainMath.ClosestOnLine (positions[i + 1], dir, positions[i]);
-                    var ttoCenter = closest - positions[i];
-                    var ptoCenter = closest - polePos;
-                    // if we are facing the opposite derection from the center, as the pole we will flip out direction
-                    // note that it will have the same distance from -1, +1, just flipped direction
-                    // also we dont wanna flip anything if the pole to the center, reason being,
-                    // we will get to much flipping (in one frame the position is the same direciton as us, and the other frame its
-                    // the opposide derection)
-                    if (ptoCenter.sqrMagnitude > poleMinDistance && Vector2.Dot (ttoCenter, ptoCenter) < 0) {
-                        positions[i] = closest + ttoCenter;
+                    var closest = PlainMath.ClosestOnLine(positions[i + 1], dir, positions[i]);
+                    var toCenter = closest - positions[i];
+                    var poleToCenter = closest - polePos;
+                    if (poleToCenter.sqrMagnitude > poleMinDistance && Vector2.Dot(toCenter, poleToCenter) < 0)
+                    {
+                        positions[i] = closest + toCenter;
                     }
-                    //var test = Vector2.SignedAngle
                 }
             }
         }
     }
 
     private float[] avAngles;
-    const float tc = 0.05f;
-    private void ApplyByTorque () {
-        if (rootrb == null || rootrb.linearVelocity == Vector2.zero) {
-            if (rootrb == null) {
+    private const float Tc = 0.05f;
+
+    private void ApplyByTorque()
+    {
+        if (rootrb == null || rootrb.linearVelocity == Vector2.zero)
+        {
+            if (rootrb == null)
+            {
                 Reinitialize();
             }
             return;
         }
         float sqrVel = rootrb.linearVelocity.sqrMagnitude;
-        float vmd = sqrVel <= Mathf.Epsilon ? 1f : 10f / sqrVel;
-        vmd = Mathf.Clamp01(vmd);
-        var fxs50 = 25 * Time.fixedDeltaTime;
-        for (int i = 1; i <= chainLength; i++) {
-            if (!IsValidBone(i - 1) || bonesR == null || bonesR[i - 1] == null) {
+        float velocityMod = sqrVel <= Mathf.Epsilon ? 1f : 10f / sqrVel;
+        velocityMod = Mathf.Clamp01(velocityMod);
+        var fixedStep = 25 * Time.fixedDeltaTime;
+        for (int i = 1; i <= chainLength; i++)
+        {
+            if (!IsValidBone(i - 1) || bonesR == null || bonesR[i - 1] == null)
+            {
                 continue;
             }
-            var t = PlainMath.AngleFromDirection (positions[i - 1] - positions[i]);
-            var angle = -Mathf.DeltaAngle (bonesT[i - 1].eulerAngles.z + angleOffset[i - 1], t);
-
-            var x = angle > 0 ? 1 : -1;
-            var vel = bonesR[i - 1].angularVelocity;
-
-            var a = (chainLength + 2 - i);
-            var index = chainLength - i + 1;
-            angle = Mathf.Abs (angle) * 0.1f;
-            if (angle < 1) {
+            var targetAngle = PlainMath.AngleFromDirection(positions[i - 1] - positions[i]);
+            var angle = -Mathf.DeltaAngle(bonesT[i - 1].eulerAngles.z + angleOffset[i - 1], targetAngle);
+            var direction = angle > 0 ? 1 : -1;
+            var velocity = bonesR[i - 1].angularVelocity;
+            angle = Mathf.Abs(angle) * 0.1f;
+            if (angle < 1)
+            {
                 angle = angle * angle;
             }
 
-            //bonesR[i - 1].angularVelocity = 0;
+            var reflection = velocity * fixedStep * reflectionForce * velocityMod;
+            reflection = Mathf.Clamp(reflection, -force * 0.2f, force * 0.2f);
+            rootrb.AddTorque(reflection);
+            bonesR[i - 1].AddTorque(-reflection);
 
-            var rv2 = vel * fxs50 * reflectionForce * vmd;
-            rv2 = Mathf.Clamp (rv2, -force * 0.2f, force * 0.2f);
-            rootrb.AddTorque (rv2);
-            bonesR[i - 1].AddTorque (-rv2);
-
-            var aaf = Mathf.Log10 ((chainLength - i) * 10 + 10);
-            var f = angle * x * force * torqueStrength * aaf * fxs50 * 6;
-            //f = Mathf.Clamp(f, -270, 270);
-            rootrb.AddTorque (f);
-            bonesR[i - 1].AddTorque (-f);
+            var forceMultiplier = Mathf.Log10((chainLength - i) * 10 + 10);
+            var torque = angle * direction * force * torqueStrength * forceMultiplier * fixedStep * 6;
+            rootrb.AddTorque(torque);
+            bonesR[i - 1].AddTorque(-torque);
         }
     }
 
     private float vn = 1;
-    const float rForce = 0.5f;
-    private void ApplyPositions () {
-        if (rootrb == null || rootrb.linearVelocity == Vector2.zero || bonesR == null) {
-            if (rootrb == null || bonesR == null) {
+    private const float RForce = 0.5f;
+
+    private void ApplyPositions()
+    {
+        if (rootrb == null || rootrb.linearVelocity == Vector2.zero || bonesR == null)
+        {
+            if (rootrb == null || bonesR == null)
+            {
                 Reinitialize();
             }
             return;
         }
-        // well this method just doing one thing
-        // its trying to set our transform position into the positions we calculated
-        // you can implement it in any way.
 
-        // note!, the positions[i] are the desired position for the hinge.anchor so setting transform.position
-        // would not work at all, in this case i calculate the "direction" that the anchor should move toward position[i]
-        // and just add that force to our transform (it would also move the anchor so we get what we wanted)
-        // also that would automatically rotate the transform as its all done via the rigidbodies physics.
-
-        Vector2 vel = Vector2.zero;
         float n = 10 / rootrb.linearVelocity.magnitude;
-        n = Mathf.Clamp01 (n);
+        n = Mathf.Clamp01(n);
         vn = n * 0.1f + vn * 0.9f;
 
-        var fxs50 = 25 * Time.fixedDeltaTime;
-        //Debug.Log (n + " ," + rootrb.velocity.magnitude);
-        for (int i = 0; i <= chainLength; i++) {
-            if (!IsValidBone(i) || bonesR == null || bonesR[i] == null) {
+        var fixedStep = 25 * Time.fixedDeltaTime;
+        for (int i = 0; i <= chainLength; i++)
+        {
+            if (!IsValidBone(i) || bonesR == null || bonesR[i] == null)
+            {
                 continue;
             }
-            //calculate the direction from anchor to position[i]
-            var dir = (positions[i] - getBonePos (i));
-            var mag = dir.magnitude;
-            var cmag = bonesR[i].linearVelocity.magnitude;
 
-            var velr = bonesR[i].linearVelocity * vn * fxs50;
+            var dir = positions[i] - GetBonePos(i);
+            var velocity = bonesR[i].linearVelocity * vn * fixedStep;
 
-            if (velr.sqrMagnitude > force * force * rForce * rForce) {
-                velr = velr.normalized * force * rForce;
+            if (velocity.sqrMagnitude > force * force * RForce * RForce)
+            {
+                velocity = velocity.normalized * force * RForce;
             }
 
-            rootrb.AddForce (velr * reflectionForce, ForceMode2D.Impulse);
-            bonesR[i].AddForce (-velr * reflectionForce, ForceMode2D.Impulse);
-            float relativeForce = Mathf.Log10 (chainLength - i + 10) * force;
-
-            var aaf = Mathf.Log10 ((chainLength - i) * 10 + 10) * force * 6 * fxs50;
-            bonesR[i].AddForce (dir * aaf * vn);
-            rootrb.AddForce (-dir * aaf * vn);
+            rootrb.AddForce(velocity * reflectionForce, ForceMode2D.Impulse);
+            bonesR[i].AddForce(-velocity * reflectionForce, ForceMode2D.Impulse);
+            var addForce = Mathf.Log10((chainLength - i) * 10 + 10) * force * 6 * fixedStep;
+            bonesR[i].AddForce(dir * addForce * vn);
+            rootrb.AddForce(-dir * addForce * vn);
         }
     }
 
 #if UNITY_EDITOR
     public float gsize = 0.1f;
-    private void OnDrawGizmos () {
+    private void OnDrawGizmos()
+    {
         if (!drawGizmos)
             return;
         Gizmos.color = Color.white;
-        try {
-            if (bones != null) {
-                Random.InitState (10);
-                // draw the anchors
-                for (int i = 0; i < bones.Length; i++) {
-                    PlainMath.NextGizmosColor ();
-                    Gizmos.DrawSphere (getBonePos (i), gsize);
+        try
+        {
+            if (bones != null)
+            {
+                Random.InitState(10);
+                for (int i = 0; i < bones.Length; i++)
+                {
+                    PlainMath.NextGizmosColor();
+                    Gizmos.DrawSphere(GetBonePos(i), gsize);
                 }
 
-                // draw the desired anchor position
-                for (int i = 0; i < chainLength + 1; i++) {
+                for (int i = 0; i < chainLength + 1; i++)
+                {
                     Gizmos.color = Color.blue;
-                    Gizmos.DrawSphere (positions[i], gsize);
+                    Gizmos.DrawSphere(positions[i], gsize);
                 }
             }
-        } catch {
-
+        }
+        catch
+        {
         }
     }
 #endif

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using CowBoya.Robots;
 using UnityEngine;
 
 [RequireComponent(typeof(RobotLocomotionController), typeof(Inventory))]
@@ -24,9 +26,18 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     private bool isCrouchingInput;
 
     [SerializeField] private EnergyBot energyBot;
+    [SerializeField] private PlayerBrain playerBrain;
     [SerializeField] private Inventory inventory;
 
+    [Header("Faint Handling")]
+    [SerializeField] private SimplePuppetBinder puppetBinder;
+    [SerializeField] private List<Rigidbody2D> faintRigidbodies2D = new List<Rigidbody2D>();
+    [SerializeField] private List<Rigidbody> faintRigidbodies3D = new List<Rigidbody>();
+
     private Vector2 lookDirection = Vector2.right;
+    private readonly Dictionary<Rigidbody2D, bool> defaultFreezeRotation2D = new Dictionary<Rigidbody2D, bool>();
+    private readonly Dictionary<Rigidbody, RigidbodyConstraints> defaultConstraints3D = new Dictionary<Rigidbody, RigidbodyConstraints>();
+    private bool isFaint;
 
     /// <summary>
     /// Gets the current look direction.
@@ -38,10 +49,16 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         if (robotBehaviour == null)
             robotBehaviour = GetComponent<RobotStateController>();
 
+        if (playerBrain == null)
+            playerBrain = GetComponent<PlayerBrain>();
+
         robotBehaviour.OnStateChanged += HandleStateChange;
 
         if (inventory == null)
             inventory = GetComponent<Inventory>();
+
+        if (puppetBinder == null)
+            puppetBinder = GetComponent<SimplePuppetBinder>();
 
         input = inputSource as IPlayerInput;
         if (input == null)
@@ -50,6 +67,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         }
         // Ensure initial facing is applied to all modules (including PoleMirror2D)
         ApplyFacingDirection();
+        CacheDefaultFreezeSettings();
     }
 
     private void Update()
@@ -146,6 +164,17 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         if (robotBehaviour.Stats != null)
             energyRequired = robotBehaviour.Stats.AttackEnergyCost;
 
+        if (playerBrain != null)
+        {
+            if (!playerBrain.TrySpendEnergy(EnergyAction.Attack, 0f, energyRequired))
+                return false;
+        }
+        else
+        {
+            if (!robotBehaviour.PerformAttackByEnergy(energyRequired))
+                return false;
+        }
+
         Vector2 targetPosition = DetermineTargetPosition();
         AttackSector sector = DetermineSector(GetAimDirection());
         request = new AttackRequest(targetPosition, sector, energyRequired);
@@ -203,14 +232,38 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 
     private void HandleStateChange(RobotState newState)
     {
-        if (newState == RobotState.Dead)
+        switch (newState)
         {
-            Die();
+            case RobotState.Alive:
+                RecoverFromFaint();
+                break;
+            case RobotState.Faint:
+                Faint();
+                break;
+            case RobotState.Dead:
+                Die();
+                break;
         }
     }
 
     public void Faint()
     {
+        if (isFaint)
+            return;
+
+        isFaint = true;
+        DisablePuppetBinder();
+        SetFreezeRotationForFaint(false);
+    }
+
+    private void RecoverFromFaint()
+    {
+        if (!isFaint)
+            return;
+
+        isFaint = false;
+        RestorePuppetBinder();
+        SetFreezeRotationForFaint(true);
     }
 
     public void Die()
@@ -221,4 +274,74 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         jointBreaker?.BreakAll();
     }
 
+    private void CacheDefaultFreezeSettings()
+    {
+        foreach (Rigidbody2D body in faintRigidbodies2D)
+        {
+            if (body != null && !defaultFreezeRotation2D.ContainsKey(body))
+                defaultFreezeRotation2D.Add(body, body.freezeRotation);
+        }
+
+        foreach (Rigidbody body in faintRigidbodies3D)
+        {
+            if (body != null && !defaultConstraints3D.ContainsKey(body))
+                defaultConstraints3D.Add(body, body.constraints);
+        }
+    }
+
+    private void SetFreezeRotationForFaint(bool useDefaultConstraints)
+    {
+        foreach (Rigidbody2D body in faintRigidbodies2D)
+        {
+            if (body == null)
+                continue;
+
+            if (!defaultFreezeRotation2D.ContainsKey(body))
+                defaultFreezeRotation2D.Add(body, body.freezeRotation);
+
+            body.freezeRotation = useDefaultConstraints ? defaultFreezeRotation2D[body] : false;
+        }
+
+        foreach (Rigidbody body in faintRigidbodies3D)
+        {
+            if (body == null)
+                continue;
+
+            if (!defaultConstraints3D.ContainsKey(body))
+                defaultConstraints3D.Add(body, body.constraints);
+
+            body.constraints = useDefaultConstraints
+                ? defaultConstraints3D[body]
+                : RemoveRotationConstraints(body.constraints);
+        }
+    }
+
+    private RigidbodyConstraints RemoveRotationConstraints(RigidbodyConstraints constraints)
+    {
+        return constraints & ~(RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ);
+    }
+
+    private void DisablePuppetBinder()
+    {
+        if (puppetBinder == null)
+            puppetBinder = GetComponent<SimplePuppetBinder>();
+
+        if (puppetBinder != null)
+            puppetBinder.enabled = false;
+    }
+
+    private void RestorePuppetBinder()
+    {
+        if (puppetBinder == null)
+            puppetBinder = GetComponent<SimplePuppetBinder>();
+
+        if (puppetBinder != null && (robotBehaviour == null || robotBehaviour.CurrentState == RobotState.Alive))
+            puppetBinder.enabled = true;
+    }
+
+    private void OnDestroy()
+    {
+        if (robotBehaviour != null)
+            robotBehaviour.OnStateChanged -= HandleStateChange;
+    }
 }

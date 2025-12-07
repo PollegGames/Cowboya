@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+
 public class RobotStateController : MonoBehaviour, IPooledObject
 {
     public event Action<RobotState> OnStateChanged;
@@ -10,16 +11,39 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     [SerializeField] private HealthBot healthBot;
     public HealthBot Health => healthBot;
 
-    [SerializeField] public RobotStats Stats;
+    [SerializeField] private RobotStats stats;
+    public RobotStats Stats
+    {
+        get => stats;
+        set
+        {
+            stats = value;
+            if (energyBot != null)
+                energyBot.SetStats(stats);
+        }
+    }
     private bool isGrounded = true;
 
     private void Awake()
     {
-        if (energyBot == null) energyBot = GetComponent<EnergyBot>();
-        if (healthBot == null) healthBot = GetComponent<HealthBot>();
+        if (energyBot == null)
+            energyBot = GetComponent<EnergyBot>();
+        if (healthBot == null)
+            healthBot = GetComponent<HealthBot>();
 
-        energyBot.OnEnergyNeeded += HandleEnergyConsumption;
-        healthBot.OnHealthChanged += HandleHealthChange;
+        if (energyBot != null)
+        {
+            energyBot.SetStats(Stats);
+        }
+
+        if (healthBot != null)
+            healthBot.OnHealthChanged += HandleHealthChange;
+    }
+
+    private void OnEnable()
+    {
+        if (energyBot != null)
+            energyBot.SetStats(Stats);
     }
 
     public bool CanJump()
@@ -29,13 +53,45 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
     public bool CanPerformAttack()
     {
-        return Stats.CurrentEnergy > Stats.AttackEnergyCost && CurrentState == RobotState.Alive;
+        if (CurrentState != RobotState.Alive)
+            return false;
+
+        if (Stats == null)
+            return false;
+
+        if (energyBot != null)
+            return energyBot.HasEnergyForAction(EnergyAction.Attack);
+
+        return Stats != null && Stats.CurrentEnergy > Stats.AttackEnergyCost;
     }
 
 
     public bool CanPerformEnergy(float energyCost)
     {
-        return Stats.CurrentEnergy > energyCost && CurrentState == RobotState.Alive;
+        if (CurrentState != RobotState.Alive)
+            return false;
+
+        if (Stats == null)
+            return false;
+
+        if (energyBot != null)
+            return energyBot.HasEnergy(energyCost);
+
+        return Stats != null && Stats.CurrentEnergy > energyCost;
+    }
+
+    public bool CanPerformEnergy(EnergyAction action, float deltaTime = 0f)
+    {
+        if (CurrentState != RobotState.Alive)
+            return false;
+
+        if (Stats == null && energyBot == null)
+            return false;
+
+        if (energyBot != null)
+            return energyBot.HasEnergyForAction(action, deltaTime);
+
+        return true;
     }
 
     private IEnumerator ResetGrounded()
@@ -43,41 +99,40 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         yield return new WaitForSeconds(2f); // Adjust based on jump duration
         isGrounded = true;
     }
+
     public void ConsumeEnergy(float amount)
     {
-        energyBot.RechargingEnergy(-amount); // Logical recharge handled in EnergyBot
+        energyBot?.TryConsumeRaw(amount);
     }
 
     public void PerformAttack(AttackType attackType)
     {
-        if (CurrentState != RobotState.Alive || !Stats.AbleToAttack) return;
+        if (CurrentState != RobotState.Alive || (Stats != null && !Stats.AbleToAttack))
+            return;
 
-        energyBot.RechargingEnergy(-Stats.AttackEnergyCost);
+        energyBot?.TryConsume(EnergyAction.Attack);
     }
 
     public bool PerformAttackByEnergy(float energyCost)
     {
-        if (CurrentState != RobotState.Alive || !Stats.AbleToAttack)
+        if (CurrentState != RobotState.Alive || Stats == null || !Stats.AbleToAttack)
         {
             return false;
         }
 
-        if (Stats == null || energyBot == null)
-        {
+        if (energyBot != null)
+            return energyBot.TryConsume(EnergyAction.Attack, 0f, energyCost);
+
+        if (Stats == null)
             return false;
-        }
 
         if (energyCost <= 0f)
-        {
             return true;
-        }
 
         if (Stats.CurrentEnergy < energyCost)
-        {
             return false;
-        }
 
-        energyBot.RechargingEnergy(-energyCost);
+        Stats.UpdateEnergy(-energyCost);
         return true;
     }
 
@@ -86,27 +141,13 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     {
         PerformAttackByEnergy(energycost);
     }
-    private void HandleEnergyConsumption(float energyChange)
-    {
-        // Prevent state changes if dead
-        if (CurrentState == RobotState.Dead)
-            return;
-
-        Stats.UpdateEnergy(energyChange);
-        if (Stats.CurrentEnergy == 0)
-        {
-            UpdateState(RobotState.Faint);
-        }
-        else if (Stats.CurrentEnergy >= Stats.AttackEnergyCost)
-        {
-            UpdateState(RobotState.Alive);
-        }
-    }
 
     private void HandleHealthChange(float healthChange)
     {
-        Stats.UpdateHealth(healthChange);
-        if (Stats.CurrentHealth <= 0)
+        if (Stats != null)
+            Stats.UpdateHealth(healthChange);
+
+        if (Stats != null && Stats.CurrentHealth <= 0)
         {
             UpdateState(RobotState.Dead);
         }
@@ -127,8 +168,13 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     {
         bool stateChanged = CurrentState != RobotState.Alive;
         CurrentState = RobotState.Alive;
-        Stats.CurrentHealth = Stats.MaxHealth;
-        Stats.CurrentEnergy = Stats.MaxEnergy;
+        if (Stats != null)
+        {
+            Stats.CurrentHealth = Stats.MaxHealth;
+            Stats.CurrentEnergy = Stats.MaxEnergy;
+        }
+        if (energyBot != null)
+            energyBot.SetStats(Stats);
         if (stateChanged)
         {
             OnStateChanged?.Invoke(RobotState.Alive);
