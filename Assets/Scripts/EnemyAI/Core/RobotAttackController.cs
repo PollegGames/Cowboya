@@ -1,80 +1,72 @@
-using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Simple attack driver for robots: activates assigned hitboxes for a short duration with cooldown.
+/// Bridges Brain requests to the arms controller while enforcing melee cooldowns.
 /// </summary>
 [DisallowMultipleComponent]
 public class RobotAttackController : MonoBehaviour
 {
-    [SerializeField] private AttackHitbox[] hitboxes;
-    [SerializeField] private float attackDuration = 0.4f;
+    [SerializeField] private EnemyArmTargetController armController;
     [SerializeField] private float attackCooldown = 1f;
 
-    private float lastAttackTime = -Mathf.Infinity;
-    private Coroutine attackRoutine;
+    private float lastAttackTime = -999f;
+    private bool isAttacking;
 
     private void OnEnable()
     {
-        DeactivateAll();
+        EnsureArmController();
+    }
+
+    /// <summary>
+    /// Attempts to start a melee attack toward the provided target transform.
+    /// Enforces cooldowns and avoids overlapping attacks.
+    /// </summary>
+    /// <param name="target">Target to attack.</param>
+    /// <returns>True if an attack was started.</returns>
+    public bool TryStartAttack(Transform target)
+    {
+        if (target == null)
+            return false;
+
+        EnsureArmController();
+        if (armController == null)
+            return false;
+
+        if (isAttacking)
+            return false;
+
+        if (Time.time < lastAttackTime + attackCooldown)
+            return false;
+
+        isAttacking = true;
+        lastAttackTime = Time.time;
+        armController.TriggerAttackPulse();
+        return true;
+    }
+
+    private void OnAttackFinished()
+    {
+        isAttacking = false;
     }
 
     private void OnDisable()
     {
-        StopActiveAttack();
-        DeactivateAll();
-    }
-
-    /// <summary>
-    /// Attempts to perform an attack. Returns true if started.
-    /// </summary>
-    public bool TryAttack(Vector2 targetPosition)
-    {
-        if (Time.time < lastAttackTime + attackCooldown)
-            return false;
-
-        StopActiveAttack();
-        attackRoutine = StartCoroutine(AttackWindow());
-        lastAttackTime = Time.time;
-        return true;
-    }
-
-    private IEnumerator AttackWindow()
-    {
-        ActivateAll();
-        yield return new WaitForSeconds(attackDuration);
-        DeactivateAll();
-        attackRoutine = null;
-    }
-
-    private void StopActiveAttack()
-    {
-        if (attackRoutine != null)
+        if (armController != null)
         {
-            StopCoroutine(attackRoutine);
-            attackRoutine = null;
+            armController.AttackFinished -= OnAttackFinished;
         }
+        isAttacking = false;
     }
 
-    private void ActivateAll()
+    private void EnsureArmController()
     {
-        if (hitboxes == null)
-            return;
-        foreach (var hitbox in hitboxes)
-        {
-            if (hitbox != null)
-                hitbox.Activate();
-        }
-    }
+        if (armController == null)
+            armController = GetComponentInChildren<EnemyArmTargetController>();
 
-    private void DeactivateAll()
-    {
-        if (hitboxes == null)
-            return;
-        foreach (var hitbox in hitboxes)
+        if (armController != null)
         {
-            if (hitbox != null)
-                hitbox.Deactivate();
+            armController.AttackFinished -= OnAttackFinished;
+            armController.AttackFinished += OnAttackFinished;
         }
     }
 }

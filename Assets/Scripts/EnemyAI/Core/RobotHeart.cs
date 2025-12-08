@@ -10,6 +10,8 @@ public class RobotHeart : MonoBehaviour
     public event Action<RobotTask> OnTaskChanged;
 
     [SerializeField] private RobotRole role = RobotRole.Worker;
+    [SerializeField] private RobotMemory memory;
+    [SerializeField] private RobotBrainConfig config;
     [SerializeField] private int overrideStackDepth = 0;
     [SerializeField] private bool seedIdleTask = true;
     [SerializeField] private bool logTaskChanges = false;
@@ -21,6 +23,14 @@ public class RobotHeart : MonoBehaviour
 
     private void Awake()
     {
+        if (memory == null)
+            memory = GetComponent<RobotMemory>();
+        if (config == null)
+        {
+            var brain = GetComponent<RobotBrain>();
+            if (brain != null)
+                config = brain.Config;
+        }
         ResetIntentStack(false);
     }
 
@@ -78,6 +88,47 @@ public class RobotHeart : MonoBehaviour
     /// Returns the full stack for debugging or brain inspection.
     /// </summary>
     public IReadOnlyList<RobotTask> GetTasks() => taskStack?.Tasks;
+
+    /// <summary>
+    /// Requests that the heart consider attacking a specific player target.
+    /// </summary>
+    /// <param name="player">Transform of the player to attack.</param>
+    public void RequestAttackTarget(Transform player)
+    {
+        if (taskStack == null || player == null)
+            return;
+
+        if (ShouldAttackPlayer())
+        {
+            PushAttackTask(player);
+            return;
+        }
+
+        HandleAttackDeclined(player);
+    }
+
+    /// <summary>
+    /// Handles the end of an attack opportunity, removing attack intent and potentially chasing.
+    /// </summary>
+    /// <param name="player">Player that left the attack zone.</param>
+    public void RequestEndAttack(Transform player)
+    {
+        if (taskStack == null)
+            return;
+
+        bool removed = taskStack.RemoveTasksOfType(RobotTaskType.AttackTarget);
+        if (removed)
+            NotifyTaskChanged();
+
+        if (memory != null && memory.LastKnownPlayerPosition != Vector3.zero)
+        {
+            TryPushTask(new RobotTask(
+                RobotTaskType.ChasePlayer,
+                memory.LastKnownPlayerPosition,
+                config != null ? config.GetTimeout(RobotTaskType.ChasePlayer) : (float?)null,
+                config != null ? config.GetUrgency(RobotTaskType.ChasePlayer) : 0));
+        }
+    }
 
     private int GetStackDepth()
     {
@@ -139,5 +190,52 @@ public class RobotHeart : MonoBehaviour
                 break;
         }
         return $"{task.Type} ({payload})";
+    }
+
+    private bool ShouldAttackPlayer()
+    {
+        if (memory != null && !memory.PlayerInAttackZone && !memory.WasRecentlyAttacked)
+            return false;
+
+        if (memory != null && memory.WasRecentlyAttacked)
+            return true;
+
+        switch (role)
+        {
+            case RobotRole.SecurityGuard:
+            case RobotRole.Follower:
+            case RobotRole.Boss:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void PushAttackTask(Transform player)
+    {
+        float? expireAt = config != null ? config.GetTimeout(RobotTaskType.AttackTarget) : (float?)null;
+        int urgency = config != null ? config.GetUrgency(RobotTaskType.AttackTarget) : 0;
+        TryPushTask(new RobotTask(RobotTaskType.AttackTarget, player, expireAt, urgency));
+    }
+
+    private void HandleAttackDeclined(Transform player)
+    {
+        if (role == RobotRole.Worker)
+        {
+            TryPushTask(new RobotTask(RobotTaskType.Flee, player));
+            return;
+        }
+
+        if (memory != null && memory.LastKnownPlayerPosition != Vector3.zero)
+        {
+            TryPushTask(new RobotTask(
+                RobotTaskType.ChasePlayer,
+                memory.LastKnownPlayerPosition,
+                config != null ? config.GetTimeout(RobotTaskType.ChasePlayer) : (float?)null,
+                config != null ? config.GetUrgency(RobotTaskType.ChasePlayer) : 0));
+            return;
+        }
+
+        TryPushTask(new RobotTask(RobotTaskType.Cower, player));
     }
 }

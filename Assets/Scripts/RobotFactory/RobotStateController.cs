@@ -10,6 +10,7 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     [SerializeField] private EnergyBot energyBot;
     [SerializeField] private HealthBot healthBot;
     public HealthBot Health => healthBot;
+    [SerializeField] private JointBreaker jointBreaker;
 
     [SerializeField] private RobotStats stats;
     public RobotStats Stats
@@ -23,18 +24,14 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         }
     }
     private bool isGrounded = true;
-
     private void Awake()
     {
         if (energyBot == null)
             energyBot = GetComponent<EnergyBot>();
         if (healthBot == null)
             healthBot = GetComponent<HealthBot>();
-
-        if (energyBot != null)
-        {
-            energyBot.SetStats(Stats);
-        }
+        if (jointBreaker == null)
+            jointBreaker = GetComponent<JointBreaker>();
 
         if (healthBot != null)
             healthBot.OnHealthChanged += HandleHealthChange;
@@ -151,6 +148,10 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         {
             UpdateState(RobotState.Dead);
         }
+        else if (Stats == null && healthChange < 0f)
+        {
+            UpdateState(RobotState.Dead);
+        }
     }
 
     public void UpdateState(RobotState newState)
@@ -159,6 +160,17 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
         CurrentState = newState;
         OnStateChanged?.Invoke(newState);
+
+        if (newState == RobotState.Dead)
+        {
+            jointBreaker?.BreakAll();
+        }
+
+        var heart = GetComponent<RobotHeart>();
+        if (heart != null && heart.Role == RobotRole.SecurityGuard)
+        {
+            Debug.Log($"[RobotStateController] SecurityGuard '{name}' state -> {newState}");
+        }
     }
 
     /// <summary>
@@ -188,4 +200,5 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     {
         OnStateChanged = null;
     }
+
 }

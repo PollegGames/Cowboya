@@ -99,16 +99,25 @@ public class RobotBrain : MonoBehaviour
     public RobotBrainConfig Config => config;
     public IWaypointService WaypointService => waypointService;
 
+    /// <summary>
+    /// Entry point for perception to report that the player entered or left melee range.
+    /// </summary>
+    /// <param name="isInside">True when the player is inside the attack zone.</param>
+    /// <param name="player">Player transform reported by perception.</param>
+    public void OnPlayerInAttackZoneChanged(bool isInside, Transform player)
+    {
+        if (heart == null)
+            return;
+
+        if (isInside)
+            heart.RequestAttackTarget(player);
+        else
+            heart.RequestEndAttack(player);
+    }
+
     public void RequestAttackTarget(Transform target)
     {
-        if (heart == null || config == null)
-            return;
-        var task = new RobotTask(
-            RobotTaskType.AttackTarget,
-            target,
-            config.GetTimeout(RobotTaskType.AttackTarget),
-            config.GetUrgency(RobotTaskType.AttackTarget));
-        heart.TryPushTask(task);
+        heart?.RequestAttackTarget(target);
     }
 
     public void OnDamageTaken(int damage)

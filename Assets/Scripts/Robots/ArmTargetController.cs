@@ -27,11 +27,14 @@ public class ArmTargetController : MonoBehaviour
 
 [Header("Controllers")]
 [SerializeField] private CowboyGrabController grabController;
-[SerializeField] private CowboySimpleAttackController attackController;
+[SerializeField] private SimpleAttackController attackController;
 [SerializeField] private bool allowAttackAim = true;
 [Header("Energy")]
 [SerializeField] private PlayerBrain playerBrain;
 [SerializeField] private RobotStateController stateController;
+[Header("AI Attack Control")]
+[SerializeField] private bool useExternalAttackInput;
+private Coroutine externalAttackPulseRoutine;
 
     private bool interactHeld;
     private bool interactPressedThisFrame;
@@ -42,6 +45,7 @@ private bool attackSuppressedUntilRelease;
 private bool preferRightArm = true;
 private CowboyArmSide? attackActiveArm;
 private bool attackEnergySpentThisPress;
+    private bool externalAttackInput;
 
     private Vector3 leftRestLocalPosition;
     private Vector3 rightRestLocalPosition;
@@ -85,7 +89,7 @@ private bool attackEnergySpentThisPress;
     private void Update()
     {
         bool currentlyHeld = IsRightMouseHeld();
-        bool attackInput = IsLeftMouseHeld();
+        bool attackInput = useExternalAttackInput ? externalAttackInput : IsLeftMouseHeld();
 
         attackInputHeld = attackInput;
         if (!attackInputHeld)
@@ -137,12 +141,12 @@ private bool attackEnergySpentThisPress;
 
         if (attackController == null)
         {
-            attackController = GetComponent<CowboySimpleAttackController>();
+            attackController = GetComponent<SimpleAttackController>();
         }
 
         if (attackController == null)
         {
-            attackController = GetComponentInParent<CowboySimpleAttackController>();
+            attackController = GetComponentInParent<SimpleAttackController>();
         }
 
         if (playerBrain == null)
@@ -527,7 +531,34 @@ private bool attackEnergySpentThisPress;
         if (playerBrain != null)
             return playerBrain.TrySpendEnergy(EnergyAction.Attack, 0f, energyCost);
 
-        return false;
+        return stateController.PerformAttackByEnergy(energyCost);
+    }
+
+    /// <summary>
+    /// Allows AI/Brain to drive attack input instead of player mouse.
+    /// </summary>
+    public void SetExternalAttackInput(bool active)
+    {
+        externalAttackInput = active;
+    }
+
+    /// <summary>
+    /// Triggers a short attack input pulse for AI-driven attacks.
+    /// </summary>
+    public void TriggerExternalAttackPulse()
+    {
+        useExternalAttackInput = true;
+        if (externalAttackPulseRoutine != null)
+            StopCoroutine(externalAttackPulseRoutine);
+        externalAttackPulseRoutine = StartCoroutine(ExternalAttackPulse());
+    }
+
+    private System.Collections.IEnumerator ExternalAttackPulse()
+    {
+        externalAttackInput = true;
+        yield return null; // one frame
+        externalAttackInput = false;
+        externalAttackPulseRoutine = null;
     }
 
     private void ApplySolverFlip(bool targetIsRightSide)

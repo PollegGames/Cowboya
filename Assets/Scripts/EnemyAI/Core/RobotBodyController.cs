@@ -15,6 +15,8 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
 
     [SerializeField] private RobotBodyMaintenance bodyMaintenance;
+    [Header("Combat")]
+    [SerializeField] private RobotAttackController attackController;
     [SerializeField] private bool isBoss;
 
     private WaypointPathFollower pathFollower;
@@ -27,6 +29,8 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         base.Awake();
         if (bodyMaintenance == null)
             bodyMaintenance = GetComponent<RobotBodyMaintenance>();
+        if (attackController == null)
+            attackController = GetComponent<RobotAttackController>();
     }
 
     public void Initialize(
@@ -95,6 +99,8 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
 
     public RoomWaypoint GetClosestWaypoint(RoomWaypoint exclude = null) =>
         pathFollower != null ? pathFollower.GetClosestWaypoint(exclude) : null;
+
+    public RobotAttackController AttackController => attackController;
 
     public void OnReleaseToPool()
     {

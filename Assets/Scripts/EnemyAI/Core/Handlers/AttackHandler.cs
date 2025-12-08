@@ -8,33 +8,43 @@ public class AttackHandler : ScriptableRobotTaskHandler
 {
     public override void Execute(RobotBrain brain, object payload)
     {
-        if (brain == null)
+        if (brain == null || brain.Body == null)
             return;
 
-        var attackController = brain.GetComponent<RobotAttackController>();
-        if (attackController == null)
+        Transform target = payload as Transform;
+        if (target == null)
+        {
+            if (payload is Component component)
+                target = component.transform;
+            else if (payload is GameObject go)
+                target = go.transform;
+        }
+
+        if (target == null)
+        {
+            Debug.LogWarning($"[AttackHandler] Missing target payload for {brain.name}");
+            return;
+        }
+
+        if (brain.Body.AttackController == null)
         {
             Debug.LogWarning($"[AttackHandler] No RobotAttackController on {brain.name}");
             return;
         }
 
-        var stateController = brain.GetComponent<RobotStateController>();
-        float energyCost = stateController != null && stateController.Stats != null
-            ? stateController.Stats.AttackEnergyCost
-            : 0f;
-        if (stateController != null && energyCost > 0f && !stateController.PerformAttackByEnergy(energyCost))
-            return;
+        brain.Body.AttackController.TryStartAttack(target);
+    }
 
-        Vector2 targetPosition;
-        if (payload is Transform t && t != null)
-            targetPosition = t.position;
-        else if (payload is Vector3 v3)
-            targetPosition = v3;
-        else if (payload is Vector2 v2)
-            targetPosition = v2;
-        else
-            targetPosition = brain.transform.position;
-
-        attackController.TryAttack(targetPosition);
+    private string DescribePayload(object payload)
+    {
+        return payload switch
+        {
+            null => "null",
+            Transform t => t.name,
+            Component c => c.name,
+            Vector3 v3 => v3.ToString(),
+            Vector2 v2 => v2.ToString(),
+            _ => payload.ToString()
+        };
     }
 }

@@ -14,6 +14,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     private Camera mainCamera;
     private bool isFacingRight = true;
+    private bool playerInAttackZone;
 
     public bool IsFacingRight => isFacingRight;
 
@@ -23,12 +24,29 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     public Transform PlayerTransform => playerBodyReference;
 
     [SerializeField] private RobotMemory memory;
+    [SerializeField] private RobotBrain brain;
 
     public event Action<bool> OnPlayerDetectInAttackZoneChanged;
 
     private void Awake()
     {
         mainCamera = Camera.main;
+        if (brain == null)
+            brain = GetComponent<RobotBrain>();
+    }
+
+    private void OnDisable()
+    {
+        if (brain != null && playerInAttackZone && playerBodyReference != null)
+            brain.OnPlayerInAttackZoneChanged(false, playerBodyReference);
+
+        playerInAttackZone = false;
+        if (memory != null)
+        {
+            memory.SetPlayerInAttackZone(false);
+            memory.SetCanSeePlayer(false);
+        }
+        playerBodyReference = null;
     }
     private void Start()
     {
@@ -47,14 +65,11 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     private void OnPlayerEnterDetectZone(Collider2D collider)
     {
-        // Make sure the collider is the player
-        if (collider.CompareTag("Player"))
+        CachePlayerReference(collider);
+        if (playerBodyReference != null)
         {
-            var playerControl = collider.transform.root.GetComponent<PlayerMovementController>();
-            if (playerControl != null)
-            {
-                playerBodyReference = playerControl.BodyReference.transform;
-            }
+            memory?.RememberPlayerPosition(playerBodyReference.position);
+            memory?.SetCanSeePlayer(true);
         }
     }
 
@@ -62,21 +77,30 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     {
         // Reset the target position if the player leaves the zone
         playerBodyReference = null;
-        memory.ClearPlayerPosition();
+        memory?.ClearPlayerPosition();
+        memory?.SetCanSeePlayer(false);
     }
 
 
     private void OnPlayerEnterAttackZone(Collider2D collider)
     {
-        // Make sure the collider is the player
-        if (collider.CompareTag("Player"))
+        CachePlayerReference(collider);
+        if (playerBodyReference != null)
         {
-            OnPlayerDetectInAttackZoneChanged?.Invoke(true);
+            memory?.SetPlayerInAttackZone(true);
+            memory?.SetCanSeePlayer(true);
+            brain?.OnPlayerInAttackZoneChanged(true, playerBodyReference);
+            playerInAttackZone = true;
         }
+        OnPlayerDetectInAttackZoneChanged?.Invoke(true);
     }
 
     private void OnPlayerExitAttackZone()
     {
+        if (playerBodyReference != null)
+            brain?.OnPlayerInAttackZoneChanged(false, playerBodyReference);
+        memory?.SetPlayerInAttackZone(false);
+        playerInAttackZone = false;
         OnPlayerDetectInAttackZoneChanged?.Invoke(false);
     }
 
@@ -88,7 +112,8 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         if (playerBodyReference != null)
         {
             Vector3 playerPosition = playerBodyReference.position;
-            memory.RememberPlayerPosition(playerPosition);
+            memory?.RememberPlayerPosition(playerPosition);
+            memory?.SetCanSeePlayer(true);
 
             Vector3 direction = (playerPosition - circleCenter.position).normalized;
             Vector3 targetPos = circleCenter.position + direction * radius;
@@ -101,5 +126,26 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         }
 
 
+    }
+
+    private void CachePlayerReference(Collider2D collider)
+    {
+        if (collider == null)
+            return;
+
+        var playerControl = collider.transform.root.GetComponent<PlayerMovementController>();
+        if (playerControl == null)
+        {
+            playerControl = collider.GetComponentInParent<PlayerMovementController>();
+        }
+
+        if (playerControl != null)
+        {
+            playerBodyReference = playerControl.BodyReference != null
+                ? playerControl.BodyReference.transform
+                : playerControl.transform;
+            memory?.RememberPlayerPosition(playerBodyReference.position);
+            memory?.SetCanSeePlayer(true);
+        }
     }
 }

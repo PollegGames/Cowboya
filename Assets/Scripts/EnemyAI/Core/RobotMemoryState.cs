@@ -7,6 +7,8 @@ public class RobotMemoryState
 {
     public Vector3 LastKnownPlayerPosition { get; private set; }
     public float TimeSincePlayerLastSeen { get; private set; }
+    public bool PlayerInAttackZone { get; private set; }
+    public bool CanSeePlayer { get; private set; }
     public bool WasRecentlyAttacked { get; private set; }
     public float TimeSinceLastAttack { get; private set; }
     public RoomWaypoint LastVisitedPoint { get; private set; }
@@ -24,6 +26,7 @@ public class RobotMemoryState
     {
         LastKnownPlayerPosition = position;
         TimeSincePlayerLastSeen = 0f;
+        CanSeePlayer = true;
     }
 
     public void ClearPlayerPosition()
@@ -32,6 +35,7 @@ public class RobotMemoryState
             return;
         LastKnownPlayerPosition = Vector3.zero;
         TimeSincePlayerLastSeen = 0f;
+        CanSeePlayer = false;
     }
 
     public void RegisterAttack()
@@ -56,10 +60,22 @@ public class RobotMemoryState
         RespawnService = service;
     }
 
+    public void SetPlayerInAttackZone(bool inZone)
+    {
+        PlayerInAttackZone = inZone;
+    }
+
+    public void SetCanSeePlayer(bool canSee)
+    {
+        CanSeePlayer = canSee;
+    }
+
     public void ResetAll()
     {
         LastKnownPlayerPosition = Vector3.zero;
         TimeSincePlayerLastSeen = 0f;
+        PlayerInAttackZone = false;
+        CanSeePlayer = false;
         WasRecentlyAttacked = false;
         TimeSinceLastAttack = 0f;
         LastVisitedPoint = null;

@@ -110,6 +110,13 @@ public class RobotTaskStack
         return before != stack.Count;
     }
 
+    public bool RemoveTasksOfType(RobotTaskType type)
+    {
+        int before = stack.Count;
+        stack.RemoveAll(t => t.Type == type);
+        return before != stack.Count;
+    }
+
     private void TrimToDepth()
     {
         int overflow = stack.Count - maxDepth;

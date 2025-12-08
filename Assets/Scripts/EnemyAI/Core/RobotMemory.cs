@@ -8,6 +8,8 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     [Header("Player Memory")]
     public Vector3 LastKnownPlayerPosition => memoryState.LastKnownPlayerPosition;
     public float TimeSincePlayerLastSeen => memoryState.TimeSincePlayerLastSeen;
+    public bool PlayerInAttackZone => memoryState.PlayerInAttackZone;
+    public bool CanSeePlayer => memoryState.CanSeePlayer;
 
     [Header("Aggression Memory")]
     public bool WasRecentlyAttacked => memoryState.WasRecentlyAttacked;
@@ -48,6 +50,24 @@ public class RobotMemory : MonoBehaviour, IRobotMemory, IPooledObject
     public void ClearPlayerPosition()
     {
         memoryState.ClearPlayerPosition();
+    }
+
+    /// <summary>
+    /// Records whether the player is currently within the attack zone.
+    /// </summary>
+    /// <param name="inZone">True if the player is in range.</param>
+    public void SetPlayerInAttackZone(bool inZone)
+    {
+        memoryState.SetPlayerInAttackZone(inZone);
+    }
+
+    /// <summary>
+    /// Records whether the player is currently visible to the enemy.
+    /// </summary>
+    /// <param name="canSee">True if the player is visible.</param>
+    public void SetCanSeePlayer(bool canSee)
+    {
+        memoryState.SetCanSeePlayer(canSee);
     }
 
     /// <summary>

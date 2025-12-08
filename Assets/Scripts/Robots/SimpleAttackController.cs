@@ -5,7 +5,7 @@ using UnityEngine;
 /// Simplified attack driver: exposes per-arm attack toggles.
 /// </summary>
 [DisallowMultipleComponent]
-public class CowboySimpleAttackController : MonoBehaviour
+public class SimpleAttackController : MonoBehaviour
 {
     [Header("Hand Hitboxes")]
     [SerializeField] private AttackHitbox leftHandHitbox;
@@ -54,7 +54,7 @@ public class CowboySimpleAttackController : MonoBehaviour
 
         if (rightHandHitbox == null)
         {
-            Debug.LogWarning("[CowboySimpleAttackController] Right hand hitbox is not assigned.", this);
+            Debug.LogWarning("[SimpleAttackController] Right hand hitbox is not assigned.", this);
         }
         referencesLogged = true;
     }
