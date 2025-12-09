@@ -112,7 +112,11 @@ public class RobotBrain : MonoBehaviour
         if (isInside)
             heart.RequestAttackTarget(player);
         else
+        {
+            if (Body != null && Body.AttackController != null)
+                Body.AttackController.StopAttacking();
             heart.RequestEndAttack(player);
+        }
     }
 
     public void RequestAttackTarget(Transform target)

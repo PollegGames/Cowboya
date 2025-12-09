@@ -591,7 +591,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780558859121276628}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.008247964, w: 0.999966}
+  m_LocalRotation: {x: -0, y: -0, z: 0.008247934, w: 0.999966}
   m_LocalPosition: {x: 1.549, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1045,6 +1045,7 @@ Transform:
   - {fileID: 3018005835058427478}
   - {fileID: 7538763862325866573}
   - {fileID: 4313440546256513939}
+  - {fileID: 7042460944159649148}
   m_Father: {fileID: 8518575868892520076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &4349025134239535110
@@ -2287,8 +2288,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d08824f9467934690b10c4608b9772, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::EnergyBot
+  stateController: {fileID: 6401809315403970274}
+  stats:
+    RobotName: 
+    MaxHealth: 1
+    CurrentHealth: 1
+    MaxEnergy: 1
+    CurrentEnergy: 1
+    AttackEnergyCost: 1
+    EnergyRechargeRate: 1
+  playerBrain: {fileID: 0}
+  consumeEnergy: 1
+  autoRecharge: 1
   rechargeRate: 2
   tickDelay: 1
+  rechargeDelayAfterUse: 0.5
+  faintRecoveryEnergy: 20
+  walkEnergyCostPerSecond: 0.25
+  jumpEnergyCost: 3
+  crouchEnergyCostPerSecond: 0.2
+  grabEnergyCost: 1
 --- !u!114 &3853985622455152034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2304,6 +2323,7 @@ MonoBehaviour:
   damageFeedback: {fileID: 4258542605172672456}
   memory: {fileID: 393579632015866257}
   brain: {fileID: 3084759943220385380}
+  playerBrain: {fileID: 0}
 --- !u!114 &3901679018326628933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2342,12 +2362,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::RobotStateController
   energyBot: {fileID: 8393969111750818763}
   healthBot: {fileID: 3853985622455152034}
-  Stats:
-    RobotName: Worker
-    MaxHealth: 30
-    CurrentHealth: 30
-    MaxEnergy: 30
-    CurrentEnergy: 30
+  jointBreaker: {fileID: 4911185535399803335}
+  stats:
+    RobotName: 
+    MaxHealth: 1
+    CurrentHealth: 1
+    MaxEnergy: 1
+    CurrentEnergy: 1
     AttackEnergyCost: 1
     EnergyRechargeRate: 1
 --- !u!114 &3888384783130253247
@@ -2363,6 +2384,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::RobotHeart
   role: 0
+  memory: {fileID: 393579632015866257}
+  config:
+    role: 0
+    resumeWorkOnMachineOn: 1
+    defaultTimeoutSeconds: 10
+    restDurationSeconds: 3
+    guardPostDurationSeconds: 300
+    workDurationSeconds: 120
+    reactivateDurationSeconds: 30
   overrideStackDepth: 0
   seedIdleTask: 1
   logTaskChanges: 1
@@ -2430,6 +2460,7 @@ MonoBehaviour:
   deadZoneY: 5
   updateLoop: 0
   bodyMaintenance: {fileID: 2232273132763882073}
+  attackController: {fileID: 0}
   isBoss: 0
 --- !u!114 &6388133658049301520
 MonoBehaviour:
@@ -2863,7 +2894,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4047482661032426603}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.003233123, w: 0.99999475}
+  m_LocalRotation: {x: -0, y: -0, z: 0.0032319387, w: 0.99999475}
   m_LocalPosition: {x: 1.197, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3168,6 +3199,7 @@ GameObject:
   - component: {fileID: 8518575868892520076}
   - component: {fileID: 4865299395680469781}
   - component: {fileID: 4258542605172672456}
+  - component: {fileID: 4911185535399803335}
   m_Layer: 7
   m_Name: Worker_Puppet
   m_TagString: Enemy
@@ -3190,7 +3222,6 @@ Transform:
   m_Children:
   - {fileID: 4296934220140894421}
   - {fileID: 7167496052472299165}
-  - {fileID: 7042460944159649148}
   m_Father: {fileID: 5745274853959273752}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4865299395680469781
@@ -3219,6 +3250,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::DamageFeedback
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.2
+--- !u!114 &4911185535399803335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4645216217745727974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbc99932fe549d64f9b583f5964335ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::JointBreaker
+  hingeJoints:
+  - {fileID: 6880629915507568943}
+  - {fileID: 6984445060703993}
+  - {fileID: 7983953202854080412}
+  - {fileID: 6424778984581279616}
+  - {fileID: 6593932874632201888}
+  - {fileID: 8913159138924853082}
+  - {fileID: 556027282823216526}
+  - {fileID: 5973760684672171024}
+  - {fileID: 261531742591180364}
+  - {fileID: 2040937320583562888}
+  - {fileID: 630213169554266220}
+  - {fileID: 7114305798187106679}
+  fixedJoints: []
+  ikSolvers: []
 --- !u!1 &4696157841817060109
 GameObject:
   m_ObjectHideFlags: 0
@@ -4973,7 +5031,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7444495495605702431}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.0135478275, w: 0.9999082}
+  m_LocalRotation: {x: -0, y: -0, z: 0.013547887, w: 0.9999082}
   m_LocalPosition: {x: 1.79, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5962,7 +6020,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8380353745103559381}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.0017938666, w: 0.99999845}
+  m_LocalRotation: {x: 0, y: 0, z: 0.0017950512, w: 0.99999845}
   m_LocalPosition: {x: 0.97774696, y: 0.00000089858094, z: 0}
   m_LocalScale: {x: 0.9999999, y: 0.9999999, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6218,7 +6276,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8885782696744028057}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0.7135053, w: 0.7006498}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6230,7 +6288,7 @@ Transform:
   - {fileID: 6101132409792038899}
   - {fileID: 6388281107842833342}
   - {fileID: 7395722855166280960}
-  m_Father: {fileID: 8518575868892520076}
+  m_Father: {fileID: 4296934220140894421}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8628381173169908439
 MonoBehaviour:

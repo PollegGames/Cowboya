@@ -118,4 +118,14 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         if (pathFollower == null && waypointQueries != null)
             SetupPathFollower();
     }
+
+    private void OnDrawGizmos()
+    {
+        pathFollower?.DrawGizmos();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        pathFollower?.DrawGizmos();
+    }
 }

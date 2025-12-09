@@ -8,9 +8,13 @@ public class RobotAttackController : MonoBehaviour
 {
     [SerializeField] private EnemyArmTargetController armController;
     [SerializeField] private float attackCooldown = 1f;
+    [SerializeField] private Vector2 attackWindupRange = new Vector2(0.5f, 1f);
 
     private float lastAttackTime = -999f;
     private bool isAttacking;
+    private bool attackRequested;
+    private Coroutine attackRoutine;
+    private Transform currentTarget;
 
     private void OnEnable()
     {
@@ -28,20 +32,65 @@ public class RobotAttackController : MonoBehaviour
         if (target == null)
             return false;
 
+        currentTarget = target;
+        attackRequested = true;
+
         EnsureArmController();
         if (armController == null)
             return false;
 
-        if (isAttacking)
-            return false;
-
-        if (Time.time < lastAttackTime + attackCooldown)
-            return false;
-
-        isAttacking = true;
-        lastAttackTime = Time.time;
-        armController.TriggerAttackPulse();
+        if (attackRoutine == null)
+            attackRoutine = StartCoroutine(AttackLoop());
         return true;
+    }
+
+    /// <summary>
+    /// Stops any ongoing attack loop immediately.
+    /// </summary>
+    public void StopAttacking()
+    {
+        attackRequested = false;
+        currentTarget = null;
+        if (attackRoutine != null)
+        {
+            StopCoroutine(attackRoutine);
+            attackRoutine = null;
+        }
+
+        if (armController != null)
+            armController.SetAttackRequested(false);
+
+        isAttacking = false;
+    }
+
+    private System.Collections.IEnumerator AttackLoop()
+    {
+        while (attackRequested)
+        {
+            if (currentTarget == null || armController == null)
+                break;
+
+            float remainingCooldown = (lastAttackTime + attackCooldown) - Time.time;
+            if (remainingCooldown > 0f)
+                yield return new WaitForSeconds(remainingCooldown);
+
+            float windup = Mathf.Clamp(UnityEngine.Random.Range(attackWindupRange.x, attackWindupRange.y), 0f, Mathf.Infinity);
+            if (windup > 0f)
+                yield return new WaitForSeconds(windup);
+
+            if (!attackRequested || currentTarget == null || armController == null)
+                break;
+
+            isAttacking = true;
+            lastAttackTime = Time.time;
+            armController.TriggerAttackPulse();
+
+            while (attackRequested && isAttacking)
+                yield return null;
+        }
+
+        attackRoutine = null;
+        attackRequested = false;
     }
 
     private void OnAttackFinished()
@@ -51,11 +100,11 @@ public class RobotAttackController : MonoBehaviour
 
     private void OnDisable()
     {
+        StopAttacking();
         if (armController != null)
         {
             armController.AttackFinished -= OnAttackFinished;
         }
-        isAttacking = false;
     }
 
     private void EnsureArmController()

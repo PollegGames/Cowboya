@@ -654,7 +654,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.7606956, y: 0.00000018626447}
+  m_ConnectedAnchor: {x: 0.7606956, y: 0.00000086746024}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1261,7 +1261,6 @@ GameObject:
   - component: {fileID: 6237459430539146587}
   - component: {fileID: 3669406677939051341}
   - component: {fileID: 1037097164734985754}
-  - component: {fileID: 8788066767680181778}
   m_Layer: 7
   m_Name: SecurityGuard_Master
   m_TagString: Untagged
@@ -1344,34 +1343,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8788066767680181778
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2214317007469405443}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 268c98130d6739248a573a4ccb8351cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::ArmTargetController
-  bodyReference: {fileID: 0}
-  targetTransform: {fileID: 0}
-  leftArmSolverTarget: {fileID: 0}
-  rightArmSolverTarget: {fileID: 0}
-  leftArmIkSolver: {fileID: 0}
-  rightArmIkSolver: {fileID: 0}
-  followSpeed: 15
-  returnSpeed: 10
-  rotationReturnSpeed: 720
-  sideSwitchThreshold: 0.1
-  grabController: {fileID: 0}
-  attackController: {fileID: 0}
-  allowAttackAim: 1
-  playerBrain: {fileID: 0}
-  stateController: {fileID: 0}
-  useExternalAttackInput: 0
 --- !u!1 &2534622212090500639
 GameObject:
   m_ObjectHideFlags: 0
@@ -1936,7 +1907,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3421139036536028361}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.12094019, w: 0.99265987}
+  m_LocalRotation: {x: -0, y: -0, z: -0.12094031, w: 0.99265975}
   m_LocalPosition: {x: 1.51, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2067,7 +2038,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.041619267, y: -0.35912597}
+  m_ConnectedAnchor: {x: 0.04161926, y: -0.35912666}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2906,7 +2877,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4265815073383725023}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.088541105, w: 0.9960726}
+  m_LocalRotation: {x: -0, y: -0, z: -0.08854088, w: 0.9960726}
   m_LocalPosition: {x: 1.51, y: 0.04, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3433,7 +3404,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.5904143, y: -0.0000011295613}
+  m_ConnectedAnchor: {x: 1.590414, y: -0.0000018094267}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4034,7 +4005,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5828479210159631785}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.27097464, w: 0.9625865}
+  m_LocalRotation: {x: 0, y: 0, z: 0.27097443, w: 0.9625866}
   m_LocalPosition: {x: 1.584616, y: 0.00000029689062, z: 0}
   m_LocalScale: {x: 0.99999976, y: 0.99999976, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5105,7 +5076,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.61541593, y: 0.00000022019125}
+  m_ConnectedAnchor: {x: 0.61541593, y: 0.0000009013871}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5517,7 +5488,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7889747572362634274}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.9911074, w: 0.13306467}
+  m_LocalRotation: {x: 0, y: 0, z: -0.9911074, w: 0.1330648}
   m_LocalPosition: {x: 0.6610893, y: -0.9889317, z: 0}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5665,7 +5636,7 @@ MonoBehaviour:
   autoRecharge: 1
   rechargeRate: 2
   tickDelay: 1
-  rechargeDelayAfterUse: 0.5
+  rechargeDelayAfterUse: 1
   faintRecoveryEnergy: 20
   walkEnergyCostPerSecond: 1
   jumpEnergyCost: 3
@@ -5747,9 +5718,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::RobotHeart
   role: 1
-  memory: {fileID: 0}
+  memory: {fileID: 224319907144265982}
   config:
-    role: 0
+    role: 1
     resumeWorkOnMachineOn: 1
     defaultTimeoutSeconds: 10
     restDurationSeconds: 3
@@ -5779,7 +5750,7 @@ MonoBehaviour:
     restDurationSeconds: 3
     guardPostDurationSeconds: 300
     workDurationSeconds: 120
-    reactivateDurationSeconds: 30
+    reactivateDurationSeconds: 5
   body: {fileID: 7286209841039381180}
   memory: {fileID: 224319907144265982}
   taskHandlers: {fileID: 11400000, guid: 1d2b2b0f631ed4a409dc543a129af7bd, type: 2}
@@ -5893,6 +5864,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::RobotAttackController
   armController: {fileID: 841705006244468887}
   attackCooldown: 2
+  attackWindupRange: {x: 0.5, y: 1}
 --- !u!114 &2558700161751015700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6095,7 +6067,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.63916254, y: 1.1055989}
+  m_ConnectedAnchor: {x: 0.63916254, y: 1.1055996}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -6504,7 +6476,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.08684808, y: 0.47502702}
+  m_ConnectedAnchor: {x: 0.08684791, y: 0.47502702}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -6749,7 +6721,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.82051873, y: 0.00000033727184}
+  m_ConnectedAnchor: {x: 0.82051873, y: -0.0000010251201}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:

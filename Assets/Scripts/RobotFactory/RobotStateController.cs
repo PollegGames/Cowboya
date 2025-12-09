@@ -18,9 +18,17 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         get => stats;
         set
         {
+            if (stats != null)
+                stats.OnHealthChanged -= HandleStatsHealthChanged;
+
             stats = value;
             if (energyBot != null)
                 energyBot.SetStats(stats);
+
+            if (stats != null)
+                stats.OnHealthChanged += HandleStatsHealthChanged;
+
+            EvaluateHealthState();
         }
     }
     private bool isGrounded = true;
@@ -41,6 +49,20 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     {
         if (energyBot != null)
             energyBot.SetStats(Stats);
+
+        if (Stats != null)
+        {
+            Stats.OnHealthChanged -= HandleStatsHealthChanged;
+            Stats.OnHealthChanged += HandleStatsHealthChanged;
+        }
+
+        EvaluateHealthState();
+    }
+
+    private void OnDisable()
+    {
+        if (Stats != null)
+            Stats.OnHealthChanged -= HandleStatsHealthChanged;
     }
 
     public bool CanJump()
@@ -199,6 +221,21 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     public void OnReleaseToPool()
     {
         OnStateChanged = null;
+
+        if (Stats != null)
+            Stats.OnHealthChanged -= HandleStatsHealthChanged;
     }
 
+    private void HandleStatsHealthChanged()
+    {
+        EvaluateHealthState();
+    }
+
+    private void EvaluateHealthState()
+    {
+        if (Stats != null && Stats.CurrentHealth <= 0f)
+        {
+            UpdateState(RobotState.Dead);
+        }
+    }
 }
