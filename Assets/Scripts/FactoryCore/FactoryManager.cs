@@ -144,6 +144,12 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         if (victorySetup != null)
         {
             victorySetup.currentKilled++;
+            if (factoryAlarmStatus != null)
+            {
+                // Escalate to Wanted on any robot death (do not downgrade more severe states).
+                if (factoryAlarmStatus.CurrentAlarmState == AlarmState.Normal)
+                    factoryAlarmStatus.CurrentAlarmState = AlarmState.Wanted;
+            }
         }
         else
         {
@@ -163,6 +169,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
             return;
 
         OnRobotKilled();
+
     }
 
     private void HandleRobotSaved(RobotStateController controller)

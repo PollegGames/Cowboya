@@ -145,6 +145,7 @@ public class RobotHeart : MonoBehaviour
             { RobotTaskType.AttackTarget, 90 },
             { RobotTaskType.ChasePlayer, 85 },
             { RobotTaskType.ReactivateMachine, 75 },
+            { RobotTaskType.WaitAtMachine, 70 },
             { RobotTaskType.WorkAtMachine, 65 },
             { RobotTaskType.GuardPost, 65 },
             { RobotTaskType.SpawnFollowers, 65 },

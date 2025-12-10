@@ -47,6 +47,23 @@ public abstract class CellProcessor : ICellProcessor
                 break;
         }
     }
+    protected void UnlockDoor(Cell cell, DoorDirection dir)
+    {
+        switch (dir)
+        {
+            case DoorDirection.Left:
+                cell.cellProperties.HasLeftDoor = true;
+                cell.cellProperties.HasLeftDoorLocked = false;
+                break;
+            case DoorDirection.Right:
+                cell.cellProperties.HasRightDoor = true;
+                cell.cellProperties.HasRightDoorLocked = false;
+                break;
+            default:
+                Debug.LogError($"Invalid door direction: {dir} for cell {cell.position}");
+                break;
+        }
+    }
 
     protected void MarkVictoryDoorIfOnEdge(Cell cell)
     {

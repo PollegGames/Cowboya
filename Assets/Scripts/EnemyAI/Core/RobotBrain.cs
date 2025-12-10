@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -19,6 +20,10 @@ public class RobotBrain : MonoBehaviour
 
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
+    private SecurityMachine homeSecurityMachine;
+    private Coroutine reactivateRoutine;
+    private Coroutine waitAtMachineRoutine;
+    [SerializeField] private float reactivateArrivalTimeoutSeconds = 8f;
 
     private void Awake()
     {
@@ -74,10 +79,23 @@ public class RobotBrain : MonoBehaviour
         RobotTask task = BuildTaskForMachine(machine, isOn);
         if (task != null)
         {
-            if (!isOn && heart.CurrentTask != null && heart.CurrentTask.Type == RobotTaskType.WorkAtMachine)
-                heart.CompleteCurrentTask();
+            heart.CompleteCurrentTask();
             heart.TryPushTask(task);
         }
+    }
+
+    /// <summary>
+    /// Allows external systems (e.g., security manager) to enqueue a specific task without
+    /// running it through the machine-state mapping.
+    /// </summary>
+    public void PushExplicitTask(RobotTaskType type, object payload = null)
+    {
+        if (heart == null || config == null)
+            return;
+
+        float? timeout = config.GetTimeout(type);
+        int urgency = config.GetUrgency(type);
+        heart.TryPushTask(new RobotTask(type, payload, timeout, urgency));
     }
 
     protected virtual void HandleTaskChanged(RobotTask task)
@@ -98,6 +116,8 @@ public class RobotBrain : MonoBehaviour
     public RobotMemory Memory => memory;
     public RobotBrainConfig Config => config;
     public IWaypointService WaypointService => waypointService;
+    public RobotHeart Heart => heart;
+    public SecurityMachine HomeSecurityMachine => homeSecurityMachine;
 
     /// <summary>
     /// Entry point for perception to report that the player entered or left melee range.
@@ -164,6 +184,7 @@ public class RobotBrain : MonoBehaviour
             case RobotTaskType.Patrol:
             case RobotTaskType.Investigate:
             case RobotTaskType.Idle:
+            case RobotTaskType.SpawnFollowers:
                 return TryMoveToPayload(task.Payload);
             case RobotTaskType.ChasePlayer:
                 if (memory != null && memory.LastKnownPlayerPosition != Vector3.zero)
@@ -183,6 +204,9 @@ public class RobotBrain : MonoBehaviour
         if (!type.HasValue)
             return null;
 
+        if (machine is SecurityMachine security && isOn)
+            homeSecurityMachine = security;
+
         object payload = ResolvePayload(machine, type.Value, isOn);
         float? timeout = config.GetTimeout(type.Value);
         int urgency = config.GetUrgency(type.Value);
@@ -201,7 +225,7 @@ public class RobotBrain : MonoBehaviour
             return isOn ? RobotTaskType.WorkAtMachine : RobotTaskType.Rest;
 
         if (machine is SpawningMachine)
-            return isOn ? RobotTaskType.WorkAtMachine : RobotTaskType.Rest;
+            return isOn ? RobotTaskType.SpawnFollowers : RobotTaskType.Rest;
 
         if (machine is RoomWaypoint)
             return isOn ? RobotTaskType.WorkAtMachine : RobotTaskType.Rest;
@@ -324,6 +348,92 @@ public class RobotBrain : MonoBehaviour
         return null;
     }
 
+    public void RunReactivateRoutine(BaseMachine machine)
+    {
+        if (machine == null || heart == null || heart.CurrentTask == null || heart.CurrentTask.Type != RobotTaskType.ReactivateMachine)
+            return;
+
+        if (reactivateRoutine != null)
+            StopCoroutine(reactivateRoutine);
+        reactivateRoutine = StartCoroutine(ReactivateAndReturnRoutine(machine));
+    }
+
+    public void CompleteCurrentTask()
+    {
+        heart?.CompleteCurrentTask();
+    }
+
+    public void RunWaitAtMachineRoutine(BaseMachine machine, float waitSeconds)
+    {
+        if (waitAtMachineRoutine != null)
+            StopCoroutine(waitAtMachineRoutine);
+        waitAtMachineRoutine = StartCoroutine(WaitAtMachineRoutine(machine, waitSeconds));
+    }
+
+    private IEnumerator ReactivateAndReturnRoutine(BaseMachine machine)
+    {
+        float start = Time.time;
+        while (body != null
+            && !body.HasArrivedAtDestination()
+            && (reactivateArrivalTimeoutSeconds <= 0f || Time.time - start < reactivateArrivalTimeoutSeconds))
+        {
+            yield return null;
+        }
+
+        if (machine != null && !machine.IsOn)
+            machine.PowerOn();
+
+        heart?.CompleteCurrentTask();
+        reactivateRoutine = null;
+
+        if (heart != null && heart.Role == RobotRole.SecurityGuard)
+            SendGuardHomeOrRest();
+    }
+
+    private IEnumerator WaitAtMachineRoutine(BaseMachine machine, float waitSeconds)
+    {
+        float duration = Mathf.Max(0f, waitSeconds);
+        if (duration > 0f)
+        {
+            float endTime = Time.time + duration;
+            while (Time.time < endTime)
+                yield return null;
+        }
+
+        if (heart != null)
+            heart.CompleteCurrentTask();
+
+        waitAtMachineRoutine = null;
+    }
+
+    private void SendGuardHomeOrRest()
+    {
+        if (homeSecurityMachine != null && homeSecurityMachine.IsOn)
+        {
+            PushExplicitTask(RobotTaskType.GuardPost, homeSecurityMachine);
+            return;
+        }
+
+        if (waypointService != null)
+        {
+            var securityPoint = waypointService.GetFirstFreeSecurityPoint();
+            if (securityPoint != null)
+            {
+                PushExplicitTask(RobotTaskType.GuardPost, securityPoint);
+                return;
+            }
+
+            var restPoint = waypointService.GetFirstRestPoint();
+            if (restPoint != null)
+            {
+                PushExplicitTask(RobotTaskType.Rest, restPoint);
+                return;
+            }
+        }
+
+        PushExplicitTask(RobotTaskType.Rest);
+    }
+
 }
 
 [System.Serializable]
@@ -337,40 +447,54 @@ public class RoleTaskHandlerBinding
 /// Lightweight per-role configuration for the Brain/Heart pairing.
 /// </summary>
 [Serializable]
-public class RobotBrainConfig
-{
-    [SerializeField] private RobotRole role = RobotRole.Worker;
-    [SerializeField] private bool resumeWorkOnMachineOn = true;
-    [SerializeField] private float defaultTimeoutSeconds = 10f;
-
-    public RobotRole Role => role;
-    public bool ResumeWorkOnMachineOn => resumeWorkOnMachineOn;
-
-    public float? GetTimeout(RobotTaskType type)
+    public class RobotBrainConfig
     {
-        switch (type)
+        [SerializeField] private RobotRole role = RobotRole.Worker;
+        [SerializeField] private bool resumeWorkOnMachineOn = true;
+        [SerializeField] private float defaultTimeoutSeconds = 10f;
+        [SerializeField] private float waitAtMachineSeconds = 5f;
+
+        public RobotRole Role => role;
+        public bool ResumeWorkOnMachineOn => resumeWorkOnMachineOn;
+        public float WaitAtMachineSeconds => waitAtMachineSeconds;
+
+        public float? GetTimeout(RobotTaskType type)
         {
+            switch (type)
+            {
             case RobotTaskType.Rest:
                 return restDurationSeconds > 0f ? Time.time + restDurationSeconds : (float?)null;
             case RobotTaskType.GuardPost:
                 return guardPostDurationSeconds > 0f ? Time.time + guardPostDurationSeconds : (float?)null;
             case RobotTaskType.WorkAtMachine:
                 return workDurationSeconds > 0f ? Time.time + workDurationSeconds : (float?)null;
+            case RobotTaskType.SpawnFollowers:
+                return 100000; // stay assigned to the spawner with no timeout
             case RobotTaskType.ReactivateMachine:
                 return reactivateDurationSeconds > 0f ? Time.time + reactivateDurationSeconds : (float?)null;
+            case RobotTaskType.WaitAtMachine:
+                return waitAtMachineSeconds > 0f ? Time.time + waitAtMachineSeconds : (float?)null;
             default:
                 return defaultTimeoutSeconds > 0f ? Time.time + defaultTimeoutSeconds : (float?)null;
+            }
         }
-    }
 
-    public int GetUrgency(RobotTaskType type)
-    {
-        // Placeholder urgency mapping; refine by role/task.
-        return type == RobotTaskType.ReactivateMachine ? 80 : 50;
-    }
+        public int GetUrgency(RobotTaskType type)
+        {
+            // Placeholder urgency mapping; refine by role/task.
+            switch (type)
+            {
+                case RobotTaskType.ReactivateMachine:
+                    return 80;
+                case RobotTaskType.WaitAtMachine:
+                    return 70;
+                default:
+                    return 50;
+            }
+        }
 
-    [SerializeField] private float restDurationSeconds = 3f;
-    [SerializeField] private float guardPostDurationSeconds = 300f;
-    [SerializeField] private float workDurationSeconds = 120f;
-    [SerializeField] private float reactivateDurationSeconds = 30f;
-}
+        [SerializeField] private float restDurationSeconds = 3f;
+        [SerializeField] private float guardPostDurationSeconds = 300f;
+        [SerializeField] private float workDurationSeconds = 120f;
+        [SerializeField] private float reactivateDurationSeconds = 30f;
+    }

@@ -41,7 +41,6 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
     public WorkerCondition WorkerConditionState => workerCondition;
     [Header("Saving")]
-    [SerializeField] private float saveRadius = 4f;
     private static RoomWaypoint cachedStartWaypoint;
     private static bool triedCacheStart;
 

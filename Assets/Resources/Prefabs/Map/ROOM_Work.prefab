@@ -3628,6 +3628,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7047981207480481909}
     m_Modifications:
+    - target: {fileID: 1369690417077139683, guid: a0a685ca51a811c41a29468b7d3217b9, type: 3}
+      propertyPath: m_Name
+      value: EnemyTriggerZone_Aggresion
+      objectReference: {fileID: 0}
     - target: {fileID: 1595361350259869594, guid: a0a685ca51a811c41a29468b7d3217b9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.75
@@ -3654,6 +3658,10 @@ PrefabInstance:
       objectReference: {fileID: 187235412449160675}
     - target: {fileID: 5816600324113775217, guid: a0a685ca51a811c41a29468b7d3217b9, type: 3}
       propertyPath: rescueEnemyZone
+      value: 
+      objectReference: {fileID: 5671426212506969044}
+    - target: {fileID: 5816600324113775217, guid: a0a685ca51a811c41a29468b7d3217b9, type: 3}
+      propertyPath: detectAggresionZone
       value: 
       objectReference: {fileID: 5671426212506969044}
     - target: {fileID: 5816600324113775217, guid: a0a685ca51a811c41a29468b7d3217b9, type: 3}
@@ -4110,10 +4118,6 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 187235412449160675}
-    - target: {fileID: 5226794923736213634, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 5226794923736213634, guid: f3f1b836dfa521c479c3faff15921ecf, type: 3}
       propertyPath: m_VersionIndex
       value: 16401

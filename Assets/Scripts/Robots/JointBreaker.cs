@@ -78,6 +78,10 @@ public class JointBreaker : MonoBehaviour
         }
 
         DisableAllSolvers();
+
+        var stateController = GetComponent<RobotStateController>();
+        if (stateController != null && stateController.CurrentState != RobotState.Dead)
+            stateController.UpdateState(RobotState.Dead);
     }
 
     public void DestroyAll()

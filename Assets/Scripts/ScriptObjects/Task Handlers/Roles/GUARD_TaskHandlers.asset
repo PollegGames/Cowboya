@@ -20,10 +20,8 @@ MonoBehaviour:
   - Type: 3
     Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}
   - Type: 4
-    Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}
+    Handler: {fileID: 11400000, guid: 823eec912b6abda488f6f503d8c3816c, type: 2}
   - Type: 7
-    Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}
-  - Type: 9
     Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}
   - Type: 10
     Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}

@@ -20,6 +20,7 @@ public class FactoryMachine : BaseMachine
     public event Action<FactoryMachine, bool> OnMachineStateChanged;
     public event Action<FactoryMachine, RobotBrain> OnMachineTurningOff;
     private RobotBrain currentWorker;
+    private RobotStateController currentWorkerState;
 
     public bool HasWorker => currentWorker != null;
     public RobotBrain CurrentWorker => currentWorker;
@@ -105,6 +106,9 @@ public class FactoryMachine : BaseMachine
     {
         cubeConveyorController?.DetachCube();
         CancelInvoke(nameof(BeginConveyorInternal));
+        UnsubscribeFromWorkerState();
+        currentWorker = null;
+        currentWorkerState = null;
     }
 
     private void HandleAlarmChanged(AlarmState state)
@@ -140,7 +144,7 @@ public class FactoryMachine : BaseMachine
 
     private void ScheduleSpawn()
     {
-        if (!isOccupied || cubeConveyorController == null || cubeActive)
+        if (!isOccupied || cubeConveyorController == null || cubeActive || !HasAliveWorker())
             return;
 
         float timeSinceLast = Time.time - lastSpawnTime;
@@ -152,7 +156,7 @@ public class FactoryMachine : BaseMachine
 
     private void BeginConveyorInternal()
     {
-        if (!isOccupied || cubeConveyorController == null || cubeActive)
+        if (!isOccupied || cubeConveyorController == null || cubeActive || !HasAliveWorker())
             return;
 
         cubeActive = true;
@@ -174,6 +178,7 @@ public class FactoryMachine : BaseMachine
         if (!isOn)
         {
             SendWorkerToRest(currentWorker);
+            UnsubscribeFromWorkerState();
             currentWorker = null;
             SendWorkerToRest(newWorker);
             return;
@@ -184,11 +189,15 @@ public class FactoryMachine : BaseMachine
             // Capture previous worker, then assign and activate the new one.
             var previousWorker = currentWorker;
             currentWorker = newWorker;
+            SubscribeToWorkerState(currentWorker);
 
             SetWorkerToWork(currentWorker);
 
             if (previousWorker != null && previousWorker != currentWorker)
+            {
+                UnsubscribeFromWorkerState(previousWorker);
                 SendWorkerToRest(previousWorker);
+            }
         }
         else
         {
@@ -196,6 +205,7 @@ public class FactoryMachine : BaseMachine
             SendWorkerToWork(currentWorker);
             SendWorkerToRest(newWorker);
             currentWorker = newWorker;
+            SubscribeToWorkerState(currentWorker);
         }
 
         waypointService?.ReleaseMachine(this);
@@ -236,6 +246,46 @@ public class FactoryMachine : BaseMachine
     {
         if (worker == null) return;
         worker.OnMachineStateChanged(this, true);
+    }
+
+    private void SubscribeToWorkerState(RobotBrain worker)
+    {
+        UnsubscribeFromWorkerState();
+        if (worker == null)
+            return;
+
+        currentWorkerState = worker.GetComponent<RobotStateController>();
+        if (currentWorkerState != null)
+            currentWorkerState.OnStateChanged += HandleWorkerStateChanged;
+    }
+
+    private void UnsubscribeFromWorkerState(RobotBrain worker = null)
+    {
+        var state = worker != null ? worker.GetComponent<RobotStateController>() : currentWorkerState;
+        if (state != null)
+            state.OnStateChanged -= HandleWorkerStateChanged;
+        if (worker == null)
+            currentWorkerState = null;
+    }
+
+    private void HandleWorkerStateChanged(RobotState newState)
+    {
+        if (newState != RobotState.Dead)
+            return;
+
+        cubeConveyorController?.DetachCube();
+        CancelInvoke(nameof(BeginConveyorInternal));
+        cubeActive = false;
+
+        UnsubscribeFromWorkerState();
+        currentWorker = null;
+        currentWorkerState = null;
+        base.ReleaseRobot(); // frees the slot and notifies listeners
+    }
+
+    private bool HasAliveWorker()
+    {
+        return currentWorker != null && currentWorkerState != null && currentWorkerState.CurrentState == RobotState.Alive;
     }
 
     /// <summary>

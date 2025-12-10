@@ -167,6 +167,15 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var factory = new EnemyRobotFactory(1);
 
         var go = PoolGet(followerGuardPrefab);
+        if (go == null)
+            return;
+
+        if (spawnPos == null)
+        {
+            Debug.LogWarning("[EnemiesSpawner] Cannot spawn follower: spawn position is null.");
+            return;
+        }
+
         var state = go.GetComponent<RobotStateController>();
         if (state != null)
         {
@@ -175,7 +184,28 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         }
 
         PositionAndWake(go, spawnPos.WorldPos);
-        InitializeRobot(go, RobotRole.SecurityGuard, spawnPos);
+        InitializeRobot(go, RobotRole.Follower, spawnPos);
+
+        var brain = go.GetComponent<RobotBrain>();
+        if (brain != null)
+        {
+            Vector3 targetPosition = alarmStatus != null ? alarmStatus.LastPlayerPosition : Vector3.zero;
+            if (targetPosition != Vector3.zero)
+            {
+                brain.Memory?.RememberPlayerPosition(targetPosition);
+                brain.PushExplicitTask(RobotTaskType.ChasePlayer, targetPosition);
+            }
+            else if (waypointService != null && waypointService.ClosestWaypointToPlayer != null)
+            {
+                var playerWaypoint = waypointService.ClosestWaypointToPlayer;
+                brain.Memory?.RememberPlayerPosition(playerWaypoint.WorldPos);
+                brain.PushExplicitTask(RobotTaskType.ChasePlayer, playerWaypoint);
+            }
+            else
+            {
+                brain.PushExplicitTask(RobotTaskType.Patrol, spawnPos);
+            }
+        }
 
         spawnedFollowers.Add(go);
     }
@@ -197,7 +227,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             if (ws == null)
                 continue;
 
-            var p = waypointService.GetBlockedRoomCenter();
+            var p = waypointService.GetBlockedRoomSecuritySpawning();
             PositionAndWake(ws, p.WorldPos);
             InitializeRobot(ws, RobotRole.WorkerSpawner, p);
         }

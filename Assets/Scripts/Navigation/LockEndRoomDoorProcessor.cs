@@ -3,7 +3,12 @@ using UnityEngine;
 
 public class LockEndRoomDoorProcessor : CellProcessor
 {
-    public LockEndRoomDoorProcessor(int gridWidth, int gridHeight) : base(gridWidth, gridHeight) { }
+    private readonly bool noBlockRequiredWhenZeroEnemies;
+
+    public LockEndRoomDoorProcessor(int gridWidth, int gridHeight, bool noBlockRequiredWhenZeroEnemies) : base(gridWidth, gridHeight)
+    {
+        this.noBlockRequiredWhenZeroEnemies = noBlockRequiredWhenZeroEnemies;
+    }
 
     public override void ProcessCells(Dictionary<Vector2, Cell> cellDataGrid)
     {
@@ -11,11 +16,14 @@ public class LockEndRoomDoorProcessor : CellProcessor
         {
             Vector2 pos = kvp.Key;
             Cell cell = kvp.Value;
+            // When no enemies exist we keep end-room doors unlocked instead of locking them
+            var doorAction = noBlockRequiredWhenZeroEnemies ? (System.Action<Cell, DoorDirection>)UnlockDoor : LockDoor;
+
             // Lock all doors if this cell is an End room
             if (cell.cellProperties.usageType == UsageType.End)
             {
-                LockDoor(cell, DoorDirection.Left);
-                LockDoor(cell, DoorDirection.Right);
+                doorAction(cell, DoorDirection.Left);
+                doorAction(cell, DoorDirection.Right);
             }
 
             // Check right neighbor
@@ -24,7 +32,7 @@ public class LockEndRoomDoorProcessor : CellProcessor
             {
                 if (rightCell.cellProperties.usageType == UsageType.End)
                 {
-                    LockDoor(cell, DoorDirection.Right);
+                    doorAction(cell, DoorDirection.Right);
                 }
             }
 
@@ -34,7 +42,7 @@ public class LockEndRoomDoorProcessor : CellProcessor
             {
                 if (leftCell.cellProperties.usageType == UsageType.End)
                 {
-                    LockDoor(cell, DoorDirection.Left);
+                    doorAction(cell, DoorDirection.Left);
                 }
             }
             // Mark the door as a victory door if this End room is at the map edge

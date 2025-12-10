@@ -13,13 +13,9 @@ MonoBehaviour:
   m_Name: Follower_TaskHandlers
   m_EditorClassIdentifier: Game::RobotTaskHandlers
   entries:
-  - Type: 0
-    Handler: {fileID: 11400000, guid: efb49af59003b924fb11ed049ca1556e, type: 2}
   - Type: 5
     Handler: {fileID: 11400000, guid: a8510f50d11646e4da80e1acfe9f5cc1, type: 2}
-  - Type: 4
-    Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}
   - Type: 11
     Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}
-  - Type: 9
+  - Type: 12
     Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}

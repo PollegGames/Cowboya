@@ -19,6 +19,7 @@ public class SpawningMachine : BaseMachine
     private Coroutine spawnCoroutine;
 
     private RobotBrain currentWorker;
+    private RobotStateController currentWorkerState;
 
     public bool HasWorker => currentWorker != null;
     public RobotBrain CurrentWorker => currentWorker;
@@ -49,6 +50,7 @@ public class SpawningMachine : BaseMachine
             securityManager.OnSecurityMachineTurnedOff -= HandleSecurityMachineTurnedOff;
 
         StopSpawning();
+        UnsubscribeFromWorkerState();
     }
 
     private void Update()
@@ -87,6 +89,7 @@ public class SpawningMachine : BaseMachine
         if (!isOn) return;
 
         StopSpawning();
+        UnsubscribeFromWorkerState();
         SendWorkerToStart(currentWorker);
         OnMachineTurningOff?.Invoke(this, currentWorker);
         base.PowerOff();
@@ -129,8 +132,10 @@ public class SpawningMachine : BaseMachine
         if (currentWorker == null)
         {
             currentWorker = newWorker;
+            SubscribeToWorkerState(currentWorker);
             SetWorkerToSpawn(currentWorker);
             base.AttachRobot(robot);
+            TryStartSpawning();
         }
     }
 
@@ -154,13 +159,14 @@ public class SpawningMachine : BaseMachine
         SendWorkerToStart(currentWorker);
         isOccupied = false;
         base.ReleaseRobot();
+        UnsubscribeFromWorkerState();
         currentWorker = null;
     }
 
     private void TryStartSpawning()
     {
         if (spawnCoroutine == null && isOn && factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted
-        && currentWorker != null)
+        && HasAliveWorker())
         {
             spawnCoroutine = StartCoroutine(SpawnLoop());
         }
@@ -186,7 +192,7 @@ public class SpawningMachine : BaseMachine
 
     private void SpawnFollower()
     {
-        if (!isOn || factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted)
+        if (!isOn || factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted || !HasAliveWorker())
             return;
         var spawnPos = trigger.transform.position;
         var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
@@ -204,5 +210,38 @@ public class SpawningMachine : BaseMachine
         var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
         enemiesSpawner.CreateAndSpawnSecurityGuard(lastVisitedPoint, machine);
 
+    }
+
+    private void SubscribeToWorkerState(RobotBrain worker)
+    {
+        UnsubscribeFromWorkerState();
+        if (worker == null)
+            return;
+        currentWorkerState = worker.GetComponent<RobotStateController>();
+        if (currentWorkerState != null)
+            currentWorkerState.OnStateChanged += HandleWorkerStateChanged;
+    }
+
+    private void UnsubscribeFromWorkerState()
+    {
+        if (currentWorkerState != null)
+            currentWorkerState.OnStateChanged -= HandleWorkerStateChanged;
+        currentWorkerState = null;
+    }
+
+    private void HandleWorkerStateChanged(RobotState newState)
+    {
+        if (newState != RobotState.Dead)
+            return;
+
+        StopSpawning();
+        base.ReleaseRobot();
+        currentWorker = null;
+        UnsubscribeFromWorkerState();
+    }
+
+    private bool HasAliveWorker()
+    {
+        return currentWorker != null && currentWorkerState != null && currentWorkerState.CurrentState == RobotState.Alive;
     }
 }

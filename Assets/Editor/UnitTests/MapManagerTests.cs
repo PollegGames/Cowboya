@@ -112,6 +112,6 @@ public class MapManagerTests
     }
     private class DummyRoomProcessor : IRoomProcessor
     {
-        public void ProcessRooms(System.Collections.Generic.Dictionary<Vector2, Cell> cellDataGrid, int width, int height) { }
+        public void ProcessRooms(System.Collections.Generic.Dictionary<Vector2, Cell> cellDataGrid, int width, int height, bool noBlockRequiredWhenZeroEnemies) { }
     }
 }

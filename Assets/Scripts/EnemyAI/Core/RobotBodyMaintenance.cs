@@ -38,6 +38,10 @@ public class RobotBodyMaintenance : MonoBehaviour, IPooledObject
         if (controller == null)
             return;
 
+        var stateController = controller.GetComponent<RobotStateController>();
+        if (stateController != null && stateController.CurrentState == RobotState.Dead)
+            return;
+
         var respawn = respawnService;
         if (respawn == null)
         {

@@ -3,5 +3,5 @@ using UnityEngine;
 
 public interface IRoomProcessor
 {
-    void ProcessRooms(Dictionary<Vector2, Cell> cellDataGrid, int width, int height);
+    void ProcessRooms(Dictionary<Vector2, Cell> cellDataGrid, int width, int height, bool noBlockRequiredWhenZeroEnemies);
 }

@@ -175,7 +175,7 @@ MonoBehaviour:
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
-  m_Flip: 0
+  m_Flip: 1
 --- !u!1 &204123777440484969
 GameObject:
   m_ObjectHideFlags: 0
@@ -1878,7 +1878,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::AttackHitbox
   damage: 5
-  pushForce: {x: 5, y: 2}
+  pushForce: {x: 30, y: 10}
   hitboxIndicator: {fileID: 8478338788437210441}
   activeColor: {r: 1, g: 0, b: 0, a: 1}
   inactiveColor: {r: 1, g: 1, b: 1, a: 0}
@@ -2911,6 +2911,7 @@ MonoBehaviour:
     CurrentEnergy: 30
     AttackEnergyCost: 5
     EnergyRechargeRate: 1
+  saveRadius: 4
 --- !u!114 &9146288787774417856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4141,7 +4142,7 @@ MonoBehaviour:
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
-  m_Flip: 1
+  m_Flip: 0
 --- !u!1 &5583993801732171609
 GameObject:
   m_ObjectHideFlags: 0
@@ -5122,7 +5123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::AttackHitbox
   damage: 5
-  pushForce: {x: 5, y: 2}
+  pushForce: {x: 30, y: 10}
   hitboxIndicator: {fileID: 7104050278844550374}
   activeColor: {r: 1, g: 0, b: 0, a: 1}
   inactiveColor: {r: 1, g: 1, b: 1, a: 0}

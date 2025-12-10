@@ -255,6 +255,19 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (guard == null)
             return;
+        // For explicit task types (e.g., ReactivateMachine), bypass machine-state remapping
+        // so only the selected guard executes the intended action.
+        if (taskType == RobotTaskType.ReactivateMachine)
+        {
+            guard.PushExplicitTask(taskType, payload);
+            if (payload is BaseMachine baseMachine)
+            {
+                float waitSeconds = guard.Config != null ? guard.Config.WaitAtMachineSeconds : 0f;
+                guard.PushExplicitTask(RobotTaskType.WaitAtMachine, new WaitAtMachinePayload(baseMachine, waitSeconds));
+            }
+            return;
+        }
+
         guard.OnMachineStateChanged(payload, isOn);
     }
 }

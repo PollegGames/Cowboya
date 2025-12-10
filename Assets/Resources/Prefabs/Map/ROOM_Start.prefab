@@ -3641,6 +3641,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5671426212506969044}
     - target: {fileID: 5816600324113775217, guid: a0a685ca51a811c41a29468b7d3217b9, type: 3}
+      propertyPath: detectAggresionZone
+      value: 
+      objectReference: {fileID: 5671426212506969044}
+    - target: {fileID: 5816600324113775217, guid: a0a685ca51a811c41a29468b7d3217b9, type: 3}
       propertyPath: reportRescueToFactory
       value: 1
       objectReference: {fileID: 0}

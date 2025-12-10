@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WaypointType { Door, LiftGoingUp, LiftGoingDown, Rest, Work, Center, Security }
+public enum WaypointType { Door, LiftGoingUp, LiftGoingDown, Rest, Work, Center, Security,Spawner  }
 
 [Serializable]
 public class RoomWaypoint : MonoBehaviour

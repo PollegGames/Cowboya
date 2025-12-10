@@ -249,7 +249,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
             .GetAllWaypoints()
             .Where(wp =>
                 wp.parentRoom.roomProperties.usageType == UsageType.Blocked
-                && wp.type == WaypointType.Security
+                && wp.type == WaypointType.Spawner
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp)
             )

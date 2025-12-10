@@ -11,6 +11,7 @@ public enum RobotTaskType
     WorkAtMachine,
     GuardPost,
     ReactivateMachine,
+    WaitAtMachine,
     ChasePlayer,
     AttackTarget,
     Flee,

@@ -655,7 +655,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 803345690220079141}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.0000011415542, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.0000000054384364, w: 1}
   m_LocalPosition: {x: 1.7577957, y: 0.0000014193498, z: 0}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -960,7 +960,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.20864813, y: -0.3726509}
+  m_ConnectedAnchor: {x: 0.20864815, y: -0.3726511}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1126,7 +1126,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.8921078, y: -0.00000069002544}
+  m_ConnectedAnchor: {x: 0.89210737, y: -0.00000071119183}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1645,7 +1645,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.7577951, y: 0.0000016780735}
+  m_ConnectedAnchor: {x: 1.7577952, y: 0.0000012733717}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -1821,7 +1821,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2759641210342709859}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.023372654, w: 0.99972683}
+  m_LocalRotation: {x: -0, y: -0, z: 0.023371518, w: 0.99972683}
   m_LocalPosition: {x: 1.78, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2062,7 +2062,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.637746, y: 0.000000057995983}
+  m_ConnectedAnchor: {x: 1.637746, y: 0.0000007082283}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2198,7 +2198,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.7170164, y: 0.0000012104668}
+  m_ConnectedAnchor: {x: 0.71701664, y: 0.0000009700152}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -2663,7 +2663,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.62670934, y: -0.00000018499446}
+  m_ConnectedAnchor: {x: 0.62670976, y: -0.000000047836096}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3656,7 +3656,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.24138607, y: 0.39487344}
+  m_ConnectedAnchor: {x: 0.2413864, y: 0.39487362}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3901,7 +3901,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.7485327, y: -0.00000013885168}
+  m_ConnectedAnchor: {x: 1.7485331, y: -0.00000024214378}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4570,7 +4570,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.76394004, y: 1.2572962}
+  m_ConnectedAnchor: {x: 0.7639403, y: 1.2572967}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4703,7 +4703,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.0050943, y: 0.00000036744913}
+  m_ConnectedAnchor: {x: 1.0050944, y: 0.00000077045786}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -4836,7 +4836,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.5693477, y: -0.00000080263027}
+  m_ConnectedAnchor: {x: 1.5693481, y: -0.00000079585703}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -5419,9 +5419,10 @@ MonoBehaviour:
   role: 2
   memory: {fileID: 5484420303611480520}
   config:
-    role: 0
+    role: 2
     resumeWorkOnMachineOn: 1
     defaultTimeoutSeconds: 10
+    waitAtMachineSeconds: 5
     restDurationSeconds: 3
     guardPostDurationSeconds: 300
     workDurationSeconds: 120
@@ -5446,6 +5447,7 @@ MonoBehaviour:
     role: 2
     resumeWorkOnMachineOn: 1
     defaultTimeoutSeconds: 10
+    waitAtMachineSeconds: 5
     restDurationSeconds: 3
     guardPostDurationSeconds: 300
     workDurationSeconds: 120
@@ -5458,6 +5460,7 @@ MonoBehaviour:
     Handlers: {fileID: 11400000, guid: ca339f7632d881c41b03569f6f4502ef, type: 2}
   waypointServiceBehaviour: {fileID: 0}
   stateController: {fileID: 5294910621018447611}
+  reactivateArrivalTimeoutSeconds: 8
 --- !u!114 &4668187307536096702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6375,7 +6378,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.32528165, y: -0.8704765}
+  m_ConnectedAnchor: {x: 0.32528168, y: -0.87047595}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
