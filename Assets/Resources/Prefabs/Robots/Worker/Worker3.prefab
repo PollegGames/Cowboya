@@ -2184,11 +2184,10 @@ GameObject:
   - component: {fileID: 3084759943220385380}
   - component: {fileID: 2232273132763882073}
   - component: {fileID: 50416280650570067}
-  - component: {fileID: 6388133658049301520}
   - component: {fileID: 2185175780099839432}
   - component: {fileID: 1964276220700352943}
   m_Layer: 7
-  m_Name: Wroker3
+  m_Name: Worker3
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2464,19 +2463,6 @@ MonoBehaviour:
   bodyMaintenance: {fileID: 2232273132763882073}
   attackController: {fileID: 0}
   isBoss: 0
---- !u!114 &6388133658049301520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3479292778027586589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotBodyMaintenance
-  memory: {fileID: 393579632015866257}
 --- !u!114 &2185175780099839432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6579,7 +6565,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: onEnter.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: onEnter.m_PersistentCalls.m_Calls.Array.data[0].m_Target

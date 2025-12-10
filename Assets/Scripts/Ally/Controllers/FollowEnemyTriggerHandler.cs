@@ -31,9 +31,14 @@ public class FollowEnemyTriggerHandler : MonoBehaviour
     private void OnEnemyEnterRoomZone(Collider2D collider)
     {
         if (stateController == null)
+        {
             return;
+        }
+
+        Debug.Log($"Enemy entered room zone via {collider.name}", this);
 
         var room = collider.GetComponentInParent<RoomManager>();
+        Debug.Log($"Room detected: {room.roomProperties.usageType}", this);
         if (room != null && room.roomProperties != null && room.roomProperties.usageType == UsageType.Start)
         {
             stateController.MarkAsSaved();
