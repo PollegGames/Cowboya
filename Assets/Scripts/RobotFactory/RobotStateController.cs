@@ -5,14 +5,16 @@ using UnityEngine;
 public class RobotStateController : MonoBehaviour, IPooledObject
 {
     public event Action<RobotState> OnStateChanged;
+    public static event Action<RobotStateController> OnAnyRobotKilled;
+    public static event Action<RobotStateController> OnAnyRobotSaved;
     public RobotState CurrentState { get; private set; } = RobotState.Alive;
 
     [SerializeField] private EnergyBot energyBot;
     [SerializeField] private HealthBot healthBot;
     public HealthBot Health => healthBot;
     [SerializeField] private JointBreaker jointBreaker;
-
     [SerializeField] private RobotStats stats;
+
     public RobotStats Stats
     {
         get => stats;
@@ -31,7 +33,18 @@ public class RobotStateController : MonoBehaviour, IPooledObject
             EvaluateHealthState();
         }
     }
+
     private bool isGrounded = true;
+    private bool deathReported;
+    private bool savedReported;
+    private WorkerCondition workerCondition = WorkerCondition.Active;
+
+    public WorkerCondition WorkerConditionState => workerCondition;
+    [Header("Saving")]
+    [SerializeField] private float saveRadius = 4f;
+    private static RoomWaypoint cachedStartWaypoint;
+    private static bool triedCacheStart;
+
     private void Awake()
     {
         if (energyBot == null)
@@ -43,6 +56,9 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
         if (healthBot != null)
             healthBot.OnHealthChanged += HandleHealthChange;
+
+        deathReported = false;
+        savedReported = false;
     }
 
     private void OnEnable()
@@ -84,7 +100,6 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         return Stats != null && Stats.CurrentEnergy > Stats.AttackEnergyCost;
     }
 
-
     public bool CanPerformEnergy(float energyCost)
     {
         if (CurrentState != RobotState.Alive)
@@ -115,7 +130,7 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
     private IEnumerator ResetGrounded()
     {
-        yield return new WaitForSeconds(2f); // Adjust based on jump duration
+        yield return new WaitForSeconds(2f);
         isGrounded = true;
     }
 
@@ -186,6 +201,12 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         if (newState == RobotState.Dead)
         {
             jointBreaker?.BreakAll();
+            ReportDeathOnce();
+        }
+        else
+        {
+            deathReported = false;
+            savedReported = false;
         }
 
         var heart = GetComponent<RobotHeart>();
@@ -195,13 +216,13 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         }
     }
 
-    /// <summary>
-    /// Resets the robot when it is acquired from the pool.
-    /// </summary>
     public void OnAcquireFromPool()
     {
         bool stateChanged = CurrentState != RobotState.Alive;
         CurrentState = RobotState.Alive;
+        deathReported = false;
+        savedReported = false;
+        workerCondition = WorkerCondition.Active;
         if (Stats != null)
         {
             Stats.CurrentHealth = Stats.MaxHealth;
@@ -215,9 +236,6 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         }
     }
 
-    /// <summary>
-    /// Performs cleanup when the robot is released to the pool.
-    /// </summary>
     public void OnReleaseToPool()
     {
         OnStateChanged = null;
@@ -238,4 +256,29 @@ public class RobotStateController : MonoBehaviour, IPooledObject
             UpdateState(RobotState.Dead);
         }
     }
+
+    private void ReportDeathOnce()
+    {
+        if (deathReported)
+            return;
+
+        if (GetComponent<PlayerBrain>() != null)
+            return;
+
+        deathReported = true;
+        OnAnyRobotKilled?.Invoke(this);
+    }
+
+    public void MarkAsSaved()
+    {
+        if (savedReported)
+            return;
+
+        if (GetComponent<PlayerBrain>() != null)
+            return;
+
+        savedReported = true;
+        OnAnyRobotSaved?.Invoke(this);
+    }
+
 }

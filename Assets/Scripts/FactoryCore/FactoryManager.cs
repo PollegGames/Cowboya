@@ -26,6 +26,18 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     public GameObject playerInstance { get; private set; }
     public Transform playerHeadTransform { get; private set; } // Head inside WholeBody
 
+    private void OnEnable()
+    {
+        RobotStateController.OnAnyRobotKilled += HandleRobotKilled;
+        RobotStateController.OnAnyRobotSaved += HandleRobotSaved;
+    }
+
+    private void OnDisable()
+    {
+        RobotStateController.OnAnyRobotKilled -= HandleRobotKilled;
+        RobotStateController.OnAnyRobotSaved -= HandleRobotSaved;
+    }
+
     public void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup, IEnemiesSpawner enemiesSpawner)
     {
         this.mapManager = mapManager;
@@ -127,7 +139,6 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         }
     }
 
-
     public void OnRobotKilled()
     {
         if (victorySetup != null)
@@ -141,6 +152,33 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 
         Debug.Log("Robot KILLED");
         playerStats?.UpdateMorality(-1f);
+    }
+
+    private void HandleRobotKilled(RobotStateController controller)
+    {
+        if (controller == null)
+            return;
+
+        if (controller.GetComponent<PlayerBrain>() != null)
+            return;
+
+        OnRobotKilled();
+    }
+
+    private void HandleRobotSaved(RobotStateController controller)
+    {
+        if (controller == null)
+            return;
+
+        if (controller.GetComponent<PlayerBrain>() != null)
+            return;
+
+        var heart = controller.GetComponent<RobotHeart>();
+        var role = heart != null ? heart.Role : RobotRole.Worker;
+        if (role == RobotRole.Worker || role == RobotRole.WorkerSpawner)
+        {
+            OnRobotSaved();
+        }
     }
 
 

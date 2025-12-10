@@ -58,6 +58,10 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     {
         if (updateLoop == UpdateLoop.Update)
             pathFollower?.Update(Time.deltaTime);
+
+        // If we arrived this frame, clear movement so the bot stays put until a new task.
+        if (HasArrivedAtDestination())
+            StopMovement();
     }
 
     protected override void FixedUpdate()
@@ -65,6 +69,9 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         base.FixedUpdate();
         if (updateLoop == UpdateLoop.FixedUpdate)
             pathFollower?.Update(Time.fixedDeltaTime);
+
+        if (HasArrivedAtDestination())
+            StopMovement();
     }
 
     private void SetupPathFollower()
@@ -117,6 +124,11 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     {
         if (pathFollower == null && waypointQueries != null)
             SetupPathFollower();
+    }
+
+    public void StopMovement()
+    {
+        pathFollower?.ClearPath();
     }
 
     private void OnDrawGizmos()

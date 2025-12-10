@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47eeb42f1fd366642856156ffc865a5b, type: 3}
   m_Name: Setup Tutorial
   m_EditorClassIdentifier: 
-  gridWidth: 4
+  gridWidth: 3
   gridHeight: 2
-  poiCount: 2
-  blockedCount: 1
+  poiCount: 1
+  blockedCount: 0
   workersCount: 2
-  enemiesCount: 1
-  seed: 61646
+  enemiesCount: 0
+  seed: 114216

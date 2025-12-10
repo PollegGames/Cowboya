@@ -182,4 +182,14 @@ public class WaypointPathFollower : IRobotNavigationListener
             prev = wp.WorldPos;
         }
     }
+
+    public void ClearPath()
+    {
+        currentPath = null;
+        currentWaypoints = null;
+        pathIndex = 0;
+        monitor.Reset(body.position);
+        mover.SetMovement(0f);
+        mover.SetVerticalMovement(0f);
+    }
 }

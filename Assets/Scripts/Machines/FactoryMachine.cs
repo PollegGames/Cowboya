@@ -168,27 +168,32 @@ public class FactoryMachine : BaseMachine
     {
         var newWorker = robot.GetComponent<RobotBrain>();
         if (newWorker == null) return;
-        // If the machine is off, send any worker to rest
+        if (newWorker == currentWorker && isOn && Type == MachineType.WorkStation)
+            return;
+        // If the machine is off, always send the incoming worker to rest.
         if (!isOn)
         {
             SendWorkerToRest(currentWorker);
             currentWorker = null;
             SendWorkerToRest(newWorker);
+            return;
         }
-        else if (Type == MachineType.WorkStation)
+
+        if (Type == MachineType.WorkStation)
         {
-            // Send existing worker to rest before assigning new
-            SendWorkerToRest(currentWorker);
-            // Assign the new worker to work
-            SetWorkerToWork(newWorker);
+            // Capture previous worker, then assign and activate the new one.
+            var previousWorker = currentWorker;
             currentWorker = newWorker;
+
+            SetWorkerToWork(currentWorker);
+
+            if (previousWorker != null && previousWorker != currentWorker)
+                SendWorkerToRest(previousWorker);
         }
         else
         {
             // Machine is rest
-            // Send existing worker to work before assigning new
             SendWorkerToWork(currentWorker);
-            // Assign the new worker to rest
             SendWorkerToRest(newWorker);
             currentWorker = newWorker;
         }
@@ -205,8 +210,14 @@ public class FactoryMachine : BaseMachine
         if (worker == null) return;
         object payload = null;
         if (waypointService != null)
+        {
             payload = waypointService.GetFirstRestPoint();
-        worker.OnMachineStateChanged(payload ?? this, false);
+            if (payload == null)
+                payload = waypointService.GetStartPoint();
+        }
+        if (payload == null)
+            payload = transform.position;
+        worker.OnMachineStateChanged(payload, false);
     }
 
     private void SendWorkerToWork(RobotBrain worker)

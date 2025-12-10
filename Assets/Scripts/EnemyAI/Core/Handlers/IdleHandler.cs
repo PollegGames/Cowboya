@@ -5,6 +5,10 @@ public class IdleHandler : ScriptableRobotTaskHandler
 {
     public override void Execute(RobotBrain brain, object payload)
     {
-        // No-op; could play idle animation or reset movement.
+        if (brain == null || brain.Body == null)
+            return;
+
+        // Clear any residual movement so the robot truly idles.
+        brain.Body.StopMovement();
     }
 }

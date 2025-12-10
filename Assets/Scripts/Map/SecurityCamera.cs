@@ -30,6 +30,7 @@ public class SecurityCamera : MonoBehaviour
 
     private List<IRobotMemory> enemiesInZone = new List<IRobotMemory>();
     private HashSet<IRobotMemory> alarmedMemories = new HashSet<IRobotMemory>();
+
     private void Awake()
     {
         if (cameraHead == null && transform.childCount > 0)
@@ -150,7 +151,6 @@ public class SecurityCamera : MonoBehaviour
 
     private void OnSecondaryZoneEnter(Collider2D enemyCollider)
     {
-        // 1) Make sure we have a FactoryAlarmStatus to update
         var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
         if (factoryAlarm != null)
         {
@@ -177,7 +177,7 @@ public class SecurityCamera : MonoBehaviour
             {
                 factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
                 alarmedMemories.Add(mem);
-                break;  // only trigger once per frame
+                break;
             }
         }
     }

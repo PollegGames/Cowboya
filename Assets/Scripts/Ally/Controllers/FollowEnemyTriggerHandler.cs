@@ -4,85 +4,47 @@ using UnityEngine;
 public class FollowEnemyTriggerHandler : MonoBehaviour
 {
     [Header("Zone Detection")]
-    public PositionTriggerZone detectZone;
-    public PositionTriggerZone attackZone;
-    [Header("References")]
-    public Transform circleCenter;
-    public float radius = 2f;
-
-    private Camera mainCamera;
-    private bool isFacingRight = true;
-    public bool IsFacingRight => isFacingRight;
-
-    private Transform enemyBodyReference;
-    public Vector3 EnemyBodyReferencePosition => enemyBodyReference != null ? enemyBodyReference.position : Vector3.zero;
-
-    public event Action<bool> OnEnemyDetectInAttackZoneChanged;
-
-    private void Awake()
-    {
-        mainCamera = Camera.main;
-    }
+    public PositionTriggerZone roomsZone;
+    [SerializeField] private RobotStateController stateController;
 
     private void Start()
     {
-        if (detectZone != null)
+        if (stateController == null)
+            stateController = GetComponent<RobotStateController>();
+
+        if (roomsZone == null)
+            roomsZone = GetComponent<PositionTriggerZone>();
+
+        if (roomsZone != null)
         {
-            detectZone.onEnter.AddListener(OnEnemyEnterDetectZone);
-            detectZone.onExit.AddListener(OnEnemyExitDetectZone);
+            roomsZone.onEnter.AddListener(OnEnemyEnterRoomZone);
         }
-        if (attackZone != null)
-        {
-            attackZone.onEnter.AddListener(OnEnemyEnterAttackZone);
-            attackZone.onExit.AddListener(OnEnemyExitAttackZone);
-        }
+       
     }
 
-    private void OnEnemyEnterDetectZone(Collider2D collider)
+    private void OnDisable()
     {
-        if (collider.CompareTag("Enemy"))
-        {
-            var brain = collider.transform.root.GetComponent<RobotBrain>();
-            if (brain != null && brain.Body != null)
-            {
-                enemyBodyReference = brain.Body.transform;
-            }
-        }
+        if (roomsZone != null)
+            roomsZone.onEnter.RemoveListener(OnEnemyEnterRoomZone);
     }
 
-    private void OnEnemyExitDetectZone()
+    private void OnEnemyEnterRoomZone(Collider2D collider)
     {
-        enemyBodyReference = null;
-    }
-
-    private void OnEnemyEnterAttackZone(Collider2D collider)
-    {
-        if (collider.CompareTag("Enemy"))
-        {
-            OnEnemyDetectInAttackZoneChanged?.Invoke(true);
-        }
-    }
-
-    private void OnEnemyExitAttackZone()
-    {
-        OnEnemyDetectInAttackZoneChanged?.Invoke(false);
-    }
-
-    private void Update()
-    {
-        if (circleCenter == null || mainCamera == null)
+        if (stateController == null)
             return;
 
-        if (enemyBodyReference != null)
+        var room = collider.GetComponentInParent<RoomManager>();
+        if (room != null && room.roomProperties != null && room.roomProperties.usageType == UsageType.Start)
         {
-            Vector3 direction = (enemyBodyReference.position - circleCenter.position).normalized;
-            Vector3 targetPos = circleCenter.position + direction * radius;
-            transform.position = targetPos;
+            stateController.MarkAsSaved();
+            return;
+        }
 
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, 0f, angle);
-
-            isFacingRight = transform.position.x <= circleCenter.position.x;
+        var roomProps = collider.GetComponentInParent<RoomProperties>();
+        if (roomProps != null && roomProps.usageType == UsageType.Start)
+        {
+            stateController.MarkAsSaved();
         }
     }
+
 }

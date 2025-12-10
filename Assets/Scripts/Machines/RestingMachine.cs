@@ -107,8 +107,21 @@ public class RestingMachine : BaseMachine
             payload = waypointService.GetLeastUsedFreeWorkPoint();
             if (payload == null)
                 payload = waypointService.GetWorkOrRestPoint();
+            if (payload == null)
+                payload = waypointService.GetStartPoint();
         }
-        worker.OnMachineStateChanged(payload ?? this, true);
+
+        // Free the slot when dispatching the current worker so a new one can rest.
+        if (worker == currentWorker)
+        {
+            CancelRestCountdown();
+            currentWorker = null;
+            isOccupied = false;
+        }
+
+        if (payload == null)
+            payload = transform.position;
+        worker.OnMachineStateChanged(payload, true);
     }
 
     private void SendCurrentWorkerToWork()

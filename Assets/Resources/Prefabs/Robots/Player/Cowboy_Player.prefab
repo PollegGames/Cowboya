@@ -2517,13 +2517,13 @@ MonoBehaviour:
     MaxEnergy: 100
     CurrentEnergy: 100
     AttackEnergyCost: 5
-    EnergyRechargeRate: 2
+    EnergyRechargeRate: 5
   playerBrain: {fileID: 7969949290834653241}
   consumeEnergy: 1
   autoRecharge: 1
-  rechargeRate: 2
+  rechargeRate: 5
   tickDelay: 1
-  rechargeDelayAfterUse: 0.5
+  rechargeDelayAfterUse: 1
   faintRecoveryEnergy: 20
   walkEnergyCostPerSecond: 1
   jumpEnergyCost: 3
