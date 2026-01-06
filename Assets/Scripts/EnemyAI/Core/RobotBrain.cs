@@ -73,7 +73,7 @@ public class RobotBrain : MonoBehaviour
     /// </summary>
     public void OnMachineStateChanged(object machine, bool isOn)
     {
-        if (heart == null || config == null)
+        if (heart == null)
             return;
 
         RobotTask task = BuildTaskForMachine(machine, isOn);
@@ -90,11 +90,11 @@ public class RobotBrain : MonoBehaviour
     /// </summary>
     public void PushExplicitTask(RobotTaskType type, object payload = null)
     {
-        if (heart == null || config == null)
+        if (heart == null)
             return;
 
-        float? timeout = config.GetTimeout(type);
-        int urgency = config.GetUrgency(type);
+        float? timeout = config != null ? config.GetTimeout(type) : (float?)null;
+        int urgency = config != null ? config.GetUrgency(type) : 0;
         heart.TryPushTask(new RobotTask(type, payload, timeout, urgency));
     }
 
@@ -208,8 +208,8 @@ public class RobotBrain : MonoBehaviour
             homeSecurityMachine = security;
 
         object payload = ResolvePayload(machine, type.Value, isOn);
-        float? timeout = config.GetTimeout(type.Value);
-        int urgency = config.GetUrgency(type.Value);
+        float? timeout = config != null ? config.GetTimeout(type.Value) : (float?)null;
+        int urgency = config != null ? config.GetUrgency(type.Value) : 0;
         return new RobotTask(type.Value, payload, timeout, urgency);
     }
 
@@ -237,7 +237,7 @@ public class RobotBrain : MonoBehaviour
             return RobotTaskType.ReactivateMachine;
         }
 
-        if (config.ResumeWorkOnMachineOn)
+        if (config != null && config.ResumeWorkOnMachineOn)
             return RobotTaskType.WorkAtMachine;
 
         return null;

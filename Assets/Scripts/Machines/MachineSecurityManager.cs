@@ -57,6 +57,7 @@ public class MachineSecurityManager : MonoBehaviour
         securityMachines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
         machine.OnMachineStateChanged += HandleSecurityMachineStateChanged;
+        machine.OnMachineTurningOff += HandleSecurityMachineTurningOff;
 
         if (IsOn(machine)) machinesOn.Add(machine); else machinesOn.Remove(machine);
     }
@@ -72,6 +73,15 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (guard == null) return;
         guards.Remove(guard);
+    }
+
+    private void HandleSecurityMachineTurningOff(SecurityMachine machine, RobotBrain currentGuard)
+    {
+        // Dispatch a different guard to reactivate; skip the one that was stationed there.
+        if (machine == null)
+            return;
+
+        DispatchGuardForSecurityMachine(machine, currentGuard);
     }
 
     private void HandleFactoryMachineStateChanged(FactoryMachine machine, bool isOn)
@@ -107,6 +117,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (!isOn)
         {
             OnSecurityMachineTurnedOff?.Invoke(machine);
+            DispatchGuardForSecurityMachine(machine, null);
         }
 
         CheckAllMachinesOff();
@@ -165,6 +176,34 @@ public class MachineSecurityManager : MonoBehaviour
             if (guard == null) continue;
             if (guard == null)
                 continue;
+            float dist = Vector2.Distance(guard.transform.position, pos);
+            if (dist < bestDist)
+            {
+                best = guard;
+                bestDist = dist;
+            }
+        }
+
+        if (best == null)
+            return;
+
+        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
+    }
+
+    private void DispatchGuardForSecurityMachine(SecurityMachine machine, RobotBrain skipGuard)
+    {
+        Debug.Log($"Dispatching guard for security machine: {machine.name}");
+        if (machine == null || guards.Count == 0) return;
+
+        RobotBrain best = null;
+        float bestDist = float.MaxValue;
+        var pos = machine.transform.position;
+
+        foreach (var guard in guards)
+        {
+            if (guard == null) continue;
+            if (skipGuard != null && ReferenceEquals(guard, skipGuard)) continue;
+
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
             {

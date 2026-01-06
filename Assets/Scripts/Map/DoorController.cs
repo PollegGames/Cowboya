@@ -69,7 +69,7 @@ public class DoorController : MonoBehaviour
         if (roomManager != null)
             roomManager.OnRoomAlarmChanged += OnRoomAlarmChanged;
 
-        UpdateStatusPanel();
+        EvaluateDoorState();
         // Start the safety check coroutine
         StartCoroutine(SafetyCheckRoutine());
     }
@@ -137,6 +137,13 @@ public class DoorController : MonoBehaviour
     }
     public void EvaluateDoorState()
     {
+        if (isVictoryDoor)
+        {
+            OpenDoor();
+            UpdateStatusPanel();
+            return;
+        }
+
         if (isRevolt)
         {
             OpenDoor();
@@ -191,6 +198,8 @@ public class DoorController : MonoBehaviour
 
     private void CloseDoor(bool forceClose = false)
     {
+        if (isVictoryDoor) return;
+
         if ((!isOpen && !forceClose) || isAnimating) return;
 
         isOpen = false;

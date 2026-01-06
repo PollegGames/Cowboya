@@ -35,6 +35,15 @@ public class PlayerTemplate : RobotTemplate
                 (int)saveData.AttackEnergyCost);
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
+        if (saveData != null)
+        {
+            robotBehaviour.Stats.EnergyRechargeRate = Mathf.Max(0f, saveData.EnergyRechargeRate);
+            EnergyBot energyBot = robotBehaviour.GetComponent<EnergyBot>();
+            if (energyBot != null)
+            {
+                energyBot.RechargeRate = robotBehaviour.Stats.EnergyRechargeRate;
+            }
+        }
 
         if (robotBehaviour.Stats != null)
         {

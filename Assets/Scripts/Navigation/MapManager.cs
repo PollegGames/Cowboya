@@ -142,7 +142,7 @@ public class MapManager : MonoBehaviour
 
         BootSystems();
 
-        bool noBlockRequiredWhenZeroEnemies = mapConfig.enemiesCount == 0 ? true: false;
+        bool noBlockRequiredWhenZeroEnemies = mapConfig == null || mapConfig.enemiesCount <= 0;
 
         roomProcessor.ProcessRooms(cellDataGrid, gridWidth, gridHeight, noBlockRequiredWhenZeroEnemies);
 

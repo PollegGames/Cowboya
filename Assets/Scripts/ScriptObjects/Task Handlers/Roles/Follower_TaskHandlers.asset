@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::RobotTaskHandlers
   entries:
   - Type: 5
+    Handler: {fileID: 11400000, guid: 6294c8893ced8f1479789e2d754e2b90, type: 2}
+  - Type: 6
     Handler: {fileID: 11400000, guid: a8510f50d11646e4da80e1acfe9f5cc1, type: 2}
   - Type: 11
     Handler: {fileID: 11400000, guid: a1f5a6336953fc6469fc180cb97553f3, type: 2}
