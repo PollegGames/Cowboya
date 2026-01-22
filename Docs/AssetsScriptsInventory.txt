@@ -1,0 +1,675 @@
+InputSystem_Actions.cs (Assets\Scripts\InputSystem_Actions.cs):
+  methods: bool Contains(), IEnumerator<InputAction> GetEnumerator(), InputAction FindAction(), int FindBinding(), void AddCallbacks(), void Disable(), void Dispose(), void Enable(), void RemoveCallbacks(), void SetCallbacks(), void UnregisterCallbacks()
+  injected: none
+RoomManager.cs (Assets\Scripts\FactoryCore\RoomManager.cs):
+  methods: Bounds GetRoomBounds(), List<RoomWaypoint> GetWaypoints(), void HandleFactoryAlarmChanged(), void Initialize(), void OnDestroy(), void OnPlayerEnterRoom(), void OnPlayerExitRoom(), void SetWaypointStatus(), void Start()
+  injected: List<FactoryMachine> factorymMachinesInRoom, PositionTriggerZone triggerZone, RoomProperties roomProperties
+PositionTriggerZone.cs (Assets\Scripts\FactoryCore\PositionTriggerZone.cs):
+  methods: void OnDrawGizmos(), void OnDrawGizmosSelected(), void OnEnterZone(), void OnExitZone(), void Update()
+  injected: ColliderEvent onEnter, Vector2 zoneSize
+LiftShaftController.cs (Assets\Scripts\FactoryCore\LiftShaftController.cs):
+  methods: void LockLiftWhenWall(), void OnAlarmChanged(), void OnDestroy(), void Start()
+  injected: List<LiftController> controlledLifts, RoomManager roomManager
+LiftController.cs (Assets\Scripts\FactoryCore\LiftController.cs):
+  methods: IEnumerator CheckLoop(), IEnumerator FlashingRedIdle(), IEnumerator LiftSequence(), IEnumerator MoveLightTo(), void Awake(), void EvaluateLiftState(), void OnDisable(), void OnEnable(), void OnEntityEnterZone(), void OnEntityExitZone(), void OnValidate(), void SetLight(), void SetLocked(), void SetMovingObjectActive(), void UpdateLight()
+  injected: bool isWall, float greenDelay, GameObject movingObject, MeshRenderer lightRenderer, string colorProperty, UnityEvent onOutboundArrival, Vector2 moveDirection
+FactoryManager.cs (Assets\Scripts\FactoryCore\FactoryManager.cs):
+  methods: IWaypointService GetWayPointService(), Vector3 GetStartCellWorldPosition(), void HandlePlayerStateChange(), void HandleRobotKilled(), void HandleRobotSaved(), void Initialize(), void OnDisable(), void OnEnable(), void OnRobotKilled(), void OnRobotSaved(), void SetPlayerInstanceHead(), void SetupFactoryState(), void Update()
+  injected: MachineSecurityManager SecurityManager
+Inventory.cs (Assets\Scripts\Inventory\Inventory.cs):
+  methods: bool HasItem(), IGrabbable GetItem(), void DropAll(), void DropItem(), void RemoveItem(), void SetItem()
+  injected: none
+TeleportToFactoryEntrance.cs (Assets\Scripts\Game\TeleportToFactoryEntrance.cs):
+  methods: void OnTriggerEnter2D()
+  injected: none
+TeleportToBaseCamp.cs (Assets\Scripts\Game\TeleportToBaseCamp.cs):
+  methods: void OnTriggerEnter2D()
+  injected: none
+TargetAim.cs (Assets\Scripts\Game\TargetAim.cs):
+  methods: void Awake(), void OnDisable(), void OnEnable()
+  injected: none
+SceneInitiator.cs (Assets\Scripts\Game\SceneInitiator.cs):
+  methods: void Construct(), void InitializeEnemies(), void InitializeFactory(), void InitializeHintManager(), void InitializeMiniMap(), void InitializePlayer(), void InitializeSceneController(), void InitializeSceneSpecificObjects(), void InitializeVictorySetup()
+  injected: none
+SceneController.cs (Assets\Scripts\Game\SceneController.cs):
+  methods: void Awake(), void Initialize(), void LoadScene(), void OnSceneLoaded(), void RobotKilled(), void RobotSaved()
+  injected: none
+RunProgressManager.cs (Assets\Scripts\Game\RunProgressManager.cs):
+  methods: RunMapConfigSO CreateDynamicConfig(), void Awake(), void LoadFirstLevel(), void LoadNextLevel(), void LoadSandBox(), void LoadStressTestLevel(), void ResetMapConfigs(), void RestartRun()
+  injected: List<RunMapConfigSO> originalMapConfigs
+LevelEndVictoryTrigger.cs (Assets\Scripts\Game\LevelEndVictoryTrigger.cs):
+  methods: void Awake(), void OnTriggerEnter2D(), void UpdateVisual()
+  injected: bool isVictoryDoor
+LevelEndTrigger.cs (Assets\Scripts\Game\LevelEndTrigger.cs):
+  methods: void Awake(), void OnTriggerEnter2D()
+  injected: none
+HintManager.cs (Assets\Scripts\Game\HintManager.cs):
+  methods: bool HasBadge(), IEnumerator ClearActiveHint(), IEnumerator ProcessQueuedHints(), void HandleHealthChanged(), void OnAlarmTriggered(), void OnDestroy(), void OnObjectiveProgress(), void OnTriggerEnter2D(), void OnTriggerExit2D(), void QueueHint(), void Setup(), void ShowHint(), void TryShowHint(), void Update()
+  injected: HealthBot health
+BulletScript.cs (Assets\Scripts\Game\BulletScript.cs):
+  methods: none
+  injected: none
+UpdateLoop.cs (Assets\Scripts\EnemyAI\UpdateLoop.cs):
+  methods: none
+  injected: none
+StartMenuUI.cs (Assets\Scripts\UI\StartMenuUI.cs):
+  methods: void OnEnable()
+  injected: none
+RunSetupManager.cs (Assets\Scripts\UI\RunSetupManager.cs):
+  methods: IEnumerator CaptureRTToUI(), void Awake(), void BindUI(), void ChangeFieldValue(), void ClampPoiAndBlocked(), void DestroyOldInstances(), void ShowRealPreview(), void StartRun(), void UpdateCellsAndConstraints(), void UpdateCellsAvailableLabel(), void Validate()
+  injected: FactoryManager factoryManagerInstance, GameObject miniMapPreviewInstance, IEnemiesSpawner enemiesSpawnerInstance, MapManager mapManagerInstance
+PauseMenuUI.cs (Assets\Scripts\UI\PauseMenuUI.cs):
+  methods: void Hide(), void Show(), void Toggle()
+  injected: none
+MiniMapDebugGizmos.cs (Assets\Scripts\UI\MiniMapDebugGizmos.cs):
+  methods: none
+  injected: none
+PlatformRiderSensor2D.cs (Assets\Scripts\Platforms\PlatformRiderSensor2D.cs):
+  methods: void Bind(), void EnsureRider(), void OnCollisionEnter2D(), void OnCollisionExit2D(), void OnCollisionStay2D()
+  injected: none
+PlatformRider2D.cs (Assets\Scripts\Platforms\PlatformRider2D.cs):
+  methods: float BestUpNormal(), void Awake(), void FixedUpdate(), void OnCollisionEnter2D(), void OnCollisionExit2D(), void OnCollisionStay2D(), void SensorCollisionEnter(), void SensorCollisionExit(), void SensorCollisionStay(), void UpdateCurrentPlatformFromContacts()
+  injected: none
+MovingPlatform2D.cs (Assets\Scripts\Platforms\MovingPlatform2D.cs):
+  methods: void Awake(), void FixedUpdate(), void OnEnable()
+  injected: Vector2 lastPosition
+IMovingPlatform2D.cs (Assets\Scripts\Platforms\IMovingPlatform2D.cs):
+  methods: none
+  injected: none
+IWaypointService.cs (Assets\Scripts\Interfaces\IWaypointService.cs):
+  methods: none
+  injected: none
+IWaypointRegistry.cs (Assets\Scripts\Interfaces\IWaypointRegistry.cs):
+  methods: none
+  injected: none
+IWaypointQueries.cs (Assets\Scripts\Interfaces\IWaypointQueries.cs):
+  methods: none
+  injected: none
+IWaypointNotifier.cs (Assets\Scripts\Interfaces\IWaypointNotifier.cs):
+  methods: none
+  injected: none
+ITargetSelector.cs (Assets\Scripts\Interfaces\ITargetSelector.cs):
+  methods: none
+  injected: none
+IRoomRenderer.cs (Assets\Scripts\Interfaces\IRoomRenderer.cs):
+  methods: none
+  injected: none
+IRoomProcessor.cs (Assets\Scripts\Interfaces\IRoomProcessor.cs):
+  methods: none
+  injected: none
+IRobotRespawnService.cs (Assets\Scripts\Interfaces\IRobotRespawnService.cs):
+  methods: none
+  injected: none
+IRobotNavigationListener.cs (Assets\Scripts\Interfaces\IRobotNavigationListener.cs):
+  methods: none
+  injected: none
+IRobotMemory.cs (Assets\Scripts\Interfaces\IRobotMemory.cs):
+  methods: none
+  injected: none
+IPOIReservationService.cs (Assets\Scripts\Interfaces\IPOIReservationService.cs):
+  methods: none
+  injected: none
+IPlayerSpawner.cs (Assets\Scripts\Interfaces\IPlayerSpawner.cs):
+  methods: none
+  injected: none
+IPathFinder.cs (Assets\Scripts\Interfaces\IPathFinder.cs):
+  methods: none
+  injected: none
+INeighborConnector.cs (Assets\Scripts\Interfaces\INeighborConnector.cs):
+  methods: none
+  injected: none
+IMover.cs (Assets\Scripts\Interfaces\IMover.cs):
+  methods: none
+  injected: none
+IMachineReservationService.cs (Assets\Scripts\Interfaces\IMachineReservationService.cs):
+  methods: none
+  injected: none
+ILookDirectionProvider.cs (Assets\Scripts\Interfaces\ILookDirectionProvider.cs):
+  methods: none
+  injected: none
+IGridBuilder.cs (Assets\Scripts\Interfaces\IGridBuilder.cs):
+  methods: none
+  injected: none
+IFactoryManager.cs (Assets\Scripts\Interfaces\IFactoryManager.cs):
+  methods: none
+  injected: none
+IEnemiesSpawner.cs (Assets\Scripts\Interfaces\IEnemiesSpawner.cs):
+  methods: none
+  injected: none
+IDropHost.cs (Assets\Scripts\Interfaces\IDropHost.cs):
+  methods: none
+  injected: none
+ICellProcessor.cs (Assets\Scripts\Interfaces\ICellProcessor.cs):
+  methods: none
+  injected: none
+PooledEnemy.cs (Assets\Scripts\EnemyAI\PooledEnemy.cs):
+  methods: void Awake(), void CacheTransforms(), void OnAcquireFromPool(), void OnReleaseToPool(), void ResetRigidbodies(), void RestoreTransforms()
+  injected: Transform[] cachedTransforms
+WarpOnPlayerTouch.cs (Assets\Scripts\OBSOLETE\WarpOnPlayerTouch.cs):
+  methods: void MarkEdgeVertices(), void OnTriggerEnter(), void OnTriggerExit(), void Start(), void Update(), void WarpInteriorVertices()
+  injected: float warpAmount
+WarpMeshZSkew.cs (Assets\Scripts\OBSOLETE\WarpMeshZSkew.cs):
+  methods: void MarkEdgeVertices(), void Start(), void Update()
+  injected: float warpFactor, Transform player
+WarpMeshByVertexColor.cs (Assets\Scripts\OBSOLETE\WarpMeshByVertexColor.cs):
+  methods: bool Approximately(), void Start(), void Update()
+  injected: Color movableColor, float warpFactorX, Transform player
+WarpMesh.cs (Assets\Scripts\OBSOLETE\WarpMesh.cs):
+  methods: none
+  injected: float warpFactor, Transform player
+SkewSprite.cs (Assets\Scripts\OBSOLETE\SkewSprite.cs):
+  methods: none
+  injected: none
+MessageSpeaker.cs (Assets\Scripts\UI\MessageSystem\MessageSpeaker.cs):
+  methods: none
+  injected: none
+MessageService.cs (Assets\Scripts\UI\MessageSystem\MessageService.cs):
+  methods: void Awake(), void HideMessage(), void Initialize(), void ShowHint(), void ShowMessage()
+  injected: none
+GameMessages.cs (Assets\Scripts\UI\MessageSystem\GameMessages.cs):
+  methods: none
+  injected: none
+GameMessage.cs (Assets\Scripts\UI\MessageSystem\GameMessage.cs):
+  methods: string ToString()
+  injected: none
+LocalizedButton.cs (Assets\Scripts\UI\LocalizedButton.cs):
+  methods: none
+  injected: none
+HealthBar.cs (Assets\Scripts\UI\HealthBar.cs):
+  methods: void CustomStylesResolved(), void OnGenerateVisualContent(), void UpdateCustomStyles(), void UpdateProgress()
+  injected: float m_CurrentHealth, float m_MaxHealth
+GameUIViewModel.cs (Assets\Scripts\UI\GameUIViewModel.cs):
+  methods: IEnumerator CaptureRTToUI(), IEnumerator LoadSceneAfterDelay(), void Awake(), void HandleRobotStateChange(), void OnDestroy(), void RefreshMinimapTexture(), void SetMiniMapTexture(), void SetPlayer(), void Start(), void UpdateEnergyBar(), void UpdateHealthBar(), void UpdateMoralityLabel()
+  injected: GameObject miniMapPreviewInstance, VisualElement gameHUDContainer, VisualElement pauseMenuContainer, VisualElement previewVE
+EnergyBar.cs (Assets\Scripts\UI\EnergyBar.cs):
+  methods: void CustomStylesResolved(), void OnGenerateVisualContent(), void UpdateCustomStyles(), void UpdateProgress()
+  injected: float m_CurrentEnergy, float m_MaxEnergy
+CanvasLevelUI.cs (Assets\Scripts\UI\CanvasLevelUI.cs):
+  methods: void Start(), void UpdateLevelLabel()
+  injected: none
+WaypointService.cs (Assets\Scripts\Map\WaypointService.cs):
+  methods: bool IsMachineReserved(), FactoryMachine ReserveFreeMachine(), List<RoomWaypoint> FindWorldPath(), List<RoomWaypoint> GetActiveWaypoints(), List<RoomWaypoint> GetActiveWaypointsList(), List<RoomWaypoint> GetAllWaypoints(), RoomWaypoint GetBlockedRoomCenter(), RoomWaypoint GetBlockedRoomSecuritySpawning(), RoomWaypoint GetClosestWaypoint(), RoomWaypoint GetEndPoint(), RoomWaypoint GetFirstFreeSecurityPoint(), RoomWaypoint GetFirstRestPoint(), RoomWaypoint GetLeastUsedFreeWorkPoint(), RoomWaypoint GetSecurityOrRestPoint(), RoomWaypoint GetStartPoint(), RoomWaypoint GetWorkOrRestPoint(), void Awake(), void BuildAllNeighbors(), void NotifyWaypointStatusChanged(), void RegisterRoomWaypoints(), void ReleaseMachine(), void ReleasePOI(), void Subscribe(), void UnregisterRoomWaypoints(), void Unsubscribe(), void UpdateClosestWaypointToPlayer()
+  injected: MonoBehaviour pathFinderBehaviour, MonoBehaviour registryBehaviour
+WaypointRegistry.cs (Assets\Scripts\Map\WaypointRegistry.cs):
+  methods: List<RoomWaypoint> GetActiveWaypoints(), List<RoomWaypoint> GetAllWaypoints(), void RegisterRoomWaypoints(), void UnregisterRoomWaypoints()
+  injected: none
+WaypointPathFinder.cs (Assets\Scripts\Map\WaypointPathFinder.cs):
+  methods: List<RoomWaypoint> FindWorldPath(), void Awake(), void BuildAllNeighbors()
+  injected: IWaypointRegistry registry
+WarpMeshXYSkew.cs (Assets\Scripts\Map\WarpMeshXYSkew.cs):
+  methods: void Awake(), void MarkEdgeVertices(), void OnEnterRoom(), void OnExitRoom(), void Start(), void Update()
+  injected: float warpFactorX, RoomManager roomManager, Transform player
+SecuritySystem.cs (Assets\Scripts\Map\SecuritySystem.cs):
+  methods: none
+  injected: none
+SecurityCamera.cs (Assets\Scripts\Map\SecurityCamera.cs):
+  methods: IEnumerator RefreshMinimapWhilePlayerMoving(), void Awake(), void CheckEnemiesAttackedInZone(), void OnDestroy(), void OnDrawGizmos(), void OnPlayerEnterZone(), void OnPlayerExitZone(), void OnSecondaryZoneEnter(), void RotateHeadTowardsTarget(), void Start(), void Update(), void UpdateWantedPlayerPosition()
+  injected: Color rayColor, Coroutine minimapRoutine, PositionTriggerZone playerFollowTriggerZone, RoomManager roomManager, Transform cameraHead
+RoomWaypoint.cs (Assets\Scripts\Map\RoomWaypoint.cs):
+  methods: bool Equals(), int GetHashCode(), void Awake()
+  injected: none
+LiftDirection.cs (Assets\Scripts\Map\LiftDirection.cs):
+  methods: none
+  injected: none
+LiftData.cs (Assets\Scripts\Map\LiftData.cs):
+  methods: none
+  injected: none
+FactoryAlarmStatus.cs (Assets\Scripts\Map\FactoryAlarmStatus.cs):
+  methods: none
+  injected: AlarmState currentAlarmState
+DoorDirection.cs (Assets\Scripts\Map\DoorDirection.cs):
+  methods: none
+  injected: none
+DoorController.cs (Assets\Scripts\Map\DoorController.cs):
+  methods: IEnumerator SafetyCheckRoutine(), IEnumerator SlidePanels(), void CachePanelPositions(), void CloseDoor(), void EvaluateDoorState(), void OnDestroy(), void OnEntityEnterZone(), void OnEntityExitZone(), void OnRoomAlarmChanged(), void OnSecurityEntityEnterZone(), void OnSecurityEntityExitZone(), void OpenDoor(), void Start(), void UpdateStatusPanel()
+  injected: bool isVictoryDoor, bool isWall, float safetyCheckInterval, Renderer statusPanelRenderer, RoomManager roomManager, Transform leftPanel
+CameraController.cs (Assets\Scripts\Map\CameraController.cs):
+  methods: void AddRoomBounds(), void Awake(), void Initialize(), void LateUpdate(), void RecalculateBounds(), void RemoveRoomBounds()
+  injected: none
+AxisNeighborConnector.cs (Assets\Scripts\Map\AxisNeighborConnector.cs):
+  methods: void Connect()
+  injected: none
+AlarmFlasher.cs (Assets\Scripts\Map\AlarmFlasher.cs):
+  methods: void ActivateAlarm(), void DeactivateAlarm(), void OnAlarmChanged(), void OnDestroy(), void Start(), void Update()
+  injected: none
+AttackRequest.cs (Assets\Scripts\Combat\AttackRequest.cs):
+  methods: none
+  injected: none
+ShowLoadingScreenDisposable.cs (Assets\Scripts\Setup\ShowLoadingScreenDisposable.cs):
+  methods: void Dispose(), void SetLoadingBarPercent()
+  injected: none
+SceneBootstrapper.cs (Assets\Scripts\Setup\SceneBootstrapper.cs):
+  methods: void Awake()
+  injected: none
+SceneBootstrapConfigSO.cs (Assets\Scripts\Setup\SceneBootstrapConfigSO.cs):
+  methods: none
+  injected: none
+SaveData.cs (Assets\Scripts\Setup\SaveData.cs):
+  methods: none
+  injected: none
+LoadingScreen.cs (Assets\Scripts\Setup\LoadingScreen.cs):
+  methods: void Hide(), void SetBarPercent(), void Show()
+  injected: none
+GameInitiator.cs (Assets\Scripts\Setup\GameInitiator.cs):
+  methods: void InitializeSharedObjects(), void SetCinemachineTarget()
+  injected: Camera _mainCamera
+WorkerCondition.cs (Assets\Scripts\EnemyAI\Core\WorkerCondition.cs):
+  methods: none
+  injected: none
+UsageType.cs (Assets\Scripts\Navigation\UsageType.cs):
+  methods: none
+  injected: none
+RunMapConfigSO.cs (Assets\Scripts\Navigation\RunMapConfigSO.cs):
+  methods: void EnsureValidSeed(), void GenerateRandomSeed()
+  injected: int gridWidth, int poiCount, int workersCount, string seed
+RoomRenderer.cs (Assets\Scripts\Navigation\RoomRenderer.cs):
+  methods: none
+  injected: none
+RoomProperties.cs (Assets\Scripts\Navigation\RoomProperties.cs):
+  methods: none
+  injected: none
+RoomProcessor.cs (Assets\Scripts\Navigation\RoomProcessor.cs):
+  methods: void ProcessRooms()
+  injected: none
+RoomLiftPerFloorProcessor.cs (Assets\Scripts\Navigation\RoomLiftPerFloorProcessor.cs):
+  methods: bool HasVerticalLiftPair(), bool IsReplaceable(), Cell GetCell(), int FindFirstReplaceableColumnForPair(), List<int> FindLiftXsOnFloor(), void ProcessCells(), void SetLift()
+  injected: none
+PriorityQueue.cs (Assets\Scripts\Navigation\PriorityQueue.cs):
+  methods: bool Contains(), T Dequeue(), void Enqueue()
+  injected: none
+PathToPOIToWorkProcessor.cs (Assets\Scripts\Navigation\PathToPOIToWorkProcessor.cs):
+  methods: HashSet<Vector2> PrecomputePathPositions(), void ProcessCells()
+  injected: none
+PathSolver.cs (Assets\Scripts\Navigation\PathSolver.cs):
+  methods: bool TryFindPath()
+  injected: none
+PathFinder.cs (Assets\Scripts\Navigation\PathFinder.cs):
+  methods: bool FindPath(), IEnumerable<Cell> GetNeighbors(), int Distance(), void RetracePath()
+  injected: none
+PathCellProcessor.cs (Assets\Scripts\Navigation\PathCellProcessor.cs):
+  methods: HashSet<Vector2> PrecomputePathToPOIPositions(), void ProcessCells()
+  injected: none
+VictorySetup.cs (Assets\Scripts\Managers\VictorySetup.cs):
+  methods: none
+  injected: int robotsSavedTarget
+ObjectPool.cs (Assets\Scripts\Managers\ObjectPool.cs):
+  methods: void Release()
+  injected: none
+IPooledObject.cs (Assets\Scripts\Managers\IPooledObject.cs):
+  methods: none
+  injected: none
+InterestPointManager.cs (Assets\Scripts\Managers\InterestPointManager.cs):
+  methods: List<Transform> GetPointsList(), Transform GetAvailablePoint(), void ReleasePoint()
+  injected: IReadOnlyList<Transform> WorkPoints
+EnemiesSpawner.cs (Assets\Scripts\Managers\EnemiesSpawner.cs):
+  methods: GameObject PoolGet(), void CreateAndSpawnFollowerGuard(), void CreateAndSpawnSecurityGuard(), void CreateBoss(), void CreateSecurityGuards(), void CreateWorkers(), void CreateWorkerSpawners(), void HandleAllMachinesOff(), void Initialize(), void InitializeRobot(), void OnDestroy(), void PositionAndWake(), void PrepareSkeleton(), void SetDropContainer(), void SpawnBossAtRandom(), void SpawnEnemyAtRandom(), void SpreadEnemies()
+  injected: Transform dropContainer
+StationReservationService.cs (Assets\Scripts\Services\StationReservationService.cs):
+  methods: BaseMachine ReserveStation(), void Awake(), void HandleMachineFreed(), void HandleMachineOccupied(), void HandleMachinePoweredOff(), void HandleMachinePoweredOn(), void NotifyPowerChanged(), void RegisterMachine(), void ReleaseStation()
+  injected: none
+SecurityBadgeSpawner.cs (Assets\Scripts\Services\SecurityBadgeSpawner.cs):
+  methods: SecurityBadgePickup SpawnBadge()
+  injected: none
+CubeSpawner.cs (Assets\Scripts\Services\CubeSpawner.cs):
+  methods: CubePickup InstantiateCube(), CubePickup SpawnCube(), CubePickup SpawnRandomUpgrade()
+  injected: Unity.Mathematics.Random random
+BatterySpawner.cs (Assets\Scripts\Services\BatterySpawner.cs):
+  methods: BatteryPickup SpawnBattery()
+  injected: none
+WaypointPathFollower.cs (Assets\Scripts\Navigation\Movement\WaypointPathFollower.cs):
+  methods: bool UpdateAxis(), RoomWaypoint GetClosestWaypoint(), void ClearPath(), void DrawGizmos(), void HandleMovement(), void OnPathObsoleted(), void SetDestination(), void Update()
+  injected: none
+MapManager.cs (Assets\Scripts\Navigation\MapManager.cs):
+  methods: Bounds GetGridWorldBounds(), Vector3 GetRandomPOIPosition(), Vector3 GetRandomWorkPosition(), Vector3 GetStartCellWorldPosition(), void ApplyConfig(), void BootSystems(), void BuildFromConfig(), void Construct(), void InitializeGrid(), void RegisterFactoryInEachRoom()
+  injected: none
+LockEndRoomDoorProcessor.cs (Assets\Scripts\Navigation\LockEndRoomDoorProcessor.cs):
+  methods: void ProcessCells()
+  injected: none
+GridRenderer.cs (Assets\Scripts\Navigation\GridRenderer.cs):
+  methods: none
+  injected: none
+GridManager.cs (Assets\Scripts\Navigation\GridManager.cs):
+  methods: Vector3 GetRandomPointOnGrid(), void AssignRoomProperties(), void ProcessRooms()
+  injected: none
+GridFactory.cs (Assets\Scripts\Navigation\GridFactory.cs):
+  methods: void AssignBlockedCells(), void AssignPOICells(), void AssignStartAndEndCells(), void CreateGrid(), void SolvePaths()
+  injected: none
+GridBuilder.cs (Assets\Scripts\Navigation\GridBuilder.cs):
+  methods: none
+  injected: none
+EndpointsFactory.cs (Assets\Scripts\Navigation\EndpointsFactory.cs):
+  methods: List<Vector2> GetRandomPoints(), Vector2 GetDistinctPosition(), void GetCornerEndpoints()
+  injected: none
+EdgeCellProcessor.cs (Assets\Scripts\Navigation\EdgeCellProcessor.cs):
+  methods: void ProcessCells()
+  injected: none
+CellProperties.cs (Assets\Scripts\Navigation\CellProperties.cs):
+  methods: none
+  injected: none
+CellProcessor.cs (Assets\Scripts\Navigation\CellProcessor.cs):
+  methods: void BlockDoor(), void BlockLift(), void LockDoor(), void MarkVictoryDoorIfOnEdge(), void UnlockDoor()
+  injected: none
+Cell.cs (Assets\Scripts\Navigation\Cell.cs):
+  methods: none
+  injected: none
+BlockedCellProcessor.cs (Assets\Scripts\Navigation\BlockedCellProcessor.cs):
+  methods: void ProcessCells()
+  injected: none
+FollowEnemyTriggerHandler.cs (Assets\Scripts\Ally\Controllers\FollowEnemyTriggerHandler.cs):
+  methods: void OnDisable(), void OnEnemyEnterRoomZone(), void Start()
+  injected: PositionTriggerZone roomsZone
+AllyPunchAttack.cs (Assets\Scripts\Ally\Controllers\AllyPunchAttack.cs):
+  methods: IEnumerator PunchSequence(), Vector3 GetQuadraticBezierPoint(), void Awake(), void ClearTarget(), void SetTargetPosition(), void TryAttack(), void Update()
+  injected: AttackHitbox leftArmHitbox, float punchDuration, Transform arcControlRight, Transform leftArmTarget
+AllyController.cs (Assets\Scripts\Ally\Controllers\AllyController.cs):
+  methods: RoomWaypoint GetClosestWaypoint(), void Awake(), void FixedUpdate(), void HandleMachineTrigger(), void Initialize(), void OnPathObsoleted(), void OnTriggerEnter2D(), void OnTriggerExit2D(), void SetDestination(), void Update()
+  injected: WaypointPathFollower pathFollower
+RobotBrain.cs (Assets\Scripts\EnemyAI\Core\RobotBrain.cs):
+  methods: bool TryFallbackHandle(), bool TryMoveToPayload(), float? GetTimeout(), IEnumerator ReactivateAndReturnRoutine(), IEnumerator WaitAtMachineRoutine(), int GetUrgency(), object ResolvePayload(), RobotTask BuildTaskForMachine(), RobotTaskHandlers ResolveHandlersForRole(), RobotTaskType? ResolveTaskType(), void Awake(), void CompleteCurrentTask(), void HandleStateChanged(), void HandleTaskChanged(), void InitializeServices(), void OnDamageTaken(), void OnDisable(), void OnEnable(), void OnMachineStateChanged(), void OnPlayerInAttackZoneChanged(), void PushExplicitTask(), void RequestAttackTarget(), void RunReactivateRoutine(), void RunWaitAtMachineRoutine(), void SendGuardHomeOrRest()
+  injected: IWaypointService waypointService, RobotRole Role
+RobotBodyMaintenance.cs (Assets\Scripts\EnemyAI\Core\RobotBodyMaintenance.cs):
+  methods: void Awake(), void HandleRespawn(), void OnAcquireFromPool(), void OnReleaseToPool(), void OnStuck(), void SetRespawnService()
+  injected: IRobotRespawnService respawnService
+RobotBodyController.cs (Assets\Scripts\EnemyAI\Core\RobotBodyController.cs):
+  methods: bool HasArrivedAtDestination(), RoomWaypoint GetClosestWaypoint(), void Awake(), void FixedUpdate(), void HandlePathFollowerStuck(), void Initialize(), void OnAcquireFromPool(), void OnDrawGizmos(), void OnDrawGizmosSelected(), void OnPathObsoleted(), void OnReleaseToPool(), void SetDestination(), void SetIsBoss(), void SetupPathFollower(), void StopMovement(), void Update()
+  injected: WaypointPathFollower pathFollower
+RobotAttackController.cs (Assets\Scripts\EnemyAI\Core\RobotAttackController.cs):
+  methods: bool TryStartAttack(), System.Collections.IEnumerator AttackLoop(), void EnsureArmController(), void OnAttackFinished(), void OnDisable(), void OnEnable(), void StopAttacking()
+  injected: float lastAttackTime
+MainMenuController.cs (Assets\Scripts\Menu\MainMenuController.cs):
+  methods: void Awake(), void OnDisable(), void OnEnable(), void OnExitClicked(), void OnPlayClicked(), void OnSandboxClicked()
+  injected: none
+WorkerSlot.cs (Assets\Scripts\Machines\WorkerSlot.cs):
+  methods: void OnTriggerEnter2D()
+  injected: none
+ToggleButton.cs (Assets\Scripts\Machines\ToggleButton.cs):
+  methods: void Toggle()
+  injected: none
+ToggleBox.cs (Assets\Scripts\Machines\ToggleBox.cs):
+  methods: void Activate(), void Deactivate(), void OnTriggerEnter2D()
+  injected: none
+SpawningWorkerSlot.cs (Assets\Scripts\Machines\SpawningWorkerSlot.cs):
+  methods: void OnTriggerEnter2D()
+  injected: none
+SpawningWorkerManager.cs (Assets\Scripts\Machines\SpawningWorkerManager.cs):
+  methods: void RegisterMachine()
+  injected: List<SpawningMachine> machines
+SpawningMachine.cs (Assets\Scripts\Machines\SpawningMachine.cs):
+  methods: bool HasAliveWorker(), IEnumerator SpawnLoop(), void ApplyMaterial(), void AttachRobot(), void Awake(), void HandleAlarmChanged(), void HandleSecurityMachineTurnedOff(), void HandleWorkerStateChanged(), void InitializeSecurityManager(), void InitializeSpawner(), void OnDisable(), void OnEnable(), void PowerOff(), void PowerOn(), void ReleaseRobot(), void SendWorkerToStart(), void SetWorkerToSpawn(), void SpawnFollower(), void StopSpawning(), void SubscribeToWorkerState(), void TryStartSpawning(), void UnsubscribeFromWorkerState(), void Update()
+  injected: Coroutine spawnCoroutine, MeshRenderer meshRenderer
+SecuritySlot.cs (Assets\Scripts\Machines\SecuritySlot.cs):
+  methods: void OnTriggerEnter2D()
+  injected: none
+SecurityMachine.cs (Assets\Scripts\Machines\SecurityMachine.cs):
+  methods: void ApplyMaterial(), void AttachRobot(), void Awake(), void PowerOff(), void PowerOn(), void ReleaseRobot(), void SendCurrentGuardToRest(), void SendGuardToRest(), void SetGuardToSecurityPost()
+  injected: MeshRenderer meshRenderer
+RestingSlot.cs (Assets\Scripts\Machines\RestingSlot.cs):
+  methods: void OnTriggerEnter2D()
+  injected: none
+RestingMachine.cs (Assets\Scripts\Machines\RestingMachine.cs):
+  methods: IEnumerator RestCountdown(), void ApplyMaterial(), void AttachRobot(), void Awake(), void CancelRestCountdown(), void PowerOff(), void PowerOn(), void ReleaseRobot(), void SendCurrentWorkerToWork(), void SendWorkerToRest(), void SendWorkerToWork(), void StartRestCountdown()
+  injected: Coroutine restCountdownCo
+MachineWorkerManager.cs (Assets\Scripts\Machines\MachineWorkerManager.cs):
+  methods: void AssignToFirstFreePointAvailable(), void HandleMachineStateChanged(), void HandleMachineTurningOff(), void OnMachineTurnedOff(), void OnMachineTurnedOn(), void PushBrainIntent(), void RegisterMachine()
+  injected: List<FactoryMachine> machines
+MachineSecurityManager.cs (Assets\Scripts\Machines\MachineSecurityManager.cs):
+  methods: bool IsOn(), void CheckAllMachinesOff(), void DispatchGuardForFactoryMachine(), void DispatchGuardForRestingMachine(), void DispatchGuardForSecurityMachine(), void HandleFactoryMachineStateChanged(), void HandleRestingMachineStateChanged(), void HandleSecurityMachineStateChanged(), void HandleSecurityMachineTurningOff(), void PushBrainIntent(), void RecountAndMaybeTrigger(), void RegisterFactoryMachine(), void RegisterGuard(), void RegisterRestingMachine(), void RegisterSecurityMachine(), void TriggerAllMachinesOff(), void UnregisterGuard(), void UpdateOnSet()
+  injected: List<FactoryMachine> factoryMachines
+FactoryMachine.cs (Assets\Scripts\Machines\FactoryMachine.cs):
+  methods: bool HasAliveWorker(), void ApplyMaterial(), void AttachRobot(), void Awake(), void BeginConveyorInternal(), void HandleAlarmChanged(), void HandleCubeProcessed(), void HandlePoweredOff(), void HandlePoweredOn(), void HandleRobotAssigned(), void HandleRobotFreed(), void HandleWorkerStateChanged(), void OnDestroy(), void OnDisable(), void OnEnable(), void OnValidate(), void PowerOff(), void PowerOn(), void ReleaseRobot(), void ScheduleSpawn(), void SendCurrentWorkerToRest(), void SendWorkerBackToWork(), void SendWorkerToRest(), void SendWorkerToWork(), void SetWorkerToWork(), void SubscribeToWorkerState(), void UnsubscribeFromWorkerState()
+  injected: float lastSpawnTime, MeshRenderer meshRenderer
+CubeUpgradeSO.cs (Assets\Scripts\Machines\CubeUpgradeSO.cs):
+  methods: void ApplyUpgrade(), void Store()
+  injected: none
+CubeUpgrade.cs (Assets\Scripts\Machines\CubeUpgrade.cs):
+  methods: none
+  injected: none
+CubeConveyorController.cs (Assets\Scripts\Machines\CubeConveyorController.cs):
+  methods: void BeginConveyor(), void ClearCurrentCube(), void DetachCube(), void HandleCubeGrabbed(), void Update()
+  injected: CubePickup currentCube
+CubeCollector.cs (Assets\Scripts\Machines\CubeCollector.cs):
+  methods: void ApplyRunBonuses(), void Awake(), void OnTriggerEnter2D(), void OnValidate(), void StoreUpgrade()
+  injected: CubeUpgradeSO ActiveUpgradeStore
+BaseMachine.cs (Assets\Scripts\Machines\BaseMachine.cs):
+  methods: void AttachRobot(), void InitializeWaypointService(), void PowerOff(), void PowerOn(), void ReleaseRobot(), void SetState(), void ToggleState()
+  injected: bool IsOn
+WaitAtMachineHandler.cs (Assets\Scripts\EnemyAI\Core\Handlers\WaitAtMachineHandler.cs):
+  methods: void Execute()
+  injected: none
+SpawnFollowersHandler.cs (Assets\Scripts\EnemyAI\Core\Handlers\SpawnFollowersHandler.cs):
+  methods: SpawningMachine ResolveMachine(), void Execute(), void RefreshTaskPayload()
+  injected: none
+MoveToPayloadHandler.cs (Assets\Scripts\EnemyAI\Core\Handlers\MoveToPayloadHandler.cs):
+  methods: void Execute()
+  injected: none
+IdleHandler.cs (Assets\Scripts\EnemyAI\Core\Handlers\IdleHandler.cs):
+  methods: void Execute()
+  injected: none
+ChaseTargetHandler.cs (Assets\Scripts\EnemyAI\Core\Handlers\ChaseTargetHandler.cs):
+  methods: void Execute()
+  injected: none
+AttackHandler.cs (Assets\Scripts\EnemyAI\Core\Handlers\AttackHandler.cs):
+  methods: string DescribePayload(), void Execute()
+  injected: none
+WorkerRobotFactory.cs (Assets\Scripts\RobotFactory\WorkerRobotFactory.cs):
+  methods: RobotStats CreateRobot()
+  injected: none
+RobotTemplate.cs (Assets\Scripts\RobotFactory\RobotTemplate.cs):
+  methods: none
+  injected: none
+RobotStateController.cs (Assets\Scripts\RobotFactory\RobotStateController.cs):
+  methods: bool CanJump(), bool CanPerformAttack(), bool CanPerformEnergy(), bool PerformAttackByEnergy(), IEnumerator ResetGrounded(), void Awake(), void ConsumeEnergy(), void EvaluateHealthState(), void HandleHealthChange(), void HandleStatsHealthChanged(), void MarkAsSaved(), void OnAcquireFromPool(), void OnDisable(), void OnEnable(), void OnReleaseToPool(), void PerformAttack(), void PerformAttackbyEnergy(), void ReportDeathOnce(), void UpdateState()
+  injected: HealthBot Health, RoomWaypoint cachedStartWaypoint
+RobotLocomotionController.cs (Assets\Scripts\RobotFactory\RobotLocomotionController.cs):
+  methods: bool HasEnergyFor(), bool SpendEnergy(), IEnumerator ResetJumpAfterDelay(), void ApplyAnimatorMovement(), void Awake(), void CompleteJump(), void Crouch(), void HandleMovement(), void Jump(), void PushCostsToEnergyBot(), void SetAnimatorBool(), void SetFacingDirection(), void Uncrouch(), void UpdateVerticalDirectionFromState()
+  injected: none
+RobotFactory.cs (Assets\Scripts\RobotFactory\RobotFactory.cs):
+  methods: List<RobotStats> CreateMany()
+  injected: none
+PlayerTemplate.cs (Assets\Scripts\RobotFactory\PlayerTemplate.cs):
+  methods: RobotStateController InitializePlayerStateController(), RobotStats InitializePlayerStats(), void ApplyStats(), void CaptureStats(), void ResetStats()
+  injected: none
+PlayerRobotFactory.cs (Assets\Scripts\RobotFactory\PlayerRobotFactory.cs):
+  methods: RobotStats CreateRobot()
+  injected: none
+HeadTargetController.cs (Assets\Scripts\RobotFactory\HeadTargetController.cs):
+  methods: void Awake(), void LateUpdate(), void OnValidate()
+  injected: float maxBendOffset, float verticalOffset, ILookDirectionProvider directionProvider
+FacingController.cs (Assets\Scripts\RobotFactory\FacingController.cs):
+  methods: void MirrorArmPoles(), void MirrorLegPoles(), void SetArmFacing(), void SetLegFacing(), void Start()
+  injected: bool legsRight
+EnemyRobotFactory.cs (Assets\Scripts\RobotFactory\EnemyRobotFactory.cs):
+  methods: RobotStats CreateRobot()
+  injected: none
+AllyRobotFactory.cs (Assets\Scripts\RobotFactory\AllyRobotFactory.cs):
+  methods: RobotStats CreateRobot()
+  injected: none
+PhysicsBaseAgentController.cs (Assets\Scripts\EnemyAI\Controllers\PhysicsBaseAgentController.cs):
+  methods: void ApplyFacingDirection(), void Awake(), void SetMovement(), void SetVerticalMovement(), void TryFlip(), void TryJump()
+  injected: float direction
+MovementMonitor.cs (Assets\Scripts\EnemyAI\Controllers\MovementMonitor.cs):
+  methods: MovementStatus Update(), void Reset()
+  injected: none
+FollowPlayerTriggerHandler.cs (Assets\Scripts\EnemyAI\Controllers\FollowPlayerTriggerHandler.cs):
+  methods: void Awake(), void CachePlayerReference(), void OnDisable(), void OnPlayerEnterAttackZone(), void OnPlayerEnterDetectZone(), void OnPlayerExitAttackZone(), void OnPlayerExitDetectZone(), void Start()
+  injected: PositionTriggerZone detectZone, Transform circleCenter
+AnimatorBaseAgentController.cs (Assets\Scripts\EnemyAI\Controllers\AnimatorBaseAgentController.cs):
+  methods: Rigidbody2D ResolveRigidbody(), void Awake(), void FixedUpdate(), void Move(), void MoveVertical(), void SetMovement(), void SetVerticalMovement(), void TranslateWithoutPhysics(), void TryFlip()
+  injected: Vector2 lookDirection
+RobotMemoryState.cs (Assets\Scripts\EnemyAI\Core\RobotMemoryState.cs):
+  methods: void ClearPlayerPosition(), void RegisterAttack(), void RememberPlayerPosition(), void ResetAll(), void ResetAttackMemory(), void SetCanSeePlayer(), void SetLastVisitedPoint(), void SetPlayerInAttackZone(), void SetRespawnService(), void Tick()
+  injected: none
+RobotMemory.cs (Assets\Scripts\EnemyAI\Core\RobotMemory.cs):
+  methods: void ClearPlayerPosition(), void OnAcquireFromPool(), void OnReleaseToPool(), void RegisterAttack(), void RememberPlayerPosition(), void ResetAttackMemory(), void SetCanSeePlayer(), void SetLastVisitedPoint(), void SetPlayerInAttackZone(), void SetRespawnService(), void Update()
+  injected: bool WasRecentlyAttacked, Vector3 LastKnownPlayerPosition
+RobotHeart.cs (Assets\Scripts\EnemyAI\Core\RobotHeart.cs):
+  methods: bool CompleteCurrentTask(), bool ShouldAttackPlayer(), bool TryPushTask(), int GetStackDepth(), IReadOnlyList<RobotTask> GetTasks(), string DescribeTask(), void Awake(), void HandleAttackDeclined(), void NotifyTaskChanged(), void PushAttackTask(), void RequestAttackTarget(), void RequestEndAttack(), void ResetIntentStack(), void Update()
+  injected: RobotTaskStack taskStack
+RobotTaskHandlers.cs (Assets\Scripts\EnemyAI\Core\RobotTaskHandlers.cs):
+  methods: bool TryHandle(), void EnsureCache(), void OnEnable()
+  injected: none
+RobotRespawnService.cs (Assets\Scripts\EnemyAI\Core\RobotRespawnService.cs):
+  methods: void Initialize(), void RespawnBoss(), void RespawnWorker()
+  injected: none
+RobotTasks.cs (Assets\Scripts\EnemyAI\Core\RobotTasks.cs):
+  methods: bool CompleteCurrent(), bool HasVisibleChange(), bool IsExpired(), bool PushOrRefresh(), bool RemoveExpired(), bool RemoveTasksOfType(), int GetInsertIndex(), int GetPrecedence(), RobotTask MergeTasks(), RobotTask WithExpiry(), RobotTask WithPayload(), void ReorderByPrecedence(), void TrimToDepth()
+  injected: none
+PlayerBrain.cs (Assets\Scripts\Player\Core\PlayerBrain.cs):
+  methods: bool TrySpendEnergy(), void Awake(), void HandleEnergyChanged(), void HandleHealthChanged(), void OnDisable(), void OnEnable(), void OnPlayerDamaged()
+  injected: none
+PlayerSpawner.cs (Assets\Scripts\Player\Core\PlayerSpawner.cs):
+  methods: Transform FindHeadUsingDefaultPath(), Transform ResolveHeadFromMovementController(), void InitializePlayer(), void SetPlayerStartPosition()
+  injected: none
+SquareMover.cs (Assets\Scripts\Robots\SquareMover.cs):
+  methods: void Update()
+  injected: none
+SpriteFlip2D.cs (Assets\Scripts\Robots\SpriteFlip2D.cs):
+  methods: void ApplyFlip(), void Awake(), void SetFacing(), void Update()
+  injected: bool flipped, ILookDirectionProvider directionProvider
+SpineBalancer.cs (Assets\Scripts\Robots\SpineBalancer.cs):
+  methods: void AddExternalLean(), void RecomputeSpineLength(), void ResetExternalLean(), void SetExternalLean()
+  injected: none
+SimplePuppetBinder.cs (Assets\Scripts\Robots\SimplePuppetBinder.cs):
+  methods: void Awake(), void FixedUpdate(), void LateUpdate(), void Reset()
+  injected: List<BonePair> Pairs, Rigidbody PuppetBody3D, Rigidbody2D PuppetBody2D, Transform MasterRoot, Transform PuppetRoot
+SimpleAttackController.cs (Assets\Scripts\Robots\SimpleAttackController.cs):
+  methods: AttackHitbox GetHitbox(), CowboyArmSide? GetArmForHitbox(), void ActivateArm(), void DeactivateAll(), void DeactivateArm(), void LogMissingReferences(), void OnDisable(), void OnEnable(), void OnHitboxHit(), void SetArmAttackActive(), void SubscribeToHitboxes(), void UnsubscribeFromHitboxes()
+  injected: bool referencesLogged
+RobotState.cs (Assets\Scripts\Robots\RobotState.cs):
+  methods: none
+  injected: none
+RobotRole.cs (Assets\Scripts\Robots\RobotRole.cs):
+  methods: none
+  injected: none
+PoleMirror2D.cs (Assets\Scripts\Robots\PoleMirror2D.cs):
+  methods: void Awake(), void SetFacing()
+  injected: bool facingRight
+PlainMath.cs (Assets\Scripts\Robots\PlainMath.cs):
+  methods: float AngleBetween(), float AngleFromDirection(), Vector2 ClosestOnLine(), Vector3 CalculateClosestToRinPlaneABwD(), Vector3 GetClosestWithRespectVisualized(), void NextGizmosColor()
+  injected: none
+Module.cs (Assets\Scripts\Robots\Module.cs):
+  methods: none
+  injected: none
+LegJointLimiter.cs (Assets\Scripts\Robots\LegJointLimiter.cs):
+  methods: HingeJoint2D FindJoint(), void ApplyJoint(), void Awake(), void RefreshJoints(), void SetLegRotationLimits()
+  injected: HingeJoint2D leftLegJoint
+JointBreaker.cs (Assets\Scripts\Robots\JointBreaker.cs):
+  methods: void Awake(), void BreakAll(), void DestroyAll(), void DisableAllSolvers(), void RestoreAll()
+  injected: List<FixedJoint2D> fixedJoints, List<Hinge2DIkSolver> ikSolvers, List<HingeJoint2D> hingeJoints
+IKController.cs (Assets\Scripts\Robots\IKController.cs):
+  methods: void Init(), void LateUpdate(), void overrideAnim()
+  injected: none
+IgnoreCollision.cs (Assets\Scripts\Robots\IgnoreCollision.cs):
+  methods: void AddIgnoreList(), void AddToIgnoreList(), void EnableColliders(), void FinalEnable(), void IgnoreCollider(), void IgnoreForigineCollider()
+  injected: none
+Hinge2DIkSolver.cs (Assets\Scripts\Robots\Hinge2DIkSolver.cs):
+  methods: bool IsValidBone(), Vector2 GetBonePos(), Vector2 GetBonePosVR2(), void ApplyByTorque(), void ApplyPositions(), void FixedUpdate(), void Init(), void LateUpdate(), void OnDrawGizmos(), void OnEnable(), void Reinitialize(), void Solve()
+  injected: none
+HealthBot.cs (Assets\Scripts\Robots\HealthBot.cs):
+  methods: void CacheBrains(), void TakeDamage(), void TakePlayerDamage()
+  injected: none
+GroundChecker.cs (Assets\Scripts\Robots\GroundChecker.cs):
+  methods: void OnCollisionEnter2D(), void OnCollisionExit2D()
+  injected: none
+GrabController.cs (Assets\Scripts\Robots\GrabController.cs):
+  methods: bool HasHeldObject(), bool IsInventoryOnlyPickup(), bool SpendGrabEnergy(), bool TryGrab(), CowboyArmSide? GetHoldingArm(), GrabHandAttractor GetHandAttractor(), GrabHandAttractor ResolveHandAttractor(), IGrabbable DetectGrabbable(), Inventory GetInventory(), PickupType? ResolvePickupSlot(), ToggleBox FindToggleBox(), ToggleBox GetToggleBox(), ToggleBox ResolveToggleBox(), Transform GetGrabAnchor(), Transform GetHoldParent(), void Awake(), void CacheGrabAnchors(), void CacheHandAttractors(), void CacheInventory(), void CacheRobotSystems(), void CacheToggleBoxes(), void MaintainHold(), void OnEnable(), void Release(), void ReleaseAllImmediate(), void ReleaseInternal(), void RemoveInventoryEntry(), void SetAllHandAttractorsInactive(), void SetAllToggleBoxesInactive(), void SetHandAttractorState(), void SetToggleBoxState()
+  injected: IGrabbable heldObject
+FootStepper.cs (Assets\Scripts\Robots\FootStepper.cs):
+  methods: IEnumerator CrouchRoutine(), IEnumerator JumpRoutine(), IEnumerator ToBackRoutine(), IEnumerator ToFarRoutine(), IEnumerator ToPeakRoutine(), IEnumerator ToStartRoutine(), IEnumerator UncrouchRoutine(), Vector3 QuadraticBezier(), void Crouch(), void InterruptAndReset(), void Jump(), void SetFacingDirection(), void ToBack(), void ToFar(), void ToPeak(), void ToStartFromFarOrBack(), void Uncrouch()
+  injected: bool IsGrounded, float toPeakDuration, Transform crouchUpLeft, Transform crouchUpRight, Transform footTarget, Transform jumpUpLeft, Transform jumpUpRight, Transform startLeft, Transform startRight
+EnergyBot.cs (Assets\Scripts\Robots\EnergyBot.cs):
+  methods: bool HasEnergy(), bool HasEnergyForAction(), bool TryConsume(), bool TryConsumeRaw(), float GetFaintRecoveryThreshold(), float ResolveActionCost(), IEnumerator RechargeCoroutine(), void ApplyEnergyChange(), void Awake(), void HandleEnergyDepleted(), void OnDisable(), void OnEnable(), void RegisterEnergySpend(), void SetActionCost(), void SetPlayerMode(), void SetStats(), void StartRechargeIfNeeded(), void StopRecharge(), void SyncRechargeRateFromStats()
+  injected: Coroutine rechargeCoroutine
+EnergyAction.cs (Assets\Scripts\Robots\EnergyAction.cs):
+  methods: none
+  injected: none
+EnemyArmTargetController.cs (Assets\Scripts\Robots\EnemyArmTargetController.cs):
+  methods: Action<bool> CreateFlipSetter(), bool ShouldUseRightArm(), CowboyArmSide GetCurrentActiveArmSide(), IEnumerator AttackPulse(), void ApplySolverFlip(), void ApplySolverStates(), void Awake(), void CacheRestPose(), void CacheSolverDefaults(), void FollowTarget(), void HandleAttackInput(), void LateUpdate(), void OnAttackHit(), void OnDisable(), void OnEnable(), void ResetState(), void ReturnToRest(), void SetAttackRequested(), void SetSolverEnabled(), void SetSolverFlip(), void StopAttackIfActive(), void SubscribeToAttackEvents(), void TriggerAttackPulse(), void UnsubscribeFromAttackEvents(), void Update(), void UpdatePreferredSide()
+  injected: none
+ISaveService.cs (Assets\Scripts\Player\Interfaces\ISaveService.cs):
+  methods: none
+  injected: none
+IPlayerInput.cs (Assets\Scripts\Player\Interfaces\IPlayerInput.cs):
+  methods: none
+  injected: none
+PlayerMovementController.cs (Assets\Scripts\Player\Controllers\PlayerMovementController.cs):
+  methods: AttackSector DetermineSector(), bool TryBuildAttackRequest(), RigidbodyConstraints RemoveRotationConstraints(), Vector2 DetermineTargetPosition(), Vector2 GetAimDirection(), void ApplyFacingDirection(), void Awake(), void CacheDefaultFreezeSettings(), void Die(), void DisablePuppetBinder(), void Faint(), void HandleCrouch(), void HandleJump(), void HandleMovement(), void HandleStateChange(), void OnDestroy(), void RecoverFromFaint(), void RestorePuppetBinder(), void SetFreezeRotationForFaint(), void TryFlip(), void Update()
+  injected: IPlayerInput input, Rigidbody2D BodyReference, Transform HeadTransform, Vector2 lookDirection
+PlayerInputReader.cs (Assets\Scripts\Player\Controllers\PlayerInputReader.cs):
+  methods: void Awake(), void LateUpdate(), void OnDisable(), void OnEnable()
+  injected: none
+NewPlayerMovementController.cs (Assets\Scripts\Player\Controllers\NewPlayerMovementController.cs):
+  methods: void Awake(), void HandleJumpCrouch(), void MoveVertical(), void OnLanded(), void ReadInput(), void Update()
+  injected: IPlayerInput input, Vector2 _move
+PlayerSaveService.cs (Assets\Scripts\Player\Data\PlayerSaveService.cs):
+  methods: void Awake(), void LoadGame(), void ResetSaveData(), void SaveGame()
+  injected: string saveFilePath
+PlayerRunStats.cs (Assets\Scripts\Player\Data\PlayerRunStats.cs):
+  methods: void AddEnergyRechargeBonus(), void Apply(), void Capture(), void Reset()
+  injected: none
+PlayerStats.cs (Assets\Scripts\Player\Data\PlayerStats.cs):
+  methods: void ResetMorality(), void UpdateEnergy(), void UpdateEnergyRecharge(), void UpdateHealth(), void UpdateMorality()
+  injected: none
+Attack.cs (Assets\Scripts\Robots\Attack.cs):
+  methods: void Execute()
+  injected: none
+ArmTargetController.cs (Assets\Scripts\Robots\ArmTargetController.cs):
+  methods: Action<bool> CreateFlipSetter(), bool IsLeftMouseHeld(), bool IsRightMouseHeld(), bool ShouldUseRightArm(), bool TrySpendEnergyForAttack(), CowboyArmSide DetermineArmForGrab(), CowboyArmSide GetCurrentActiveArmSide(), CowboyArmSide GetOppositeArm(), System.Collections.IEnumerator ExternalAttackPulse(), void ApplySolverFlip(), void ApplySolverStates(), void Awake(), void CacheControllers(), void CacheRestPose(), void CacheSolverDefaults(), void FollowTarget(), void HandleAttackInput(), void HandleGrabInput(), void LateUpdate(), void OnAttackHit(), void OnDisable(), void OnEnable(), void ReturnToRest(), void SetExternalAttackInput(), void SetSolverEnabled(), void SetSolverFlip(), void SubscribeToAttackEvents(), void TriggerExternalAttackPulse(), void UnsubscribeFromAttackEvents(), void Update(), void UpdatePreferredSide()
+  injected: Coroutine externalAttackPulseRoutine
+ArmSide.cs (Assets\Scripts\Robots\ArmSide.cs):
+  methods: none
+  injected: none
+ArcTargetFollower.cs (Assets\Scripts\Robots\ArcTargetFollower.cs):
+  methods: void Awake()
+  injected: none
+AnimatorDirectionMover.cs (Assets\Scripts\Robots\AnimatorDirectionMover.cs):
+  methods: bool HasParameter(), void ApplyTransformMovement(), void Awake(), void CacheAnimatorParameters(), void CachePhysicsComponents(), void FixedUpdate(), void OnValidate(), void Reset(), void Update(), void UpdateHorizontalSpeed()
+  injected: Rigidbody2D targetBody2D
+AlternatingToggle.cs (Assets\Scripts\Robots\AlternatingToggle.cs):
+  methods: IEnumerator ReturnToRest(), IEnumerator ToggleHoldSequence(), Vector3 GetQuadraticBezierPoint(), void Awake(), void OnDisable(), void OnEnable(), void Update()
+  injected: float toggleDuration, ToggleBox leftArmToggleBox, Transform arcControlRight, Transform leftArmTarget
+AlternatingPunchAttack.cs (Assets\Scripts\Robots\AlternatingPunchAttack.cs):
+  methods: void Awake()
+  injected: none
+BodyBalance.cs (Assets\Scripts\Robots\BodyBalance.cs):
+  methods: void ActivateBalance(), void Update(), void UpdateBalance(), void UpdateMuscleForce()
+  injected: none
+AttackType.cs (Assets\Scripts\Robots\AttackType.cs):
+  methods: none
+  injected: none
+AttackHitbox.cs (Assets\Scripts\Robots\AttackHitbox.cs):
+  methods: void Activate(), void Awake(), void Deactivate(), void OnTriggerEnter2D(), void UpdateIndicator()
+  injected: int DamageCost
+DamageFeedback.cs (Assets\Scripts\Robots\DamageFeedback.cs):
+  methods: void Awake(), void Flash(), void ResetColors()
+  injected: List<SpriteRenderer> renderers
+BodyJointLimiter.cs (Assets\Scripts\Robots\BodyJointLimiter.cs):
+  methods: HingeJoint2D FindJoint(), void Awake(), void RefreshJoints(), void SetBodyRotationLimits(), void SetJointLimits()
+  injected: none
+IRobotDecisionProvider.cs (Assets\Scripts\Robots\Decisions\IRobotDecisionProvider.cs):
+  methods: none
+  injected: none
+SecurityBadgePickup.cs (Assets\Scripts\Player\GrabSystem\SecurityBadgePickup.cs):
+  methods: bool CanBeGrabbed(), void ApplySortingOrder(), void AssignInventory(), void CacheSpriteRenderers(), void OnAttract(), void OnGrab(), void OnRelease(), void SetFollowTarget()
+  injected: float throwStrength
+PickupBox.cs (Assets\Scripts\Player\GrabSystem\PickupBox.cs):
+  methods: bool CanBeGrabbed(), void Awake(), void OnAttract(), void OnGrab(), void OnRelease()
+  injected: RigidbodyType2D originalBodyType
+LeverHandle.cs (Assets\Scripts\Player\GrabSystem\LeverHandle.cs):
+  methods: bool CanBeGrabbed(), void OnAttract(), void OnGrab(), void OnRelease(), void UpdatePosition()
+  injected: Transform startPoint, UnityEvent OnActivated
+IGrabbable.cs (Assets\Scripts\Player\GrabSystem\IGrabbable.cs):
+  methods: none
+  injected: none
+HoldButton.cs (Assets\Scripts\Player\GrabSystem\HoldButton.cs):
+  methods: bool CanBeGrabbed(), void OnAttract(), void OnGrab(), void OnRelease()
+  injected: none
+GrabHandAttractor.cs (Assets\Scripts\Player\GrabSystem\GrabHandAttractor.cs):
+  methods: bool IsDetectionActive(), IGrabbable DetectGrabbable(), ToggleBox GetToggleBox(), void Activate(), void Awake(), void Deactivate(), void UpdateIndicator()
+  injected: none
+CubePickup.cs (Assets\Scripts\Player\GrabSystem\CubePickup.cs):
+  methods: bool CanBeGrabbed(), void ApplySortingOrder(), void Awake(), void CacheSpriteRenderers(), void FixedUpdate(), void OnAttract(), void OnGrab(), void OnRelease(), void SetFollowTarget()
+  injected: Rigidbody2D rb
+BatteryPickup.cs (Assets\Scripts\Player\GrabSystem\BatteryPickup.cs):
+  methods: bool CanBeGrabbed(), void ApplySortingOrder(), void AssignInventory(), void Awake(), void CacheOriginalPhysicsState(), void CacheSpriteRenderers(), void FixedUpdate(), void OnAttract(), void OnGrab(), void OnRelease(), void SetFollowTarget()
+  injected: none
