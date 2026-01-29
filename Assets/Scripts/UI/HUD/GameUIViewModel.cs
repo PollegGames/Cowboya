@@ -14,6 +14,7 @@ public class GameUIViewModel : MonoBehaviour
     private GameObject miniMapPreviewInstance;                 // instance runtime
     [SerializeField] private RenderTexture miniMapRT;
     private VisualElement previewVE;      // <VisualElement name="preview">
+    private bool minimapCaptured;
 
     [Header("PAUSE MENU")]
 
@@ -52,6 +53,8 @@ public class GameUIViewModel : MonoBehaviour
         resumeButton.clicked += ResumeGame;
         restartButton.clicked += RestartGame;
         mainMenuButton.clicked += GoToMainMenu;
+
+        minimapCaptured = false;
     }
 
     void PauseGame()
@@ -223,12 +226,12 @@ public class GameUIViewModel : MonoBehaviour
             cam.targetTexture = miniMapRT;
 
         }
-        StartCoroutine(CaptureRTToUI());
+        CaptureMinimapOnce();
     }
 
     public void RefreshMinimapTexture()
     {
-        StartCoroutine(CaptureRTToUI());
+        CaptureMinimapOnce();
     }
 
     private void OnDestroy()
@@ -261,6 +264,14 @@ public class GameUIViewModel : MonoBehaviour
         BackgroundPosition center = new BackgroundPosition(BackgroundPositionKeyword.Center);
         previewVE.style.backgroundPositionX = center;
         previewVE.style.backgroundPositionY = center;
+    }
+
+    private void CaptureMinimapOnce()
+    {
+        if (minimapCaptured)
+            return;
+        minimapCaptured = true;
+        StartCoroutine(CaptureRTToUI());
     }
 
 }

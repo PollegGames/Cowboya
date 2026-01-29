@@ -9,18 +9,18 @@ public class MainMenuController : MonoBehaviour
     private Button _playButton;
     private Button _sandboxButton;
     private Button _exitButton;
-    private AudioSource _audioSource;
     [SerializeField] private RunProgressManager runProgressManager;
 
     private void Awake()
     {
         _menuRoot = GetComponent<UIDocument>().rootVisualElement;
-        _audioSource = GetComponent<AudioSource>();
         if (RunProgressManager.Instance == null && runProgressManager != null)
         {
             Instantiate(runProgressManager);
         }
         runProgressManager = RunProgressManager.Instance;
+
+        AudioManager.Instance?.PlayMenuMusic(0.5f);
     }
 
     private void OnEnable()
@@ -53,7 +53,7 @@ public class MainMenuController : MonoBehaviour
 
     private void OnPlayClicked(ClickEvent evt)
     {
-        _audioSource?.Play();
+        AudioManager.Instance?.PlayUIClick();
         var saveService = FindFirstObjectByType<PlayerSaveService>();
         saveService?.ResetSaveData();
         runProgressManager.LoadFirstLevel();
@@ -61,13 +61,13 @@ public class MainMenuController : MonoBehaviour
 
     private void OnSandboxClicked(ClickEvent evt)
     {
-        _audioSource?.Play();
+        AudioManager.Instance?.PlayUIClick();
         runProgressManager.LoadSandBox();
     }
 
     private void OnExitClicked(ClickEvent evt)
     {
-        _audioSource?.Play();
+        AudioManager.Instance?.PlayUIClick();
         Application.Quit();
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

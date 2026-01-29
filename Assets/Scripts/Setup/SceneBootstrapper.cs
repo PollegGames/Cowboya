@@ -5,6 +5,7 @@ public class SceneBootstrapper : MonoBehaviour
 {
     [SerializeField] private SceneInitiator sceneInitiator;
     [SerializeField] private SceneBootstrapConfigSO config;
+    private const string AudioManagerResourcePath = "Prefabs/Setup/AudioManager";
 
     private void Awake()
     {
@@ -17,6 +18,19 @@ public class SceneBootstrapper : MonoBehaviour
         if (RunProgressManager.Instance == null)
         {
             Instantiate(config.runProgressManagerPrefab);
+        }
+
+        if (AudioManager.Instance == null)
+        {
+            var audioPrefab = Resources.Load<GameObject>(AudioManagerResourcePath);
+            if (audioPrefab != null)
+            {
+                Instantiate(audioPrefab);
+            }
+            else
+            {
+                Debug.LogWarning($"AudioManager prefab not found at Resources/{AudioManagerResourcePath}");
+            }
         }
 
         var factory = Instantiate(config.factoryManagerPrefab);

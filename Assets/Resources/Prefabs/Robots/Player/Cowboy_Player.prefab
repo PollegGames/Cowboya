@@ -3171,6 +3171,7 @@ GameObject:
   - component: {fileID: 1120256067129306326}
   - component: {fileID: 2894464590997933270}
   - component: {fileID: 3313546521264822034}
+  - component: {fileID: 7562543586856771184}
   m_Layer: 6
   m_Name: Cowboy_Master
   m_TagString: Player
@@ -3253,6 +3254,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7562543586856771184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2252902769847219381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2285e8784661f64292466b7234b0ea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotFootstepAudio
+  volume: 1
 --- !u!1 &2359867086974579403
 GameObject:
   m_ObjectHideFlags: 0

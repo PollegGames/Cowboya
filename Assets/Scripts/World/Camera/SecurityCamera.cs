@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,12 +21,6 @@ public class SecurityCamera : MonoBehaviour
 
     [Header("Room & Player References")]
     public RoomManager roomManager;
-    [Header("Minimap Update")]
-    [SerializeField] private float minimapRefreshInterval = 2f;
-    private Coroutine minimapRoutine;
-    private GameUIViewModel minimapView;
-    private Vector3 lastPlayerPosition;
-
     private List<IRobotMemory> enemiesInZone = new List<IRobotMemory>();
     private HashSet<IRobotMemory> alarmedMemories = new HashSet<IRobotMemory>();
 
@@ -53,7 +46,6 @@ public class SecurityCamera : MonoBehaviour
             detectAggresionZone.onEnter.AddListener(OnSecondaryZoneEnter);
         }
 
-        minimapView = FindFirstObjectByType<GameUIViewModel>();
     }
 
     private void Update()
@@ -112,10 +104,6 @@ public class SecurityCamera : MonoBehaviour
 
             Vector2 playerPos = player.transform.position;
             roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
-            lastPlayerPosition = targetToFollow.position;
-            if (minimapRoutine != null)
-                StopCoroutine(minimapRoutine);
-            minimapRoutine = StartCoroutine(RefreshMinimapWhilePlayerMoving());
         }
         else
         {
@@ -130,23 +118,6 @@ public class SecurityCamera : MonoBehaviour
 
         Vector2 playerPos = player.transform.position;
         roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
-        if (minimapRoutine != null)
-            StopCoroutine(minimapRoutine);
-    }
-
-    private IEnumerator RefreshMinimapWhilePlayerMoving()
-    {
-        while (isFollowing && targetToFollow != null)
-        {
-            Vector3 currentPos = targetToFollow.position;
-            if ((currentPos - lastPlayerPosition).sqrMagnitude > 0.01f)
-            {
-                minimapView?.RefreshMinimapTexture();
-                UpdateWantedPlayerPosition();
-                lastPlayerPosition = currentPos;
-            }
-            yield return new WaitForSeconds(minimapRefreshInterval);
-        }
     }
 
     private void OnSecondaryZoneEnter(Collider2D enemyCollider)
@@ -184,8 +155,6 @@ public class SecurityCamera : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (minimapRoutine != null)
-            StopCoroutine(minimapRoutine);
         if (playerFollowTriggerZone != null)
         {
             playerFollowTriggerZone.onEnter.RemoveListener(OnPlayerEnterZone);
