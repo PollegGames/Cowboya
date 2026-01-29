@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Keeps the robot at a machine for a specified duration before completing the task.
+/// Handles wait at machine behavior.
 /// </summary>
 [CreateAssetMenu(menuName = "RobotAI/Handlers/WaitAtMachine", fileName = "WaitAtMachineHandler")]
 public class WaitAtMachineHandler : ScriptableRobotTaskHandler

@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// Creates grid instances.
+/// </summary>
 public class GridFactory
 {
     public Dictionary<Vector2, Cell> cellDataGrid;

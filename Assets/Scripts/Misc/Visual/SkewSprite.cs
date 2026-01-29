@@ -1,6 +1,9 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
+/// <summary>
+/// Handles skew sprite.
+/// </summary>
 public class SkewSprite : MonoBehaviour
 {
     public float skewFactor = 0.1f; // Control the intensity of the skew

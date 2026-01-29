@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles priority queue.
+/// </summary>
 public class PriorityQueue<T>
 {
     private readonly List<T> elements = new List<T>();

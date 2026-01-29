@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// Directs worker spawners to a spawning machine and keeps them there so followers are produced.
+/// Handles spawn followers behavior.
 /// </summary>
 [CreateAssetMenu(menuName = "RobotAI/Handlers/SpawnFollowers", fileName = "SpawnFollowersHandler")]
 public class SpawnFollowersHandler : ScriptableRobotTaskHandler

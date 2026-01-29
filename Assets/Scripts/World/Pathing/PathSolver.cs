@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles path solver.
+/// </summary>
 public class PathSolver
 {
     private readonly GridFactory gridFactory;

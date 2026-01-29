@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Triggers the robot attack controller toward a target position/transform.
+/// Handles attack behavior.
 /// </summary>
 [CreateAssetMenu(menuName = "RobotAI/Handlers/Attack", fileName = "AttackHandler")]
 public class AttackHandler : ScriptableRobotTaskHandler

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes lock end room door data.
+/// </summary>
 public class LockEndRoomDoorProcessor : CellProcessor
 {
     private readonly bool noBlockRequiredWhenZeroEnemies;

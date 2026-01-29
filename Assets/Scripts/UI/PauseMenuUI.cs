@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(UIDocument))]
+/// <summary>
+/// Handles pause menu ui.
+/// </summary>
 public class PauseMenuUI : MonoBehaviour
 {
     public event Action OnResumeClicked;

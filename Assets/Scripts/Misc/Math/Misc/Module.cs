@@ -4,6 +4,9 @@ using UnityEngine;
 
 // Base Module class - can be extended for various functionalities
 [Serializable]
+/// <summary>
+/// Handles module.
+/// </summary>
 public class Module
 {
     public string ModuleName;

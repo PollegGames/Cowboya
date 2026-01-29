@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes path cell data.
+/// </summary>
 public class PathCellProcessor : CellProcessor
 {
     private readonly UsageType pathToPOIUsageType;

@@ -2,6 +2,9 @@
 using UnityEngine;
 
 [ExecuteAlways]
+/// <summary>
+/// Draws gizmos for mini map debug.
+/// </summary>
 public class MiniMapDebugGizmos : MonoBehaviour
 {
     public Bounds gridBounds;

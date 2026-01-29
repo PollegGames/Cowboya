@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Ally Robot Factory
+/// <summary>
+/// Creates ally robot instances.
+/// </summary>
 public class AllyRobotFactory : RobotFactory
 {
     public AllyRobotFactory()

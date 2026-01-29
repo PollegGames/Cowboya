@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Monitors movement.
+/// </summary>
 public class MovementMonitor
 {
     private Vector3 lastCheckPosition;

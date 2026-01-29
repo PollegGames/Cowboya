@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Player Robot Factory
+/// <summary>
+/// Creates player robot instances.
+/// </summary>
 public class PlayerRobotFactory : RobotFactory
 {
     private int currentHealth;

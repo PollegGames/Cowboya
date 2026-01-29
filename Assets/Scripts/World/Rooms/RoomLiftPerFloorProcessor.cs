@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes room lift per floor data.
+/// </summary>
 public class RoomLiftPerFloorProcessor : CellProcessor
 {
     public RoomLiftPerFloorProcessor(int gridWidth, int gridHeight) : base(gridWidth, gridHeight) { }

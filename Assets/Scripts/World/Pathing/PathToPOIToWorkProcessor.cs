@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes path to poi to work data.
+/// </summary>
 public class PathToPOIToWorkProcessor : CellProcessor
 {
     public PathToPOIToWorkProcessor(int gridWidth, int gridHeight) : base(gridWidth, gridHeight) { }

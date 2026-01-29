@@ -1,6 +1,9 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// Handles plain math.
+/// </summary>
 public static class PlainMath
 {
     const float size = 0.25f;

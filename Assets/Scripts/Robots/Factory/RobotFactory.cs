@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Factory class to create different types of robots
+/// <summary>
+/// Creates robot instances.
+/// </summary>
 public abstract class RobotFactory
 {
     protected int health = 1;

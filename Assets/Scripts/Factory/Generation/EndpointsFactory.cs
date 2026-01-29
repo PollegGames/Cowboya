@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+/// <summary>
+/// Creates endpoints instances.
+/// </summary>
 public class EndpointsFactory
 {
     public void GetCornerEndpoints(int width, int height, out Vector2 start, out Vector2 end)

@@ -1,6 +1,9 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "LiftSetup", menuName = "Map/LiftData")]
+/// <summary>
+/// Holds lift data.
+/// </summary>
 public class LiftData : ScriptableObject
 {
     public Vector2 moveDirection = Vector2.up; // up or down

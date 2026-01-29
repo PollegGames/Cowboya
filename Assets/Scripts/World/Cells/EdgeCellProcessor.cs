@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes edge cell data.
+/// </summary>
 public class EdgeCellProcessor : CellProcessor
 {
     public EdgeCellProcessor(int gridWidth, int gridHeight) : base(gridWidth, gridHeight) { }

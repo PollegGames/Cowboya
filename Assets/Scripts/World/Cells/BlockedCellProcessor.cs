@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes blocked cell data.
+/// </summary>
 public class BlockedCellProcessor : CellProcessor
 {
     public BlockedCellProcessor(int gridWidth, int gridHeight) : base(gridWidth, gridHeight) { }

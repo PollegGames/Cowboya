@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Moves toward a target transform or last known player position.
+/// Handles chase target behavior.
 /// </summary>
 [CreateAssetMenu(menuName = "RobotAI/Handlers/ChaseTarget", fileName = "ChaseTargetHandler")]
 public class ChaseTargetHandler : ScriptableRobotTaskHandler

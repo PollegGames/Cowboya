@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Renders grid.
+/// </summary>
 public class GridRenderer
 {
     private readonly Dictionary<UsageType, GameObject> usageTypeToPrefab;

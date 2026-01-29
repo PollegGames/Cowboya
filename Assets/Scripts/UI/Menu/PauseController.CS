@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// Controls pause.
+/// </summary>
 public class PauseController : MonoBehaviour
 {
     public static PauseController Instance { get; private set; }

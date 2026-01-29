@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Processes cell data.
+/// </summary>
 public abstract class CellProcessor : ICellProcessor
 {
     protected readonly int width;

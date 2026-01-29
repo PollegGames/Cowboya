@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Moves the body toward a waypoint or machine-linked waypoint.
+/// Handles move to payload behavior.
 /// </summary>
 [CreateAssetMenu(menuName = "RobotAI/Handlers/MoveToPayload", fileName = "MoveToPayloadHandler")]
 public class MoveToPayloadHandler : ScriptableRobotTaskHandler

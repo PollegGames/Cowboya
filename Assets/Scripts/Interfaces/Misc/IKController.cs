@@ -1,7 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controls ik.
+/// </summary>
 public class IKController : MonoBehaviour {
     public Hinge2DIkSolver solver { get; private set; }
     // Start is called before the first frame update
