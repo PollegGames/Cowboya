@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 19e1a72533d1154418f1902eec4a9454
+guid: acbccd0f847c4e74f87357bae2475d72
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7314064279959886257
-    second: PlayBtn_0
+      213: 2233800241684580827
+    second: ExitCustomButton_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: PlayBtn_0
+      name: ExitCustomButton_0
       rect:
         serializedVersion: 2
-        x: 12
-        y: 15
-        width: 208
-        height: 98
+        x: 595
+        y: 57
+        width: 534
+        height: 231
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1b9d16706b6c08560800000000000000
-      internalID: 7314064279959886257
+      spriteID: bd98ac01c7d000f10800000000000000
+      internalID: 2233800241684580827
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 1368448c4e3285c44b5ab268a1251f14
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      PlayBtn_0: 7314064279959886257
+      ExitCustomButton_0: 2233800241684580827
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
