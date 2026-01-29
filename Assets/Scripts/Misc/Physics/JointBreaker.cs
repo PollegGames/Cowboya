@@ -1,0 +1,151 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class JointBreaker : MonoBehaviour
+{
+    [Header("HingeJoint2D references")]
+    public List<HingeJoint2D> hingeJoints = new List<HingeJoint2D>();
+
+    [Header("FixedJoint2D references")]
+    public List<FixedJoint2D> fixedJoints = new List<FixedJoint2D>();
+
+    [Header("IK Solvers (Hinge2DIkSolver)")]
+    public List<Hinge2DIkSolver> ikSolvers = new List<Hinge2DIkSolver>();
+
+    private class JointInfo
+    {
+        public GameObject owner;
+        public System.Type type;
+        public Rigidbody2D connectedBody;
+        public Vector2 anchor;
+        public Vector2 connectedAnchor;
+        public float breakForce;
+        public float breakTorque;
+        public bool enableCollision;
+        public bool autoConfigure;
+        public bool enabled;
+    }
+
+    private readonly List<Joint2D> allJoints2D = new();
+    private readonly List<JointInfo> jointInfos = new();
+
+    private void Awake()
+    {
+        // Ensure lists start empty to avoid duplicate entries when the
+        // component is reused or deserialized with existing items.
+        hingeJoints.Clear();
+        fixedJoints.Clear();
+        ikSolvers.Clear();
+
+        hingeJoints.AddRange(GetComponentsInChildren<HingeJoint2D>());
+        fixedJoints.AddRange(GetComponentsInChildren<FixedJoint2D>());
+        ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
+        allJoints2D.Clear();
+        allJoints2D.AddRange(GetComponentsInChildren<Joint2D>(true));
+
+        foreach (var joint in allJoints2D)
+        {
+            var info = new JointInfo
+            {
+                owner = joint.gameObject,
+                type = joint.GetType(),
+                connectedBody = joint.connectedBody,
+                breakForce = joint.breakForce,
+                breakTorque = joint.breakTorque,
+                enableCollision = joint.enableCollision,
+                enabled = joint.enabled,
+            };
+
+            if (joint is AnchoredJoint2D anchored)
+            {
+                info.anchor = anchored.anchor;
+                info.connectedAnchor = anchored.connectedAnchor;
+                info.autoConfigure = anchored.autoConfigureConnectedAnchor;
+            }
+
+            jointInfos.Add(info);
+        }
+    }
+
+    public void BreakAll()
+    {
+        foreach (var joint in allJoints2D)
+        {
+            if (joint == null)
+                continue;
+
+            joint.breakForce = 0f;
+        }
+
+        DisableAllSolvers();
+
+        var stateController = GetComponent<RobotStateController>();
+        if (stateController != null && stateController.CurrentState != RobotState.Dead)
+            stateController.UpdateState(RobotState.Dead);
+    }
+
+    public void DestroyAll()
+    {
+        foreach (var joint in allJoints2D)
+        {
+            if (joint != null)
+                Destroy(joint);
+        }
+
+        hingeJoints.Clear();
+        fixedJoints.Clear();
+        allJoints2D.Clear();
+
+        DisableAllSolvers();
+    }
+
+    public void DisableAllSolvers()
+    {
+        foreach (var solver in ikSolvers)
+            if (solver != null) solver.enabled = false;
+    }
+
+    /// <summary>
+    /// Restores all cached joints and re-enables any IK solvers.
+    /// </summary>
+    public void RestoreAll()
+    {
+        foreach (var info in jointInfos)
+        {
+            var component = info.owner.GetComponent(info.type);
+            Joint2D joint = component as Joint2D;
+            if (joint == null)
+                joint = info.owner.AddComponent(info.type) as Joint2D;
+            if (joint == null)
+                continue;
+            joint.connectedBody = info.connectedBody;
+            if (joint is AnchoredJoint2D anchored)
+            {
+                anchored.anchor = info.anchor;
+                anchored.connectedAnchor = info.connectedAnchor;
+                anchored.autoConfigureConnectedAnchor = info.autoConfigure;
+            }
+            joint.breakForce = info.breakForce;
+            joint.breakTorque = info.breakTorque;
+            joint.enableCollision = info.enableCollision;
+            joint.enabled = info.enabled;
+            joint.enabled = true;
+        }
+
+        hingeJoints.Clear();
+        hingeJoints.AddRange(GetComponentsInChildren<HingeJoint2D>());
+        fixedJoints.Clear();
+        fixedJoints.AddRange(GetComponentsInChildren<FixedJoint2D>());
+        ikSolvers.Clear();
+        ikSolvers.AddRange(GetComponentsInChildren<Hinge2DIkSolver>());
+        allJoints2D.Clear();
+        allJoints2D.AddRange(GetComponentsInChildren<Joint2D>(true));
+
+        foreach (var solver in ikSolvers)
+            if (solver != null)
+            {
+                solver.Reinitialize();
+                solver.enabled = true;
+            }
+    }
+}

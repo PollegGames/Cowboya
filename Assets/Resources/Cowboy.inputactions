@@ -1,0 +1,76 @@
+{
+    "name": "Cowboy",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "133a1986-fa95-4a9d-9718-31dba758b2c5",
+            "actions": [
+                {
+                    "name": "MoveHorizontal",
+                    "type": "Value",
+                    "id": "3b95284f-3673-442d-8200-bcacab2d2003",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "MoveVertical",
+                    "type": "Value",
+                    "id": "cd568d7c-e2ce-4fbc-8910-eb18cbf92ae2",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5c7c4197-aa8f-479e-848c-9a24f37aa859",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "Clamp(max=-1)",
+                    "groups": "",
+                    "action": "MoveHorizontal",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "aa960cdb-27e1-47c0-a39a-d8d840c272bb",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "Clamp(max=1)",
+                    "groups": "",
+                    "action": "MoveHorizontal",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dc599b5e-0106-4e00-90e4-5c1d0a2726b2",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "Clamp(max=1)",
+                    "groups": "",
+                    "action": "MoveVertical",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "15bf360f-e98e-48d8-811f-3cec43d41526",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "Clamp(min=-1)",
+                    "groups": "",
+                    "action": "MoveVertical",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
