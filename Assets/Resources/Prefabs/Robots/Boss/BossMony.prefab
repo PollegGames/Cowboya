@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 7
   m_Sprite: {fileID: 6996204577941301759, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -391,7 +391,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 4
   m_Sprite: {fileID: -2310379465151782513, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -638,7 +638,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 12
   m_Sprite: {fileID: 3264379983354968053, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -882,7 +882,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Sprite: {fileID: 8455680958083215620, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2488,7 +2488,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 2
   m_Sprite: {fileID: 7944310012104918758, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2842,7 +2842,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::EnergyBot
   stateController: {fileID: 7124027368022760294}
   stats:
-    RobotName: 
+    RobotName: Boss
     MaxHealth: 1
     CurrentHealth: 1
     MaxEnergy: 1
@@ -2911,7 +2911,6 @@ MonoBehaviour:
     CurrentEnergy: 30
     AttackEnergyCost: 5
     EnergyRechargeRate: 1
-  saveRadius: 4
 --- !u!114 &9146288787774417856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2942,6 +2941,7 @@ MonoBehaviour:
     role: 4
     resumeWorkOnMachineOn: 0
     defaultTimeoutSeconds: 10
+    waitAtMachineSeconds: 5
     restDurationSeconds: 3
     guardPostDurationSeconds: 300
     workDurationSeconds: 120
@@ -2966,6 +2966,7 @@ MonoBehaviour:
     role: 4
     resumeWorkOnMachineOn: 1
     defaultTimeoutSeconds: 10
+    waitAtMachineSeconds: 5
     restDurationSeconds: 3
     guardPostDurationSeconds: 300
     workDurationSeconds: 120
@@ -2978,6 +2979,7 @@ MonoBehaviour:
     Handlers: {fileID: 11400000, guid: 8c4a06d021ee8454984206e6823669ee, type: 2}
   waypointServiceBehaviour: {fileID: 0}
   stateController: {fileID: 7124027368022760294}
+  reactivateArrivalTimeoutSeconds: 8
 --- !u!114 &1598322442020894122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3007,8 +3009,8 @@ MonoBehaviour:
   animator: {fileID: 7747097817031334347}
   bodyReference: {fileID: 6495128365634737989}
   hipRb: {fileID: 4922993214350235987}
-  arrivalThresholdX: 2
-  arrivalThresholdY: 2
+  arrivalThresholdX: 1
+  arrivalThresholdY: 1
   deadZoneX: 5
   deadZoneY: 5
   updateLoop: 0
@@ -3179,7 +3181,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 8
   m_Sprite: {fileID: 5606092670326891968, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3603,7 +3605,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 14
   m_Sprite: {fileID: 3285574477456568156, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3857,7 +3859,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 11
   m_Sprite: {fileID: 6719865845382750156, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4224,7 +4226,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 6
   m_Sprite: {fileID: 7112710580219956316, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4399,7 +4401,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 15
   m_Sprite: {fileID: 2419426049980136934, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4942,7 +4944,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 9
   m_Sprite: {fileID: -7412845061920914625, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5408,7 +5410,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_Sprite: {fileID: 6962968598782918416, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5924,7 +5926,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_Sprite: {fileID: 6714376197386404867, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -6231,7 +6233,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 3352466850430908511, guid: 57c8c1233eb922445b3e2b09761ac4c2, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -7145,3 +7147,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a492d78718bb644cb1dbc7f66d57986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+

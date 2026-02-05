@@ -187,9 +187,14 @@ public class RobotBrain : MonoBehaviour
             case RobotTaskType.SpawnFollowers:
                 return TryMoveToPayload(task.Payload);
             case RobotTaskType.ChasePlayer:
+                if (waypointService != null && waypointService.ClosestWaypointToPlayer != null)
+                {
+                    body.SetDestination(waypointService.ClosestWaypointToPlayer, includeUnavailable: true);
+                    return true;
+                }
                 if (memory != null && memory.LastKnownPlayerPosition != Vector3.zero)
                 {
-                    body.SetDestination(memory.LastKnownPlayerPosition);
+                    body.SetDestination(memory.LastKnownPlayerPosition, includeUnavailable: true);
                     return true;
                 }
                 return false;

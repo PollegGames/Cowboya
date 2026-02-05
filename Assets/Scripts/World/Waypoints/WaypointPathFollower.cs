@@ -26,6 +26,13 @@ public class WaypointPathFollower : IRobotNavigationListener
 
     public event Action OnStuck;
 
+    public int CurrentPathCount => currentPath?.Count ?? 0;
+    public int CurrentWaypointsCount => currentWaypoints?.Count ?? 0;
+    public int PathIndex => pathIndex;
+    public RoomWaypoint LastAttemptedWaypoint => lastAttemptedWaypoint;
+    public RoomWaypoint CurrentTarget =>
+        currentWaypoints != null && currentWaypoints.Count > 0 ? currentWaypoints[^1] : null;
+
     public WaypointPathFollower(
         Transform body,
         IMover mover,
@@ -103,7 +110,6 @@ public class WaypointPathFollower : IRobotNavigationListener
             svc.BuildAllNeighbors(true);
 
         RoomWaypoint start = GetClosestWaypoint(target, includeUnavailable);
-
         if (start == target)
         {
             Debug.LogWarning($"Already at destination {target.name}, no pathfinding needed.");
@@ -150,10 +156,13 @@ public class WaypointPathFollower : IRobotNavigationListener
         var agentY = body.position.y;
 
         var source = includeUnavailable ? waypointQueries.GetAllWaypoints() : waypointQueries.GetActiveWaypoints();
-        var candidates = source
-            .Where(wp => Mathf.Abs(wp.WorldPos.y - agentY) < 5f && wp != exclude)
-            .OrderBy(wp => Vector2.Distance(body.position, wp.WorldPos))
-            .ToList();
+        var candidates = includeUnavailable
+            ? source.Where(wp => wp != exclude)
+                .OrderBy(wp => Vector2.Distance(body.position, wp.WorldPos))
+                .ToList()
+            : source.Where(wp => Mathf.Abs(wp.WorldPos.y - agentY) < 5f && wp != exclude)
+                .OrderBy(wp => Vector2.Distance(body.position, wp.WorldPos))
+                .ToList();
 
         foreach (var wp in candidates)
         {

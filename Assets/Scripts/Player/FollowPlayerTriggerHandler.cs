@@ -14,6 +14,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     private Camera mainCamera;
     private bool isFacingRight = true;
+    private bool playerInDetectZone;
     private bool playerInAttackZone;
 
     public bool IsFacingRight => isFacingRight;
@@ -71,10 +72,27 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             memory?.RememberPlayerPosition(playerBodyReference.position);
             memory?.SetCanSeePlayer(true);
         }
+        playerInDetectZone = true;
+
+        if (ShouldUseDetectZoneForAttack() && playerBodyReference != null)
+        {
+            memory?.SetPlayerInAttackZone(true);
+            brain?.OnPlayerInAttackZoneChanged(true, playerBodyReference);
+            playerInAttackZone = true;
+            brain?.Body?.StopMovement();
+        }
     }
 
     private void OnPlayerExitDetectZone()
     {
+        if (ShouldUseDetectZoneForAttack() && playerInAttackZone && playerBodyReference != null)
+        {
+            brain?.OnPlayerInAttackZoneChanged(false, playerBodyReference);
+            memory?.SetPlayerInAttackZone(false);
+            playerInAttackZone = false;
+        }
+
+        playerInDetectZone = false;
         // Reset the target position if the player leaves the zone
         playerBodyReference = null;
         memory?.ClearPlayerPosition();
@@ -97,6 +115,12 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
 
     private void OnPlayerExitAttackZone()
     {
+        if (ShouldUseDetectZoneForAttack() && playerInDetectZone)
+        {
+            OnPlayerDetectInAttackZoneChanged?.Invoke(false);
+            return;
+        }
+
         if (playerBodyReference != null)
             brain?.OnPlayerInAttackZoneChanged(false, playerBodyReference);
         memory?.SetPlayerInAttackZone(false);
@@ -146,6 +170,23 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
                 : playerControl.transform;
             memory?.RememberPlayerPosition(playerBodyReference.position);
             memory?.SetCanSeePlayer(true);
+        }
+    }
+
+    private bool ShouldUseDetectZoneForAttack()
+    {
+        var heart = brain != null ? brain.Heart : null;
+        if (heart == null)
+            return false;
+
+        switch (heart.Role)
+        {
+            case RobotRole.SecurityGuard:
+            case RobotRole.Follower:
+            case RobotRole.Boss:
+                return true;
+            default:
+                return false;
         }
     }
 }

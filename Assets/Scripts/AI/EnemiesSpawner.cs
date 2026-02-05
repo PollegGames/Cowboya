@@ -374,4 +374,5 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 inventory.SetItem(PickupType.SecurityBadge, badge);
         }
     }
+
 }

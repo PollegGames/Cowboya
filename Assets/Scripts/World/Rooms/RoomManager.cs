@@ -23,6 +23,7 @@ public class RoomManager : MonoBehaviour
     public List<SpawningMachine> spawningMachinesInRoom = new();
 
     public IWaypointService waypointService;
+    private bool alarmSubscribed;
 
     /// <summary>
     /// Call this immediately after Instantiate().
@@ -97,16 +98,22 @@ public class RoomManager : MonoBehaviour
             }
         }
 
-        if (factoryManager != null)
+        if (factoryManager != null && !alarmSubscribed)
+        {
             factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
+            alarmSubscribed = true;
+        }
     }
 
     private void OnDestroy()
     {
         if (waypointService != null)
             waypointService.UnregisterRoomWaypoints(this);
-        if (FactoryManager != null)
+        if (FactoryManager != null && alarmSubscribed)
+        {
             FactoryManager.OnFactoryAlarmChanged -= HandleFactoryAlarmChanged;
+            alarmSubscribed = false;
+        }
     }
 
     // Exemple d’API pour fermer/ouvrir une porte (et notifier le service)
@@ -137,9 +144,10 @@ public class RoomManager : MonoBehaviour
             return;
         }
 
-        if (FactoryManager != null)
+        if (FactoryManager != null && !alarmSubscribed)
         {
             FactoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
+            alarmSubscribed = true;
         }
 
         if (triggerZone != null)
@@ -152,7 +160,6 @@ public class RoomManager : MonoBehaviour
 
     private void HandleFactoryAlarmChanged(AlarmState newAlarmState)
     {
-        Debug.Log($"{gameObject.name} RoomManager received new AlarmState: {newAlarmState}");
         OnRoomAlarmChanged?.Invoke(newAlarmState);
     }
 

@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 2
   m_Sprite: {fileID: 718216056729951438, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1033,7 +1033,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Sprite: {fileID: -1094504083165205452, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1191,7 +1191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::EnergyBot
   stateController: {fileID: 2749617419865133381}
   stats:
-    RobotName: 
+    RobotName: Follower
     MaxHealth: 1
     CurrentHealth: 1
     MaxEnergy: 1
@@ -1253,7 +1253,7 @@ MonoBehaviour:
   healthBot: {fileID: 5995244961177809690}
   jointBreaker: {fileID: 4943937888695721436}
   stats:
-    RobotName: 
+    RobotName: Follower
     MaxHealth: 1
     CurrentHealth: 1
     MaxEnergy: 1
@@ -1287,13 +1287,14 @@ MonoBehaviour:
   role: 3
   memory: {fileID: 5063167390386217836}
   config:
-    role: 0
-    resumeWorkOnMachineOn: 1
+    role: 3
+    resumeWorkOnMachineOn: 0
     defaultTimeoutSeconds: 10
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 120
-    reactivateDurationSeconds: 30
+    waitAtMachineSeconds: 0
+    restDurationSeconds: 0
+    guardPostDurationSeconds: 0
+    workDurationSeconds: 0
+    reactivateDurationSeconds: 0
   overrideStackDepth: 0
   seedIdleTask: 1
   logTaskChanges: 1
@@ -1312,12 +1313,13 @@ MonoBehaviour:
   heart: {fileID: 94803746851431767}
   config:
     role: 3
-    resumeWorkOnMachineOn: 1
+    resumeWorkOnMachineOn: 0
     defaultTimeoutSeconds: 10
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 120
-    reactivateDurationSeconds: 30
+    waitAtMachineSeconds: 0
+    restDurationSeconds: 0
+    guardPostDurationSeconds: 0
+    workDurationSeconds: 0
+    reactivateDurationSeconds: 0
   body: {fileID: 5727168351269883916}
   memory: {fileID: 5063167390386217836}
   taskHandlers: {fileID: 11400000, guid: 6a247282c5d33424389e8af2fef0ec87, type: 2}
@@ -1326,6 +1328,7 @@ MonoBehaviour:
     Handlers: {fileID: 11400000, guid: 6a247282c5d33424389e8af2fef0ec87, type: 2}
   waypointServiceBehaviour: {fileID: 0}
   stateController: {fileID: 2749617419865133381}
+  reactivateArrivalTimeoutSeconds: 8
 --- !u!114 &6802799724986707657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1803,7 +1806,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 6
   m_Sprite: {fileID: 6365564566121613262, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3131,7 +3134,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 14
   m_Sprite: {fileID: 5391704184800105206, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3242,7 +3245,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 9
   m_Sprite: {fileID: 8068298573419655574, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3515,7 +3518,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 11
   m_Sprite: {fileID: 7884046274350086015, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3937,7 +3940,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 4
   m_Sprite: {fileID: 1127777836320158771, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4832,7 +4835,7 @@ MonoBehaviour:
   circleCenter: {fileID: 5423274823824284250}
   radius: 2
   memory: {fileID: 5063167390386217836}
-  brain: {fileID: 0}
+  brain: {fileID: 8211299274638722592}
 --- !u!1 &6291357191075851414
 GameObject:
   m_ObjectHideFlags: 0
@@ -5533,7 +5536,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 7
   m_Sprite: {fileID: 8749207082339407358, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5644,7 +5647,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 8
   m_Sprite: {fileID: 2717971060052253535, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -6156,7 +6159,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: -8997698790021580843, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -6267,7 +6270,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_Sprite: {fileID: 4698244832345688698, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -6521,7 +6524,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 12
   m_Sprite: {fileID: 2802824274421899878, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -6632,7 +6635,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_Sprite: {fileID: -1113450888871581598, guid: a54586aa5ce082f4e88412d22199b5b0, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -6758,3 +6761,5 @@ MonoBehaviour:
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
   m_Flip: 0
+
+

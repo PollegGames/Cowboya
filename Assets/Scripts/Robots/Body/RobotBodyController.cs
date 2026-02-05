@@ -10,8 +10,8 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     [Header("Navigation")]
     [SerializeField] private float arrivalThresholdX = 2f;
     [SerializeField] private float arrivalThresholdY = 2f;
-    [SerializeField] private float deadZoneX = 5f;
-    [SerializeField] private float deadZoneY = 5f;
+    [SerializeField] private float deadZoneX = 4f;
+    [SerializeField] private float deadZoneY = 4f;
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
 
     [SerializeField] private RobotBodyMaintenance bodyMaintenance;
@@ -31,6 +31,14 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
             bodyMaintenance = GetComponent<RobotBodyMaintenance>();
         if (attackController == null)
             attackController = GetComponent<RobotAttackController>();
+
+        var heart = GetComponent<RobotHeart>();
+        if (heart != null && heart.Role == RobotRole.Follower)
+        {
+            // Follower prefab sometimes leaves bodyReference at root while hipRb moves; align to hip for correct path origin.
+            if (bodyReference == transform && hipRb != null && hipRb.transform != transform)
+                bodyReference = hipRb.transform;
+        }
     }
 
     public void Initialize(
@@ -47,6 +55,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
             SetupPathFollower();
         if (this.waypointNotifier != null && pathFollower != null)
             this.waypointNotifier.Subscribe(pathFollower);
+
     }
 
     public void SetIsBoss(bool value)
@@ -93,7 +102,9 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     public void SetDestination(Vector3 worldPosition, bool includeUnavailable = false)
     {
         if (waypointQueries == null)
+        {
             return;
+        }
         var waypoint = waypointQueries.GetClosestWaypoint(worldPosition, includeUnavailable);
         if (waypoint != null)
             pathFollower?.SetDestination(waypoint, includeUnavailable);
@@ -140,4 +151,5 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     {
         pathFollower?.DrawGizmos();
     }
+
 }

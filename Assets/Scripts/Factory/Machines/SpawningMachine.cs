@@ -198,7 +198,6 @@ public class SpawningMachine : BaseMachine
         var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
         enemiesSpawner.CreateAndSpawnFollowerGuard(lastVisitedPoint, factoryAlarmStatus);
 
-        Debug.Log("[SpawningMachine] Enemy spawned and sent to Follower state.");
     }
 
     private void HandleSecurityMachineTurnedOff(SecurityMachine machine)

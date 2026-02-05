@@ -76,6 +76,7 @@ public class SecurityCamera : MonoBehaviour
         if (factoryAlarm != null && factoryAlarm.CurrentAlarmState != AlarmState.Normal)
         {
             Vector2 playerPos = player.transform.position;
+            factoryAlarm.LastPlayerPosition = playerPos;
             roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
         }
     }
@@ -98,8 +99,8 @@ public class SecurityCamera : MonoBehaviour
             if (morality <= -10f)
             {
                 var factoryAlarm = roomManager.FactoryManager.factoryAlarmStatus;
-                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
                 factoryAlarm.LastPlayerPosition = player.position;
+                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
             }
 
             Vector2 playerPos = player.transform.position;
@@ -132,7 +133,8 @@ public class SecurityCamera : MonoBehaviour
             if (mem != null && mem.WasRecentlyAttacked)
             {
                 factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
-                factoryAlarm.LastPlayerPosition = mem.LastKnownPlayerPosition;
+                if (mem.LastKnownPlayerPosition != Vector3.zero)
+                    factoryAlarm.LastPlayerPosition = mem.LastKnownPlayerPosition;
             }
         }
     }
@@ -146,6 +148,23 @@ public class SecurityCamera : MonoBehaviour
         {
             if (mem.WasRecentlyAttacked && !alarmedMemories.Contains(mem))
             {
+                Vector3 alarmPos = mem.LastKnownPlayerPosition;
+                if (alarmPos == Vector3.zero && roomManager != null)
+                {
+                    var factoryPlayer = roomManager.FactoryManager != null
+                        ? roomManager.FactoryManager.playerHeadTransform
+                        : null;
+                    var fallbackPlayer = factoryPlayer != null ? factoryPlayer : roomManager.PlayerHead;
+                    if (fallbackPlayer != null)
+                        alarmPos = fallbackPlayer.position;
+                }
+
+                if (alarmPos != Vector3.zero)
+                {
+                    factoryAlarm.LastPlayerPosition = alarmPos;
+                    roomManager.waypointService.UpdateClosestWaypointToPlayer(alarmPos);
+                }
+
                 factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
                 alarmedMemories.Add(mem);
                 break;
