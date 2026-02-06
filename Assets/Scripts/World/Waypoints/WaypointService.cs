@@ -93,6 +93,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
         return source.OrderBy(wp => Vector2.Distance(wp.WorldPos, position)).FirstOrDefault();
     }
 
+
     public RoomWaypoint GetEndPoint()
     {
         var ep = GetActiveWaypoints()

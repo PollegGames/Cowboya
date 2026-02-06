@@ -167,7 +167,7 @@ GameObject:
   - component: {fileID: 319821926145957788}
   - component: {fileID: 2426789629070749637}
   - component: {fileID: 6650209482719534368}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,7 +278,7 @@ GameObject:
   - component: {fileID: 4145637444352495302}
   - component: {fileID: 7696492238144785862}
   - component: {fileID: 6071513629511936842}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: 'BodyLow '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -420,7 +420,7 @@ GameObject:
   - component: {fileID: 5000059016457627638}
   - component: {fileID: 7738867227237247358}
   - component: {fileID: 8134232664814505471}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: RHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -674,7 +674,7 @@ GameObject:
   - component: {fileID: 8348315466565430702}
   - component: {fileID: 2553856744803976861}
   - component: {fileID: 1968700097478230487}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Helmet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2264,7 +2264,7 @@ GameObject:
   - component: {fileID: 8607799125630174705}
   - component: {fileID: 6591759400293297464}
   - component: {fileID: 2640588753858149715}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: 'LHand '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2438,7 +2438,7 @@ GameObject:
   - component: {fileID: 4084054212133341265}
   - component: {fileID: 2405676499744601589}
   - component: {fileID: 611195492039868817}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: RFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2922,7 +2922,7 @@ GameObject:
   - component: {fileID: 7675102416506552929}
   - component: {fileID: 826714988084323134}
   - component: {fileID: 4194071736371135912}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: LArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3033,7 +3033,7 @@ GameObject:
   - component: {fileID: 7234989792275164904}
   - component: {fileID: 3529837718015329689}
   - component: {fileID: 4282414794684451898}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: UpLLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3146,7 +3146,7 @@ GameObject:
   - component: {fileID: 8562004229183186640}
   - component: {fileID: 3134699103565108181}
   - component: {fileID: 1569035085667568854}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Hips
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3401,7 +3401,7 @@ GameObject:
   - component: {fileID: 5709377403065425138}
   - component: {fileID: 1901207358027999994}
   - component: {fileID: 8284229431494381734}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4344,7 +4344,7 @@ GameObject:
   - component: {fileID: 5672860758718054814}
   - component: {fileID: 4653650396609290523}
   - component: {fileID: 3495387503924466581}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: UpRLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4857,7 +4857,7 @@ GameObject:
   - component: {fileID: 6338053979373545179}
   - component: {fileID: 7810608301210376272}
   - component: {fileID: 7241903282824930207}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: LFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5460,6 +5460,8 @@ MonoBehaviour:
     Handlers: {fileID: 11400000, guid: ca339f7632d881c41b03569f6f4502ef, type: 2}
   waypointServiceBehaviour: {fileID: 0}
   stateController: {fileID: 5294910621018447611}
+  logChaseDecisions: 1
+  followerChaseRefreshSeconds: 0.5
   reactivateArrivalTimeoutSeconds: 8
 --- !u!114 &4668187307536096702
 MonoBehaviour:
@@ -5495,6 +5497,7 @@ MonoBehaviour:
   deadZoneX: 5
   deadZoneY: 5
   updateLoop: 0
+  logFollowerPathing: 1
   bodyMaintenance: {fileID: 4668187307536096702}
   attackController: {fileID: 0}
   isBoss: 0
@@ -5731,7 +5734,7 @@ GameObject:
   - component: {fileID: 9055581795490573553}
   - component: {fileID: 5268553202310597799}
   - component: {fileID: 1543695915591252793}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: BodyUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6399,7 +6402,7 @@ GameObject:
   - component: {fileID: 3643528424105112006}
   - component: {fileID: 3629174880348601133}
   - component: {fileID: 7177935945624299458}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: 'RArm '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6499,4 +6502,3 @@ MonoBehaviour:
     m_Extent: {x: 0.42308474, y: 0.857615, z: 0}
   m_AlwaysUpdate: 1
   m_AutoRebind: 0
-

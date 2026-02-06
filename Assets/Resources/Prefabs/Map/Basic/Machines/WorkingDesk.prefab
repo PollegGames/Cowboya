@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   machine: {fileID: 1403945648289567780}
+  logSlotDecisions: 1
 --- !u!61 &429215285151596846
 BoxCollider2D:
   m_ObjectHideFlags: 0

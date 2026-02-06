@@ -17,12 +17,15 @@ public class RobotBrain : MonoBehaviour
     [SerializeField] private RoleTaskHandlerBinding[] roleTaskHandlers;
     [SerializeField] private MonoBehaviour waypointServiceBehaviour;
     [SerializeField] private RobotStateController stateController;
+    [SerializeField] private bool logChaseDecisions = true;
+    [SerializeField] private float followerChaseRefreshSeconds = 0.5f;
 
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
     private SecurityMachine homeSecurityMachine;
     private Coroutine reactivateRoutine;
     private Coroutine waitAtMachineRoutine;
+    private Coroutine followerChaseRoutine;
     [SerializeField] private float reactivateArrivalTimeoutSeconds = 8f;
 
     private void Awake()
@@ -56,6 +59,7 @@ public class RobotBrain : MonoBehaviour
             heart.OnTaskChanged -= HandleTaskChanged;
         if (stateController != null)
             stateController.OnStateChanged -= HandleStateChanged;
+        StopFollowerChaseRefresh();
     }
 
     public void InitializeServices(IWaypointService waypointService, IRobotRespawnService respawnService)
@@ -103,12 +107,26 @@ public class RobotBrain : MonoBehaviour
         if (task == null)
             return;
 
+        if (ShouldLogChase)
+        {
+            Debug.Log(
+                $"[Follower][Chase] {name} task -> {task.Type} payload={DescribePayload(task.Payload)}",
+                this);
+        }
+
         if (taskHandlers != null && taskHandlers.TryHandle(task.Type, task.Payload, this))
+        {
+            HandleFollowerChaseRefresh(task);
             return;
+        }
 
         if (TryFallbackHandle(task))
+        {
+            HandleFollowerChaseRefresh(task);
             return;
+        }
 
+        HandleFollowerChaseRefresh(task);
         Debug.LogWarning($"[{nameof(RobotBrain)}] No handler for task {task.Type} on {name}");
     }
 
@@ -189,14 +207,17 @@ public class RobotBrain : MonoBehaviour
             case RobotTaskType.ChasePlayer:
                 if (waypointService != null && waypointService.ClosestWaypointToPlayer != null)
                 {
+                    LogChase($"ChasePlayer -> closest waypoint {waypointService.ClosestWaypointToPlayer.name}");
                     body.SetDestination(waypointService.ClosestWaypointToPlayer, includeUnavailable: true);
                     return true;
                 }
                 if (memory != null && memory.LastKnownPlayerPosition != Vector3.zero)
                 {
+                    LogChase($"ChasePlayer -> lastKnown {memory.LastKnownPlayerPosition}");
                     body.SetDestination(memory.LastKnownPlayerPosition, includeUnavailable: true);
                     return true;
                 }
+                LogChase("ChasePlayer -> no target (closest waypoint or lastKnown missing)");
                 return false;
             default:
                 return false;
@@ -437,6 +458,83 @@ public class RobotBrain : MonoBehaviour
         }
 
         PushExplicitTask(RobotTaskType.Rest);
+    }
+
+    private void HandleFollowerChaseRefresh(RobotTask task)
+    {
+        if (heart == null || heart.Role != RobotRole.Follower)
+            return;
+
+        if (task.Type == RobotTaskType.ChasePlayer)
+            StartFollowerChaseRefresh();
+        else
+            StopFollowerChaseRefresh();
+    }
+
+    private void StartFollowerChaseRefresh()
+    {
+        if (followerChaseRoutine != null)
+            StopCoroutine(followerChaseRoutine);
+        followerChaseRoutine = StartCoroutine(FollowerChaseRefreshLoop());
+    }
+
+    private void StopFollowerChaseRefresh()
+    {
+        if (followerChaseRoutine == null)
+            return;
+        StopCoroutine(followerChaseRoutine);
+        followerChaseRoutine = null;
+    }
+
+    private IEnumerator FollowerChaseRefreshLoop()
+    {
+        float interval = Mathf.Max(0.1f, followerChaseRefreshSeconds);
+        var wait = new WaitForSeconds(interval);
+        while (heart != null && heart.CurrentTask != null && heart.CurrentTask.Type == RobotTaskType.ChasePlayer)
+        {
+            if (memory != null && memory.PlayerInAttackZone)
+            {
+                body?.StopMovement();
+                yield return wait;
+                continue;
+            }
+
+            if (body != null && body.HasActivePath)
+            {
+                yield return wait;
+                continue;
+            }
+
+            taskHandlers?.TryHandle(RobotTaskType.ChasePlayer, heart.CurrentTask.Payload, this);
+            yield return wait;
+        }
+        followerChaseRoutine = null;
+    }
+
+    private bool ShouldLogChase => logChaseDecisions && heart != null && heart.Role == RobotRole.Follower;
+
+    private void LogChase(string message)
+    {
+        if (!ShouldLogChase)
+            return;
+        Debug.Log($"[Follower][Chase] {name} {message}", this);
+    }
+
+    private static string DescribePayload(object payload)
+    {
+        if (payload == null)
+            return "null";
+        switch (payload)
+        {
+            case RoomWaypoint waypoint:
+                return $"waypoint:{waypoint.name}";
+            case Vector3 v3:
+                return $"vec3:{v3}";
+            case Vector2 v2:
+                return $"vec2:{v2}";
+            default:
+                return payload.ToString();
+        }
     }
 
 }

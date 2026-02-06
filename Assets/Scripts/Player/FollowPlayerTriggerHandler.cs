@@ -11,6 +11,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     [Header("References")]
     public Transform circleCenter; // typically the player's torso
     public float radius = 2f;
+    [SerializeField] private bool logDetectFlow = true;
 
     private Camera mainCamera;
     private bool isFacingRight = true;
@@ -81,10 +82,24 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             playerInAttackZone = true;
             brain?.Body?.StopMovement();
         }
+
+        if (logDetectFlow)
+        {
+            Debug.Log(
+                $"[{nameof(FollowPlayerTriggerHandler)}] {name} detect ENTER player={playerBodyReference?.name}",
+                this);
+        }
     }
 
     private void OnPlayerExitDetectZone()
     {
+        if (logDetectFlow)
+        {
+            Debug.Log(
+                $"[{nameof(FollowPlayerTriggerHandler)}] {name} detect EXIT player={playerBodyReference?.name}",
+                this);
+        }
+
         if (ShouldUseDetectZoneForAttack() && playerInAttackZone && playerBodyReference != null)
         {
             brain?.OnPlayerInAttackZoneChanged(false, playerBodyReference);
@@ -111,6 +126,13 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             playerInAttackZone = true;
         }
         OnPlayerDetectInAttackZoneChanged?.Invoke(true);
+
+        if (logDetectFlow)
+        {
+            Debug.Log(
+                $"[{nameof(FollowPlayerTriggerHandler)}] {name} attack ENTER player={playerBodyReference?.name}",
+                this);
+        }
     }
 
     private void OnPlayerExitAttackZone()
@@ -126,6 +148,13 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         memory?.SetPlayerInAttackZone(false);
         playerInAttackZone = false;
         OnPlayerDetectInAttackZoneChanged?.Invoke(false);
+
+        if (logDetectFlow)
+        {
+            Debug.Log(
+                $"[{nameof(FollowPlayerTriggerHandler)}] {name} attack EXIT player={playerBodyReference?.name}",
+                this);
+        }
     }
 
     void Update()
