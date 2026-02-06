@@ -24,13 +24,10 @@ public class ChaseTargetHandler : ScriptableRobotTaskHandler
             var closest = GetClosestWaypointSameFloor(brain.WaypointService, targetPos, 5f, includeUnavailable: true);
             if (closest != null)
             {
-                LogFollowerChase(brain, $"closestWaypointToPlayer={closest.name} pos={closest.WorldPos}");
                 brain.Body.SetDestination(closest, includeUnavailable: true);
                 return;
             }
         }
-
-        LogFollowerChase(brain, $"payloadType={(payload != null ? payload.GetType().Name : "null")} payload={payload}");
 
         Transform target = payload as Transform;
         if (target != null)
@@ -38,41 +35,29 @@ public class ChaseTargetHandler : ScriptableRobotTaskHandler
             var waypoint = target.GetComponent<RoomWaypoint>();
             if (waypoint != null)
             {
-                LogFollowerChase(brain, $"targetWaypoint={waypoint.name} pos={waypoint.WorldPos}");
                 brain.Body.SetDestination(waypoint, includeUnavailable: true);
                 return;
             }
-            LogFollowerChase(brain, $"targetTransform={target.name} pos={target.position}");
             brain.Body.SetDestination(target.position, includeUnavailable: true);
             return;
         }
 
         if (payload is RoomWaypoint roomWaypoint && roomWaypoint != null)
         {
-            LogFollowerChase(brain, $"payloadWaypoint={roomWaypoint.name} pos={roomWaypoint.WorldPos}");
             brain.Body.SetDestination(roomWaypoint, includeUnavailable: true);
             return;
         }
 
         if (payload is Vector3 payloadPos)
         {
-            LogFollowerChase(brain, $"payloadPos={payloadPos}");
             brain.Body.SetDestination(payloadPos, includeUnavailable: true);
             return;
         }
 
         if (brain.Memory != null && brain.Memory.LastKnownPlayerPosition != Vector3.zero)
         {
-            LogFollowerChase(brain, $"memoryPos={brain.Memory.LastKnownPlayerPosition}");
             brain.Body.SetDestination(brain.Memory.LastKnownPlayerPosition, includeUnavailable: true);
         }
-    }
-
-    private void LogFollowerChase(RobotBrain brain, string message)
-    {
-        if (brain == null || brain.Heart == null || brain.Heart.Role != RobotRole.Follower)
-            return;
-        Debug.Log($"[Follower][ChaseTarget] {message}", brain);
     }
 
     private static RoomWaypoint GetClosestWaypointSameFloor(

@@ -13,7 +13,6 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     [SerializeField] private float deadZoneX = 4f;
     [SerializeField] private float deadZoneY = 4f;
     [SerializeField] private UpdateLoop updateLoop = UpdateLoop.Update;
-    [SerializeField] private bool logFollowerPathing = true;
 
     [SerializeField] private RobotBodyMaintenance bodyMaintenance;
     [Header("Combat")]
@@ -40,7 +39,6 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
             // Follower prefab sometimes leaves bodyReference at root while hipRb moves; align to hip for correct path origin.
             if (bodyReference == transform && hipRb != null && hipRb.transform != transform)
                 bodyReference = hipRb.transform;
-            LogFollower($"Awake bodyReference={bodyReference?.name} hipRb={hipRb?.name} attackController={attackController?.name}");
         }
     }
 
@@ -58,8 +56,6 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
             SetupPathFollower();
         if (this.waypointNotifier != null && pathFollower != null)
             this.waypointNotifier.Subscribe(pathFollower);
-        LogFollower($"Initialize waypointQueries={waypointQueries?.GetType().Name} waypointNotifier={waypointNotifier?.GetType().Name} pathFollower={(pathFollower != null ? "ready" : "null")} bodyReference={bodyReference?.name}");
-
     }
 
     public void SetIsBoss(bool value)
@@ -103,23 +99,18 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     public void SetDestination(RoomWaypoint target, bool includeUnavailable = false)
     {
         pathFollower?.SetDestination(target, includeUnavailable);
-        LogFollower($"SetDestination waypoint={DescribeWaypoint(target)} includeUnavailable={includeUnavailable}");
-        LogPathState("PathState");
     }
 
     public void SetDestination(Vector3 worldPosition, bool includeUnavailable = false)
     {
         if (waypointQueries == null)
         {
-            LogFollower($"SetDestination worldPosition={worldPosition} includeUnavailable={includeUnavailable} but waypointQueries is null");
             return;
         }
         Vector2 position2D = worldPosition;
         RoomWaypoint waypoint = waypointQueries.GetClosestWaypoint(position2D, includeUnavailable);
         if (waypoint != null)
             pathFollower?.SetDestination(waypoint, worldPosition, includeUnavailable);
-        LogFollower($"SetDestination worldPosition={worldPosition} includeUnavailable={includeUnavailable} closestWaypoint={DescribeWaypoint(waypoint)}");
-        LogPathState("PathState");
     }
 
     public bool HasArrivedAtDestination() => pathFollower != null && pathFollower.HasArrived;
@@ -156,7 +147,6 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     public void StopMovement()
     {
         pathFollower?.ClearPath();
-        LogFollower("StopMovement (clearing path)");
     }
 
     private void OnDrawGizmos()
@@ -167,34 +157,6 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     private void OnDrawGizmosSelected()
     {
         pathFollower?.DrawGizmos();
-    }
-
-    private bool ShouldLogFollower => logFollowerPathing && heart != null && heart.Role == RobotRole.Follower;
-
-    private void LogFollower(string message)
-    {
-        if (!ShouldLogFollower)
-            return;
-        Debug.Log($"[Follower][Body] {message}", this);
-    }
-
-    private void LogPathState(string prefix)
-    {
-        if (!ShouldLogFollower || pathFollower == null)
-            return;
-        string target = pathFollower.CurrentTarget != null ? pathFollower.CurrentTarget.name : "null";
-        string lastAttempted = pathFollower.LastAttemptedWaypoint != null ? pathFollower.LastAttemptedWaypoint.name : "null";
-        Debug.Log(
-            $"[Follower][Body] {prefix} pathCount={pathFollower.CurrentPathCount} waypointCount={pathFollower.CurrentWaypointsCount} pathIndex={pathFollower.PathIndex} target={target} lastAttempted={lastAttempted}",
-            this);
-    }
-
-    private static string DescribeWaypoint(RoomWaypoint waypoint)
-    {
-        if (waypoint == null)
-            return "null";
-        string room = waypoint.parentRoom != null ? waypoint.parentRoom.name : "null";
-        return $"{waypoint.name} type={waypoint.type} parentRoom={room} isAvailable={waypoint.IsAvailable} worldPos={waypoint.WorldPos}";
     }
 
 }

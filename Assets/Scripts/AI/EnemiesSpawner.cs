@@ -13,7 +13,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     [Header("Hierarchy")]
     [SerializeField] private Transform enemiesParent;
-    [SerializeField] private bool logFollowerSpawn = true;
     private Transform dropContainer;
 
     private MapManager mapManager;
@@ -178,13 +177,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             return;
         }
 
-        LogFollowerSpawn(
-            $"spawnPos={spawnPos.name} type={spawnPos.type} parentRoom={spawnPos.parentRoom?.name} isAvailable={spawnPos.IsAvailable} worldPos={spawnPos.WorldPos}");
-        string neighborList = spawnPos.Neighbors != null && spawnPos.Neighbors.Count > 0
-            ? string.Join(", ", spawnPos.Neighbors.Select(wp => wp != null ? wp.name : "null"))
-            : "none";
-        LogFollowerSpawn($"neighbors count={spawnPos.Neighbors?.Count ?? 0} list={neighborList}");
-
         var state = go.GetComponent<RobotStateController>();
         if (state != null)
         {
@@ -202,19 +194,16 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             if (targetPosition != Vector3.zero)
             {
                 brain.Memory?.RememberPlayerPosition(targetPosition);
-                LogFollowerSpawn($"target=AlarmLastPlayerPos pos={targetPosition}");
                 brain.PushExplicitTask(RobotTaskType.ChasePlayer, targetPosition);
             }
             else if (waypointService != null && waypointService.ClosestWaypointToPlayer != null)
             {
                 var playerWaypoint = waypointService.ClosestWaypointToPlayer;
                 brain.Memory?.RememberPlayerPosition(playerWaypoint.WorldPos);
-                LogFollowerSpawn($"target=ClosestWaypointToPlayer waypoint={playerWaypoint.name} pos={playerWaypoint.WorldPos}");
                 brain.PushExplicitTask(RobotTaskType.ChasePlayer, playerWaypoint);
             }
             else
             {
-                LogFollowerSpawn($"target=ChasePlayer (pending) spawnPos={spawnPos.name}");
                 brain.PushExplicitTask(RobotTaskType.ChasePlayer);
             }
         }
@@ -385,13 +374,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             if (badge != null && inventory != null)
                 inventory.SetItem(PickupType.SecurityBadge, badge);
         }
-    }
-
-    private void LogFollowerSpawn(string message)
-    {
-        if (!logFollowerSpawn)
-            return;
-        Debug.Log($"[Follower][Spawn] {message}", this);
     }
 
 }

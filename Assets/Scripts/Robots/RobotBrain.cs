@@ -17,7 +17,6 @@ public class RobotBrain : MonoBehaviour
     [SerializeField] private RoleTaskHandlerBinding[] roleTaskHandlers;
     [SerializeField] private MonoBehaviour waypointServiceBehaviour;
     [SerializeField] private RobotStateController stateController;
-    [SerializeField] private bool logChaseDecisions = true;
     [SerializeField] private float followerChaseRefreshSeconds = 0.5f;
 
     private IWaypointService waypointService;
@@ -106,13 +105,6 @@ public class RobotBrain : MonoBehaviour
     {
         if (task == null)
             return;
-
-        if (ShouldLogChase)
-        {
-            Debug.Log(
-                $"[Follower][Chase] {name} task -> {task.Type} payload={DescribePayload(task.Payload)}",
-                this);
-        }
 
         if (taskHandlers != null && taskHandlers.TryHandle(task.Type, task.Payload, this))
         {
@@ -207,17 +199,14 @@ public class RobotBrain : MonoBehaviour
             case RobotTaskType.ChasePlayer:
                 if (waypointService != null && waypointService.ClosestWaypointToPlayer != null)
                 {
-                    LogChase($"ChasePlayer -> closest waypoint {waypointService.ClosestWaypointToPlayer.name}");
                     body.SetDestination(waypointService.ClosestWaypointToPlayer, includeUnavailable: true);
                     return true;
                 }
                 if (memory != null && memory.LastKnownPlayerPosition != Vector3.zero)
                 {
-                    LogChase($"ChasePlayer -> lastKnown {memory.LastKnownPlayerPosition}");
                     body.SetDestination(memory.LastKnownPlayerPosition, includeUnavailable: true);
                     return true;
                 }
-                LogChase("ChasePlayer -> no target (closest waypoint or lastKnown missing)");
                 return false;
             default:
                 return false;
@@ -509,32 +498,6 @@ public class RobotBrain : MonoBehaviour
             yield return wait;
         }
         followerChaseRoutine = null;
-    }
-
-    private bool ShouldLogChase => logChaseDecisions && heart != null && heart.Role == RobotRole.Follower;
-
-    private void LogChase(string message)
-    {
-        if (!ShouldLogChase)
-            return;
-        Debug.Log($"[Follower][Chase] {name} {message}", this);
-    }
-
-    private static string DescribePayload(object payload)
-    {
-        if (payload == null)
-            return "null";
-        switch (payload)
-        {
-            case RoomWaypoint waypoint:
-                return $"waypoint:{waypoint.name}";
-            case Vector3 v3:
-                return $"vec3:{v3}";
-            case Vector2 v2:
-                return $"vec2:{v2}";
-            default:
-                return payload.ToString();
-        }
     }
 
 }
