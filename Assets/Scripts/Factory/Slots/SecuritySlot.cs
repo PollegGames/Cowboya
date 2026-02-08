@@ -16,6 +16,16 @@ public class SecuritySlot : MonoBehaviour
                 Debug.Log($"[SecuritySlot] Ignored {brain.name} role={heart?.Role}", this);
             return;
         }
+        if (heart.CurrentTask != null && heart.CurrentTask.Type == RobotTaskType.ReactivateMachine)
+        {
+            var targetMachine = heart.CurrentTask.Payload as BaseMachine;
+            if (targetMachine != null && securityMachine != null && !ReferenceEquals(targetMachine, securityMachine))
+            {
+                if (logSlotDecisions)
+                    Debug.Log($"[SecuritySlot] Ignored {brain.name} reactivating {targetMachine.name}", this);
+                return;
+            }
+        }
         securityMachine.AttachRobot(brain.gameObject);
     }
 }

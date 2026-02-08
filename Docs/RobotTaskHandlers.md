@@ -10,6 +10,7 @@ Core flow
 - Gameplay code talks to the **Brain**, not the Heart. Call `RobotBrain.OnMachineStateChanged(payload, isOn)` or another Brain API.
 - The Brain decides which `RobotTask` to push into the Heart (e.g., ReactivateMachine when a machine turns off, WorkAtMachine when it turns on).
 - When the Heart surface changes, the Brain looks up a handler in a `RobotTaskHandlers` asset and executes it. If no handler exists, it falls back to simple movement and logs a warning.
+- `ReactivateMachine` must be handled by a task handler (e.g., `MoveToPayloadHandler`) that starts the reactivation routine; simple movement alone will not power the machine back on.
 
 How to set it up in the Editor
 ------------------------------

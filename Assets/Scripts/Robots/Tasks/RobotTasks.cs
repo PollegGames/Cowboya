@@ -87,7 +87,7 @@ public class RobotTaskStack
         int incomingPrecedence = GetPrecedence(task.Type);
         int currentTopPrecedence = Current != null ? GetPrecedence(Current.Type) : int.MinValue;
 
-        if (incomingPrecedence > currentTopPrecedence)
+        if (incomingPrecedence > currentTopPrecedence && ShouldClearLowerPrecedenceTasks(task.Type))
             stack.RemoveAll(t => GetPrecedence(t.Type) < incomingPrecedence);
 
         int insertIndex = GetInsertIndex(incomingPrecedence);
@@ -144,6 +144,19 @@ public class RobotTaskStack
     private int GetPrecedence(RobotTaskType type)
     {
         return precedence.TryGetValue(type, out int value) ? value : 0;
+    }
+
+    private static bool ShouldClearLowerPrecedenceTasks(RobotTaskType type)
+    {
+        switch (type)
+        {
+            case RobotTaskType.AttackTarget:
+            case RobotTaskType.ChasePlayer:
+                // Combat should temporarily override without erasing long-running intents.
+                return false;
+            default:
+                return true;
+        }
     }
 
     private static RobotTask MergeTasks(RobotTask existing, RobotTask incoming)

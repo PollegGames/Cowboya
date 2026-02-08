@@ -70,6 +70,15 @@ public class SecurityMachine : BaseMachine
         base.ReleaseRobot();
     }
 
+    public void VacateGuard(RobotBrain guard)
+    {
+        if (guard == null || currentGuardBrain != guard)
+            return;
+
+        currentGuardBrain = null;
+        base.ReleaseRobot();
+    }
+
     private void SendGuardToRest(RobotBrain guard)
     {
         if (guard == null) return;

@@ -115,7 +115,6 @@ public class WaypointService : MonoBehaviour, IWaypointService
             );
         if (sp == null)
             Debug.LogWarning("No start point found.");
-        Debug.Log($"[WaypointService] Start Point: {sp?.WorldPos}");
         return sp;
     }
 
@@ -375,7 +374,29 @@ public class WaypointService : MonoBehaviour, IWaypointService
             }
         }
 
-        return null;
+        // Fallback to any rest point even if no resting machines are powered on.
+        var fallbackRestPoints = allWaypoints
+            .Where(wp =>
+                wp != null
+                && wp.parentRoom != null
+                && wp.parentRoom.roomProperties.usageType == UsageType.POI
+                && wp.type == WaypointType.Rest
+            )
+            .Where(wp => wp != exclude)
+            .ToList();
+
+        if (!fallbackRestPoints.Any())
+            return null;
+
+        var fallbackUnreserved = fallbackRestPoints.Where(wp => !reservedWaypoints.Contains(wp)).ToList();
+        if (fallbackUnreserved.Any())
+        {
+            var chosen = fallbackUnreserved.First();
+            reservedWaypoints.Add(chosen);
+            return chosen;
+        }
+
+        return fallbackRestPoints.FirstOrDefault();
     }
 
     public RoomWaypoint GetFirstFreeSecurityPoint()

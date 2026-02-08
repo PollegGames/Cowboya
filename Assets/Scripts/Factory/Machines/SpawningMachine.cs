@@ -46,9 +46,6 @@ public class SpawningMachine : BaseMachine
         if (factoryAlarmStatus != null)
             factoryAlarmStatus.OnAlarmStateChanged -= HandleAlarmChanged;
 
-        if (securityManager != null)
-            securityManager.OnSecurityMachineTurnedOff -= HandleSecurityMachineTurnedOff;
-
         StopSpawning();
         UnsubscribeFromWorkerState();
     }
@@ -72,8 +69,6 @@ public class SpawningMachine : BaseMachine
     public void InitializeSecurityManager(MachineSecurityManager manager)
     {
         securityManager = manager;
-        if (securityManager != null)
-            securityManager.OnSecurityMachineTurnedOff += HandleSecurityMachineTurnedOff;
     }
 
     public override void PowerOn()
@@ -197,17 +192,6 @@ public class SpawningMachine : BaseMachine
         var spawnPos = trigger.transform.position;
         var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
         enemiesSpawner.CreateAndSpawnFollowerGuard(lastVisitedPoint, factoryAlarmStatus);
-
-    }
-
-    private void HandleSecurityMachineTurnedOff(SecurityMachine machine)
-    {
-        if (!isOn || enemiesSpawner == null)
-            return;
-
-        var spawnPos = trigger.transform.position;
-        var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
-        enemiesSpawner.CreateAndSpawnSecurityGuard(lastVisitedPoint, machine);
 
     }
 

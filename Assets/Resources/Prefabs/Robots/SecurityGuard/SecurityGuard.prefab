@@ -2365,10 +2365,6 @@ MonoBehaviour:
   attackZone: {fileID: 7211130415348659133}
   circleCenter: {fileID: 4172600288706783507}
   radius: 3
-  detectRecalcSeconds: 5
-  directChaseDistance: 5
-  chaseTargetBias: 0.8
-  logDetectFlow: 1
   memory: {fileID: 224319907144265982}
   brain: {fileID: 2059339075112266266}
 --- !u!1 &3745571107507111190
@@ -5765,10 +5761,10 @@ MonoBehaviour:
     Handlers: {fileID: 11400000, guid: 1d2b2b0f631ed4a409dc543a129af7bd, type: 2}
   waypointServiceBehaviour: {fileID: 0}
   stateController: {fileID: 6491073062591767818}
-  directChaseDistance: 5
-  logChaseDecisions: 1
-  chaseRefreshSeconds: 1
+  followerChaseRefreshSeconds: 0.5
   reactivateArrivalTimeoutSeconds: 8
+  reactivateProximityThreshold: 2
+  logReactivation: 1
 --- !u!114 &8898253893182114851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5800,8 +5796,8 @@ MonoBehaviour:
   hipRb: {fileID: 1936784638377024432}
   arrivalThresholdX: 1
   arrivalThresholdY: 2
-  deadZoneX: 3
-  deadZoneY: 5
+  deadZoneX: 2
+  deadZoneY: 3
   updateLoop: 0
   bodyMaintenance: {fileID: 8898253893182114851}
   attackController: {fileID: 5784438595850109908}

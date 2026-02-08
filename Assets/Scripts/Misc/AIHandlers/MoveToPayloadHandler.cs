@@ -20,12 +20,6 @@ public class MoveToPayloadHandler : ScriptableRobotTaskHandler
             var target = machine.GetComponent<RoomWaypoint>();
             if (target != null) brain.Body.SetDestination(target);
             else brain.Body.SetDestination(machine.transform.position);
-            if (brain.Heart != null
-                && brain.Heart.CurrentTask != null
-                && brain.Heart.CurrentTask.Type == RobotTaskType.ReactivateMachine)
-            {
-                brain.RunReactivateRoutine(machine);
-            }
         }
         else if (payload is Vector3 v3)
         {

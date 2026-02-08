@@ -148,6 +148,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine)
     {
+        _ = machine;
         var prefab = securityGuardPrefab != null ? securityGuardPrefab : bossPrefab;
         if (prefab == null)
         {
@@ -340,7 +341,10 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         {
             brain.InitializeServices(waypointService, respawnService);
             if (role == RobotRole.SecurityGuard && securityManager != null)
+            {
+                brain.SetSecurityManager(securityManager);
                 securityManager.RegisterGuard(brain);
+            }
         }
 
         var bodyController = go.GetComponent<RobotBodyController>();

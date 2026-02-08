@@ -114,6 +114,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     }
 
     public bool HasArrivedAtDestination() => pathFollower != null && pathFollower.HasArrived;
+    public RoomWaypoint CurrentTarget => pathFollower != null ? pathFollower.CurrentTarget : null;
     public bool HasActivePath =>
         pathFollower != null
         && pathFollower.CurrentPathCount > 0
@@ -148,6 +149,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     {
         pathFollower?.ClearPath();
     }
+
 
     private void OnDrawGizmos()
     {

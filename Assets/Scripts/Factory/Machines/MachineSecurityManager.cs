@@ -27,6 +27,24 @@ public class MachineSecurityManager : MonoBehaviour
     public event Action<RestingMachine> OnRestingMachineTurnedOff;
     public event Action<SecurityMachine> OnSecurityMachineTurnedOff;
 
+    private void OnEnable()
+    {
+        if (reservationService != null)
+        {
+            reservationService.OnMachineFreed += HandleMachineFreed;
+            reservationService.OnMachinePoweredOn += HandleMachinePoweredOn;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (reservationService != null)
+        {
+            reservationService.OnMachineFreed -= HandleMachineFreed;
+            reservationService.OnMachinePoweredOn -= HandleMachinePoweredOn;
+        }
+    }
+
     public void RegisterFactoryMachine(FactoryMachine machine)
     {
         if (machine == null || factoryMachines.Contains(machine)) return;
@@ -67,6 +85,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (guard == null || guards.Contains(guard)) return;
         Debug.Log($"Registering guard: {guard.name}");
         guards.Add(guard);
+        RequestGuardPost(guard);
     }
 
     public void UnregisterGuard(RobotBrain guard)
@@ -77,7 +96,7 @@ public class MachineSecurityManager : MonoBehaviour
 
     private void HandleSecurityMachineTurningOff(SecurityMachine machine, RobotBrain currentGuard)
     {
-        // Dispatch a different guard to reactivate; skip the one that was stationed there.
+        // Dispatch a different guard to reactivate; fall back to the current guard if it's the only eligible one.
         if (machine == null)
             return;
 
@@ -119,6 +138,10 @@ public class MachineSecurityManager : MonoBehaviour
             OnSecurityMachineTurnedOff?.Invoke(machine);
             DispatchGuardForSecurityMachine(machine, null);
         }
+        else if (reservationService == null)
+        {
+            TryAssignClosestRestingGuard(machine);
+        }
 
         CheckAllMachinesOff();
     }
@@ -145,8 +168,7 @@ public class MachineSecurityManager : MonoBehaviour
         foreach (var guard in guards)
         {
             if (guard == null) continue;
-            if (guard == null)
-                continue;
+            if (!IsGuardStationedAtSecurityMachine(guard)) continue;
 
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
@@ -158,6 +180,10 @@ public class MachineSecurityManager : MonoBehaviour
 
         if (best == null)
             return;
+
+        var home = best.HomeSecurityMachine;
+        if (home != null)
+            home.VacateGuard(best);
 
         PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
     }
@@ -174,8 +200,7 @@ public class MachineSecurityManager : MonoBehaviour
         foreach (var guard in guards)
         {
             if (guard == null) continue;
-            if (guard == null)
-                continue;
+            if (!IsGuardStationedAtSecurityMachine(guard)) continue;
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
             {
@@ -187,13 +212,176 @@ public class MachineSecurityManager : MonoBehaviour
         if (best == null)
             return;
 
+        var home = best.HomeSecurityMachine;
+        if (home != null)
+            home.VacateGuard(best);
+
         PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
     }
 
-    private void DispatchGuardForSecurityMachine(SecurityMachine machine, RobotBrain skipGuard)
+    private bool DispatchGuardForSecurityMachine(SecurityMachine machine, RobotBrain skipGuard)
     {
         Debug.Log($"Dispatching guard for security machine: {machine.name}");
-        if (machine == null || guards.Count == 0) return;
+        if (machine == null || guards.Count == 0) return false;
+
+        RobotBrain best = null;
+        float bestDist = float.MaxValue;
+        var pos = machine.transform.position;
+        bool skippedEligible = false;
+
+        foreach (var guard in guards)
+        {
+            if (guard == null) continue;
+            if (!IsGuardStationedAtSecurityMachine(guard)) continue;
+            if (skipGuard != null && ReferenceEquals(guard, skipGuard))
+            {
+                skippedEligible = true;
+                continue;
+            }
+
+            float dist = Vector2.Distance(guard.transform.position, pos);
+            if (dist < bestDist)
+            {
+                best = guard;
+                bestDist = dist;
+            }
+        }
+
+        if (best == null && skippedEligible)
+            best = skipGuard;
+
+        if (best == null)
+            return false;
+
+        var home = best.HomeSecurityMachine;
+        if (home != null)
+            home.VacateGuard(best);
+
+        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
+        return true;
+    }
+
+    public bool RequestGuardPost(RobotBrain guard)
+    {
+        if (guard == null)
+            return false;
+
+        if (TryAssignGuardToSecurityMachine(guard))
+            return true;
+
+        RoomWaypoint restPoint = null;
+        if (guard.WaypointService != null)
+        {
+            restPoint = guard.WaypointService.GetFirstRestPoint();
+            if (restPoint == null)
+                restPoint = guard.WaypointService.GetWorkOrRestPoint();
+            if (restPoint == null)
+                restPoint = guard.WaypointService.GetStartPoint();
+        }
+
+        if (restPoint != null)
+            guard.PushExplicitTask(RobotTaskType.Rest, restPoint);
+        else
+            guard.PushExplicitTask(RobotTaskType.Rest);
+        return true;
+    }
+
+    private bool TryAssignGuardToSecurityMachine(RobotBrain guard)
+    {
+        if (guard == null)
+            return false;
+
+        SecurityMachine target = null;
+        if (reservationService != null)
+        {
+            target = reservationService.ReserveClosestStation(
+                RobotRole.SecurityGuard,
+                guard.transform.position,
+                MachineType.SecurityMachine) as SecurityMachine;
+        }
+
+        if (target == null)
+        {
+            target = FindClosestAvailableSecurityMachine(guard.transform.position);
+        }
+
+        if (target == null)
+            return false;
+
+        guard.PushExplicitTask(RobotTaskType.GuardPost, target);
+        return true;
+    }
+
+    private SecurityMachine FindClosestAvailableSecurityMachine(Vector3 position)
+    {
+        SecurityMachine best = null;
+        float bestDist = float.MaxValue;
+
+        foreach (var machine in securityMachines)
+        {
+            if (machine == null)
+                continue;
+            if (!machine.IsOn || machine.IsOccupied)
+                continue;
+
+            float dist = Vector2.Distance(position, machine.transform.position);
+            if (dist < bestDist)
+            {
+                best = machine;
+                bestDist = dist;
+            }
+        }
+
+        return best;
+    }
+
+    private RestingMachine FindClosestAvailableRestMachine(Vector3 position)
+    {
+        RestingMachine best = null;
+        float bestDist = float.MaxValue;
+
+        foreach (var machine in restingMachines)
+        {
+            if (machine == null)
+                continue;
+            if (!machine.IsOn)
+                continue;
+
+            float dist = Vector2.Distance(position, machine.transform.position);
+            if (dist < bestDist)
+            {
+                best = machine;
+                bestDist = dist;
+            }
+        }
+
+        return best;
+    }
+
+    private void HandleMachineFreed(BaseMachine machine)
+    {
+        if (machine is SecurityMachine security)
+            TryAssignClosestRestingGuard(security);
+    }
+
+    private void HandleMachinePoweredOn(BaseMachine machine)
+    {
+        if (machine is SecurityMachine security)
+            TryAssignClosestRestingGuard(security);
+    }
+
+    private bool TryAssignClosestRestingGuard(SecurityMachine machine)
+    {
+        if (machine == null || !machine.IsOn || machine.IsOccupied)
+            return false;
+
+        bool reserved = false;
+        if (reservationService != null)
+        {
+            reserved = reservationService.TryReserveStation(machine, RobotRole.SecurityGuard);
+            if (!reserved)
+                return false;
+        }
 
         RobotBrain best = null;
         float bestDist = float.MaxValue;
@@ -202,7 +390,13 @@ public class MachineSecurityManager : MonoBehaviour
         foreach (var guard in guards)
         {
             if (guard == null) continue;
-            if (skipGuard != null && ReferenceEquals(guard, skipGuard)) continue;
+            if (IsGuardStationedAtSecurityMachine(guard)) continue;
+            if (guard.Heart == null)
+                continue;
+            if (guard.Heart.CurrentTask != null
+                && guard.Heart.CurrentTask.Type != RobotTaskType.Rest
+                && guard.Heart.CurrentTask.Type != RobotTaskType.Idle)
+                continue;
 
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
@@ -213,9 +407,22 @@ public class MachineSecurityManager : MonoBehaviour
         }
 
         if (best == null)
-            return;
+        {
+            if (reserved)
+                reservationService.ReleaseStation(machine);
+            return false;
+        }
 
-        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
+        best.PushExplicitTask(RobotTaskType.GuardPost, machine);
+        return true;
+    }
+
+    private static bool IsGuardStationedAtSecurityMachine(RobotBrain guard)
+    {
+        if (guard == null)
+            return false;
+        var home = guard.HomeSecurityMachine;
+        return home != null && home.IsOn && home.CurrentGuard == guard;
     }
 
     /// <summary>

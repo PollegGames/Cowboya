@@ -111,6 +111,62 @@ public class StationReservationService : MonoBehaviour
     }
 
     /// <summary>
+    /// Reserves and returns the closest available machine for the specified role.
+    /// </summary>
+    /// <param name="role">The role requesting a machine.</param>
+    /// <param name="position">World position used to find the closest machine.</param>
+    /// <param name="typeFilter">Optional machine type filter.</param>
+    /// <returns>The reserved machine or <c>null</c> if none are available.</returns>
+    public BaseMachine ReserveClosestStation(RobotRole role, Vector3 position, MachineType? typeFilter = null)
+    {
+        var list = available[role];
+        if (list.Count == 0) return null;
+
+        BaseMachine best = null;
+        float bestDist = float.MaxValue;
+
+        foreach (var machine in list)
+        {
+            if (machine == null) continue;
+            if (typeFilter.HasValue && machine.Type != typeFilter.Value) continue;
+
+            float dist = Vector2.Distance(position, machine.transform.position);
+            if (dist < bestDist)
+            {
+                best = machine;
+                bestDist = dist;
+            }
+        }
+
+        if (best == null)
+            return null;
+
+        list.Remove(best);
+        return best;
+    }
+
+    /// <summary>
+    /// Attempts to reserve a specific machine for the specified role.
+    /// </summary>
+    /// <param name="machine">Machine to reserve.</param>
+    /// <param name="role">Role requesting the machine.</param>
+    /// <returns><c>true</c> if the machine was reserved.</returns>
+    public bool TryReserveStation(BaseMachine machine, RobotRole role)
+    {
+        if (machine == null)
+            return false;
+
+        if (!available.TryGetValue(role, out var list))
+            return false;
+
+        if (!list.Contains(machine))
+            return false;
+
+        list.Remove(machine);
+        return true;
+    }
+
+    /// <summary>
     /// Releases a previously reserved machine, making it available again.
     /// </summary>
     /// <param name="machine">The machine to release.</param>

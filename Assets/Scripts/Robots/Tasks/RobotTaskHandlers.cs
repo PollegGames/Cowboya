@@ -33,11 +33,22 @@ public class RobotTaskHandlers : ScriptableObject
         if (cached != null)
             return;
         cached = new Dictionary<RobotTaskType, IRobotTaskHandler>();
+        HashSet<RobotTaskType> duplicates = null;
         foreach (var entry in entries)
         {
             if (entry == null || entry.Handler == null)
                 continue;
+            if (cached.ContainsKey(entry.Type))
+            {
+                duplicates ??= new HashSet<RobotTaskType>();
+                duplicates.Add(entry.Type);
+            }
             cached[entry.Type] = entry.Handler;
+        }
+        if (duplicates != null)
+        {
+            foreach (var duplicate in duplicates)
+                Debug.LogWarning($"[RobotTaskHandlers] Duplicate handler mapping for task={duplicate} in asset={name}. Last entry wins.", this);
         }
     }
 }

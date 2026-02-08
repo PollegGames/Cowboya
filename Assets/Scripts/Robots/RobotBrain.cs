@@ -21,11 +21,15 @@ public class RobotBrain : MonoBehaviour
 
     private IWaypointService waypointService;
     private IRobotRespawnService respawnService;
+    private MachineSecurityManager securityManager;
     private SecurityMachine homeSecurityMachine;
+    private BaseMachine pendingReactivateMachine;
     private Coroutine reactivateRoutine;
     private Coroutine waitAtMachineRoutine;
     private Coroutine followerChaseRoutine;
     [SerializeField] private float reactivateArrivalTimeoutSeconds = 8f;
+    [SerializeField] private float reactivateProximityThreshold = 2f;
+    [SerializeField] private bool logReactivation = true;
 
     private void Awake()
     {
@@ -71,6 +75,11 @@ public class RobotBrain : MonoBehaviour
             memory.SetRespawnService(respawnService);
     }
 
+    public void SetSecurityManager(MachineSecurityManager manager)
+    {
+        securityManager = manager;
+    }
+
     /// <summary>
     /// Called when a machine relevant to this robot changes state.
     /// </summary>
@@ -99,6 +108,9 @@ public class RobotBrain : MonoBehaviour
         float? timeout = config != null ? config.GetTimeout(type) : (float?)null;
         int urgency = config != null ? config.GetUrgency(type) : 0;
         heart.TryPushTask(new RobotTask(type, payload, timeout, urgency));
+
+        if (type == RobotTaskType.ReactivateMachine && payload is BaseMachine machine)
+            pendingReactivateMachine = machine;
     }
 
     protected virtual void HandleTaskChanged(RobotTask task)
@@ -128,6 +140,11 @@ public class RobotBrain : MonoBehaviour
     public IWaypointService WaypointService => waypointService;
     public RobotHeart Heart => heart;
     public SecurityMachine HomeSecurityMachine => homeSecurityMachine;
+    public BaseMachine PendingReactivateMachine => pendingReactivateMachine;
+    public float ReactivateArrivalTimeoutSeconds => reactivateArrivalTimeoutSeconds;
+    public float ReactivateProximityThreshold => reactivateProximityThreshold;
+    public bool LogReactivation => logReactivation;
+    public bool IsSecurityGuard => heart != null && heart.Role == RobotRole.SecurityGuard;
 
     /// <summary>
     /// Entry point for perception to report that the player entered or left melee range.
@@ -187,7 +204,6 @@ public class RobotBrain : MonoBehaviour
         switch (task.Type)
         {
             case RobotTaskType.WorkAtMachine:
-            case RobotTaskType.ReactivateMachine:
             case RobotTaskType.Rest:
             case RobotTaskType.GuardPost:
             case RobotTaskType.ReturnHome:
@@ -195,7 +211,9 @@ public class RobotBrain : MonoBehaviour
             case RobotTaskType.Investigate:
             case RobotTaskType.Idle:
             case RobotTaskType.SpawnFollowers:
-                return TryMoveToPayload(task.Payload);
+                {
+                    return TryMoveToPayload(task.Payload);
+                }
             case RobotTaskType.ChasePlayer:
                 if (waypointService != null && waypointService.ClosestWaypointToPlayer != null)
                 {
@@ -363,16 +381,6 @@ public class RobotBrain : MonoBehaviour
         return null;
     }
 
-    public void RunReactivateRoutine(BaseMachine machine)
-    {
-        if (machine == null || heart == null || heart.CurrentTask == null || heart.CurrentTask.Type != RobotTaskType.ReactivateMachine)
-            return;
-
-        if (reactivateRoutine != null)
-            StopCoroutine(reactivateRoutine);
-        reactivateRoutine = StartCoroutine(ReactivateAndReturnRoutine(machine));
-    }
-
     public void CompleteCurrentTask()
     {
         heart?.CompleteCurrentTask();
@@ -383,26 +391,6 @@ public class RobotBrain : MonoBehaviour
         if (waitAtMachineRoutine != null)
             StopCoroutine(waitAtMachineRoutine);
         waitAtMachineRoutine = StartCoroutine(WaitAtMachineRoutine(machine, waitSeconds));
-    }
-
-    private IEnumerator ReactivateAndReturnRoutine(BaseMachine machine)
-    {
-        float start = Time.time;
-        while (body != null
-            && !body.HasArrivedAtDestination()
-            && (reactivateArrivalTimeoutSeconds <= 0f || Time.time - start < reactivateArrivalTimeoutSeconds))
-        {
-            yield return null;
-        }
-
-        if (machine != null && !machine.IsOn)
-            machine.PowerOn();
-
-        heart?.CompleteCurrentTask();
-        reactivateRoutine = null;
-
-        if (heart != null && heart.Role == RobotRole.SecurityGuard)
-            SendGuardHomeOrRest();
     }
 
     private IEnumerator WaitAtMachineRoutine(BaseMachine machine, float waitSeconds)
@@ -421,13 +409,56 @@ public class RobotBrain : MonoBehaviour
         waitAtMachineRoutine = null;
     }
 
+    public bool HasArrivedAtExpectedMachine(BaseMachine machine, RoomWaypoint expectedWaypoint)
+    {
+        if (body == null || machine == null)
+            return false;
+
+        if (expectedWaypoint != null)
+        {
+            if (!ReferenceEquals(body.CurrentTarget, expectedWaypoint))
+                return false;
+            return body.HasArrivedAtDestination();
+        }
+
+        if (!body.HasArrivedAtDestination())
+            return false;
+
+        float threshold = Mathf.Max(0.1f, reactivateProximityThreshold);
+        float dist = Vector2.Distance(body.transform.position, machine.transform.position);
+        return dist <= threshold;
+    }
+
+    public void StartReactivateRoutine(IEnumerator routine)
+    {
+        if (routine == null)
+            return;
+
+        if (reactivateRoutine != null)
+            StopCoroutine(reactivateRoutine);
+        reactivateRoutine = StartCoroutine(routine);
+    }
+
+    public void EndReactivateRoutine()
+    {
+        reactivateRoutine = null;
+    }
+
+    public void CompleteReactivateTask(BaseMachine machine, bool reached)
+    {
+        if (ReferenceEquals(pendingReactivateMachine, machine))
+            pendingReactivateMachine = null;
+
+        heart?.CompleteCurrentTask();
+
+        if (heart != null && heart.Role == RobotRole.SecurityGuard)
+            SendGuardHomeOrRest();
+    }
+
     private void SendGuardHomeOrRest()
     {
-        if (homeSecurityMachine != null && homeSecurityMachine.IsOn)
-        {
-            PushExplicitTask(RobotTaskType.GuardPost, homeSecurityMachine);
+        if (securityManager != null && securityManager.RequestGuardPost(this))
             return;
-        }
 
         if (waypointService != null)
         {
