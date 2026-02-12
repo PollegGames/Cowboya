@@ -227,18 +227,21 @@ public class FactoryMachine : BaseMachine
         }
         if (payload == null)
             payload = transform.position;
+        Debug.Log($"[WorkerRestDebug][FactoryMachine.SendWorkerToRest] machine={name} isOn={isOn} worker={worker.name} payloadType={(payload!=null?payload.GetType().Name:"null")} payload={payload}");
         worker.OnMachineStateChanged(payload, false);
     }
 
     private void SendWorkerToWork(RobotBrain worker)
     {
         if (worker == null) return;
+        Debug.Log($"[WorkerRestDebug][FactoryMachine.SendWorkerToWork] machine={name} isOn={isOn} worker={worker.name} payloadType={this.GetType().Name} payload={this}");
         worker.OnMachineStateChanged(this, true);
     }
 
     private void SetWorkerToWork(RobotBrain worker)
     {
         if (worker == null) return;
+        Debug.Log($"[WorkerRestDebug][FactoryMachine.SetWorkerToWork] machine={name} isOn={isOn} worker={worker.name}");
         worker.OnMachineStateChanged(this, true);
     }
 

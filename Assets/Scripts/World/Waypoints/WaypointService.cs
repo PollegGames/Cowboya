@@ -374,6 +374,9 @@ public class WaypointService : MonoBehaviour, IWaypointService
             }
         }
 
+        // If here, there were no restPoints where resting machines are ON. Log for debugging.
+        Debug.Log("[WaypointService] No rest points with ON resting machines found; falling back to any rest point.");
+
         // Fallback to any rest point even if no resting machines are powered on.
         var fallbackRestPoints = allWaypoints
             .Where(wp =>

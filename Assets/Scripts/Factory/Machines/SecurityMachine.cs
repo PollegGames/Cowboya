@@ -82,10 +82,8 @@ public class SecurityMachine : BaseMachine
     private void SendGuardToRest(RobotBrain guard)
     {
         if (guard == null) return;
-        object payload = null;
-        if (waypointService != null)
-            payload = waypointService.GetFirstRestPoint();
-        guard.OnMachineStateChanged(payload ?? this, false);
+        // Send null so the brain re-evaluates without machine context.
+        guard.OnMachineStateChanged(null, false);
     }
 
     private void SetGuardToSecurityPost(RobotBrain guard)

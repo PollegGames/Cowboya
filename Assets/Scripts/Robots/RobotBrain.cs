@@ -54,6 +54,7 @@ public class RobotBrain : MonoBehaviour
             heart.OnTaskChanged += HandleTaskChanged;
         if (stateController != null)
             stateController.OnStateChanged += HandleStateChanged;
+        
     }
 
     private void OnDisable()
@@ -62,6 +63,7 @@ public class RobotBrain : MonoBehaviour
             heart.OnTaskChanged -= HandleTaskChanged;
         if (stateController != null)
             stateController.OnStateChanged -= HandleStateChanged;
+        
         StopFollowerChaseRefresh();
     }
 
@@ -88,11 +90,18 @@ public class RobotBrain : MonoBehaviour
         if (heart == null)
             return;
 
+        Debug.Log($"[WorkerRestDebug][RobotBrain.OnMachineStateChanged] robot={name} machineType={(machine!=null?machine.GetType().Name:"null")} machinePayload={machine} isOn={isOn}");
+
         RobotTask task = BuildTaskForMachine(machine, isOn);
         if (task != null)
         {
+            Debug.Log($"[WorkerRestDebug][RobotBrain.OnMachineStateChanged] robot={name} resolvedTask={task.Type} taskPayload={(task.Payload!=null?task.Payload.ToString():"null")} expireAt={(task.ExpireAt.HasValue?task.ExpireAt.ToString():"null")} urgency={task.Urgency}");
             heart.CompleteCurrentTask();
             heart.TryPushTask(task);
+        }
+        else
+        {
+            Debug.Log($"[WorkerRestDebug][RobotBrain.OnMachineStateChanged] robot={name} no task resolved for machinePayload={machine}");
         }
     }
 
@@ -116,7 +125,9 @@ public class RobotBrain : MonoBehaviour
     protected virtual void HandleTaskChanged(RobotTask task)
     {
         if (task == null)
+        {
             return;
+        }
 
         if (taskHandlers != null && taskHandlers.TryHandle(task.Type, task.Payload, this))
         {
@@ -295,7 +306,7 @@ public class RobotBrain : MonoBehaviour
                 }
                 break;
             case RobotTaskType.Rest:
-                if (machine is FactoryMachine && waypointService != null)
+                if ((machine is FactoryMachine || machine is RestingMachine) && waypointService != null)
                 {
                     var restPoint = waypointService.GetFirstRestPoint();
                     if (restPoint != null)
@@ -336,6 +347,7 @@ public class RobotBrain : MonoBehaviour
     {
         if (payload is RoomWaypoint waypoint && waypoint != null)
         {
+            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to RoomWaypoint {waypoint.name}");
             body.SetDestination(waypoint);
             return true;
         }
@@ -345,23 +357,27 @@ public class RobotBrain : MonoBehaviour
             var target = machine.GetComponent<RoomWaypoint>();
             if (target != null)
             {
+                Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to machine's waypoint {target.name} (machine {machine.name})");
                 body.SetDestination(target);
                 return true;
             }
 
             // If the machine does not expose a RoomWaypoint, still move toward its position.
+            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to machine position {machine.transform.position} (machine {machine.name})");
             body.SetDestination(machine.transform.position);
             return true;
         }
 
         if (payload is Vector3 v3)
         {
+            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to Vector3 {v3}");
             body.SetDestination(v3);
             return true;
         }
 
         if (payload is Vector2 v2)
         {
+            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to Vector2 {v2}");
             body.SetDestination(v2);
             return true;
         }

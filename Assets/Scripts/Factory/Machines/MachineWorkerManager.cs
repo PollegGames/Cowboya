@@ -42,9 +42,6 @@ public class MachineWorkerManager : MonoBehaviour
 
         // Store that this worker was attached to this machine
         waitingWorkers[worker] = machine;
-        PushBrainIntent(worker, RobotTaskType.Rest, machine, false);
-
-        AssignToFirstFreePointAvailable(worker);
     }
 
     private void OnMachineTurnedOn(FactoryMachine machine)
@@ -57,7 +54,6 @@ public class MachineWorkerManager : MonoBehaviour
                 var worker = pair.Key;
                 waitingWorkers.Remove(worker);
                 PushBrainIntent(worker, RobotTaskType.WorkAtMachine, machine, true);
-                machine.SendWorkerBackToWork(worker);
             }
         }
     }
@@ -67,6 +63,7 @@ public class MachineWorkerManager : MonoBehaviour
     /// </summary>
     public void AssignToFirstFreePointAvailable(RobotBrain worker)
     {
+        Debug.Log($"[WorkerRestDebug][MachineWorkerManager] AssignToFirstFreePointAvailable for worker={worker?.name}");
         worker.OnMachineStateChanged(null, false);
     }
 
@@ -78,4 +75,3 @@ public class MachineWorkerManager : MonoBehaviour
     }
 
 }
-

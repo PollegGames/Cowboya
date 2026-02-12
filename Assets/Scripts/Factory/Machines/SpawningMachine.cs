@@ -146,7 +146,8 @@ public class SpawningMachine : BaseMachine
     private void SendWorkerToStart(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.OnMachineStateChanged(this, false);
+        // Send null so the brain re-evaluates without machine context.
+        worker.OnMachineStateChanged(null, false);
     }
 
     public override void ReleaseRobot()

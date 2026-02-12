@@ -3780,7 +3780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: onEnter.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: onExit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -3812,7 +3812,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: onEnter.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: RoomManager, Assembly-CSharp
+      value: RoomManager, Game
       objectReference: {fileID: 0}
     - target: {fileID: 8033728930962257356, guid: 8cd3a9edb4f5be140bf1e06f6c703a10, type: 3}
       propertyPath: onExit.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -4032,6 +4032,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1071092506774039879, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1452695893849039890, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: doorNext
       value: 
@@ -4240,6 +4244,10 @@ PrefabInstance:
     - target: {fileID: 1071092506774039879, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_Color.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1071092506774039879, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1452695893849039890, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: doorNext

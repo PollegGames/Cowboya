@@ -15,6 +15,7 @@ public class RestingMachine : BaseMachine
 
     public event Action<RestingMachine, bool> OnMachineStateChanged;
     public event Action<RestingMachine, RobotBrain> OnMachineTurningOff;
+    public event Action<RestingMachine, RobotBrain> OnWorkerAttached;  // NEW: signal when worker arrives to rest
     protected override void Awake()
     {
         base.Awake();
@@ -77,8 +78,8 @@ public class RestingMachine : BaseMachine
         isOccupied = true;
 
         SendWorkerToRest(currentWorker);
+        OnWorkerAttached?.Invoke(this, currentWorker);  // Signal manager that worker arrived
         StartRestCountdown(currentWorker);
-
 
         base.AttachRobot(robot);
     }
@@ -95,21 +96,16 @@ public class RestingMachine : BaseMachine
     private void SendWorkerToRest(RobotBrain worker)
     {
         if (worker == null) return;
-        worker.OnMachineStateChanged(this, false);
+        string onStatus = isOn ? "ON" : "OFF";
+        Debug.Log($"[WorkerRestDebug][RestingMachine.SendWorkerToRest] machine={name} isOn={onStatus} worker={worker.name}");
+        // Send null so the brain re-evaluates without machine context.
+        worker.OnMachineStateChanged(null, false);
     }
 
     private void SendWorkerToWork(RobotBrain worker)
     {
         if (worker == null) return;
-        object payload = null;
-        if (waypointService != null)
-        {
-            payload = waypointService.GetLeastUsedFreeWorkPoint();
-            if (payload == null)
-                payload = waypointService.GetWorkOrRestPoint();
-            if (payload == null)
-                payload = waypointService.GetStartPoint();
-        }
+        Debug.Log($"[WorkerRestDebug][RestingMachine.SendWorkerToWork] machine={name} worker={worker.name}");
 
         // Free the slot when dispatching the current worker so a new one can rest.
         if (worker == currentWorker)
@@ -119,9 +115,8 @@ public class RestingMachine : BaseMachine
             isOccupied = false;
         }
 
-        if (payload == null)
-            payload = transform.position;
-        worker.OnMachineStateChanged(payload, true);
+        // Send null so the brain chooses the next task and destination.
+        worker.OnMachineStateChanged(null, true);
     }
 
     private void SendCurrentWorkerToWork()

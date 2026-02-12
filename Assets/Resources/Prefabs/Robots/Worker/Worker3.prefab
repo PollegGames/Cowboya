@@ -2371,7 +2371,6 @@ MonoBehaviour:
     CurrentEnergy: 1
     AttackEnergyCost: 1
     EnergyRechargeRate: 1
-  saveRadius: 4
 --- !u!114 &3888384783130253247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2390,10 +2389,11 @@ MonoBehaviour:
     role: 0
     resumeWorkOnMachineOn: 1
     defaultTimeoutSeconds: 10
+    waitAtMachineSeconds: 5
     restDurationSeconds: 3
-    guardPostDurationSeconds: 300
+    guardPostDurationSeconds: 0
     workDurationSeconds: 120
-    reactivateDurationSeconds: 30
+    reactivateDurationSeconds: 0
   overrideStackDepth: 0
   seedIdleTask: 1
   logTaskChanges: 1
@@ -2414,10 +2414,11 @@ MonoBehaviour:
     role: 0
     resumeWorkOnMachineOn: 1
     defaultTimeoutSeconds: 10
+    waitAtMachineSeconds: 5
     restDurationSeconds: 3
-    guardPostDurationSeconds: 300
+    guardPostDurationSeconds: 0
     workDurationSeconds: 120
-    reactivateDurationSeconds: 30
+    reactivateDurationSeconds: 0
   body: {fileID: 50416280650570067}
   memory: {fileID: 393579632015866257}
   taskHandlers: {fileID: 11400000, guid: ab799656829ebdf41a83399ccf7224c0, type: 2}
@@ -2426,6 +2427,10 @@ MonoBehaviour:
     Handlers: {fileID: 11400000, guid: ab799656829ebdf41a83399ccf7224c0, type: 2}
   waypointServiceBehaviour: {fileID: 0}
   stateController: {fileID: 6401809315403970274}
+  followerChaseRefreshSeconds: 0.5
+  reactivateArrivalTimeoutSeconds: 0
+  reactivateProximityThreshold: 0
+  logReactivation: 1
 --- !u!114 &2232273132763882073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2456,9 +2461,9 @@ MonoBehaviour:
   bodyReference: {fileID: 8129104314148306132}
   hipRb: {fileID: 4349025134239535110}
   arrivalThresholdX: 1
-  arrivalThresholdY: 1
-  deadZoneX: 5
-  deadZoneY: 5
+  arrivalThresholdY: 2
+  deadZoneX: 2
+  deadZoneY: 3
   updateLoop: 0
   bodyMaintenance: {fileID: 2232273132763882073}
   attackController: {fileID: 0}
@@ -6596,4 +6601,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a492d78718bb644cb1dbc7f66d57986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-
