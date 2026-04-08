@@ -2947,8 +2947,8 @@ MonoBehaviour:
     workDurationSeconds: 120
     reactivateDurationSeconds: 5
   overrideStackDepth: 0
-  seedIdleTask: 1
-  logTaskChanges: 1
+  seedPrimaryTask: 1
+  logStackChanges: 1
 --- !u!114 &4849546215194926996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7147,4 +7147,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a492d78718bb644cb1dbc7f66d57986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+
 

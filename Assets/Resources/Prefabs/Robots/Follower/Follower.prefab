@@ -1296,8 +1296,8 @@ MonoBehaviour:
     workDurationSeconds: 0
     reactivateDurationSeconds: 0
   overrideStackDepth: 0
-  seedIdleTask: 1
-  logTaskChanges: 1
+  seedPrimaryTask: 1
+  logStackChanges: 1
 --- !u!114 &8211299274638722592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6951,3 +6951,4 @@ MonoBehaviour:
     - {x: 0, y: 0, z: 0, w: 0}
     - {x: 0, y: 0, z: 0, w: 0}
   m_Flip: 0
+

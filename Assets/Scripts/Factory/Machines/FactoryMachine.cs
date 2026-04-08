@@ -1,26 +1,29 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
-public class FactoryMachine : BaseMachine
+public sealed class FactoryMachine : BaseMachine
 {
+    [Header("Visuals")]
     [SerializeField] private Material materialOn;
     [SerializeField] private Material materialOff;
-
-    private MeshRenderer meshRenderer;
 
     [Header("Conveyor Settings")]
     [SerializeField] private CubeConveyorController cubeConveyorController;
     [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
+    [Min(0f)]
     [SerializeField] private float spawnCooldown = 1f;
 
+    private MeshRenderer meshRenderer;
     private float lastSpawnTime = -Mathf.Infinity;
-    private bool cubeActive = false;
+    private bool cubeActive;
+    private RobotBrain currentWorker;
+    private RobotStateController currentWorkerState;
+
+    private const string SpawnMethodName = nameof(SpawnCubeIfPossible);
 
     public event Action<FactoryMachine, bool> OnMachineStateChanged;
     public event Action<FactoryMachine, RobotBrain> OnMachineTurningOff;
-    private RobotBrain currentWorker;
-    private RobotStateController currentWorkerState;
 
     public bool HasWorker => currentWorker != null;
     public RobotBrain CurrentWorker => currentWorker;
@@ -28,66 +31,111 @@ public class FactoryMachine : BaseMachine
     protected override void Awake()
     {
         base.Awake();
+
         meshRenderer = GetComponent<MeshRenderer>();
         ApplyMaterial();
-        OnPoweredOn += HandlePoweredOn;
-        OnPoweredOff += HandlePoweredOff;
+        SubscribeCoreEvents();
+        SubscribeConveyorEvents();
+    }
 
-        OnRobotAssigned += HandleRobotAssigned;
-        OnRobotFreed += HandleRobotFreed;
+    private void OnEnable() => SubscribeAlarmEvents();
 
-        if (cubeConveyorController != null)
-            cubeConveyorController.OnCubeProcessed += HandleCubeProcessed;
+    private void OnDisable()
+    {
+        UnsubscribeAlarmEvents();
+        StopConveyorAndCancelSpawn();
     }
 
     private void OnDestroy()
     {
-        OnPoweredOn -= HandlePoweredOn;
-        OnPoweredOff -= HandlePoweredOff;
-
-        OnRobotAssigned -= HandleRobotAssigned;
-        OnRobotFreed -= HandleRobotFreed;
-        if (cubeConveyorController != null)
-            cubeConveyorController.OnCubeProcessed -= HandleCubeProcessed;
-    }
-
-    private void OnEnable()
-    {
-        if (factoryAlarmStatus != null)
-            factoryAlarmStatus.OnAlarmStateChanged += HandleAlarmChanged;
-    }
-
-    private void OnDisable()
-    {
-        if (factoryAlarmStatus != null)
-            factoryAlarmStatus.OnAlarmStateChanged -= HandleAlarmChanged;
-        CancelInvoke(nameof(BeginConveyorInternal));
+        UnsubscribeAlarmEvents();
+        UnsubscribeCoreEvents();
+        UnsubscribeConveyorEvents();
+        UnsubscribeFromWorkerState();
     }
 
     public override void PowerOn()
     {
         base.PowerOn();
         ApplyMaterial();
-        SendWorkerToWork(currentWorker);
         OnMachineStateChanged?.Invoke(this, true);
+
+        TryScheduleSpawn();
     }
 
     public override void PowerOff()
     {
         if (!isOn) return;
-        SendCurrentWorkerToRest();
+
         OnMachineTurningOff?.Invoke(this, currentWorker);
+
+        if (isOccupied)
+            base.ReleaseRobot();
+
         base.PowerOff();
+
         ApplyMaterial();
         OnMachineStateChanged?.Invoke(this, false);
-        currentWorker = null;
+
+        ResetWorkerTracking();
+        StopConveyorAndCancelSpawn();
     }
 
-    private void ApplyMaterial()
+    /// <summary>
+    /// Called when a worker arrives at this machine.
+    /// The machine only validates/updates occupancy and emits machine events.
+    /// </summary>
+    public override void AttachRobot(GameObject robot)
     {
-        if (meshRenderer == null) return;
-        if (materialOn == null || materialOff == null) return;
-        meshRenderer.material = isOn ? materialOn : materialOff;
+        if (robot == null) return;
+
+        var newWorker = robot.GetComponent<RobotBrain>();
+        if (newWorker == null) return;
+
+        if (!CanAcceptWorker(newWorker)) return;
+        if (ReferenceEquals(newWorker, currentWorker)) return;
+
+        TrackWorker(newWorker);
+
+        waypointService?.ReleaseMachine(this);
+        base.AttachRobot(robot);
+
+        TryScheduleSpawn();
+    }
+
+    public override void ReleaseRobot()
+    {
+        UnsubscribeFromWorkerState();
+        base.ReleaseRobot();
+        ResetWorkerTracking();
+        StopConveyorAndCancelSpawn();
+    }
+
+    public void ReleaseWorker(RobotBrain worker)
+    {
+        if (worker == null) return;
+        if (!ReferenceEquals(worker, currentWorker)) return;
+
+        ReleaseRobot();
+    }
+
+    public bool CanAcceptWorker(RobotBrain worker)
+    {
+        if (worker == null || !isOn)
+            return false;
+
+        if (waypointService != null
+            && waypointService.IsMachineReserved(this)
+            && !waypointService.IsMachineReservedFor(this, worker)
+            && !ReferenceEquals(worker, currentWorker))
+        {
+            return false;
+        }
+
+        if (currentWorker != null && !ReferenceEquals(currentWorker, worker))
+            return false;
+
+        return true;
     }
 
     private void OnValidate()
@@ -97,66 +145,114 @@ public class FactoryMachine : BaseMachine
         ApplyMaterial();
     }
 
-    private void HandlePoweredOn(BaseMachine machine)
+    private void ApplyMaterial()
     {
-        ScheduleSpawn();
+        if (meshRenderer == null) return;
+        if (materialOn == null || materialOff == null) return;
+
+        meshRenderer.material = isOn ? materialOn : materialOff;
     }
 
-    private void HandlePoweredOff(BaseMachine machine)
+    private void SubscribeCoreEvents()
     {
-        cubeConveyorController?.DetachCube();
-        CancelInvoke(nameof(BeginConveyorInternal));
-        UnsubscribeFromWorkerState();
-        currentWorker = null;
-        currentWorkerState = null;
+        OnPoweredOn += HandlePoweredOn;
+        OnPoweredOff += HandlePoweredOff;
+
+        OnRobotAssigned += HandleRobotAssigned;
+        OnRobotFreed += HandleRobotFreed;
+    }
+
+    private void UnsubscribeCoreEvents()
+    {
+        OnPoweredOn -= HandlePoweredOn;
+        OnPoweredOff -= HandlePoweredOff;
+
+        OnRobotAssigned -= HandleRobotAssigned;
+        OnRobotFreed -= HandleRobotFreed;
+    }
+
+    private void SubscribeConveyorEvents()
+    {
+        if (cubeConveyorController != null)
+            cubeConveyorController.OnCubeProcessed += HandleCubeProcessed;
+    }
+
+    private void UnsubscribeConveyorEvents()
+    {
+        if (cubeConveyorController != null)
+            cubeConveyorController.OnCubeProcessed -= HandleCubeProcessed;
+    }
+
+    private void SubscribeAlarmEvents()
+    {
+        if (factoryAlarmStatus != null)
+            factoryAlarmStatus.OnAlarmStateChanged += HandleAlarmChanged;
+    }
+
+    private void UnsubscribeAlarmEvents()
+    {
+        if (factoryAlarmStatus != null)
+            factoryAlarmStatus.OnAlarmStateChanged -= HandleAlarmChanged;
+    }
+
+    private void HandlePoweredOn(BaseMachine _)
+    {
+        ApplyMaterial();
+        TryScheduleSpawn();
+    }
+
+    private void HandlePoweredOff(BaseMachine _)
+    {
+        StopConveyorAndCancelSpawn();
+        ResetWorkerTracking();
     }
 
     private void HandleAlarmChanged(AlarmState state)
     {
-        if (state == AlarmState.Wanted && isOn)
+        if (!isOn)
         {
-            ScheduleSpawn();
+            StopConveyorAndCancelSpawn();
+            return;
         }
+
+        if (state == AlarmState.Wanted)
+            TryScheduleSpawn();
         else
-        {
-            cubeConveyorController?.DetachCube();
-            CancelInvoke(nameof(BeginConveyorInternal));
-        }
+            StopConveyorAndCancelSpawn();
     }
+
     private void HandleRobotAssigned(BaseMachine m)
     {
-        if (m != this) return;
-        ScheduleSpawn();
+        if (!ReferenceEquals(m, this)) return;
+        TryScheduleSpawn();
     }
 
     private void HandleRobotFreed(BaseMachine m)
     {
-        if (m != this) return;
-        cubeConveyorController?.DetachCube();        // drop any cube currently on the conveyor
-        CancelInvoke(nameof(BeginConveyorInternal)); // stop future spawns
+        if (!ReferenceEquals(m, this)) return;
+        StopConveyorAndCancelSpawn();
     }
 
     private void HandleCubeProcessed()
     {
         cubeActive = false;
-        ScheduleSpawn();
+        TryScheduleSpawn();
     }
 
-    private void ScheduleSpawn()
+    private void TryScheduleSpawn()
     {
-        if (!isOccupied || cubeConveyorController == null || cubeActive || !HasAliveWorker())
+        if (!CanSpawnNow())
             return;
 
-        float timeSinceLast = Time.time - lastSpawnTime;
-        float delay = Mathf.Max(0f, spawnCooldown - timeSinceLast);
-        CancelInvoke(nameof(BeginConveyorInternal));
-        Invoke(nameof(BeginConveyorInternal), delay);
+        var timeSinceLast = Time.time - lastSpawnTime;
+        var delay = Mathf.Max(0f, spawnCooldown - timeSinceLast);
+        CancelSpawn();
+        Invoke(SpawnMethodName, delay);
     }
 
-
-    private void BeginConveyorInternal()
+    private void SpawnCubeIfPossible()
     {
-        if (!isOccupied || cubeConveyorController == null || cubeActive || !HasAliveWorker())
+        if (!CanSpawnNow())
             return;
 
         cubeActive = true;
@@ -164,111 +260,61 @@ public class FactoryMachine : BaseMachine
         cubeConveyorController.BeginConveyor();
     }
 
-    /// <summary>
-    /// Called when a worker arrives at this machine.
-    /// Sends workers to the appropriate state based on machine status and type.
-    /// </summary>
-    public override void AttachRobot(GameObject robot)
+    private bool CanSpawnNow()
     {
-        var newWorker = robot.GetComponent<RobotBrain>();
-        if (newWorker == null) return;
-        if (newWorker == currentWorker && isOn && Type == MachineType.WorkStation)
-            return;
-        // If the machine is off, always send the incoming worker to rest.
-        if (!isOn)
-        {
-            SendWorkerToRest(currentWorker);
-            UnsubscribeFromWorkerState();
-            currentWorker = null;
-            SendWorkerToRest(newWorker);
-            return;
-        }
-
-        if (Type == MachineType.WorkStation)
-        {
-            // Capture previous worker, then assign and activate the new one.
-            var previousWorker = currentWorker;
-            currentWorker = newWorker;
-            SubscribeToWorkerState(currentWorker);
-
-            SetWorkerToWork(currentWorker);
-
-            if (previousWorker != null && previousWorker != currentWorker)
-            {
-                UnsubscribeFromWorkerState(previousWorker);
-                SendWorkerToRest(previousWorker);
-            }
-        }
-        else
-        {
-            // Machine is rest
-            SendWorkerToWork(currentWorker);
-            SendWorkerToRest(newWorker);
-            currentWorker = newWorker;
-            SubscribeToWorkerState(currentWorker);
-        }
-
-        waypointService?.ReleaseMachine(this);
-        base.AttachRobot(robot);
+        if (!isOn) return false;
+        if (!isOccupied) return false;
+        if (cubeConveyorController == null) return false;
+        if (cubeActive) return false;
+        if (!HasAliveWorker()) return false;
+        return true;
     }
 
-    /// <summary>
-    /// Helper to send a worker to the rest station state.
-    /// </summary>
-    private void SendWorkerToRest(RobotBrain worker)
+    private void CancelSpawn() => CancelInvoke(SpawnMethodName);
+
+    private void StopConveyorAndCancelSpawn()
     {
-        if (worker == null) return;
-        object payload = null;
-        if (waypointService != null)
-        {
-            payload = waypointService.GetFirstRestPoint();
-            if (payload == null)
-                payload = waypointService.GetStartPoint();
-        }
-        if (payload == null)
-            payload = transform.position;
-        Debug.Log($"[WorkerRestDebug][FactoryMachine.SendWorkerToRest] machine={name} isOn={isOn} worker={worker.name} payloadType={(payload!=null?payload.GetType().Name:"null")} payload={payload}");
-        worker.OnMachineStateChanged(payload, false);
+        cubeConveyorController?.DetachCube();
+        CancelSpawn();
+        cubeActive = false;
     }
 
-    private void SendWorkerToWork(RobotBrain worker)
+    private bool HasAliveWorker()
     {
-        if (worker == null) return;
-        Debug.Log($"[WorkerRestDebug][FactoryMachine.SendWorkerToWork] machine={name} isOn={isOn} worker={worker.name} payloadType={this.GetType().Name} payload={this}");
-        worker.OnMachineStateChanged(this, true);
+        return currentWorker != null
+            && currentWorkerState != null
+            && currentWorkerState.CurrentState == RobotState.Alive;
     }
 
-    private void SetWorkerToWork(RobotBrain worker)
+    private void TrackWorker(RobotBrain worker)
     {
-        if (worker == null) return;
-        Debug.Log($"[WorkerRestDebug][FactoryMachine.SetWorkerToWork] machine={name} isOn={isOn} worker={worker.name}");
-        worker.OnMachineStateChanged(this, true);
+        currentWorker = worker;
+        SubscribeToWorkerState(worker);
     }
 
-    public void SendWorkerBackToWork(RobotBrain worker)
+    private void ResetWorkerTracking()
     {
-        if (worker == null) return;
-        worker.OnMachineStateChanged(this, true);
+        UnsubscribeFromWorkerState();
+        currentWorker = null;
+        currentWorkerState = null;
     }
 
     private void SubscribeToWorkerState(RobotBrain worker)
     {
         UnsubscribeFromWorkerState();
-        if (worker == null)
-            return;
+        if (worker == null) return;
 
         currentWorkerState = worker.GetComponent<RobotStateController>();
         if (currentWorkerState != null)
             currentWorkerState.OnStateChanged += HandleWorkerStateChanged;
     }
 
-    private void UnsubscribeFromWorkerState(RobotBrain worker = null)
+    private void UnsubscribeFromWorkerState()
     {
-        var state = worker != null ? worker.GetComponent<RobotStateController>() : currentWorkerState;
-        if (state != null)
-            state.OnStateChanged -= HandleWorkerStateChanged;
-        if (worker == null)
-            currentWorkerState = null;
+        if (currentWorkerState != null)
+            currentWorkerState.OnStateChanged -= HandleWorkerStateChanged;
+
+        currentWorkerState = null;
     }
 
     private void HandleWorkerStateChanged(RobotState newState)
@@ -276,34 +322,10 @@ public class FactoryMachine : BaseMachine
         if (newState != RobotState.Dead)
             return;
 
-        cubeConveyorController?.DetachCube();
-        CancelInvoke(nameof(BeginConveyorInternal));
-        cubeActive = false;
+        StopConveyorAndCancelSpawn();
+        ResetWorkerTracking();
 
-        UnsubscribeFromWorkerState();
-        currentWorker = null;
-        currentWorkerState = null;
-        base.ReleaseRobot(); // frees the slot and notifies listeners
-    }
-
-    private bool HasAliveWorker()
-    {
-        return currentWorker != null && currentWorkerState != null && currentWorkerState.CurrentState == RobotState.Alive;
-    }
-
-    /// <summary>
-    /// Sends the currently assigned worker to the rest station and clears the reference.
-    /// </summary>
-    private void SendCurrentWorkerToRest()
-    {
-        SendWorkerToRest(currentWorker);
-    }
-
-    public override void ReleaseRobot()
-    {
-        SendCurrentWorkerToRest();
-        isOccupied = false;
+        // Frees the slot and notifies listeners.
         base.ReleaseRobot();
-        currentWorker = null;
     }
 }

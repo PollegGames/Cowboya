@@ -13,8 +13,9 @@ public class RobotHeart : MonoBehaviour
     [SerializeField] private RobotMemory memory;
     [SerializeField] private RobotBrainConfig config;
     [SerializeField] private int overrideStackDepth = 0;
-    [SerializeField] private bool seedIdleTask = true;
-    [SerializeField] private bool logTaskChanges = false;
+    [SerializeField] private bool seedPrimaryTask = true;
+    [SerializeField] private bool logStackChanges = false;
+    [SerializeField] private bool logPrimaryTaskDecisions = false;
 
     private RobotTaskStack taskStack;
 
@@ -38,7 +39,9 @@ public class RobotHeart : MonoBehaviour
     {
         if (taskStack == null)
             return;
-        if (taskStack.RemoveExpired(Time.time))
+        bool removed = taskStack.RemoveExpired(Time.time);
+        bool reseeded = removed && EnsurePrimaryTaskSeeded();
+        if (removed || reseeded)
             NotifyTaskChanged();
     }
 
@@ -49,8 +52,12 @@ public class RobotHeart : MonoBehaviour
     public void ResetIntentStack(bool notifyListeners = true)
     {
         taskStack = new RobotTaskStack(GetStackDepth(), BuildPrecedenceTable());
-        if (seedIdleTask)
-            taskStack.PushOrRefresh(new RobotTask(RobotTaskType.Idle), Time.time);
+        if (seedPrimaryTask)
+        {
+            var primary = BuildPrimaryTask();
+            if (primary != null)
+                taskStack.PushOrRefresh(primary, Time.time);
+        }
         if (notifyListeners)
             NotifyTaskChanged();
     }
@@ -74,12 +81,13 @@ public class RobotHeart : MonoBehaviour
     /// Marks the current task as complete and surfaces the next available intent.
     /// </summary>
     /// <returns>True if a task was removed.</returns>
-    public bool CompleteCurrentTask()
+    public bool CompleteCurrentTask(bool reseedPrimary = true)
     {
         if (taskStack == null)
             return false;
         bool changed = taskStack.CompleteCurrent();
-        if (changed)
+        bool reseeded = changed && reseedPrimary && EnsurePrimaryTaskSeeded();
+        if (changed || reseeded)
             NotifyTaskChanged();
         return changed;
     }
@@ -88,6 +96,19 @@ public class RobotHeart : MonoBehaviour
     /// Returns the full stack for debugging or brain inspection.
     /// </summary>
     public IReadOnlyList<RobotTask> GetTasks() => taskStack?.Tasks;
+
+    /// <summary>
+    /// Removes all tasks of the given type.
+    /// </summary>
+    public bool RemoveTasksOfType(RobotTaskType type)
+    {
+        if (taskStack == null)
+            return false;
+        bool removed = taskStack.RemoveTasksOfType(type);
+        if (removed)
+            NotifyTaskChanged();
+        return removed;
+    }
 
     /// <summary>
     /// Requests that the heart consider attacking a specific player target.
@@ -117,7 +138,8 @@ public class RobotHeart : MonoBehaviour
             return;
 
         bool removed = taskStack.RemoveTasksOfType(RobotTaskType.AttackTarget);
-        if (removed)
+        bool reseeded = removed && EnsurePrimaryTaskSeeded();
+        if (removed || reseeded)
             NotifyTaskChanged();
 
         if (memory != null && memory.LastKnownPlayerPosition != Vector3.zero)
@@ -161,9 +183,9 @@ public class RobotHeart : MonoBehaviour
     private void NotifyTaskChanged()
     {
         OnTaskChanged?.Invoke(CurrentTask);
-        if (logTaskChanges)
+        if (logStackChanges)
         {
-            Debug.Log($"[RobotHeart] {name} -> {DescribeTask(CurrentTask)}");
+            Debug.Log($"[RobotHeart] {name} intent={DescribePrimaryIntent(CurrentTask)} current={DescribeTask(CurrentTask)} stack={DescribeStack()}");
         }
     }
 
@@ -191,6 +213,100 @@ public class RobotHeart : MonoBehaviour
                 break;
         }
         return $"{task.Type} ({payload})";
+    }
+
+    private string DescribePrimaryIntent(RobotTask task)
+    {
+        if (task == null)
+            return "None";
+        switch (task.Type)
+        {
+            case RobotTaskType.AttackTarget:
+                return "Attack";
+            case RobotTaskType.ChasePlayer:
+            case RobotTaskType.Flee:
+            case RobotTaskType.ReactivateMachine:
+            case RobotTaskType.ReturnHome:
+            case RobotTaskType.Patrol:
+            case RobotTaskType.Investigate:
+                return "Move";
+            case RobotTaskType.WorkAtMachine:
+            case RobotTaskType.GuardPost:
+            case RobotTaskType.Rest:
+            case RobotTaskType.SpawnFollowers:
+            case RobotTaskType.Cower:
+            case RobotTaskType.WaitAtMachine:
+            case RobotTaskType.Idle:
+                return "Stay";
+            default:
+                return "Unknown";
+        }
+    }
+
+    private string DescribeStack()
+    {
+        if (taskStack == null || taskStack.Tasks == null || taskStack.Tasks.Count == 0)
+            return "[]";
+        var parts = new string[taskStack.Tasks.Count];
+        for (int i = 0; i < taskStack.Tasks.Count; i++)
+            parts[i] = DescribeTask(taskStack.Tasks[i]);
+        return "[" + string.Join(" > ", parts) + "]";
+    }
+
+    private RobotTask BuildPrimaryTask()
+    {
+        var brain = GetComponent<RobotBrain>();
+        object payload = null;
+        RobotTaskType type;
+
+        switch (role)
+        {
+            case RobotRole.Worker:
+                type = RobotTaskType.ReturnHome;
+                payload = brain != null && brain.WaypointService != null ? brain.WaypointService.GetStartPoint() : null;
+                break;
+            case RobotRole.SecurityGuard:
+                type = RobotTaskType.GuardPost;
+                payload = brain != null && brain.WaypointService != null ? brain.WaypointService.GetFirstFreeSecurityPoint() : null;
+                break;
+            case RobotRole.Follower:
+                type = RobotTaskType.ChasePlayer;
+                payload = brain != null && brain.WaypointService != null ? brain.WaypointService.ClosestWaypointToPlayer : null;
+                break;
+            case RobotRole.WorkerSpawner:
+                type = RobotTaskType.SpawnFollowers;
+                payload = null;
+                break;
+            case RobotRole.Boss:
+                type = RobotTaskType.ReturnHome;
+                if (brain != null && brain.WaypointService != null)
+                {
+                    payload = brain.WaypointService.GetEndPoint();
+                    if (payload == null)
+                        payload = brain.WaypointService.GetStartPoint();
+                }
+                break;
+            default:
+                return null;
+        }
+
+        float? timeout = config != null ? config.GetTimeout(type) : (float?)null;
+        int urgency = config != null ? config.GetUrgency(type) : 0;
+        return new RobotTask(type, payload, timeout, urgency);
+    }
+
+    private bool EnsurePrimaryTaskSeeded()
+    {
+        if (!seedPrimaryTask || taskStack == null)
+            return false;
+        if (taskStack.Tasks != null && taskStack.Tasks.Count > 0)
+            return false;
+
+        var primary = BuildPrimaryTask();
+        if (primary == null)
+            return false;
+
+        return taskStack.PushOrRefresh(primary, Time.time);
     }
 
     private bool ShouldAttackPlayer()

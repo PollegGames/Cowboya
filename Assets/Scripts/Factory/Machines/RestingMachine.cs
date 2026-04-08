@@ -3,82 +3,90 @@ using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
-public class RestingMachine : BaseMachine
+public sealed class RestingMachine : BaseMachine
 {
+    [Header("Visuals")]
     [SerializeField] private Material materialOn;
     [SerializeField] private Material materialOff;
+
+    [Header("Behavior")]
+    [Min(0f)]
     [SerializeField] private float sendBackToWorkDelay = 3f;
-    private Coroutine restCountdownCo;
+
+    [Header("Debug")]
+    [SerializeField] private bool logRestingMachine = false;
 
     private MeshRenderer meshRenderer;
+    private Coroutine restCountdownCo;
     private RobotBrain currentWorker;
+
+    public RobotBrain CurrentWorker => currentWorker;
 
     public event Action<RestingMachine, bool> OnMachineStateChanged;
     public event Action<RestingMachine, RobotBrain> OnMachineTurningOff;
-    public event Action<RestingMachine, RobotBrain> OnWorkerAttached;  // NEW: signal when worker arrives to rest
+    public event Action<RestingMachine, RobotBrain> OnWorkerAttached;
+    public event Action<RestingMachine, RobotBrain> OnRestTimerCompleted;
     protected override void Awake()
     {
         base.Awake();
         meshRenderer = GetComponent<MeshRenderer>();
-        ApplyMaterial();
-    }
-
-    private void ApplyMaterial()
-    {
-        if (meshRenderer == null) return;
-        if (materialOn == null || materialOff == null) return;
-        meshRenderer.material = isOn ? materialOn : materialOff;
+        RefreshVisual();
     }
 
     public override void PowerOn()
     {
+        if (isOn) return;
+
         base.PowerOn();
-        ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, true);
-        // If a worker is already attached, (re)start their rest countdown.
+        RefreshVisual();
+        RaiseStateChanged(true);
+
+        // If a worker is already attached while powering on, start the timer.
         if (currentWorker != null)
-        {
-            SendWorkerToRest(currentWorker);
             StartRestCountdown(currentWorker);
-        }
     }
 
     public override void PowerOff()
     {
         if (!isOn) return;
+
         CancelRestCountdown();
 
-        SendCurrentWorkerToWork();
+        // Preserve old behavior: worker still visible to listeners at this point.
         OnMachineTurningOff?.Invoke(this, currentWorker);
+
+        if (isOccupied)
+            base.ReleaseRobot();
+
         base.PowerOff();
-        ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, false);
-        currentWorker = null;
+        RefreshVisual();
+
+        // Preserve old behavior: CurrentWorker still readable here.
+        RaiseStateChanged(false);
+
+        ClearWorkerSlot();
     }
 
     public override void AttachRobot(GameObject robot)
     {
-        var worker = robot.GetComponent<RobotBrain>();
-        if (worker == null) return;
+        if (!TryGetWorker(robot, out var worker))
+            return;
 
-        if (!isOn)
+        LogAttachAttempt(worker);
+
+        // Already same worker while on -> no-op.
+        if (isOn && ReferenceEquals(currentWorker, worker))
+            return;
+
+        if (!CanAcceptWorker(worker))
         {
-            SendWorkerToWork(worker);
+            LogReject(worker);
             return;
         }
-        // If already occupied, push the current one back to work
-        if (currentWorker != null && currentWorker != worker)
-        {
-            CancelRestCountdown();
-            SendWorkerToWork(currentWorker);
-        }
 
-        // Accept the new worker and start their rest
-        currentWorker = worker;
-        isOccupied = true;
+        SetWorkerSlot(worker);
 
-        SendWorkerToRest(currentWorker);
-        OnWorkerAttached?.Invoke(this, currentWorker);  // Signal manager that worker arrived
+        OnWorkerAttached?.Invoke(this, currentWorker);
         StartRestCountdown(currentWorker);
 
         base.AttachRobot(robot);
@@ -87,78 +95,119 @@ public class RestingMachine : BaseMachine
     public override void ReleaseRobot()
     {
         CancelRestCountdown();
-        SendCurrentWorkerToWork();
-        isOccupied = false;
         base.ReleaseRobot();
+        ClearWorkerSlot();
+    }
+
+    public void ReleaseWorker(RobotBrain worker)
+    {
+        if (worker == null || !ReferenceEquals(worker, currentWorker))
+            return;
+
+        if (logRestingMachine)
+            Debug.Log($"[RestingMachine] ReleaseWorker worker={worker.name}", this);
+
+        ReleaseRobot();
+    }
+
+    public bool CanAcceptWorker(RobotBrain worker)
+    {
+        if (worker == null || !isOn) return false;
+        if (currentWorker != null && !ReferenceEquals(currentWorker, worker)) return false;
+        return true;
+    }
+
+    private static bool TryGetWorker(GameObject robot, out RobotBrain worker)
+    {
+        worker = null;
+        if (robot == null) return false;
+        return robot.TryGetComponent(out worker) && worker != null;
+    }
+
+    private void SetWorkerSlot(RobotBrain worker)
+    {
+        currentWorker = worker;
+        isOccupied = worker != null;
+    }
+
+    private void ClearWorkerSlot()
+    {
         currentWorker = null;
+        isOccupied = false;
     }
 
-    private void SendWorkerToRest(RobotBrain worker)
+    private void RaiseStateChanged(bool on) => OnMachineStateChanged?.Invoke(this, on);
+
+    private void RefreshVisual()
     {
-        if (worker == null) return;
-        string onStatus = isOn ? "ON" : "OFF";
-        Debug.Log($"[WorkerRestDebug][RestingMachine.SendWorkerToRest] machine={name} isOn={onStatus} worker={worker.name}");
-        // Send null so the brain re-evaluates without machine context.
-        worker.OnMachineStateChanged(null, false);
+        if (meshRenderer == null) return;
+        if (materialOn == null || materialOff == null) return;
+
+        // material instantiates; use sharedMaterial to avoid per-instance allocations.
+        meshRenderer.sharedMaterial = isOn ? materialOn : materialOff;
     }
-
-    private void SendWorkerToWork(RobotBrain worker)
-    {
-        if (worker == null) return;
-        Debug.Log($"[WorkerRestDebug][RestingMachine.SendWorkerToWork] machine={name} worker={worker.name}");
-
-        // Free the slot when dispatching the current worker so a new one can rest.
-        if (worker == currentWorker)
-        {
-            CancelRestCountdown();
-            currentWorker = null;
-            isOccupied = false;
-        }
-
-        // Send null so the brain chooses the next task and destination.
-        worker.OnMachineStateChanged(null, true);
-    }
-
-    private void SendCurrentWorkerToWork()
-    {
-        SendWorkerToWork(currentWorker);
-    }
-
 
     private void StartRestCountdown(RobotBrain worker)
     {
         CancelRestCountdown();
+        if (worker == null) return;
+
         restCountdownCo = StartCoroutine(RestCountdown(worker));
     }
 
     private void CancelRestCountdown()
     {
-        if (restCountdownCo != null)
-        {
-            StopCoroutine(restCountdownCo);
-            restCountdownCo = null;
-        }
+        if (restCountdownCo == null) return;
+        StopCoroutine(restCountdownCo);
+        restCountdownCo = null;
     }
+
     private IEnumerator RestCountdown(RobotBrain worker)
     {
-        float t = 0f;
-        while (t < sendBackToWorkDelay)
-        {
-            // Abort if machine turns off or worker changes
-            if (!isOn || worker == null || worker != currentWorker)
-                yield break;
+        var elapsed = 0f;
 
-            t += Time.deltaTime;
+        while (elapsed < sendBackToWorkDelay)
+        {
+            if (!IsCountdownStillValid(worker))
+            {
+                restCountdownCo = null;
+                yield break;
+            }
+
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
-        // Still valid? Send back to work and free the slot.
-        if (isOn && worker != null && worker == currentWorker)
+        if (!IsCountdownStillValid(worker))
         {
-            SendWorkerToWork(worker);
-            currentWorker = null;
-            isOccupied = false;
             restCountdownCo = null;
+            yield break;
         }
+
+        OnRestTimerCompleted?.Invoke(this, worker);
+        restCountdownCo = null;
+    }
+
+    private bool IsCountdownStillValid(RobotBrain worker)
+        => isOn && worker != null && ReferenceEquals(worker, currentWorker);
+
+    private void LogAttachAttempt(RobotBrain worker)
+    {
+        if (!logRestingMachine) return;
+
+        Debug.Log(
+            $"[RestingMachine] AttachRobot worker={worker.name} isOn={isOn} currentWorker={(currentWorker != null ? currentWorker.name : "null")}",
+            this
+        );
+    }
+
+    private void LogReject(RobotBrain worker)
+    {
+        if (!logRestingMachine) return;
+
+        Debug.Log(
+            $"[RestingMachine] Rejecting worker={worker.name} isOn={isOn} occupied={(currentWorker != null)}",
+            this
+        );
     }
 }

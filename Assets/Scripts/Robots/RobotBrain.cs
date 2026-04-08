@@ -30,6 +30,7 @@ public class RobotBrain : MonoBehaviour
     [SerializeField] private float reactivateArrivalTimeoutSeconds = 8f;
     [SerializeField] private float reactivateProximityThreshold = 2f;
     [SerializeField] private bool logReactivation = true;
+    [SerializeField] private bool logWorkerRouting = false;
 
     private void Awake()
     {
@@ -43,6 +44,7 @@ public class RobotBrain : MonoBehaviour
             stateController = GetComponent<RobotStateController>();
         if (taskHandlers == null)
             taskHandlers = ResolveHandlersForRole(heart != null ? heart.Role : RobotRole.Worker);
+
         waypointService = waypointServiceBehaviour as IWaypointService;
         if (waypointService != null && body != null)
             body.Initialize(waypointService, waypointService, respawnService);
@@ -75,6 +77,9 @@ public class RobotBrain : MonoBehaviour
             body.Initialize(waypointService, waypointService, respawnService);
         if (memory != null && respawnService != null)
             memory.SetRespawnService(respawnService);
+        // Rebuild intent stack now that services are available (waypoint-dependent tasks).
+        if (heart != null)
+            heart.ResetIntentStack();
     }
 
     public void SetSecurityManager(MachineSecurityManager manager)
@@ -90,18 +95,18 @@ public class RobotBrain : MonoBehaviour
         if (heart == null)
             return;
 
-        Debug.Log($"[WorkerRestDebug][RobotBrain.OnMachineStateChanged] robot={name} machineType={(machine!=null?machine.GetType().Name:"null")} machinePayload={machine} isOn={isOn}");
-
         RobotTask task = BuildTaskForMachine(machine, isOn);
         if (task != null)
         {
-            Debug.Log($"[WorkerRestDebug][RobotBrain.OnMachineStateChanged] robot={name} resolvedTask={task.Type} taskPayload={(task.Payload!=null?task.Payload.ToString():"null")} expireAt={(task.ExpireAt.HasValue?task.ExpireAt.ToString():"null")} urgency={task.Urgency}");
-            heart.CompleteCurrentTask();
+            if (logWorkerRouting && heart.Role == RobotRole.Worker)
+                Debug.Log($"[{nameof(RobotBrain)}] MachineStateChanged worker={name} machine={(machine != null ? machine.GetType().Name : "null")} isOn={isOn} -> task={task.Type} payload={(task.Payload != null ? task.Payload.ToString() : "null")}", this);
+            if (task.Type == RobotTaskType.Rest && heart != null && heart.Role == RobotRole.Worker)
+            {
+                // Ensure rest can surface by clearing work intent.
+                heart.RemoveTasksOfType(RobotTaskType.WorkAtMachine);
+            }
+            heart.CompleteCurrentTask(reseedPrimary: false);
             heart.TryPushTask(task);
-        }
-        else
-        {
-            Debug.Log($"[WorkerRestDebug][RobotBrain.OnMachineStateChanged] robot={name} no task resolved for machinePayload={machine}");
         }
     }
 
@@ -117,6 +122,8 @@ public class RobotBrain : MonoBehaviour
         float? timeout = config != null ? config.GetTimeout(type) : (float?)null;
         int urgency = config != null ? config.GetUrgency(type) : 0;
         heart.TryPushTask(new RobotTask(type, payload, timeout, urgency));
+        if (logWorkerRouting && heart.Role == RobotRole.Worker)
+            Debug.Log($"[{nameof(RobotBrain)}] PushExplicitTask worker={name} type={type} payload={(payload != null ? payload.ToString() : "null")}", this);
 
         if (type == RobotTaskType.ReactivateMachine && payload is BaseMachine machine)
             pendingReactivateMachine = machine;
@@ -167,6 +174,14 @@ public class RobotBrain : MonoBehaviour
         if (heart == null)
             return;
 
+        if (heart.Role == RobotRole.Boss)
+        {
+            if (Body != null && Body.AttackController != null)
+                Body.AttackController.StopAttacking();
+            heart.ResetIntentStack();
+            return;
+        }
+
         if (isInside)
             heart.RequestAttackTarget(player);
         else
@@ -204,6 +219,25 @@ public class RobotBrain : MonoBehaviour
         if (newState == RobotState.Dead || newState == RobotState.Faint)
         {
             heart.ResetIntentStack(false);
+        }
+    }
+
+    public bool CanUseMachineSlot(BaseMachine machine, RobotTaskType slotTaskType)
+    {
+        if (!IsWorkerRole || machine == null)
+            return false;
+
+        if (heart == null || heart.CurrentTask == null || heart.CurrentTask.Type != slotTaskType)
+            return false;
+
+        switch (slotTaskType)
+        {
+            case RobotTaskType.WorkAtMachine:
+                return IsWorkPayloadCompatible(heart.CurrentTask.Payload, machine);
+            case RobotTaskType.Rest:
+                return machine is RestingMachine;
+            default:
+                return false;
         }
     }
 
@@ -295,12 +329,16 @@ public class RobotBrain : MonoBehaviour
                 if (machine is RestingMachine && waypointService != null)
                 {
                     var workPoint = waypointService.GetLeastUsedFreeWorkPoint();
+                    if (logReactivation)
+                        Debug.Log($"[{nameof(RobotBrain)}] ResolvePayload WorkAtMachine from RestingMachine -> {(workPoint != null ? workPoint.name : "null")}", this);
                     if (workPoint != null)
                         return workPoint;
                 }
                 if (machine == null && waypointService != null)
                 {
                     var poi = waypointService.GetWorkOrRestPoint();
+                    if (logReactivation)
+                        Debug.Log($"[{nameof(RobotBrain)}] ResolvePayload WorkAtMachine (machine=null) -> {(poi != null ? poi.name : "null")}", this);
                     if (poi != null)
                         return poi;
                 }
@@ -309,12 +347,16 @@ public class RobotBrain : MonoBehaviour
                 if ((machine is FactoryMachine || machine is RestingMachine) && waypointService != null)
                 {
                     var restPoint = waypointService.GetFirstRestPoint();
+                    if (logReactivation)
+                        Debug.Log($"[{nameof(RobotBrain)}] ResolvePayload Rest (machine={machine?.GetType().Name}) -> {(restPoint != null ? restPoint.name : "null")}", this);
                     if (restPoint != null)
                         return restPoint;
                 }
                 if (machine == null && waypointService != null)
                 {
                     var restPoint = waypointService.GetFirstRestPoint();
+                    if (logReactivation)
+                        Debug.Log($"[{nameof(RobotBrain)}] ResolvePayload Rest (machine=null) -> {(restPoint != null ? restPoint.name : "null")}", this);
                     if (restPoint != null)
                         return restPoint;
                 }
@@ -347,7 +389,6 @@ public class RobotBrain : MonoBehaviour
     {
         if (payload is RoomWaypoint waypoint && waypoint != null)
         {
-            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to RoomWaypoint {waypoint.name}");
             body.SetDestination(waypoint);
             return true;
         }
@@ -357,32 +398,47 @@ public class RobotBrain : MonoBehaviour
             var target = machine.GetComponent<RoomWaypoint>();
             if (target != null)
             {
-                Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to machine's waypoint {target.name} (machine {machine.name})");
                 body.SetDestination(target);
                 return true;
             }
 
             // If the machine does not expose a RoomWaypoint, still move toward its position.
-            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to machine position {machine.transform.position} (machine {machine.name})");
             body.SetDestination(machine.transform.position);
             return true;
         }
 
         if (payload is Vector3 v3)
         {
-            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to Vector3 {v3}");
             body.SetDestination(v3);
             return true;
         }
 
         if (payload is Vector2 v2)
         {
-            Debug.Log($"[WorkerRestDebug][RobotBrain.TryMoveToPayload] robot={name} moving to Vector2 {v2}");
             body.SetDestination(v2);
             return true;
         }
 
         return false;
+    }
+
+    private static bool IsWorkPayloadCompatible(object payload, BaseMachine machine)
+    {
+        if (!(machine is FactoryMachine localFactory))
+            return false;
+
+        if (payload is FactoryMachine assignedFactory)
+            return ReferenceEquals(localFactory, assignedFactory);
+
+        if (payload is RoomWaypoint waypoint)
+        {
+            return waypoint != null
+                && waypoint.parentRoom != null
+                && waypoint.parentRoom.factorymMachinesInRoom != null
+                && waypoint.parentRoom.factorymMachinesInRoom.Contains(localFactory);
+        }
+
+        return payload == null;
     }
 
     private RobotTaskHandlers ResolveHandlersForRole(RobotRole role)
@@ -546,6 +602,7 @@ public class RobotBrain : MonoBehaviour
         }
         followerChaseRoutine = null;
     }
+    private bool IsWorkerRole => heart != null && heart.Role == RobotRole.Worker;
 
 }
 

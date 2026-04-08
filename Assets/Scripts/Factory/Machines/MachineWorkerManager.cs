@@ -63,7 +63,6 @@ public class MachineWorkerManager : MonoBehaviour
     /// </summary>
     public void AssignToFirstFreePointAvailable(RobotBrain worker)
     {
-        Debug.Log($"[WorkerRestDebug][MachineWorkerManager] AssignToFirstFreePointAvailable for worker={worker?.name}");
         worker.OnMachineStateChanged(null, false);
     }
 

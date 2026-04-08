@@ -5428,8 +5428,8 @@ MonoBehaviour:
     workDurationSeconds: 120
     reactivateDurationSeconds: 30
   overrideStackDepth: 0
-  seedIdleTask: 1
-  logTaskChanges: 1
+  seedPrimaryTask: 1
+  logStackChanges: 1
 --- !u!114 &372659840463579902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6502,3 +6502,4 @@ MonoBehaviour:
     m_Extent: {x: 0.42308474, y: 0.857615, z: 0}
   m_AlwaysUpdate: 1
   m_AutoRebind: 0
+

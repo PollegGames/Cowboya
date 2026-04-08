@@ -17,6 +17,8 @@ public enum Bidirection
 
 public class WaypointService : MonoBehaviour, IWaypointService
 {
+    [Header("Debug")]
+    [SerializeField] private bool logWorkAssignments = false;
     [Header("Dependencies")]
     [SerializeField]
     private MonoBehaviour registryBehaviour;
@@ -149,6 +151,8 @@ public class WaypointService : MonoBehaviour, IWaypointService
     #region Reservation: Work, Rest, Security
     public RoomWaypoint GetLeastUsedFreeWorkPoint(RoomWaypoint exclude = null)
     {
+        PruneReservationData();
+
         var works = registry
             .GetActiveWaypoints()
             .Where(wp =>
@@ -165,26 +169,14 @@ public class WaypointService : MonoBehaviour, IWaypointService
         if (!works.Any())
         {
             works = registry
-                .GetActiveWaypoints()
+                .GetAllWaypoints()
                 .Where(wp =>
                     wp.parentRoom.roomProperties.usageType == UsageType.Work
                     && wp.type == WaypointType.Work
                     && wp.parentRoom.factorymMachinesInRoom.Any(m =>
-                        m.IsOn && m.CurrentWorker != null
+                        m.IsOn && m.CurrentWorker == null && !reservedMachines.ContainsKey(m)
                     )
-                    && wp != exclude
-                )
-                .ToList();
-        }
-
-        if (!works.Any())
-        {
-            works = registry
-                .GetActiveWaypoints()
-                .Where(wp =>
-                    wp.parentRoom.roomProperties.usageType == UsageType.Work
-                    && wp.type == WaypointType.Work
-                    && wp.parentRoom.factorymMachinesInRoom.Any(m => m.IsOn)
+                    && !reservedWaypoints.Contains(wp)
                     && wp != exclude
                 )
                 .ToList();
@@ -199,17 +191,24 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 ? count + 1
                 : 1;
             reservedWaypoints.Add(best);
-            Debug.Log(
-                $"[WaypointReservation] Assigned WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
-            );
+            if (logWorkAssignments)
+            {
+                Debug.Log(
+                    $"[WaypointReservation] Assigned FREE WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
+                );
+            }
             return best;
         }
 
+        if (logWorkAssignments)
+            Debug.Log("[WaypointReservation] No FREE work points available.");
         return null;
     }
 
     public RoomWaypoint GetWorkOrRestPoint(RoomWaypoint exclude = null)
     {
+        PruneReservationData();
+
         var works = registry
             .GetActiveWaypoints()
             .Where(wp =>
@@ -217,6 +216,9 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 && wp.type == WaypointType.Work
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp)
+                && wp.parentRoom.factorymMachinesInRoom.Any(m =>
+                    m.IsOn && m.CurrentWorker == null && !reservedMachines.ContainsKey(m)
+                )
             )
             .ToList();
 
@@ -229,22 +231,84 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 ? count + 1
                 : 1;
             reservedWaypoints.Add(best);
-            Debug.Log(
-                $"[WaypointReservation] Assigned WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
-            );
+            if (logWorkAssignments)
+            {
+                Debug.Log(
+                    $"[WaypointReservation] Assigned FREE WORK '{best.WorldPos}' (count={workUsageCounts[best]})."
+                );
+            }
             return best;
         }
+
         var restPoint = GetFirstRestPoint(exclude);
         if (restPoint == null)
         {
             restPoint = GetStartPoint();
         }
+        if (logWorkAssignments)
+            Debug.Log($"[WaypointReservation] No FREE work; fallback={(restPoint != null ? restPoint.name : "null")}");
         return restPoint;
+    }
+
+    public RoomWaypoint GetAnyOnWorkPoint(RoomWaypoint exclude = null)
+    {
+        PruneReservationData();
+
+        var works = registry
+            .GetActiveWaypoints()
+            .Where(wp =>
+                wp.parentRoom.roomProperties.usageType == UsageType.Work
+                && wp.type == WaypointType.Work
+                && wp != exclude
+                && wp.parentRoom.factorymMachinesInRoom.Any(m => m.IsOn)
+            )
+            .ToList();
+
+        if (!works.Any())
+        {
+            works = registry
+                .GetAllWaypoints()
+                .Where(wp =>
+                    wp.parentRoom.roomProperties.usageType == UsageType.Work
+                    && wp.type == WaypointType.Work
+                    && wp != exclude
+                    && wp.parentRoom.factorymMachinesInRoom.Any(m => m.IsOn)
+                )
+                .ToList();
+        }
+
+        if (!works.Any())
+            return null;
+
+        var best = works
+            .OrderBy(wp => workUsageCounts.TryGetValue(wp, out var c) ? c : 0)
+            .First();
+        workUsageCounts[best] = workUsageCounts.TryGetValue(best, out var count)
+            ? count + 1
+            : 1;
+        return best;
+    }
+
+    public FactoryMachine GetAnyOnFactoryMachine()
+    {
+        var machines = registry
+            .GetActiveWaypoints()
+            .Where(wp =>
+                wp.parentRoom.roomProperties.usageType == UsageType.Work
+                && wp.parentRoom.factorymMachinesInRoom.Any(m => m.IsOn)
+            )
+            .SelectMany(wp => wp.parentRoom.factorymMachinesInRoom)
+            .Where(m => m.IsOn)
+            .ToList();
+
+        return machines.FirstOrDefault();
     }
 
     //Get the center point of a blocked room
     public RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null)
     {
+        PruneReservationData();
+
         var blockedRooms = registry
             .GetAllWaypoints()
             .Where(wp =>
@@ -275,6 +339,8 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null)
     {
+        PruneReservationData();
+
         var blockedRooms = registry
             .GetAllWaypoints()
             .Where(wp =>
@@ -318,6 +384,8 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null)
     {
+        PruneReservationData();
+
         var secs = registry
             .GetActiveWaypoints()
             .Where(wp =>
@@ -347,6 +415,8 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     public RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null)
     {
+        PruneReservationData();
+
         var allWaypoints = registry.GetActiveWaypoints();
         var restPoints = allWaypoints
             .Where(wp =>
@@ -368,10 +438,9 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 reservedWaypoints.Add(chosen);
                 return chosen;
             }
-            else
-            {
-                return restPoints.FirstOrDefault();
-            }
+
+            // All rest points are already reserved; do not return an occupied/shared fallback.
+            return null;
         }
 
         // If here, there were no restPoints where resting machines are ON. Log for debugging.
@@ -399,11 +468,13 @@ public class WaypointService : MonoBehaviour, IWaypointService
             return chosen;
         }
 
-        return fallbackRestPoints.FirstOrDefault();
+        return null;
     }
 
     public RoomWaypoint GetFirstFreeSecurityPoint()
     {
+        PruneReservationData();
+
         var secs = registry
             .GetActiveWaypoints()
             .Where(wp =>
@@ -433,10 +504,25 @@ public class WaypointService : MonoBehaviour, IWaypointService
         return target;
     }
 
+    public bool IsPOIReserved(RoomWaypoint poi)
+    {
+        if (poi == null)
+            return false;
+
+        PruneReservationData();
+        return reservedWaypoints.Contains(poi);
+    }
+
+    public void ReleaseInvalidReservations()
+    {
+        PruneReservationData();
+    }
+
     public void ReleasePOI(RoomWaypoint poi)
     {
         if (poi == null)
             return;
+        PruneReservationData();
         reservedWaypoints.Remove(poi);
         if (workUsageCounts.TryGetValue(poi, out var wc) && wc > 0)
             workUsageCounts[poi] = wc - 1;
@@ -445,6 +531,25 @@ public class WaypointService : MonoBehaviour, IWaypointService
         OnPOIReleased?.Invoke(poi);
     }
     #endregion
+
+    private void PruneReservationData()
+    {
+        reservedWaypoints.RemoveWhere(wp => wp == null);
+
+        var activeWaypoints = registry != null ? registry.GetAllWaypoints() : null;
+        if (activeWaypoints == null || activeWaypoints.Count == 0)
+            return;
+
+        var activeSet = new HashSet<RoomWaypoint>(activeWaypoints);
+        reservedWaypoints.RemoveWhere(wp => wp == null || !activeSet.Contains(wp));
+
+        workUsageCounts.Keys.Where(k => k == null || !activeSet.Contains(k)).ToList()
+            .ForEach(k => workUsageCounts.Remove(k));
+        securityUsageCounts.Keys.Where(k => k == null || !activeSet.Contains(k)).ToList()
+            .ForEach(k => securityUsageCounts.Remove(k));
+        workSpawnersUsageCounts.Keys.Where(k => k == null || !activeSet.Contains(k)).ToList()
+            .ForEach(k => workSpawnersUsageCounts.Remove(k));
+    }
 
     #region Machine Reservation
     public FactoryMachine ReserveFreeMachine(RoomManager room, RobotBrain worker)
@@ -459,6 +564,16 @@ public class WaypointService : MonoBehaviour, IWaypointService
         return machine;
     }
 
+    public bool ReserveMachine(FactoryMachine machine, RobotBrain worker)
+    {
+        if (machine == null || worker == null)
+            return false;
+        if (reservedMachines.ContainsKey(machine))
+            return false;
+        reservedMachines[machine] = worker;
+        return true;
+    }
+
     public void ReleaseMachine(FactoryMachine machine)
     {
         if (machine != null)
@@ -468,6 +583,13 @@ public class WaypointService : MonoBehaviour, IWaypointService
     public bool IsMachineReserved(FactoryMachine machine)
     {
         return machine != null && reservedMachines.ContainsKey(machine);
+    }
+
+    public bool IsMachineReservedFor(FactoryMachine machine, RobotBrain worker)
+    {
+        if (machine == null || worker == null)
+            return false;
+        return reservedMachines.TryGetValue(machine, out var reserved) && reserved == worker;
     }
     #endregion
 

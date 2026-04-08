@@ -8,8 +8,10 @@ using UnityEngine;
 public enum RobotTaskType
 {
     Idle,
+    GoToMachine,
     WorkAtMachine,
     GuardPost,
+    SearchForMachine,
     ReactivateMachine,
     WaitAtMachine,
     ChasePlayer,
@@ -20,7 +22,9 @@ public enum RobotTaskType
     ReturnHome,
     Patrol,
     Investigate,
-    Cower
+    Cower,
+    Faint,
+    Dead
 }
 
 /// <summary>

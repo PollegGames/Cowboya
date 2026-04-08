@@ -10,19 +10,28 @@ Shared architecture for every robot except the player.
 
 ## Core Rules
 - **Single entry point**: machines/managers/alarms talk to `RobotBrain`, never directly to Heart or Body.
-- **Machines only describe state + targets**: they say “I am ON/OFF” and provide points (`WorkPoint`, `RestPoint`, `SecurityPoint`). They never move robots.
+- **Machines only describe state + targets**: they say "I am ON/OFF" and provide points (`WorkPoint`, `RestPoint`, `SecurityPoint`). They never move robots.
 - **Managers are routers**: `MachineWorkerManager` and `MachineSecurityManager` listen to machine events, pick the right robot, and forward to that robot's Brain with the relevant points.
 - **Heart owns the task stack**: Brain chooses *which* task; Heart executes and talks to Body.
 
+## Primary intents (draft)
+We group tasks into three primary intents: `Move`, `Stay`, and `Attack`. Each role maps its tasks into these buckets.
+
+Worker: Move = `MoveToPoint`, `Flee`; Stay = `WorkAtMachine`, `Rest`, `Saved`; Attack = none.  
+Security guard: Move = `MoveToPoint`, `Flee`; Stay = `GuardPost`, `Rest`, `ReactivateMachine`, `Saved`; Attack = `AttackTarget`.  
+Worker spawner: Stay = `WorkAtMachine`, `Dead`.  
+Follower: Move = `MoveToPoint`, `Flee`; Stay = `Stare`; Attack = `AttackTarget`.  
+Boss: Move = `MoveTowardPlayer`, `MoveToPoint` (end room), `Flee`; Stay = `Defense`; Attack = `AttackTarget`.
+
 ## Worker loop
 - Default task: `WorkAtMachine(machine, machine.WorkPoint)` while machine is ON.
-- When machine turns OFF → Brain pushes `GoToRest(machine.RestPoint)`.
-- When machine turns ON again → Brain pushes `WorkAtMachine` and the loop resumes.
+- When machine turns OFF -> Brain pushes `GoToRest(machine.RestPoint)`.
+- When machine turns ON again -> Brain pushes `WorkAtMachine` and the loop resumes.
 
 ## Guard loop
 - Default task: `GuardPost(securityPoint)`.
-- When a machine turns OFF → Brain raises `ReactivateMachine(machine, machine.SecurityPoint)`.
-- After reactivation → return to `GuardPost`.
+- When a machine turns OFF -> Brain raises `ReactivateMachine(machine, machine.SecurityPoint)`.
+- After reactivation -> return to `GuardPost`.
 
 ## Player
 The player uses a separate, simpler system and is not part of this architecture.
