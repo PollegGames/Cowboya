@@ -322,6 +322,7 @@ public class RunSetupManager : MonoBehaviour
     private void ShowRealPreview()
     {
         DestroyOldInstances();
+        RobotDomainEventAdapter.EnsureInScene();
         factoryManagerInstance = Instantiate(factoryManagerPrefab);
         mapManagerInstance = Instantiate(mapManagerPrefab);
         var gridBuilder = mapManagerInstance.gameObject.AddComponent<GridBuilder>();
@@ -331,7 +332,7 @@ public class RunSetupManager : MonoBehaviour
         waypointServiceInstance = Instantiate(waypointServicePrefab);
         enemiesSpawnerInstance = Instantiate(enemiesSpawnerPrefab);
         enemiesSpawnerInstance.SetDropContainer(factoryManagerInstance.transform);
-        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance.SecurityManager, null, null);
+        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance, factoryManagerInstance.SecurityManager, null, null);
 
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 

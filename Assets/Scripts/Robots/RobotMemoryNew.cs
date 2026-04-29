@@ -19,6 +19,7 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     public bool IsConnectedToMachine => memoryState.IsConnectedToMachine;
     public bool IsDead => memoryState.IsDead;
     public RoomWaypoint LastVisitedPoint => memoryState.LastVisitedPoint;
+    public MachineType? DesiredMachineType => memoryState.DesiredMachineType;
     public Dictionary<RoomWaypoint, bool> AllAvailableWaypoints => memoryState.AllAvailableWaypoints;
     public event Action<MemoryChangeEvent> OnMemoryChanged;
     public RobotMemorySnapshotNew Snapshot => memoryState.Snapshot;
@@ -35,8 +36,33 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     private void HandleStateChanged(MemoryChangeEvent e)
     {
         OnMemoryChanged?.Invoke(e); // Brain listens here
+        RobotNewTrace.Log(
+            this,
+            eventSource: "MemoryNew.OnChanged",
+            memoryDelta: e.Type.ToString(),
+            brainOptions: BrainOption.None,
+            plannedTask: null,
+            heartCurrentTask: null,
+            taskSignal: "none");
     }
-    
+
+    public void InitializeWaypointAvailability(IEnumerable<RoomWaypoint> waypoints)
+    {
+        memoryState.ReplaceWaypointAvailability(waypoints);
+    }
+
+    public void SetMachineWaypointAvailability(BaseMachine machine, bool isAvailable)
+    {
+        if (machine == null)
+            return;
+
+        var waypoint = machine.GetComponent<RoomWaypoint>() ?? machine.GetComponentInParent<RoomWaypoint>();
+        if (waypoint == null)
+            return;
+
+        memoryState.SetRoomWaypointAvailability(waypoint, isAvailable);
+    }
+
     public void SetLastVisitedPoint(RoomWaypoint point) => memoryState.SetLastVisitedPoint(point);
 
     /// <summary>
@@ -63,6 +89,16 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     /// <param name="inZone">True if the player is in range.</param>
     public void SetPlayerInDetectZone(bool inZone) => memoryState.SetPlayerInDetectZone(inZone);
 
+    /// <summary>
+    /// Backward-compatible alias for older code paths.
+    /// </summary>
+    public void SetCanSeePlayer(bool canSeePlayer)
+    {
+        SetPlayerInDetectZone(canSeePlayer);
+        if (!canSeePlayer && !PlayerInAttackZone)
+            ClearPlayerPosition();
+    }
+
 
     /// <summary>
     /// Records that the enemy has just been attacked.
@@ -80,5 +116,14 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
 
     public void SetDead(bool isDead) => memoryState.SetDead(isDead);
 
+    public void NotifyMachineSlotAttached(RoomWaypoint point) => memoryState.NotifyMachineSlotAttached(point);
+
+    public void NotifyMachineSlotReleased() => memoryState.NotifyMachineSlotReleased();
+
+    public void NotifyMachineSlotReleasedTransient() => memoryState.NotifyMachineSlotReleasedTransient();
+
+    public void NotifyMachineSlotReleasedFinal() => memoryState.NotifyMachineSlotReleasedFinal();
+
+    public void SetDesiredMachineType(MachineType? machineType) => memoryState.SetDesiredMachineType(machineType);
 
 }

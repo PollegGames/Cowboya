@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(PositionTriggerZone))]
 public class MachineReactivationTrigger : MonoBehaviour
@@ -37,7 +37,7 @@ public class MachineReactivationTrigger : MonoBehaviour
         if (machine == null || machine.IsOn)
             return;
 
-        var brain = collider != null ? collider.GetComponentInParent<RobotBrain>() : null;
+        var brain = collider != null ? collider.GetComponentInParent<RobotBrainNew>() : null;
         if (requireSecurityGuard && (brain == null || !brain.IsSecurityGuard))
             return;
 
@@ -47,10 +47,10 @@ public class MachineReactivationTrigger : MonoBehaviour
         machine.PowerOn();
 
         if (completeReactivateTask && brain != null && brain.IsSecurityGuard)
-            brain.CompleteReactivateTask(machine, reached: true);
+            RobotDomainEventBus.PublishCompleteReactivateDispatch(brain, machine, reached: true);
     }
 
-    private bool IsMatchingReactivateTask(RobotBrain brain)
+    private bool IsMatchingReactivateTask(RobotBrainNew brain)
     {
         if (brain == null || brain.Heart == null)
             return false;
@@ -60,3 +60,4 @@ public class MachineReactivationTrigger : MonoBehaviour
         return ReferenceEquals(task.Payload, machine);
     }
 }
+

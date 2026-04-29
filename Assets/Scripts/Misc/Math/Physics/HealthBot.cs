@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 public class HealthBot : MonoBehaviour
@@ -6,8 +6,10 @@ public class HealthBot : MonoBehaviour
     public event Action<float> OnHealthChanged;
 
     [SerializeField] private DamageFeedback damageFeedback;
-    [SerializeField] private RobotMemory memory = null;
-    [SerializeField] private RobotBrain brain = null;
+    [SerializeField] private RobotMemoryNew memory = null;
+    [SerializeField] private RobotBrainNew brain = null;
+    [SerializeField] private RobotMemoryNew memoryNew = null;
+    [SerializeField] private RobotBrainNew brainNew = null;
     [SerializeField] private PlayerBrain playerBrain = null;
 
     public void TakeDamage(int damage)
@@ -19,6 +21,11 @@ public class HealthBot : MonoBehaviour
 
         CacheBrains();
         memory?.RegisterAttack();
+        if (RobotNewPipelineRuntime.IsNewPipelineActive)
+        {
+            memoryNew?.RegisterAttack();
+            brainNew?.OnDamageTaken(damage);
+        }
 
         if (playerBrain != null)
         {
@@ -44,8 +51,13 @@ public class HealthBot : MonoBehaviour
         if (playerBrain == null)
             playerBrain = GetComponent<PlayerBrain>();
         if (brain == null)
-            brain = GetComponent<RobotBrain>();
+            brain = GetComponent<RobotBrainNew>();
         if (memory == null)
-            memory = GetComponent<RobotMemory>();
+            memory = GetComponent<RobotMemoryNew>();
+        if (brainNew == null)
+            brainNew = GetComponent<RobotBrainNew>();
+        if (memoryNew == null)
+            memoryNew = GetComponent<RobotMemoryNew>();
     }
 }
+

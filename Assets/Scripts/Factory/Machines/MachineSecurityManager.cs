@@ -1,11 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// Notifies security guards when a factory machine turns off.
 /// Guards can subscribe to <see cref="OnFactoryMachineTurnedOff"/> to react.
-/// Also raises <see cref="OnAllMachinesOff"/> once EVERY registered machine is OFF.
 /// </summary>
 public class MachineSecurityManager : MonoBehaviour
 {
@@ -15,17 +14,10 @@ public class MachineSecurityManager : MonoBehaviour
     private readonly List<RestingMachine> restingMachines = new();
     private readonly List<SecurityMachine> securityMachines = new();
 
-    // Tracks *currently ON* machines (any type)
-    private readonly HashSet<MonoBehaviour> machinesOn = new();
-
-    private readonly List<RobotBrain> guards = new();
-
-    public event Action OnAllMachinesOff;
+    private readonly List<RobotBrainNew> guards = new();
 
     /// <summary> Fired whenever a registered machine is switched off. </summary>
     public event Action<FactoryMachine> OnFactoryMachineTurnedOff;
-    public event Action<RestingMachine> OnRestingMachineTurnedOff;
-    public event Action<SecurityMachine> OnSecurityMachineTurnedOff;
 
     private void OnEnable()
     {
@@ -51,10 +43,7 @@ public class MachineSecurityManager : MonoBehaviour
 
         factoryMachines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
-        machine.OnMachineStateChanged += HandleFactoryMachineStateChanged;
-
-        // seed initial state if available
-        if (IsOn(machine)) machinesOn.Add(machine); else machinesOn.Remove(machine);
+        machine.OnMachinePowerChanged += HandleMachinePowerChanged;
     }
 
     public void RegisterRestingMachine(RestingMachine machine)
@@ -63,9 +52,7 @@ public class MachineSecurityManager : MonoBehaviour
 
         restingMachines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
-        machine.OnMachineStateChanged += HandleRestingMachineStateChanged;
-
-        if (IsOn(machine)) machinesOn.Add(machine); else machinesOn.Remove(machine);
+        machine.OnMachinePowerChanged += HandleMachinePowerChanged;
     }
 
     public void RegisterSecurityMachine(SecurityMachine machine)
@@ -74,13 +61,36 @@ public class MachineSecurityManager : MonoBehaviour
 
         securityMachines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
-        machine.OnMachineStateChanged += HandleSecurityMachineStateChanged;
-        machine.OnMachineTurningOff += HandleSecurityMachineTurningOff;
-
-        if (IsOn(machine)) machinesOn.Add(machine); else machinesOn.Remove(machine);
+        machine.OnMachinePowerChanged += HandleMachinePowerChanged;
+        machine.OnMachineTurnedOff += HandleMachineTurnedOff;
     }
 
-    public void RegisterGuard(RobotBrain guard)
+    private void OnDestroy()
+    {
+        foreach (var machine in factoryMachines)
+        {
+            if (machine == null)
+                continue;
+            machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
+        }
+
+        foreach (var machine in restingMachines)
+        {
+            if (machine == null)
+                continue;
+            machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
+        }
+
+        foreach (var machine in securityMachines)
+        {
+            if (machine == null)
+                continue;
+            machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
+            machine.OnMachineTurnedOff -= HandleMachineTurnedOff;
+        }
+    }
+
+    public void RegisterGuard(RobotBrainNew guard)
     {
         if (guard == null || guards.Contains(guard)) return;
         Debug.Log($"Registering guard: {guard.name}");
@@ -88,13 +98,13 @@ public class MachineSecurityManager : MonoBehaviour
         RequestGuardPost(guard);
     }
 
-    public void UnregisterGuard(RobotBrain guard)
+    public void UnregisterGuard(RobotBrainNew guard)
     {
         if (guard == null) return;
         guards.Remove(guard);
     }
 
-    private void HandleSecurityMachineTurningOff(SecurityMachine machine, RobotBrain currentGuard)
+    private void HandleSecurityMachineTurningOff(SecurityMachine machine, RobotBrainNew currentGuard)
     {
         // Dispatch a different guard to reactivate; fall back to the current guard if it's the only eligible one.
         if (machine == null)
@@ -103,57 +113,59 @@ public class MachineSecurityManager : MonoBehaviour
         DispatchGuardForSecurityMachine(machine, currentGuard);
     }
 
+    private void HandleMachinePowerChanged(MachinePowerChangedEvent evt)
+    {
+        if (evt.Machine is FactoryMachine factoryMachine)
+        {
+            HandleFactoryMachineStateChanged(factoryMachine, evt.IsOn);
+            return;
+        }
+
+        if (evt.Machine is RestingMachine restingMachine)
+        {
+            HandleRestingMachineStateChanged(restingMachine, evt.IsOn);
+            return;
+        }
+
+        if (evt.Machine is SecurityMachine securityMachine)
+            HandleSecurityMachineStateChanged(securityMachine, evt.IsOn);
+    }
+
+    private void HandleMachineTurnedOff(MachineTurnedOffEvent evt)
+    {
+        if (evt.Machine is not SecurityMachine securityMachine)
+            return;
+
+        var currentGuard = TryResolveRobotBrain(evt.PreviousRobot);
+        HandleSecurityMachineTurningOff(securityMachine, currentGuard);
+    }
+
     private void HandleFactoryMachineStateChanged(FactoryMachine machine, bool isOn)
     {
-        UpdateOnSet(machine, isOn);
-
         if (!isOn)
         {
             OnFactoryMachineTurnedOff?.Invoke(machine);
             DispatchGuardForFactoryMachine(machine);
         }
-
-        CheckAllMachinesOff();
     }
 
     private void HandleRestingMachineStateChanged(RestingMachine machine, bool isOn)
     {
-        UpdateOnSet(machine, isOn);
-
         if (!isOn)
         {
-            OnRestingMachineTurnedOff?.Invoke(machine);
             DispatchGuardForRestingMachine(machine);
         }
-
-        CheckAllMachinesOff();
     }
 
     private void HandleSecurityMachineStateChanged(SecurityMachine machine, bool isOn)
     {
-        UpdateOnSet(machine, isOn);
-
         if (!isOn)
         {
-            OnSecurityMachineTurnedOff?.Invoke(machine);
-            DispatchGuardForSecurityMachine(machine, null);
         }
         else if (reservationService == null)
         {
             TryAssignClosestRestingGuard(machine);
         }
-
-        CheckAllMachinesOff();
-    }
-
-    private void UpdateOnSet(MonoBehaviour machine, bool isOn)
-    {
-        if (machine == null) return;
-        if (isOn) machinesOn.Add(machine);
-        else machinesOn.Remove(machine);
-
-        // cleanup destroyed refs
-        machinesOn.RemoveWhere(m => m == null);
     }
 
     private void DispatchGuardForFactoryMachine(FactoryMachine machine)
@@ -161,7 +173,7 @@ public class MachineSecurityManager : MonoBehaviour
         Debug.Log($"Dispatching guard for machine: {machine.name}");
         if (machine == null || guards.Count == 0) return;
 
-        RobotBrain best = null;
+        RobotBrainNew best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
 
@@ -181,11 +193,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (best == null)
             return;
 
-        var home = best.HomeSecurityMachine;
-        if (home != null)
-            home.VacateGuard(best);
-
-        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
+        PublishGuardDispatch(best, machine, false);
     }
 
     private void DispatchGuardForRestingMachine(RestingMachine machine)
@@ -193,7 +201,7 @@ public class MachineSecurityManager : MonoBehaviour
         Debug.Log($"Dispatching guard for machine: {machine.name}");
         if (machine == null || guards.Count == 0) return;
 
-        RobotBrain best = null;
+        RobotBrainNew best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
 
@@ -212,19 +220,15 @@ public class MachineSecurityManager : MonoBehaviour
         if (best == null)
             return;
 
-        var home = best.HomeSecurityMachine;
-        if (home != null)
-            home.VacateGuard(best);
-
-        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
+        PublishGuardDispatch(best, machine, false);
     }
 
-    private bool DispatchGuardForSecurityMachine(SecurityMachine machine, RobotBrain skipGuard)
+    private bool DispatchGuardForSecurityMachine(SecurityMachine machine, RobotBrainNew skipGuard)
     {
         Debug.Log($"Dispatching guard for security machine: {machine.name}");
         if (machine == null || guards.Count == 0) return false;
 
-        RobotBrain best = null;
+        RobotBrainNew best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
         bool skippedEligible = false;
@@ -253,15 +257,11 @@ public class MachineSecurityManager : MonoBehaviour
         if (best == null)
             return false;
 
-        var home = best.HomeSecurityMachine;
-        if (home != null)
-            home.VacateGuard(best);
-
-        PushBrainIntent(best, RobotTaskType.ReactivateMachine, machine, false);
+        PublishGuardDispatch(best, machine, false);
         return true;
     }
 
-    public bool RequestGuardPost(RobotBrain guard)
+    public bool RequestGuardPost(RobotBrainNew guard)
     {
         if (guard == null)
             return false;
@@ -269,24 +269,11 @@ public class MachineSecurityManager : MonoBehaviour
         if (TryAssignGuardToSecurityMachine(guard))
             return true;
 
-        RoomWaypoint restPoint = null;
-        if (guard.WaypointService != null)
-        {
-            restPoint = guard.WaypointService.GetFirstRestPoint();
-            if (restPoint == null)
-                restPoint = guard.WaypointService.GetWorkOrRestPoint();
-            if (restPoint == null)
-                restPoint = guard.WaypointService.GetStartPoint();
-        }
-
-        if (restPoint != null)
-            guard.PushExplicitTask(RobotTaskType.Rest, restPoint);
-        else
-            guard.PushExplicitTask(RobotTaskType.Rest);
+        PublishGuardDispatch(guard, null, false);
         return true;
     }
 
-    private bool TryAssignGuardToSecurityMachine(RobotBrain guard)
+    private bool TryAssignGuardToSecurityMachine(RobotBrainNew guard)
     {
         if (guard == null)
             return false;
@@ -308,7 +295,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (target == null)
             return false;
 
-        guard.PushExplicitTask(RobotTaskType.GuardPost, target);
+        PublishGuardDispatch(guard, target, target != null && target.IsOn);
         return true;
     }
 
@@ -322,29 +309,6 @@ public class MachineSecurityManager : MonoBehaviour
             if (machine == null)
                 continue;
             if (!machine.IsOn || machine.IsOccupied)
-                continue;
-
-            float dist = Vector2.Distance(position, machine.transform.position);
-            if (dist < bestDist)
-            {
-                best = machine;
-                bestDist = dist;
-            }
-        }
-
-        return best;
-    }
-
-    private RestingMachine FindClosestAvailableRestMachine(Vector3 position)
-    {
-        RestingMachine best = null;
-        float bestDist = float.MaxValue;
-
-        foreach (var machine in restingMachines)
-        {
-            if (machine == null)
-                continue;
-            if (!machine.IsOn)
                 continue;
 
             float dist = Vector2.Distance(position, machine.transform.position);
@@ -383,7 +347,7 @@ public class MachineSecurityManager : MonoBehaviour
                 return false;
         }
 
-        RobotBrain best = null;
+        RobotBrainNew best = null;
         float bestDist = float.MaxValue;
         var pos = machine.transform.position;
 
@@ -391,13 +355,6 @@ public class MachineSecurityManager : MonoBehaviour
         {
             if (guard == null) continue;
             if (IsGuardStationedAtSecurityMachine(guard)) continue;
-            if (guard.Heart == null)
-                continue;
-            if (guard.Heart.CurrentTask != null
-                && guard.Heart.CurrentTask.Type != RobotTaskType.Rest
-                && guard.Heart.CurrentTask.Type != RobotTaskType.Idle)
-                continue;
-
             float dist = Vector2.Distance(guard.transform.position, pos);
             if (dist < bestDist)
             {
@@ -413,107 +370,36 @@ public class MachineSecurityManager : MonoBehaviour
             return false;
         }
 
-        best.PushExplicitTask(RobotTaskType.GuardPost, machine);
+        PublishGuardDispatch(best, machine, machine.IsOn);
         return true;
     }
 
-    private static bool IsGuardStationedAtSecurityMachine(RobotBrain guard)
+    private static bool IsGuardStationedAtSecurityMachine(RobotBrainNew guard)
     {
         if (guard == null)
             return false;
-        var home = guard.HomeSecurityMachine;
-        return home != null && home.IsOn && home.CurrentGuard == guard;
-    }
-
-    /// <summary>
-    /// Call this to (re)count states from scratch (e.g., after all registrations).
-    /// </summary>
-    public void RecountAndMaybeTrigger()
-    {
-        machinesOn.Clear();
-
-        foreach (var m in factoryMachines) if (IsOn(m)) machinesOn.Add(m);
-        foreach (var m in restingMachines) if (IsOn(m)) machinesOn.Add(m);
-        foreach (var m in securityMachines) if (IsOn(m)) machinesOn.Add(m);
-
-        CheckAllMachinesOff();
-    }
-
-    private void CheckAllMachinesOff()
-    {
-        // consider 'all off' only if at least one machine is registered
-        int registeredCount = factoryMachines.Count + restingMachines.Count + securityMachines.Count;
-        if (registeredCount == 0) return;
-
-        // purge any destroyed references to be safe
-        machinesOn.RemoveWhere(m => m == null);
-
-        if (machinesOn.Count == 0)
-        {
-            // avoid duplicate raises
-            if (!allOffRaised)
-            {
-                allOffRaised = true;
-                TriggerAllMachinesOff();
-            }
-        }
-        else
-        {
-            // reset latch when any machine turns back on
-            allOffRaised = false;
-        }
-    }
-
-    // Call this method when all machines are off
-    public void TriggerAllMachinesOff()
-    {
-        Debug.Log("[MachineSecurityManager] All machines are OFF -> broadcasting OnAllMachinesOff");
-        OnAllMachinesOff?.Invoke();
-    }
-
-    private bool allOffRaised = false;
-
-    private static bool IsOn(MonoBehaviour machine)
-    {
-        if (machine == null) return false;
-
-        // Prefer a common base type if your machines inherit from it
-        // (uncomment if you have such a type)
-        // if (machine is BaseMachine bm) return bm.IsOn; // or bm.isOn if public
-
-        // Fallback to reflection to support either a public property 'IsOn'
-        // or a field named 'isOn' (protected/private). Keeps this class decoupled.
-        var t = machine.GetType();
-        var prop = t.GetProperty("IsOn");
-        if (prop != null && prop.PropertyType == typeof(bool))
-        {
-            try { return (bool)prop.GetValue(machine); } catch { }
-        }
-        var field = t.GetField("isOn", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-        if (field != null && field.FieldType == typeof(bool))
-        {
-            try { return (bool)field.GetValue(machine); } catch { }
-        }
         return false;
     }
 
-    private static void PushBrainIntent(RobotBrain guard, RobotTaskType taskType, object payload, bool isOn)
+    private static void PublishGuardDispatch(RobotBrainNew guard, object payload, bool isOn)
     {
         if (guard == null)
             return;
-        // For explicit task types (e.g., ReactivateMachine), bypass machine-state remapping
-        // so only the selected guard executes the intended action.
-        if (taskType == RobotTaskType.ReactivateMachine)
-        {
-            guard.PushExplicitTask(taskType, payload);
-            if (payload is BaseMachine baseMachine)
-            {
-                float waitSeconds = guard.Config != null ? guard.Config.WaitAtMachineSeconds : 0f;
-                guard.PushExplicitTask(RobotTaskType.WaitAtMachine, new WaitAtMachinePayload(baseMachine, waitSeconds));
-            }
-            return;
-        }
 
-        guard.OnMachineStateChanged(payload, isOn);
+        RobotDomainEventBus.PublishSecurityDispatch(guard, payload);
+        RobotDomainEventBus.PublishMachineStateDispatch(guard, payload, isOn);
+    }
+
+    private static RobotBrainNew TryResolveRobotBrain(GameObject robot)
+    {
+        if (robot == null)
+            return null;
+
+        var brain = robot.GetComponent<RobotBrainNew>();
+        if (brain != null)
+            return brain;
+
+        return robot.GetComponentInParent<RobotBrainNew>();
     }
 }
+

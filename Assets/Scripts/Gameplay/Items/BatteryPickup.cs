@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
 public class BatteryPickup : MonoBehaviour, IGrabbable
@@ -15,11 +15,11 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
     [SerializeField, Tooltip("Sorting order applied when the battery is idle.")] private int idleSortingOrder = 0;
 
     [Header("Target Joint Settings")]
-    [Tooltip("How springy the joint movement is. Recommended range: 5–15.")]
+    [Tooltip("How springy the joint movement is. Recommended range: 5â€“15.")]
     [SerializeField, Range(5f, 15f)] private float frequency = 10f;
-    [Tooltip("How much the joint resists oscillation. Recommended range: 0–1.")]
+    [Tooltip("How much the joint resists oscillation. Recommended range: 0â€“1.")]
     [SerializeField, Range(0f, 1f)] private float dampingRatio = 0.9f;
-    [Tooltip("Maximum force the joint can apply. Recommended range: 500–3000.")]
+    [Tooltip("Maximum force the joint can apply. Recommended range: 500â€“3000.")]
     [SerializeField, Range(500f, 3000f)] private float maxForce = 2000f;
 
     /// <summary>
@@ -196,7 +196,7 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
 
         if (!wasStolen && transform.parent != null)
         {
-            var brain = transform.parent.GetComponentInParent<RobotBrain>();
+            var brain = transform.parent.GetComponentInParent<RobotBrainNew>();
             var stateController = brain != null ? brain.GetComponent<RobotStateController>() : null;
             if (brain != null && stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
             {
@@ -338,3 +338,4 @@ public class BatteryPickup : MonoBehaviour, IGrabbable
         }
     }
 }
+

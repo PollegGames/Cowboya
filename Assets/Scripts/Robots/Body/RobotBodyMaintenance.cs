@@ -1,26 +1,24 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Handles physical maintenance actions such as recovering stuck robots and respawning.
 /// Keeps this logic out of Memory to maintain the Heart/Brain/Body separation.
 /// </summary>
-[RequireComponent(typeof(RobotMemory))]
+[RequireComponent(typeof(RobotMemoryNew))]
 public class RobotBodyMaintenance : MonoBehaviour, IPooledObject
 {
-    [SerializeField] private RobotMemory memory;
+    [SerializeField] private RobotMemoryNew memory;
     private IRobotRespawnService respawnService;
 
     private void Awake()
     {
         if (memory == null)
-            memory = GetComponent<RobotMemory>();
+            memory = GetComponent<RobotMemoryNew>();
     }
 
     public void SetRespawnService(IRobotRespawnService service)
     {
         respawnService = service;
-        if (memory != null && memory.Snapshot != null)
-            memory.Snapshot.SetRespawnService(service);
     }
 
     /// <summary>
@@ -66,3 +64,4 @@ public class RobotBodyMaintenance : MonoBehaviour, IPooledObject
     {
     }
 }
+

@@ -5211,14 +5211,12 @@ GameObject:
   - component: {fileID: 866202936189086745}
   - component: {fileID: 3917880315361645317}
   - component: {fileID: 3707647543561557023}
-  - component: {fileID: 5484420303611480520}
   - component: {fileID: 5294910621018447611}
-  - component: {fileID: 6022156654658359713}
-  - component: {fileID: 372659840463579902}
   - component: {fileID: 4668187307536096702}
   - component: {fileID: 6412355153765705650}
   - component: {fileID: 5496899899287031183}
   - component: {fileID: 3298033236516481121}
+  - component: {fileID: 6091592845371575527}
   m_Layer: 7
   m_Name: WorkerSpawner
   m_TagString: Enemy
@@ -5354,8 +5352,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::HealthBot
   damageFeedback: {fileID: 607272071551454932}
-  memory: {fileID: 5484420303611480520}
-  brain: {fileID: 372659840463579902}
+  memory: {fileID: 0}
+  brain: {fileID: 0}
+  memoryNew: {fileID: 0}
+  brainNew: {fileID: 0}
   playerBrain: {fileID: 0}
 --- !u!114 &3707647543561557023
 MonoBehaviour:
@@ -5369,18 +5369,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0fc7a5ea4be4010be29e4887b018d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::Inventory
---- !u!114 &5484420303611480520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7235029246623758551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 906126257589b3140b69badd1f7e1d9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotMemory
 --- !u!114 &5294910621018447611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5404,65 +5392,6 @@ MonoBehaviour:
     CurrentEnergy: 1
     AttackEnergyCost: 1
     EnergyRechargeRate: 1
---- !u!114 &6022156654658359713
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7235029246623758551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab148081b3947484ab0d3ba9c3fb06db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotHeart
-  role: 2
-  memory: {fileID: 5484420303611480520}
-  config:
-    role: 2
-    resumeWorkOnMachineOn: 1
-    defaultTimeoutSeconds: 10
-    waitAtMachineSeconds: 5
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 120
-    reactivateDurationSeconds: 30
-  overrideStackDepth: 0
-  seedPrimaryTask: 1
-  logStackChanges: 1
---- !u!114 &372659840463579902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7235029246623758551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b782b515f2c0dcc4684933419bbf779d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotBrain
-  heart: {fileID: 6022156654658359713}
-  config:
-    role: 2
-    resumeWorkOnMachineOn: 1
-    defaultTimeoutSeconds: 10
-    waitAtMachineSeconds: 5
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 120
-    reactivateDurationSeconds: 30
-  body: {fileID: 6412355153765705650}
-  memory: {fileID: 5484420303611480520}
-  taskHandlers: {fileID: 11400000, guid: ca339f7632d881c41b03569f6f4502ef, type: 2}
-  roleTaskHandlers:
-  - Role: 2
-    Handlers: {fileID: 11400000, guid: ca339f7632d881c41b03569f6f4502ef, type: 2}
-  waypointServiceBehaviour: {fileID: 0}
-  stateController: {fileID: 5294910621018447611}
-  logChaseDecisions: 1
-  followerChaseRefreshSeconds: 0.5
-  reactivateArrivalTimeoutSeconds: 8
 --- !u!114 &4668187307536096702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5475,7 +5404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::RobotBodyMaintenance
-  memory: {fileID: 5484420303611480520}
+  memory: {fileID: 0}
 --- !u!114 &6412355153765705650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5497,7 +5426,6 @@ MonoBehaviour:
   deadZoneX: 5
   deadZoneY: 5
   updateLoop: 0
-  logFollowerPathing: 1
   bodyMaintenance: {fileID: 4668187307536096702}
   attackController: {fileID: 0}
   isBoss: 0
@@ -5513,7 +5441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::RobotBodyMaintenance
-  memory: {fileID: 5484420303611480520}
+  memory: {fileID: 0}
 --- !u!114 &3298033236516481121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5526,11 +5454,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::PooledEnemy
-  heart: {fileID: 6022156654658359713}
+  heart: {fileID: 0}
   body: {fileID: 6412355153765705650}
-  memory: {fileID: 5484420303611480520}
+  memory: {fileID: 0}
   stateController: {fileID: 5294910621018447611}
   animator: {fileID: 3790727305438757836}
+--- !u!114 &6091592845371575527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7235029246623758551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49ceeaa695335f448915ff284349a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotMemoryNew
 --- !u!1 &7267900126899738927
 GameObject:
   m_ObjectHideFlags: 0
@@ -6502,4 +6442,3 @@ MonoBehaviour:
     m_Extent: {x: 0.42308474, y: 0.857615, z: 0}
   m_AlwaysUpdate: 1
   m_AutoRebind: 0
-

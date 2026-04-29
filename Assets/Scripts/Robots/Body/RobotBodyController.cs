@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Executes movement/physics for a robot. This is the Body pillar that drives locomotion
@@ -19,7 +19,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     [SerializeField] private RobotAttackController attackController;
     [SerializeField] private bool isBoss;
 
-    private RobotHeart heart;
+    private RobotHeartNew heart;
     private WaypointPathFollower pathFollower;
     private IWaypointQueries waypointQueries;
     private IWaypointNotifier waypointNotifier;
@@ -28,7 +28,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     protected override void Awake()
     {
         base.Awake();
-        heart = GetComponent<RobotHeart>();
+        heart = GetComponent<RobotHeartNew>();
         if (bodyMaintenance == null)
             bodyMaintenance = GetComponent<RobotBodyMaintenance>();
         if (attackController == null)
@@ -162,3 +162,4 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     }
 
 }
+

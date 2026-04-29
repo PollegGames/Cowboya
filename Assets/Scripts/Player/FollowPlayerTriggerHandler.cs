@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -24,8 +24,10 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     public Vector3 PlayerBodyReferencePosition => playerBodyReference != null ? playerBodyReference.position : Vector3.zero;
     public Transform PlayerTransform => playerBodyReference;
 
-    [SerializeField] private RobotMemory memory;
-    [SerializeField] private RobotBrain brain;
+    [SerializeField] private RobotMemoryNew memory;
+    [SerializeField] private RobotBrainNew brain;
+    [SerializeField] private RobotMemoryNew memoryNew;
+    [SerializeField] private RobotBrainNew brainNew;
 
     public event Action<bool> OnPlayerDetectInAttackZoneChanged;
 
@@ -33,19 +35,31 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     {
         mainCamera = Camera.main;
         if (brain == null)
-            brain = GetComponent<RobotBrain>();
+            brain = GetComponent<RobotBrainNew>();
+        if (memoryNew == null)
+            memoryNew = GetComponent<RobotMemoryNew>();
+        if (brainNew == null)
+            brainNew = GetComponent<RobotBrainNew>();
     }
 
     private void OnDisable()
     {
         if (brain != null && playerInAttackZone && playerBodyReference != null)
             brain.OnPlayerInAttackZoneChanged(false, playerBodyReference);
+        if (RobotNewPipelineRuntime.IsNewPipelineActive && brainNew != null)
+            brainNew.OnPerceptionChanged(false, false, Vector3.zero, hasKnownPosition: false);
 
         playerInAttackZone = false;
         if (memory != null)
         {
             memory.SetPlayerInAttackZone(false);
             memory.SetCanSeePlayer(false);
+        }
+        if (memoryNew != null)
+        {
+            memoryNew.SetPlayerInAttackZone(false);
+            memoryNew.SetPlayerInDetectZone(false);
+            memoryNew.ClearPlayerPosition();
         }
         playerBodyReference = null;
     }
@@ -71,6 +85,8 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         {
             memory?.RememberPlayerPosition(playerBodyReference.position);
             memory?.SetCanSeePlayer(true);
+            if (RobotNewPipelineRuntime.IsNewPipelineActive)
+                brainNew?.OnPerceptionChanged(true, playerInAttackZone, playerBodyReference.position, hasKnownPosition: true);
         }
         playerInDetectZone = true;
 
@@ -98,6 +114,8 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         playerBodyReference = null;
         memory?.ClearPlayerPosition();
         memory?.SetCanSeePlayer(false);
+        if (RobotNewPipelineRuntime.IsNewPipelineActive)
+            brainNew?.OnPerceptionChanged(false, false, Vector3.zero, hasKnownPosition: false);
     }
 
 
@@ -110,6 +128,8 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             memory?.SetCanSeePlayer(true);
             brain?.OnPlayerInAttackZoneChanged(true, playerBodyReference);
             playerInAttackZone = true;
+            if (RobotNewPipelineRuntime.IsNewPipelineActive)
+                brainNew?.OnPerceptionChanged(playerInDetectZone, true, playerBodyReference.position, hasKnownPosition: true);
         }
         OnPlayerDetectInAttackZoneChanged?.Invoke(true);
 
@@ -127,6 +147,8 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             brain?.OnPlayerInAttackZoneChanged(false, playerBodyReference);
         memory?.SetPlayerInAttackZone(false);
         playerInAttackZone = false;
+        if (RobotNewPipelineRuntime.IsNewPipelineActive)
+            brainNew?.OnPerceptionChanged(playerInDetectZone, false, playerBodyReference != null ? playerBodyReference.position : Vector3.zero, hasKnownPosition: playerBodyReference != null);
         OnPlayerDetectInAttackZoneChanged?.Invoke(false);
 
     }
@@ -141,6 +163,8 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             Vector3 playerPosition = playerBodyReference.position;
             memory?.RememberPlayerPosition(playerPosition);
             memory?.SetCanSeePlayer(true);
+            if (RobotNewPipelineRuntime.IsNewPipelineActive)
+                brainNew?.OnPerceptionChanged(playerInDetectZone, playerInAttackZone, playerPosition, hasKnownPosition: true);
 
             Vector3 direction = (playerPosition - circleCenter.position).normalized;
             Vector3 targetPos = circleCenter.position + direction * radius;
@@ -173,6 +197,8 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
                 : playerControl.transform;
             memory?.RememberPlayerPosition(playerBodyReference.position);
             memory?.SetCanSeePlayer(true);
+            if (RobotNewPipelineRuntime.IsNewPipelineActive)
+                brainNew?.OnPerceptionChanged(true, playerInAttackZone, playerBodyReference.position, hasKnownPosition: true);
         }
     }
 
@@ -193,3 +219,4 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         }
     }
 }
+

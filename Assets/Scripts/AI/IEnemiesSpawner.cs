@@ -7,6 +7,7 @@ public interface IEnemiesSpawner
         IWaypointService waypointService,
         GameUIViewModel viewModel,
         IRobotRespawnService respawnService,
+        IFactoryManager factoryManager,
         MachineSecurityManager securityManager,
         SecurityBadgeSpawner securityBadgeSpawner,
         BatterySpawner batterySpawner);

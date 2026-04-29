@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -9,20 +8,17 @@ public class SpawningMachine : BaseMachine
 
     private MeshRenderer meshRenderer;
 
-    public event Action<SpawningMachine, bool> OnMachineStateChanged;
-    public event Action<SpawningMachine, RobotBrain> OnMachineTurningOff;
-
     [Header("Spawning Settings")]
     [SerializeField] private float spawnInterval = 30f;
     [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
 
     private Coroutine spawnCoroutine;
 
-    private RobotBrain currentWorker;
+    private RobotBrainNew currentWorker;
     private RobotStateController currentWorkerState;
 
     public bool HasWorker => currentWorker != null;
-    public RobotBrain CurrentWorker => currentWorker;
+    public RobotBrainNew CurrentWorker => currentWorker;
 
     private IEnemiesSpawner enemiesSpawner;
     private MachineSecurityManager securityManager;
@@ -76,7 +72,6 @@ public class SpawningMachine : BaseMachine
         base.PowerOn();
         TryStartSpawning();
         ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, true);
     }
 
     public override void PowerOff()
@@ -86,10 +81,8 @@ public class SpawningMachine : BaseMachine
         StopSpawning();
         UnsubscribeFromWorkerState();
         SendWorkerToStart(currentWorker);
-        OnMachineTurningOff?.Invoke(this, currentWorker);
         base.PowerOff();
         ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, false);
         currentWorker = null;
     }
 
@@ -115,7 +108,7 @@ public class SpawningMachine : BaseMachine
     /// </summary>
     public override void AttachRobot(GameObject robot)
     {
-        var newWorker = robot.GetComponent<RobotBrain>();
+        var newWorker = robot.GetComponent<RobotBrainNew>();
         if (newWorker == null) return;
 
         if (!isOn)
@@ -134,20 +127,19 @@ public class SpawningMachine : BaseMachine
         }
     }
 
-    private void SetWorkerToSpawn(RobotBrain worker)
+    private void SetWorkerToSpawn(RobotBrainNew worker)
     {
         if (worker == null) return;
-        worker.OnMachineStateChanged(this, true);
+        RobotDomainEventBus.PublishMachineStateDispatch(worker, this, true);
     }
 
     /// <summary>
     /// Helper to send a worker to the rest station state.
     /// </summary>
-    private void SendWorkerToStart(RobotBrain worker)
+    private void SendWorkerToStart(RobotBrainNew worker)
     {
         if (worker == null) return;
-        // Send null so the brain re-evaluates without machine context.
-        worker.OnMachineStateChanged(null, false);
+        RobotDomainEventBus.PublishMachineStateDispatch(worker, null, false);
     }
 
     public override void ReleaseRobot()
@@ -196,7 +188,7 @@ public class SpawningMachine : BaseMachine
 
     }
 
-    private void SubscribeToWorkerState(RobotBrain worker)
+    private void SubscribeToWorkerState(RobotBrainNew worker)
     {
         UnsubscribeFromWorkerState();
         if (worker == null)
@@ -229,3 +221,6 @@ public class SpawningMachine : BaseMachine
         return currentWorker != null && currentWorkerState != null && currentWorkerState.CurrentState == RobotState.Alive;
     }
 }
+
+
+

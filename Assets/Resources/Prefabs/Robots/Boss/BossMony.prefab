@@ -1725,8 +1725,10 @@ MonoBehaviour:
   attackZone: {fileID: 5699356779240498680}
   circleCenter: {fileID: 6495128365634737989}
   radius: 3.5
-  memory: {fileID: 6360489659453437763}
-  brain: {fileID: 4849546215194926996}
+  memory: {fileID: 0}
+  brain: {fileID: 0}
+  memoryNew: {fileID: 0}
+  brainNew: {fileID: 0}
 --- !u!1 &2068708825231265343
 GameObject:
   m_ObjectHideFlags: 0
@@ -2726,11 +2728,8 @@ GameObject:
   - component: {fileID: 8145536696515162152}
   - component: {fileID: 7298898667421222504}
   - component: {fileID: 7006426421426987256}
-  - component: {fileID: 6360489659453437763}
   - component: {fileID: 7124027368022760294}
   - component: {fileID: 9146288787774417856}
-  - component: {fileID: 1096035392043712394}
-  - component: {fileID: 4849546215194926996}
   - component: {fileID: 1598322442020894122}
   - component: {fileID: 6499326095617453643}
   - component: {fileID: 5616405064648756055}
@@ -2738,6 +2737,7 @@ GameObject:
   - component: {fileID: 8767766267532763180}
   - component: {fileID: 6659830223704625551}
   - component: {fileID: 298235982843602329}
+  - component: {fileID: 4779150262777816012}
   m_Layer: 7
   m_Name: BossMony
   m_TagString: Enemy
@@ -2873,21 +2873,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::HealthBot
   damageFeedback: {fileID: 4150757731813430936}
-  memory: {fileID: 6360489659453437763}
-  brain: {fileID: 4849546215194926996}
+  memory: {fileID: 0}
+  brain: {fileID: 0}
+  memoryNew: {fileID: 0}
+  brainNew: {fileID: 0}
   playerBrain: {fileID: 0}
---- !u!114 &6360489659453437763
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3629763386926311630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 906126257589b3140b69badd1f7e1d9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotMemory
 --- !u!114 &7124027368022760294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2923,63 +2913,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0fc7a5ea4be4010be29e4887b018d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::Inventory
---- !u!114 &1096035392043712394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3629763386926311630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab148081b3947484ab0d3ba9c3fb06db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotHeart
-  role: 4
-  memory: {fileID: 6360489659453437763}
-  config:
-    role: 4
-    resumeWorkOnMachineOn: 0
-    defaultTimeoutSeconds: 10
-    waitAtMachineSeconds: 5
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 120
-    reactivateDurationSeconds: 5
-  overrideStackDepth: 0
-  seedPrimaryTask: 1
-  logStackChanges: 1
---- !u!114 &4849546215194926996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3629763386926311630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b782b515f2c0dcc4684933419bbf779d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotBrain
-  heart: {fileID: 1096035392043712394}
-  config:
-    role: 4
-    resumeWorkOnMachineOn: 1
-    defaultTimeoutSeconds: 10
-    waitAtMachineSeconds: 5
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 120
-    reactivateDurationSeconds: 30
-  body: {fileID: 6499326095617453643}
-  memory: {fileID: 6360489659453437763}
-  taskHandlers: {fileID: 11400000, guid: 8c4a06d021ee8454984206e6823669ee, type: 2}
-  roleTaskHandlers:
-  - Role: 4
-    Handlers: {fileID: 11400000, guid: 8c4a06d021ee8454984206e6823669ee, type: 2}
-  waypointServiceBehaviour: {fileID: 0}
-  stateController: {fileID: 7124027368022760294}
-  reactivateArrivalTimeoutSeconds: 8
 --- !u!114 &1598322442020894122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2992,7 +2925,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::RobotBodyMaintenance
-  memory: {fileID: 6360489659453437763}
+  memory: {fileID: 0}
 --- !u!114 &6499326095617453643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3029,7 +2962,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::RobotBodyMaintenance
-  memory: {fileID: 6360489659453437763}
+  memory: {fileID: 0}
 --- !u!114 &757712647934146845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3042,9 +2975,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::PooledEnemy
-  heart: {fileID: 1096035392043712394}
+  heart: {fileID: 0}
   body: {fileID: 6499326095617453643}
-  memory: {fileID: 6360489659453437763}
+  memory: {fileID: 0}
   stateController: {fileID: 7124027368022760294}
   animator: {fileID: 7747097817031334347}
 --- !u!114 &8767766267532763180
@@ -3100,6 +3033,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::SimpleAttackController
   leftHandHitbox: {fileID: 6031340125726269645}
   rightHandHitbox: {fileID: 7356225863704016723}
+--- !u!114 &4779150262777816012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629763386926311630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49ceeaa695335f448915ff284349a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotMemoryNew
 --- !u!1 &3636523153973176014
 GameObject:
   m_ObjectHideFlags: 0
@@ -7147,5 +7092,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a492d78718bb644cb1dbc7f66d57986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-
-

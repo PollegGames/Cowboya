@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpawningWorkerSlot : MonoBehaviour
 {
@@ -7,7 +7,7 @@ public class SpawningWorkerSlot : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var brain = collision.GetComponentInParent<RobotBrain>();
+        var brain = collision.GetComponentInParent<RobotBrainNew>();
         if (brain == null) return;
         var heart = brain.Heart;
         if (heart == null || heart.Role != RobotRole.WorkerSpawner)
@@ -19,3 +19,4 @@ public class SpawningWorkerSlot : MonoBehaviour
         machine.AttachRobot(brain.gameObject);
     }
 }
+

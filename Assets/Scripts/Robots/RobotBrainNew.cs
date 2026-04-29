@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -25,6 +26,7 @@ public class RobotBrainNew : MonoBehaviour
     public event Action<RobotTask> UpdatePlannedTask;
 
     [SerializeField] private RobotHeartNew heart;
+    [SerializeField] private RobotBodyController body;
 
     // Memory holds contextual facts used to compute brain options.
     [SerializeField] private RobotMemoryNew memory;
@@ -32,11 +34,17 @@ public class RobotBrainNew : MonoBehaviour
     private BrainOption options;
     private RobotTask lastPlannedTask;
     public BrainOption CurrentOptions => options;
+    public RobotHeartNew Heart => heart;
+    public RobotBodyController Body => body;
+    public RobotMemoryNew Memory => memory;
+    public bool IsSecurityGuard => heart != null && heart.Role == RobotRole.SecurityGuard;
 
     private void Awake()
     {
         if (heart == null)
             heart = GetComponent<RobotHeartNew>();
+        if (body == null)
+            body = GetComponent<RobotBodyController>();
         if (memory == null)
             memory = GetComponent<RobotMemoryNew>();
     }
@@ -54,11 +62,104 @@ public class RobotBrainNew : MonoBehaviour
     {
         if (memory != null)
             memory.OnMemoryChanged -= UpdateMemoryState;
+        RobotMachineDestinationBalancer.ReleaseRobot(gameObject.GetInstanceID());
     }
 
     private void UpdateMemoryState(MemoryChangeEvent e)
     {
         PublishPlan(e.Snapshot);
+    }
+
+    public void OnPerceptionChanged(bool playerInDetectZone, bool playerInAttackZone, Vector3 playerPosition, bool hasKnownPosition = true)
+    {
+        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+            return;
+
+        RobotEcosystemProbe.RecordBrainCall(
+            this,
+            "OnPerceptionChanged",
+            "detect=" + playerInDetectZone + " attack=" + playerInAttackZone + " knownPos=" + hasKnownPosition);
+
+        memory.SetPlayerInDetectZone(playerInDetectZone);
+        memory.SetPlayerInAttackZone(playerInAttackZone);
+
+        if (hasKnownPosition)
+            memory.RememberPlayerPosition(playerPosition);
+        else if (!playerInDetectZone && !playerInAttackZone)
+            memory.ClearPlayerPosition();
+    }
+
+    public void OnDamageTaken(int damage)
+    {
+        _ = damage;
+        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+            return;
+
+        RobotEcosystemProbe.RecordBrainCall(this, "OnDamageTaken", "damage=" + damage);
+        memory.RegisterAttack();
+    }
+
+    /// <summary>
+    /// Backward-compatible bridge for legacy trigger handlers.
+    /// </summary>
+    public void OnPlayerInAttackZoneChanged(bool inZone, Transform playerReference)
+    {
+        Vector3 playerPosition = playerReference != null ? playerReference.position : Vector3.zero;
+        bool playerDetected = memory != null && memory.PlayerInDetectZone;
+        OnPerceptionChanged(playerDetected, inZone, playerPosition, hasKnownPosition: playerReference != null);
+    }
+
+    public void OnMachineStateEvent(object machinePayload, bool isOn)
+    {
+        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+            return;
+
+        RobotEcosystemProbe.RecordBrainCall(
+            this,
+            "OnMachineStateEvent",
+            "payload=" + DescribePayload(machinePayload) + " isOn=" + isOn);
+
+        RoomWaypoint waypoint = ResolveWaypoint(machinePayload);
+        if (waypoint != null)
+            memory.SetRoomWaypointAvailability(waypoint, isOn);
+
+        if (!isOn)
+            memory.ChangeConnectionToMachine(false);
+    }
+
+    public void OnSecurityDispatch(object machinePayload)
+    {
+        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+            return;
+
+        RobotEcosystemProbe.RecordBrainCall(
+            this,
+            "OnSecurityDispatch",
+            "payload=" + DescribePayload(machinePayload));
+
+        RoomWaypoint waypoint = ResolveWaypoint(machinePayload);
+        if (waypoint != null)
+            memory.SetLastVisitedPoint(waypoint);
+    }
+
+    public bool CanUseMachineSlot(BaseMachine machine, RobotTaskType slotTaskType)
+    {
+        _ = machine;
+        if (heart == null || heart.CurrentTask == null)
+            return false;
+        return heart.CurrentTask.Type == slotTaskType;
+    }
+
+    public void CompleteReactivateTask(BaseMachine machine, bool reached)
+    {
+        _ = reached;
+        if (memory != null && machine != null)
+        {
+            memory.SetMachineWaypointAvailability(machine, true);
+            memory.ChangeConnectionToMachine(machine.IsOn);
+        }
+
+        heart?.CompleteCurrentTask();
     }
 
     public bool TryGetCurrentPlan(out BrainOption currentOptions, out RobotTask plannedTask)
@@ -79,6 +180,9 @@ public class RobotBrainNew : MonoBehaviour
     private void PublishPlan(RobotMemorySnapshotNew snapshot)
     {
         var nextOptions = BuildOptions(snapshot);
+        if (!nextOptions.HasFlag(BrainOption.NeedMachine))
+            RobotMachineDestinationBalancer.ReleaseRobot(gameObject.GetInstanceID());
+
         if (nextOptions != options)
         {
             options = nextOptions;
@@ -92,6 +196,15 @@ public class RobotBrainNew : MonoBehaviour
         lastPlannedTask = nextTask;
         if (nextTask != null)
             UpdatePlannedTask?.Invoke(nextTask);
+
+        RobotNewTrace.Log(
+            this,
+            eventSource: "BrainNew.PublishPlan",
+            memoryDelta: "snapshot",
+            brainOptions: nextOptions,
+            plannedTask: nextTask,
+            heartCurrentTask: heart != null ? heart.CurrentTask : null,
+            taskSignal: "plan");
     }
 
     private BrainOption BuildOptions(RobotMemorySnapshotNew s)
@@ -101,8 +214,11 @@ public class RobotBrainNew : MonoBehaviour
         if (s.WasRecentlyAttacked) o |= BrainOption.InDanger;
         if (s.PlayerInAttackZone) o |= BrainOption.CanAttack;
         if (s.PlayerInDetectZone) o |= BrainOption.PlayerDetected;
-        if (!s.IsConnectedToMachine) o |= BrainOption.NeedMachine;
-        if (!HasAvailableWaypoint(s)) o |= BrainOption.MachineUnavailable;
+        if (ShouldNeedMachine(s)) o |= BrainOption.NeedMachine;
+        bool machineUnavailable = heart != null && heart.Role == RobotRole.Worker
+            ? !HasAnyWorkerMachineWaypoint(s)
+            : !HasAvailableWaypoint(s);
+        if (machineUnavailable) o |= BrainOption.MachineUnavailable;
         return o;
     }
 
@@ -118,6 +234,36 @@ public class RobotBrainNew : MonoBehaviour
         }
 
         return false;
+    }
+
+    private static bool HasAnyWorkerMachineWaypoint(RobotMemorySnapshotNew s)
+    {
+        if (s.AllAvailableWaypoints == null || s.AllAvailableWaypoints.Count == 0)
+            return false;
+
+        foreach (var entry in s.AllAvailableWaypoints)
+        {
+            if (entry.Key == null)
+                continue;
+
+            if (entry.Key.type == WaypointType.Work || entry.Key.type == WaypointType.Rest)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool ShouldNeedMachine(RobotMemorySnapshotNew s)
+    {
+        if (s.IsConnectedToMachine)
+            return false;
+
+        // If a desired machine is known, we must keep planning toward it even while
+        // a transition flag is active (handoff/replacement path).
+        if (s.DesiredMachineType.HasValue)
+            return true;
+
+        return !s.IsMachineTransitionInProgress;
     }
 
     private RobotTask BuildTaskFromOptions(BrainOption o, RobotMemorySnapshotNew snapshot)
@@ -137,12 +283,27 @@ public class RobotBrainNew : MonoBehaviour
                 if (o.HasFlag(BrainOption.NeedMachine))
                 {
                     if (o.HasFlag(BrainOption.MachineUnavailable))
+                        return new RobotTask(RobotTaskType.SearchForMachine);
+
+                    int robotId = gameObject.GetInstanceID();
+                    var waypoint = FindBestWaypointForRole(RobotRole.Worker, snapshot, robotId);
+                    if (waypoint == null)
                         return new RobotTask(RobotTaskType.Idle);
 
-                    var waypoint = FindBestWaypointForRole(RobotRole.Worker, snapshot);
-                    return waypoint != null
-                        ? new RobotTask(RobotTaskType.GoToMachine, waypoint)
-                        : new RobotTask(RobotTaskType.Idle);
+                    RobotMachineDestinationBalancer.AssignDestination(robotId, waypoint);
+                    return new RobotTask(RobotTaskType.GoToMachine, waypoint);
+                }
+
+                if (snapshot.LastVisitedPoint != null)
+                {
+                    if (snapshot.LastVisitedPoint.type == WaypointType.Work)
+                        return new RobotTask(RobotTaskType.WorkAtMachine, snapshot.LastVisitedPoint);
+                    else if (snapshot.LastVisitedPoint.type == WaypointType.Rest)
+                        return new RobotTask(RobotTaskType.Rest, snapshot.LastVisitedPoint);
+                    else
+                    {
+                        return new RobotTask(RobotTaskType.SearchForMachine);
+                    }
                 }
 
                 return new RobotTask(RobotTaskType.WorkAtMachine);
@@ -159,10 +320,13 @@ public class RobotBrainNew : MonoBehaviour
                     if (o.HasFlag(BrainOption.MachineUnavailable))
                         return new RobotTask(RobotTaskType.Idle);
 
-                    var securityWaypoint = FindBestWaypointForRole(RobotRole.SecurityGuard, snapshot);
-                    return securityWaypoint != null
-                        ? new RobotTask(RobotTaskType.GoToMachine, securityWaypoint)
-                        : new RobotTask(RobotTaskType.Idle);
+                    var securityWaypoint = FindBestWaypointForRole(RobotRole.SecurityGuard, snapshot, gameObject.GetInstanceID());
+                    if (securityWaypoint == null)
+                        return new RobotTask(RobotTaskType.Idle);
+
+                    if (IsBalancedMachineWaypointType(securityWaypoint.type))
+                        RobotMachineDestinationBalancer.AssignDestination(gameObject.GetInstanceID(), securityWaypoint);
+                    return new RobotTask(RobotTaskType.GoToMachine, securityWaypoint);
                 }
                 return new RobotTask(RobotTaskType.Patrol);
 
@@ -173,7 +337,7 @@ public class RobotBrainNew : MonoBehaviour
                     return new RobotTask(RobotTaskType.Faint);
                 if (o.HasFlag(BrainOption.NeedMachine))
                 {
-                    var spawnWaypoint = FindBestWaypointForRole(RobotRole.WorkerSpawner, snapshot);
+                    var spawnWaypoint = FindBestWaypointForRole(RobotRole.WorkerSpawner, snapshot, gameObject.GetInstanceID());
                     return spawnWaypoint != null
                         ? new RobotTask(RobotTaskType.GoToMachine, spawnWaypoint)
                         : new RobotTask(RobotTaskType.Idle);
@@ -203,14 +367,14 @@ public class RobotBrainNew : MonoBehaviour
         }
     }
 
-    private static RoomWaypoint FindBestWaypointForRole(RobotRole role, RobotMemorySnapshotNew snapshot)
+    private static RoomWaypoint FindBestWaypointForRole(RobotRole role, RobotMemorySnapshotNew snapshot, int robotId)
     {
         switch (role)
         {
             case RobotRole.Worker:
-                return FindBestWaypointForWorker(snapshot);
+                return FindBestWaypointForWorker(snapshot, robotId);
             case RobotRole.SecurityGuard:
-                return FindBestWaypointForGuard(snapshot);
+                return FindBestWaypointForGuard(snapshot, robotId);
             case RobotRole.WorkerSpawner:
                 return FindBestWaypointForSpawner(snapshot);
             default:
@@ -218,16 +382,97 @@ public class RobotBrainNew : MonoBehaviour
         }
     }
 
-    private static RoomWaypoint FindBestWaypointForWorker(RobotMemorySnapshotNew snapshot)
+    private static RoomWaypoint FindBestWaypointForWorker(RobotMemorySnapshotNew snapshot, int robotId)
     {
-        // Priority: Work -> Rest -> Center (start room fallback).
-        return FindByPriority(snapshot, WaypointType.Work, WaypointType.Rest, WaypointType.Center);
+        if (snapshot.DesiredMachineType.HasValue)
+        {
+            var desired = FindByDesiredMachineTypeBalanced(snapshot, snapshot.DesiredMachineType.Value, availableOnly: true, robotId)
+                ?? FindByDesiredMachineTypeBalanced(snapshot, snapshot.DesiredMachineType.Value, availableOnly: false, robotId);
+            if (desired != null)
+                return desired;
+        }
+
+        // Cycle preference: after Work go to Rest, after Rest go to Work.
+        if (snapshot.LastVisitedPoint != null)
+        {
+            if (snapshot.LastVisitedPoint.type == WaypointType.Work)
+                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Rest, WaypointType.Work)
+                    ?? FindByPriorityBalanced(snapshot, availableOnly: false, robotId, WaypointType.Rest, WaypointType.Work);
+            if (snapshot.LastVisitedPoint.type == WaypointType.Rest)
+                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Work, WaypointType.Rest)
+                    ?? FindByPriorityBalanced(snapshot, availableOnly: false, robotId, WaypointType.Work, WaypointType.Rest);
+        }
+
+        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Work, WaypointType.Rest)
+            ?? FindByPriorityBalanced(snapshot, availableOnly: false, robotId, WaypointType.Work, WaypointType.Rest);
     }
 
-    private static RoomWaypoint FindBestWaypointForGuard(RobotMemorySnapshotNew snapshot)
+    private static RoomWaypoint FindByDesiredMachineTypeBalanced(RobotMemorySnapshotNew snapshot, MachineType desiredMachineType, bool availableOnly, int robotId)
+    {
+        WaypointType? desiredWaypointType = null;
+        switch (desiredMachineType)
+        {
+            case MachineType.WorkStation:
+                desiredWaypointType = WaypointType.Work;
+                break;
+            case MachineType.RestStation:
+                desiredWaypointType = WaypointType.Rest;
+                break;
+        }
+
+        if (!desiredWaypointType.HasValue)
+            return null;
+
+        return FindByPriorityBalanced(snapshot, availableOnly, robotId, desiredWaypointType.Value);
+    }
+
+    private static RoomWaypoint FindByPriorityBalanced(RobotMemorySnapshotNew snapshot, bool availableOnly, int robotId, params WaypointType[] orderedTypes)
+    {
+        if (snapshot.AllAvailableWaypoints == null || snapshot.AllAvailableWaypoints.Count == 0)
+            return null;
+
+        var candidates = new List<RoomWaypoint>();
+        foreach (WaypointType type in orderedTypes)
+        {
+            candidates.Clear();
+            foreach (var pair in snapshot.AllAvailableWaypoints)
+            {
+                if (pair.Key == null)
+                    continue;
+                if (availableOnly && !pair.Value)
+                    continue;
+                if (pair.Key.type != type)
+                    continue;
+
+                candidates.Add(pair.Key);
+            }
+
+            if (!IsBalancedMachineWaypointType(type))
+            {
+                if (candidates.Count > 0)
+                    return candidates[0];
+                continue;
+            }
+
+            RoomWaypoint selected = RobotMachineDestinationBalancer.SelectLeastTargeted(candidates, robotId);
+            if (selected != null)
+                return selected;
+        }
+
+        return null;
+    }
+
+    private static RoomWaypoint FindBestWaypointForGuard(RobotMemorySnapshotNew snapshot, int robotId)
     {
         // Priority: Security -> Work/Rest (other machines) -> Center fallback.
-        return FindByPriority(snapshot, WaypointType.Security, WaypointType.Work, WaypointType.Rest, WaypointType.Center);
+        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Security, WaypointType.Work, WaypointType.Rest, WaypointType.Center);
+    }
+
+    private static bool IsBalancedMachineWaypointType(WaypointType type)
+    {
+        return type == WaypointType.Work
+            || type == WaypointType.Rest
+            || type == WaypointType.Security;
     }
 
     private static RoomWaypoint FindBestWaypointForSpawner(RobotMemorySnapshotNew snapshot)
@@ -243,10 +488,10 @@ public class RobotBrainNew : MonoBehaviour
             return last;
         }
 
-        return FindByPriority(snapshot, WaypointType.Spawner);
+        return FindByPriority(snapshot, availableOnly: true, WaypointType.Spawner);
     }
 
-    private static RoomWaypoint FindByPriority(RobotMemorySnapshotNew snapshot, params WaypointType[] orderedTypes)
+    private static RoomWaypoint FindByPriority(RobotMemorySnapshotNew snapshot, bool availableOnly, params WaypointType[] orderedTypes)
     {
         if (snapshot.AllAvailableWaypoints == null || snapshot.AllAvailableWaypoints.Count == 0)
             return null;
@@ -255,7 +500,9 @@ public class RobotBrainNew : MonoBehaviour
         {
             foreach (var pair in snapshot.AllAvailableWaypoints)
             {
-                if (!pair.Value || pair.Key == null)
+                if (pair.Key == null)
+                    continue;
+                if (availableOnly && !pair.Value)
                     continue;
 
                 if (pair.Key.type == type)
@@ -279,5 +526,37 @@ public class RobotBrainNew : MonoBehaviour
             return false;
 
         return left.Type == right.Type && Equals(left.Payload, right.Payload);
+    }
+
+    private static RoomWaypoint ResolveWaypoint(object payload)
+    {
+        if (payload is RoomWaypoint waypoint)
+            return waypoint;
+
+        if (payload is BaseMachine machine && machine != null)
+            return machine.GetComponent<RoomWaypoint>() ?? machine.GetComponentInParent<RoomWaypoint>();
+
+        if (payload is Component component && component != null)
+            return component.GetComponent<RoomWaypoint>() ?? component.GetComponentInParent<RoomWaypoint>();
+
+        if (payload is GameObject gameObject && gameObject != null)
+            return gameObject.GetComponent<RoomWaypoint>() ?? gameObject.GetComponentInParent<RoomWaypoint>();
+
+        return null;
+    }
+
+    private static string DescribePayload(object payload)
+    {
+        if (payload == null)
+            return "null";
+        if (payload is RoomWaypoint waypoint && waypoint != null)
+            return "RoomWaypoint:" + waypoint.type;
+        if (payload is BaseMachine machine && machine != null)
+            return "BaseMachine:" + machine.name;
+        if (payload is Component component && component != null)
+            return "Component:" + component.name;
+        if (payload is GameObject gameObject && gameObject != null)
+            return "GameObject:" + gameObject.name;
+        return payload.GetType().Name;
     }
 }

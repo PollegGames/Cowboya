@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -35,7 +35,6 @@ public class WaypointService : MonoBehaviour, IWaypointService
     private readonly Dictionary<RoomWaypoint, int> securityUsageCounts = new();
 
     private readonly Dictionary<RoomWaypoint, int> workSpawnersUsageCounts = new();
-    private readonly Dictionary<FactoryMachine, RobotBrain> reservedMachines = new();
 
     // Listeners
     private readonly HashSet<IRobotNavigationListener> robots = new();
@@ -159,7 +158,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 wp.parentRoom.roomProperties.usageType == UsageType.Work
                 && wp.type == WaypointType.Work
                 && wp.parentRoom.factorymMachinesInRoom.Any(m =>
-                    m.IsOn && m.CurrentWorker == null && !reservedMachines.ContainsKey(m)
+                    m.IsOn && m.CurrentWorker == null
                 )
                 && !reservedWaypoints.Contains(wp)
                 && wp != exclude
@@ -174,7 +173,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
                     wp.parentRoom.roomProperties.usageType == UsageType.Work
                     && wp.type == WaypointType.Work
                     && wp.parentRoom.factorymMachinesInRoom.Any(m =>
-                        m.IsOn && m.CurrentWorker == null && !reservedMachines.ContainsKey(m)
+                        m.IsOn && m.CurrentWorker == null
                     )
                     && !reservedWaypoints.Contains(wp)
                     && wp != exclude
@@ -217,7 +216,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp)
                 && wp.parentRoom.factorymMachinesInRoom.Any(m =>
-                    m.IsOn && m.CurrentWorker == null && !reservedMachines.ContainsKey(m)
+                    m.IsOn && m.CurrentWorker == null
                 )
             )
             .ToList();
@@ -243,11 +242,31 @@ public class WaypointService : MonoBehaviour, IWaypointService
         var restPoint = GetFirstRestPoint(exclude);
         if (restPoint == null)
         {
+            // Spawn-time fallback: if all rest points are reserved, still place overflow workers in rest room
+            // instead of sending them directly to Start.
+            restPoint = GetAnyRestPoint(exclude);
+        }
+        if (restPoint == null)
+        {
             restPoint = GetStartPoint();
         }
         if (logWorkAssignments)
             Debug.Log($"[WaypointReservation] No FREE work; fallback={(restPoint != null ? restPoint.name : "null")}");
         return restPoint;
+    }
+
+    private RoomWaypoint GetAnyRestPoint(RoomWaypoint exclude = null)
+    {
+        var allWaypoints = registry.GetActiveWaypoints();
+        return allWaypoints
+            .Where(wp =>
+                wp != null
+                && wp.parentRoom != null
+                && wp.parentRoom.roomProperties.usageType == UsageType.POI
+                && wp.type == WaypointType.Rest
+                && wp.parentRoom.restingMachinesInRoom.Any(m => m.IsOn)
+                && wp != exclude)
+            .FirstOrDefault();
     }
 
     public RoomWaypoint GetAnyOnWorkPoint(RoomWaypoint exclude = null)
@@ -551,47 +570,6 @@ public class WaypointService : MonoBehaviour, IWaypointService
             .ForEach(k => workSpawnersUsageCounts.Remove(k));
     }
 
-    #region Machine Reservation
-    public FactoryMachine ReserveFreeMachine(RoomManager room, RobotBrain worker)
-    {
-        if (room == null)
-            return null;
-        var machine = room.factorymMachinesInRoom.FirstOrDefault(m =>
-            m.IsOn && m.CurrentWorker == null && !reservedMachines.ContainsKey(m)
-        );
-        if (machine != null)
-            reservedMachines[machine] = worker;
-        return machine;
-    }
-
-    public bool ReserveMachine(FactoryMachine machine, RobotBrain worker)
-    {
-        if (machine == null || worker == null)
-            return false;
-        if (reservedMachines.ContainsKey(machine))
-            return false;
-        reservedMachines[machine] = worker;
-        return true;
-    }
-
-    public void ReleaseMachine(FactoryMachine machine)
-    {
-        if (machine != null)
-            reservedMachines.Remove(machine);
-    }
-
-    public bool IsMachineReserved(FactoryMachine machine)
-    {
-        return machine != null && reservedMachines.ContainsKey(machine);
-    }
-
-    public bool IsMachineReservedFor(FactoryMachine machine, RobotBrain worker)
-    {
-        if (machine == null || worker == null)
-            return false;
-        return reservedMachines.TryGetValue(machine, out var reserved) && reserved == worker;
-    }
-    #endregion
-
     public event Action<RoomWaypoint> OnPOIReleased;
 }
+

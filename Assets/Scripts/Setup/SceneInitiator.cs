@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 
 public class SceneInitiator : GameInitiator
@@ -78,6 +79,8 @@ public class SceneInitiator : GameInitiator
             return;
         }
 
+        RobotDomainEventAdapter.EnsureInScene();
+
         if (mapManager != null)
         {
             if (mapConfig != null)
@@ -149,17 +152,38 @@ public class SceneInitiator : GameInitiator
             waypointService,
             gameUIViewModel,
             respawnService,
+            factoryManager,
             factoryManager.SecurityManager,
             securityBadgeSpawner,
             batterySpawner);
         if (mapConfig != null)
         {
+            int securityGuardsCount = mapConfig.securityGuardsCount;
             enemiesSpawner.CreateWorkers(mapConfig.workersCount);
             enemiesSpawner.CreateWorkerSpawners(mapConfig.blockedCount);
-            enemiesSpawner.CreateSecurityGuards(mapConfig.enemiesCount);
+            enemiesSpawner.CreateSecurityGuards(securityGuardsCount);
             enemiesSpawner.CreateBoss();
         }
         enemiesSpawner.SpreadEnemies();
+        if (RobotNewPipelineRuntime.EnableProbeSummaryOnSceneInit)
+            StartCoroutine(DumpProbeSummaryEndOfFrame());
+        if (RobotNewPipelineRuntime.IsWorkerCycleValidationEnabled && RobotNewPipelineRuntime.EnableEcosystemProbe)
+            StartCoroutine(DumpWorkerProbeSummaryIntervals());
+    }
+
+    private IEnumerator DumpProbeSummaryEndOfFrame()
+    {
+        yield return new WaitForEndOfFrame();
+        RobotEcosystemProbe.DumpSummary("SceneInitiator.InitializeEnemies");
+    }
+
+    private IEnumerator DumpWorkerProbeSummaryIntervals()
+    {
+        yield return new WaitForSeconds(10f);
+        RobotEcosystemProbe.DumpWorkerSummary("SceneInitiator.WorkerCycle.t+10s");
+
+        yield return new WaitForSeconds(20f);
+        RobotEcosystemProbe.DumpWorkerSummary("SceneInitiator.WorkerCycle.t+30s");
     }
 
     private void InitializeSceneController()
@@ -177,8 +201,9 @@ public class SceneInitiator : GameInitiator
         {
             if (mapConfig != null)
             {
+                int securityGuardsCount = mapConfig.securityGuardsCount;
                 victorySetup.robotsSavedTarget = mapConfig.workersCount;
-                victorySetup.robotsKilledTarget = mapConfig.enemiesCount;
+                victorySetup.robotsKilledTarget = securityGuardsCount;
             }
             victorySetup.currentSaved = 0;
             victorySetup.currentKilled = 0;

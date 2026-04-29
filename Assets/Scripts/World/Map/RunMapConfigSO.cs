@@ -15,6 +15,13 @@ public class RunMapConfigSO : ScriptableObject
     public int workersCount = 1;
     public int enemiesCount = 1;
 
+    // Compatibility alias: security guards are currently backed by enemiesCount in assets.
+    public int securityGuardsCount
+    {
+        get => enemiesCount;
+        set => enemiesCount = value;
+    }
+
     [Header("Seed")]
     public string seed = "0";
 

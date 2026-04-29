@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
 public class SecurityBadgePickup : MonoBehaviour, IGrabbable
@@ -15,11 +15,11 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     [SerializeField, Tooltip("Sorting order applied when the badge is idle.")] private int idleSortingOrder = 0;
 
     [Header("Target Joint Settings")]
-    [Tooltip("How springy the joint movement is. Recommended range: 5–15.")]
+    [Tooltip("How springy the joint movement is. Recommended range: 5â€“15.")]
     [SerializeField, Range(5f, 15f)] private float frequency = 10f;
-    [Tooltip("How much the joint resists oscillation. Recommended range: 0–1.")]
+    [Tooltip("How much the joint resists oscillation. Recommended range: 0â€“1.")]
     [SerializeField, Range(0f, 1f)] private float dampingRatio = 0.9f;
-    [Tooltip("Maximum force the joint can apply. Recommended range: 500–3000.")]
+    [Tooltip("Maximum force the joint can apply. Recommended range: 500â€“3000.")]
     [SerializeField, Range(500f, 3000f)] private float maxForce = 2000f;
 
     /// <summary>
@@ -96,7 +96,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         ApplySortingOrder(idleSortingOrder);
         if (joint != null)
         {
-            // Start disabled — only enable when grabbed
+            // Start disabled â€” only enable when grabbed
             joint.enabled = false;
 
             // Configure joint behavior
@@ -176,12 +176,12 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
                 inventory = candidates[0];
         }
         var player = grabParent.GetComponentInParent<PlayerMovementController>();
-        RobotHeart enemyHeart = null;
+        RobotHeartNew enemyHeart = null;
 
         // Detect if we're stealing from an enemy
         if (!wasStolen && transform.parent != null)
         {
-            enemyHeart = transform.parent.GetComponentInParent<RobotHeart>();
+            enemyHeart = transform.parent.GetComponentInParent<RobotHeartNew>();
             var stateController = enemyHeart != null ? enemyHeart.GetComponent<RobotStateController>() : null;
             if (enemyHeart != null && stateController != null && stateController.CurrentState != RobotState.Dead && player != null)
             {
@@ -311,3 +311,4 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         }
     }
 }
+

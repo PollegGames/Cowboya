@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
@@ -17,16 +16,13 @@ public sealed class FactoryMachine : BaseMachine
     private MeshRenderer meshRenderer;
     private float lastSpawnTime = -Mathf.Infinity;
     private bool cubeActive;
-    private RobotBrain currentWorker;
+    private RobotBrainNew currentWorker;
     private RobotStateController currentWorkerState;
 
     private const string SpawnMethodName = nameof(SpawnCubeIfPossible);
 
-    public event Action<FactoryMachine, bool> OnMachineStateChanged;
-    public event Action<FactoryMachine, RobotBrain> OnMachineTurningOff;
-
     public bool HasWorker => currentWorker != null;
-    public RobotBrain CurrentWorker => currentWorker;
+    public RobotBrainNew CurrentWorker => currentWorker;
 
     protected override void Awake()
     {
@@ -58,7 +54,6 @@ public sealed class FactoryMachine : BaseMachine
     {
         base.PowerOn();
         ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, true);
 
         TryScheduleSpawn();
     }
@@ -67,15 +62,12 @@ public sealed class FactoryMachine : BaseMachine
     {
         if (!isOn) return;
 
-        OnMachineTurningOff?.Invoke(this, currentWorker);
-
         if (isOccupied)
-            base.ReleaseRobot();
+            ReleaseRobot();
 
         base.PowerOff();
 
         ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, false);
 
         ResetWorkerTracking();
         StopConveyorAndCancelSpawn();
@@ -89,15 +81,13 @@ public sealed class FactoryMachine : BaseMachine
     {
         if (robot == null) return;
 
-        var newWorker = robot.GetComponent<RobotBrain>();
+        var newWorker = robot.GetComponent<RobotBrainNew>();
         if (newWorker == null) return;
 
         if (!CanAcceptWorker(newWorker)) return;
         if (ReferenceEquals(newWorker, currentWorker)) return;
 
         TrackWorker(newWorker);
-
-        waypointService?.ReleaseMachine(this);
         base.AttachRobot(robot);
 
         TryScheduleSpawn();
@@ -105,13 +95,16 @@ public sealed class FactoryMachine : BaseMachine
 
     public override void ReleaseRobot()
     {
+        if (!isOccupied && currentWorker == null)
+            return;
+
         UnsubscribeFromWorkerState();
         base.ReleaseRobot();
         ResetWorkerTracking();
         StopConveyorAndCancelSpawn();
     }
 
-    public void ReleaseWorker(RobotBrain worker)
+    public void ReleaseWorker(RobotBrainNew worker)
     {
         if (worker == null) return;
         if (!ReferenceEquals(worker, currentWorker)) return;
@@ -119,18 +112,53 @@ public sealed class FactoryMachine : BaseMachine
         ReleaseRobot();
     }
 
-    public bool CanAcceptWorker(RobotBrain worker)
+    public override bool TryAttachWorker(RobotBrainNew worker, string reason)
+    {
+        _ = reason;
+        if (worker == null || !isOn)
+            return false;
+        if (ReferenceEquals(currentWorker, worker))
+            return false;
+        if (currentWorker != null)
+            return false;
+        if (!CanAcceptWorker(worker))
+            return false;
+
+        AttachRobot(worker.gameObject);
+        NotifyWorkerAttached(worker, this);
+        return true;
+    }
+
+    public override bool TryReplaceWorker(RobotBrainNew incoming, string reason)
+    {
+        if (incoming == null || !isOn)
+            return false;
+        if (ReferenceEquals(currentWorker, incoming))
+            return false;
+        if (currentWorker == null)
+            return TryAttachWorker(incoming, reason);
+
+        var previous = currentWorker;
+        ReplaceWorkerInPlace(incoming);
+        NotifyWorkerAttached(incoming, this);
+        NotifyWorkerReleased(previous, this, "replaced");
+        return true;
+    }
+
+    public override bool TryReleaseWorker(RobotBrainNew worker, string reason)
+    {
+        if (worker == null || !ReferenceEquals(currentWorker, worker))
+            return false;
+
+        ReleaseWorker(worker);
+        NotifyWorkerReleased(worker, this, reason);
+        return true;
+    }
+
+    public bool CanAcceptWorker(RobotBrainNew worker)
     {
         if (worker == null || !isOn)
             return false;
-
-        if (waypointService != null
-            && waypointService.IsMachineReserved(this)
-            && !waypointService.IsMachineReservedFor(this, worker)
-            && !ReferenceEquals(worker, currentWorker))
-        {
-            return false;
-        }
 
         if (currentWorker != null && !ReferenceEquals(currentWorker, worker))
             return false;
@@ -286,10 +314,20 @@ public sealed class FactoryMachine : BaseMachine
             && currentWorkerState.CurrentState == RobotState.Alive;
     }
 
-    private void TrackWorker(RobotBrain worker)
+    private void TrackWorker(RobotBrainNew worker)
     {
         currentWorker = worker;
         SubscribeToWorkerState(worker);
+    }
+
+    private void ReplaceWorkerInPlace(RobotBrainNew incoming)
+    {
+        if (incoming == null)
+            return;
+
+        TrackWorker(incoming);
+        base.AttachRobot(incoming.gameObject);
+        TryScheduleSpawn();
     }
 
     private void ResetWorkerTracking()
@@ -299,7 +337,7 @@ public sealed class FactoryMachine : BaseMachine
         currentWorkerState = null;
     }
 
-    private void SubscribeToWorkerState(RobotBrain worker)
+    private void SubscribeToWorkerState(RobotBrainNew worker)
     {
         UnsubscribeFromWorkerState();
         if (worker == null) return;
@@ -329,3 +367,6 @@ public sealed class FactoryMachine : BaseMachine
         base.ReleaseRobot();
     }
 }
+
+
+

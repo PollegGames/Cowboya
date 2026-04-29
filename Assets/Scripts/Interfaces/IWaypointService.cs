@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public interface IWaypointService : IWaypointNotifier, IWaypointQueries
@@ -20,9 +20,5 @@ public interface IWaypointService : IWaypointNotifier, IWaypointQueries
     bool IsPOIReserved(RoomWaypoint poi);
     void ReleaseInvalidReservations();
     void ReleasePOI(RoomWaypoint poi);
-    FactoryMachine ReserveFreeMachine(RoomManager room, RobotBrain worker);
-    bool ReserveMachine(FactoryMachine machine, RobotBrain worker);
-    void ReleaseMachine(FactoryMachine machine);
-    bool IsMachineReserved(FactoryMachine machine);
-    bool IsMachineReservedFor(FactoryMachine machine, RobotBrain worker);
 }
+

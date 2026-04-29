@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Pool lifecycle glue for robots using the Heart/Brain/Body/Memory architecture.
@@ -7,9 +7,9 @@ using UnityEngine;
 public class PooledEnemy : MonoBehaviour, IPooledObject
 {
     [Header("Core")]
-    [SerializeField] private RobotHeart heart;
+    [SerializeField] private RobotHeartNew heart;
     [SerializeField] private RobotBodyController body;
-    [SerializeField] private RobotMemory memory;
+    [SerializeField] private RobotMemoryNew memory;
     [SerializeField] private RobotStateController stateController;
 
     [Header("Visuals & Physics")]
@@ -22,11 +22,11 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
     private void Awake()
     {
         if (heart == null)
-            heart = GetComponent<RobotHeart>();
+            heart = GetComponent<RobotHeartNew>();
         if (body == null)
             body = GetComponent<RobotBodyController>();
         if (memory == null)
-            memory = GetComponent<RobotMemory>();
+            memory = GetComponent<RobotMemoryNew>();
         if (stateController == null)
             stateController = GetComponent<RobotStateController>();
         if (animator == null)
@@ -93,3 +93,4 @@ public class PooledEnemy : MonoBehaviour, IPooledObject
         transform.localRotation = Quaternion.identity;
     }
 }
+

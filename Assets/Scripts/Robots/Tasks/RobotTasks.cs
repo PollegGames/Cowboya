@@ -9,6 +9,7 @@ public enum RobotTaskType
 {
     Idle,
     GoToMachine,
+    AttachToMachine,
     WorkAtMachine,
     GuardPost,
     SearchForMachine,

@@ -4,6 +4,13 @@ This document is the migration organizer for switching from `RobotBrain`/`RobotH
 
 No production behavior changes are required by this document. It is a sequencing guide.
 
+## Current Snapshot
+
+For the latest implementation status and remaining checklist, see:
+- `Docs/RobotAI_NewPipeline_MigrationStatus_2026-04-08.md`
+
+Use this guide as the target migration sequence, and the snapshot document as the current-state tracker.
+
 ## Target Runtime Chain
 
 `External Event -> RobotMemoryStateNew -> RobotMemoryNew (change event) -> RobotBrainNew -> RobotHeartNew -> RobotTaskStack -> TaskHandler -> RobotBodyController`

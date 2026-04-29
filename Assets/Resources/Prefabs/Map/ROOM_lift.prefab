@@ -6058,7 +6058,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67050fc561c15f14fbe88dc840e3ceaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 4
+  type: 5
   parentRoom: {fileID: 187235412449160675}
   IsAvailable: 1
 --- !u!1 &6635929678752723512

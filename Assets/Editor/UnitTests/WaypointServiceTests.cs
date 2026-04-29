@@ -19,9 +19,10 @@ public class WaypointServiceTests
     {
         public bool Registered; public bool Unregistered;
         public List<RoomWaypoint> active = new();
+        public List<RoomWaypoint> all = new();
         public void RegisterRoomWaypoints(RoomManager room, IEnumerable<RoomWaypoint> waypoints) { Registered = true; }
         public void UnregisterRoomWaypoints(RoomManager room) { Unregistered = true; }
-        public List<RoomWaypoint> GetAllWaypoints() => new();
+        public List<RoomWaypoint> GetAllWaypoints() => all.Count > 0 ? all : active;
         public List<RoomWaypoint> GetActiveWaypoints() => active;
     }
     private class DummyPathFinder : MonoBehaviour, IPathFinder
@@ -154,5 +155,39 @@ public class WaypointServiceTests
 
         Assert.IsTrue(finder.BuildCalled);
         Assert.IsTrue(finder.IncludeFlag);
+    }
+
+    [Test]
+    public void GetWorkOrRestPoint_WhenRestReserved_FallsBackToAnyRestBeforeStart()
+    {
+        var reg = new GameObject().AddComponent<DummyRegistry>();
+        var finder = new GameObject().AddComponent<DummyPathFinder>();
+        InitService(reg, finder);
+
+        var roomGo = new GameObject("RestRoom");
+        var room = roomGo.AddComponent<RoomManager>();
+        var props = roomGo.AddComponent<RoomProperties>();
+        props.usageType = UsageType.POI;
+
+        var machineGo = new GameObject("RestMachine");
+        var machine = machineGo.AddComponent<RestingMachine>();
+        typeof(BaseMachine).GetField("isOn", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(machine, true);
+        room.restingMachinesInRoom.Add(machine);
+
+        var restWpGo = new GameObject("RestWaypoint");
+        var restWp = restWpGo.AddComponent<RoomWaypoint>();
+        restWp.type = WaypointType.Rest;
+        restWp.parentRoom = room;
+
+        reg.active = new List<RoomWaypoint> { restWp };
+        reg.all = new List<RoomWaypoint> { restWp };
+
+        // Reserve rest point once.
+        var first = _service.GetWorkOrRestPoint();
+        Assert.AreEqual(restWp, first);
+
+        // Previously this returned Start/null. New behavior should still return rest for overflow spawn.
+        var second = _service.GetWorkOrRestPoint();
+        Assert.AreEqual(restWp, second);
     }
 }

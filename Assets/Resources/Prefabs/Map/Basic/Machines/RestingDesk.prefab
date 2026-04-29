@@ -900,7 +900,8 @@ MonoBehaviour:
   trigger: {fileID: 429215285151596846}
   materialOn: {fileID: 2100000, guid: e4c8fe212ac65394cb2979609eeb3a94, type: 2}
   materialOff: {fileID: 2100000, guid: 57633b0e550a91e4c98965050e121a39, type: 2}
-  sendBackToWorkDelay: 5
+  sendBackToWorkDelay: 6
+  logRestingMachine: 0
 --- !u!1 &1273394523665273949
 GameObject:
   m_ObjectHideFlags: 0

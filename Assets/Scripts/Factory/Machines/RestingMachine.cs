@@ -11,21 +11,17 @@ public sealed class RestingMachine : BaseMachine
 
     [Header("Behavior")]
     [Min(0f)]
-    [SerializeField] private float sendBackToWorkDelay = 3f;
+    [SerializeField] private float sendBackToWorkDelay = 6f;
 
     [Header("Debug")]
     [SerializeField] private bool logRestingMachine = false;
 
     private MeshRenderer meshRenderer;
     private Coroutine restCountdownCo;
-    private RobotBrain currentWorker;
+    private RobotBrainNew currentWorker;
 
-    public RobotBrain CurrentWorker => currentWorker;
-
-    public event Action<RestingMachine, bool> OnMachineStateChanged;
-    public event Action<RestingMachine, RobotBrain> OnMachineTurningOff;
-    public event Action<RestingMachine, RobotBrain> OnWorkerAttached;
-    public event Action<RestingMachine, RobotBrain> OnRestTimerCompleted;
+    public RobotBrainNew CurrentWorker => currentWorker;
+    public event Action<RestingMachine, RobotBrainNew> OnWorkerAttached;
     protected override void Awake()
     {
         base.Awake();
@@ -39,7 +35,6 @@ public sealed class RestingMachine : BaseMachine
 
         base.PowerOn();
         RefreshVisual();
-        RaiseStateChanged(true);
 
         // If a worker is already attached while powering on, start the timer.
         if (currentWorker != null)
@@ -53,16 +48,14 @@ public sealed class RestingMachine : BaseMachine
         CancelRestCountdown();
 
         // Preserve old behavior: worker still visible to listeners at this point.
-        OnMachineTurningOff?.Invoke(this, currentWorker);
 
         if (isOccupied)
-            base.ReleaseRobot();
+            ReleaseRobot();
 
         base.PowerOff();
         RefreshVisual();
 
         // Preserve old behavior: CurrentWorker still readable here.
-        RaiseStateChanged(false);
 
         ClearWorkerSlot();
     }
@@ -94,12 +87,15 @@ public sealed class RestingMachine : BaseMachine
 
     public override void ReleaseRobot()
     {
+        if (!isOccupied && currentWorker == null)
+            return;
+
         CancelRestCountdown();
         base.ReleaseRobot();
         ClearWorkerSlot();
     }
 
-    public void ReleaseWorker(RobotBrain worker)
+    public void ReleaseWorker(RobotBrainNew worker)
     {
         if (worker == null || !ReferenceEquals(worker, currentWorker))
             return;
@@ -110,24 +106,78 @@ public sealed class RestingMachine : BaseMachine
         ReleaseRobot();
     }
 
-    public bool CanAcceptWorker(RobotBrain worker)
+    public override bool TryAttachWorker(RobotBrainNew worker, string reason)
+    {
+        _ = reason;
+        if (worker == null || !isOn)
+            return false;
+        if (ReferenceEquals(currentWorker, worker))
+            return false;
+        if (currentWorker != null)
+            return false;
+        if (!CanAcceptWorker(worker))
+            return false;
+
+        AttachRobot(worker.gameObject);
+        NotifyWorkerAttached(worker, this);
+        return true;
+    }
+
+    public override bool TryReplaceWorker(RobotBrainNew incoming, string reason)
+    {
+        if (incoming == null || !isOn)
+            return false;
+        if (ReferenceEquals(currentWorker, incoming))
+            return false;
+        if (currentWorker == null)
+            return TryAttachWorker(incoming, reason);
+
+        var previous = currentWorker;
+        ReplaceWorkerInPlace(incoming);
+        NotifyWorkerAttached(incoming, this);
+        NotifyWorkerReleased(previous, this, "replaced");
+        return true;
+    }
+
+    public override bool TryReleaseWorker(RobotBrainNew worker, string reason)
+    {
+        if (worker == null || !ReferenceEquals(currentWorker, worker))
+            return false;
+
+        ReleaseWorker(worker);
+        NotifyWorkerReleased(worker, this, reason);
+        return true;
+    }
+
+    public bool CanAcceptWorker(RobotBrainNew worker)
     {
         if (worker == null || !isOn) return false;
         if (currentWorker != null && !ReferenceEquals(currentWorker, worker)) return false;
         return true;
     }
 
-    private static bool TryGetWorker(GameObject robot, out RobotBrain worker)
+    private static bool TryGetWorker(GameObject robot, out RobotBrainNew worker)
     {
         worker = null;
         if (robot == null) return false;
         return robot.TryGetComponent(out worker) && worker != null;
     }
 
-    private void SetWorkerSlot(RobotBrain worker)
+    private void SetWorkerSlot(RobotBrainNew worker)
     {
         currentWorker = worker;
         isOccupied = worker != null;
+    }
+
+    private void ReplaceWorkerInPlace(RobotBrainNew incoming)
+    {
+        if (incoming == null)
+            return;
+
+        SetWorkerSlot(incoming);
+        base.AttachRobot(incoming.gameObject);
+        OnWorkerAttached?.Invoke(this, currentWorker);
+        StartRestCountdown(currentWorker);
     }
 
     private void ClearWorkerSlot()
@@ -135,8 +185,6 @@ public sealed class RestingMachine : BaseMachine
         currentWorker = null;
         isOccupied = false;
     }
-
-    private void RaiseStateChanged(bool on) => OnMachineStateChanged?.Invoke(this, on);
 
     private void RefreshVisual()
     {
@@ -147,7 +195,7 @@ public sealed class RestingMachine : BaseMachine
         meshRenderer.sharedMaterial = isOn ? materialOn : materialOff;
     }
 
-    private void StartRestCountdown(RobotBrain worker)
+    private void StartRestCountdown(RobotBrainNew worker)
     {
         CancelRestCountdown();
         if (worker == null) return;
@@ -162,7 +210,7 @@ public sealed class RestingMachine : BaseMachine
         restCountdownCo = null;
     }
 
-    private IEnumerator RestCountdown(RobotBrain worker)
+    private IEnumerator RestCountdown(RobotBrainNew worker)
     {
         var elapsed = 0f;
 
@@ -184,14 +232,14 @@ public sealed class RestingMachine : BaseMachine
             yield break;
         }
 
-        OnRestTimerCompleted?.Invoke(this, worker);
+        TryReleaseWorker(worker, "rest_done");
         restCountdownCo = null;
     }
 
-    private bool IsCountdownStillValid(RobotBrain worker)
+    private bool IsCountdownStillValid(RobotBrainNew worker)
         => isOn && worker != null && ReferenceEquals(worker, currentWorker);
 
-    private void LogAttachAttempt(RobotBrain worker)
+    private void LogAttachAttempt(RobotBrainNew worker)
     {
         if (!logRestingMachine) return;
 
@@ -201,7 +249,7 @@ public sealed class RestingMachine : BaseMachine
         );
     }
 
-    private void LogReject(RobotBrain worker)
+    private void LogReject(RobotBrainNew worker)
     {
         if (!logRestingMachine) return;
 
@@ -211,3 +259,6 @@ public sealed class RestingMachine : BaseMachine
         );
     }
 }
+
+
+

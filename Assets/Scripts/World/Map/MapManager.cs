@@ -142,7 +142,7 @@ public class MapManager : MonoBehaviour
 
         BootSystems();
 
-        bool noBlockRequiredWhenZeroEnemies = mapConfig == null || mapConfig.enemiesCount <= 0;
+        bool noBlockRequiredWhenZeroEnemies = mapConfig == null || mapConfig.securityGuardsCount <= 0;
 
         roomProcessor.ProcessRooms(cellDataGrid, gridWidth, gridHeight, noBlockRequiredWhenZeroEnemies);
 
@@ -220,19 +220,25 @@ public class MapManager : MonoBehaviour
         };
     }
 
-    public void RegisterFactoryInEachRoom(
+    public List<RoomManager> RegisterFactoryInEachRoom(
         FactoryManager factoryManager,
         MachineWorkerManager machineWorkerManager,
         MachineSecurityManager machineSecurityManager,
         SpawningWorkerManager spawningWorkerManager,
         IEnemiesSpawner enemiesSpawner)
     {
+        var registeredRooms = new List<RoomManager>();
         foreach (var roomGO in roomInstances.Values)
         {
             var rm = roomGO.GetComponent<RoomManager>();
             if (rm != null)
+            {
                 rm.Initialize(factoryManager, machineWorkerManager, machineSecurityManager, spawningWorkerManager, enemiesSpawner);
+                registeredRooms.Add(rm);
+            }
         }
+
+        return registeredRooms;
     }
 
     /// <summary>

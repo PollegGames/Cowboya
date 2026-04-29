@@ -24,21 +24,30 @@ public class RobotHeartNew : MonoBehaviour
     public RobotTask CurrentTask => taskStack?.Current;
     public RobotRole Role => role;
 
+    public void ConfigureRole(RobotRole newRole, bool resetStack = true)
+    {
+        EnsureInitialized();
+
+        if (role == newRole)
+        {
+            if (resetStack)
+                ResetIntentStack(repopulateDefaultTask: true);
+            return;
+        }
+
+        role = newRole;
+        if (resetStack)
+            ResetIntentStack(repopulateDefaultTask: true);
+    }
+
     private void Awake()
     {
-        if (brain == null)
-            brain = GetComponent<RobotBrainNew>();
-        if (body == null)
-            body = GetComponent<RobotBodyController>();
-        if (memory == null)
-            memory = GetComponent<RobotMemoryNew>();
-
-        taskRuntime = new RobotTaskNew();
-        taskStack = new RobotTaskStackNew();
+        EnsureInitialized();
     }
 
     private void OnEnable()
     {
+        EnsureInitialized();
         taskStack.PushOrRefresh(BuildDefaultTask());
 
         if (brain != null)
@@ -68,6 +77,17 @@ public class RobotHeartNew : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
+            return;
+        if (body == null || activeTopTask == null)
+            return;
+
+        if (ShouldCompleteOnArrival(activeTopTask.Type) && body.HasArrivedAtDestination())
+            CompleteCurrentTask();
+    }
+
     private void ReactToBrainOptions(BrainOption options)
     {
         currentOptions = options;
@@ -79,6 +99,15 @@ public class RobotHeartNew : MonoBehaviour
             return;
 
         taskStack.PushOrRefresh(planned);
+        RobotEcosystemProbe.RecordHeartPlannedTask(this, planned, taskStack.Current);
+        RobotNewTrace.Log(
+            this,
+            eventSource: "HeartNew.OnPlannedTask",
+            memoryDelta: "none",
+            brainOptions: currentOptions,
+            plannedTask: planned,
+            heartCurrentTask: taskStack.Current,
+            taskSignal: "push_refresh");
         StartTopTaskIfChanged();
     }
 
@@ -87,15 +116,49 @@ public class RobotHeartNew : MonoBehaviour
     /// </summary>
     public void CompleteCurrentTask()
     {
+        EnsureInitialized();
         if (taskStack == null)
             return;
 
+        var before = taskStack.Current;
+        ApplyMemoryTransitionsOnTaskCompletion(before);
         CancelScheduledTaskSignal();
         taskStack.CompleteCurrent();
         if (taskStack.Current == null)
             taskStack.PushOrRefresh(BuildDefaultTask());
 
+        RobotNewTrace.Log(
+            this,
+            eventSource: "HeartNew.CompleteCurrentTask",
+            memoryDelta: "none",
+            brainOptions: currentOptions,
+            plannedTask: null,
+            heartCurrentTask: taskStack.Current,
+            taskSignal: "complete:" + (before != null ? before.Type.ToString() : "null"));
         StartTopTaskIfChanged();
+    }
+
+    private void ApplyMemoryTransitionsOnTaskCompletion(RobotTask completed)
+    {
+        if (memory == null || completed == null)
+            return;
+
+        if (role == RobotRole.Worker)
+            return;
+
+        switch (completed.Type)
+        {
+            case RobotTaskType.GoToMachine:
+                if (body != null && body.CurrentTarget != null)
+                    memory.SetLastVisitedPoint(body.CurrentTarget);
+                memory.ChangeConnectionToMachine(true);
+                break;
+
+            case RobotTaskType.WorkAtMachine:
+            case RobotTaskType.Rest:
+                memory.ChangeConnectionToMachine(false);
+                break;
+        }
     }
 
     /// <summary>
@@ -103,7 +166,16 @@ public class RobotHeartNew : MonoBehaviour
     /// </summary>
     public void BlockCurrentTask()
     {
+        EnsureInitialized();
         CancelScheduledTaskSignal();
+        RobotNewTrace.Log(
+            this,
+            eventSource: "HeartNew.BlockCurrentTask",
+            memoryDelta: "none",
+            brainOptions: currentOptions,
+            plannedTask: null,
+            heartCurrentTask: taskStack != null ? taskStack.Current : null,
+            taskSignal: "block");
         // Task stays on top; we keep it as a debug point and wait for new brain planning.
     }
 
@@ -112,10 +184,19 @@ public class RobotHeartNew : MonoBehaviour
     /// </summary>
     public void QueueTask(RobotTask task)
     {
+        EnsureInitialized();
         if (taskStack == null || task == null)
             return;
 
         taskStack.PushOrRefresh(task);
+        RobotNewTrace.Log(
+            this,
+            eventSource: "HeartNew.QueueTask",
+            memoryDelta: "none",
+            brainOptions: currentOptions,
+            plannedTask: task,
+            heartCurrentTask: taskStack.Current,
+            taskSignal: "queue");
         StartTopTaskIfChanged();
     }
 
@@ -124,16 +205,39 @@ public class RobotHeartNew : MonoBehaviour
     /// </summary>
     public void ScheduleCompleteCurrentTask(float delaySeconds)
     {
+        EnsureInitialized();
         CancelScheduledTaskSignal();
         scheduledTaskSignal = StartCoroutine(CompleteCurrentTaskAfterDelay(Mathf.Max(0f, delaySeconds)));
     }
 
+    /// <summary>
+    /// Backward-compatible reset hook used by legacy pool lifecycle code.
+    /// </summary>
+    /// <param name="repopulateDefaultTask">Whether to push the role default task after reset.</param>
+    public void ResetIntentStack(bool repopulateDefaultTask = true)
+    {
+        EnsureInitialized();
+        CancelScheduledTaskSignal();
+
+        if (activeTopTask != null && taskRuntime != null)
+            taskRuntime.Exit(TaskExitReason.Replanned);
+
+        taskStack = new RobotTaskStackNew();
+        if (repopulateDefaultTask)
+            taskStack.PushOrRefresh(BuildDefaultTask());
+
+        activeTopTask = null;
+        StartTopTaskIfChanged();
+    }
+
     private void StartTopTaskIfChanged()
     {
+        EnsureInitialized();
         var newTop = taskStack.Current;
         if (IsSameTask(activeTopTask, newTop))
             return;
 
+        var previousTop = activeTopTask;
         CancelScheduledTaskSignal();
         if (activeTopTask != null)
         {
@@ -143,6 +247,9 @@ public class RobotHeartNew : MonoBehaviour
 
         activeTopTask = newTop;
         OnCurrentTaskChanged?.Invoke(activeTopTask);
+        RobotEcosystemProbe.RecordHeartCurrentTaskChanged(this, activeTopTask);
+        if (role == RobotRole.Worker && RobotNewPipelineRuntime.IsWorkerCycleValidationEnabled)
+            RobotEcosystemProbe.RecordWorkerCycleTransition(this, previousTop, activeTopTask, "replan");
 
         if (activeTopTask == null)
             return;
@@ -158,6 +265,21 @@ public class RobotHeartNew : MonoBehaviour
             Memory = memory
         };
         taskRuntime.Enter(context);
+    }
+
+    private void EnsureInitialized()
+    {
+        if (brain == null)
+            brain = GetComponent<RobotBrainNew>();
+        if (body == null)
+            body = GetComponent<RobotBodyController>();
+        if (memory == null)
+            memory = GetComponent<RobotMemoryNew>();
+
+        if (taskRuntime == null)
+            taskRuntime = new RobotTaskNew();
+        if (taskStack == null)
+            taskStack = new RobotTaskStackNew();
     }
 
     private IEnumerator CompleteCurrentTaskAfterDelay(float delaySeconds)
@@ -189,20 +311,41 @@ public class RobotHeartNew : MonoBehaviour
 
     private RobotTask BuildDefaultTask()
     {
+        RobotTask defaultTask;
         switch (role)
         {
             case RobotRole.Worker:
-                return new RobotTask(RobotTaskType.WorkAtMachine);
+                defaultTask = new RobotTask(RobotTaskType.WorkAtMachine);
+                break;
             case RobotRole.SecurityGuard:
-                return new RobotTask(RobotTaskType.GuardPost);
+                defaultTask = new RobotTask(RobotTaskType.GuardPost);
+                break;
             case RobotRole.Follower:
-                return new RobotTask(RobotTaskType.ChasePlayer);
+                defaultTask = new RobotTask(RobotTaskType.ChasePlayer);
+                break;
             case RobotRole.WorkerSpawner:
-                return new RobotTask(RobotTaskType.SpawnFollowers);
+                defaultTask = new RobotTask(RobotTaskType.SpawnFollowers);
+                break;
             case RobotRole.Boss:
-                return new RobotTask(RobotTaskType.Patrol);
+                defaultTask = new RobotTask(RobotTaskType.Patrol);
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+
+        RobotEcosystemProbe.RecordHeartDefaultTask(this, defaultTask);
+        return defaultTask;
+    }
+
+    private static bool ShouldCompleteOnArrival(RobotTaskType type)
+    {
+        switch (type)
+        {
+            case RobotTaskType.GoToMachine:
+            case RobotTaskType.ReturnHome:
+                return true;
+            default:
+                return false;
         }
     }
 

@@ -2365,8 +2365,10 @@ MonoBehaviour:
   attackZone: {fileID: 7211130415348659133}
   circleCenter: {fileID: 4172600288706783507}
   radius: 3
-  memory: {fileID: 224319907144265982}
-  brain: {fileID: 2059339075112266266}
+  memory: {fileID: 0}
+  brain: {fileID: 0}
+  memoryNew: {fileID: 0}
+  brainNew: {fileID: 0}
 --- !u!1 &3745571107507111190
 GameObject:
   m_ObjectHideFlags: 0
@@ -5508,11 +5510,8 @@ GameObject:
   - component: {fileID: 1021285097535538032}
   - component: {fileID: 1641416552730651371}
   - component: {fileID: 6835097784835360146}
-  - component: {fileID: 224319907144265982}
   - component: {fileID: 6491073062591767818}
   - component: {fileID: 5626653186851933311}
-  - component: {fileID: 4400964301056722348}
-  - component: {fileID: 2059339075112266266}
   - component: {fileID: 8898253893182114851}
   - component: {fileID: 7286209841039381180}
   - component: {fileID: 787461846324334410}
@@ -5520,6 +5519,7 @@ GameObject:
   - component: {fileID: 841705006244468887}
   - component: {fileID: 5784438595850109908}
   - component: {fileID: 2558700161751015700}
+  - component: {fileID: 2373234721261732654}
   m_Layer: 7
   m_Name: SecurityGuard
   m_TagString: Enemy
@@ -5655,21 +5655,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::HealthBot
   damageFeedback: {fileID: 6389208014240366247}
-  memory: {fileID: 224319907144265982}
-  brain: {fileID: 2059339075112266266}
+  memory: {fileID: 0}
+  brain: {fileID: 0}
+  memoryNew: {fileID: 0}
+  brainNew: {fileID: 0}
   playerBrain: {fileID: 0}
---- !u!114 &224319907144265982
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7904953425273788862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 906126257589b3140b69badd1f7e1d9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotMemory
 --- !u!114 &6491073062591767818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5705,66 +5695,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0fc7a5ea4be4010be29e4887b018d45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::Inventory
---- !u!114 &4400964301056722348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7904953425273788862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab148081b3947484ab0d3ba9c3fb06db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotHeart
-  role: 1
-  memory: {fileID: 224319907144265982}
-  config:
-    role: 1
-    resumeWorkOnMachineOn: 1
-    defaultTimeoutSeconds: 10
-    waitAtMachineSeconds: 5
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 120
-    reactivateDurationSeconds: 30
-  overrideStackDepth: 0
-  seedPrimaryTask: 1
-  logStackChanges: 1
---- !u!114 &2059339075112266266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7904953425273788862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b782b515f2c0dcc4684933419bbf779d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game::RobotBrain
-  heart: {fileID: 4400964301056722348}
-  config:
-    role: 1
-    resumeWorkOnMachineOn: 0
-    defaultTimeoutSeconds: 10
-    waitAtMachineSeconds: 5
-    restDurationSeconds: 3
-    guardPostDurationSeconds: 300
-    workDurationSeconds: 0
-    reactivateDurationSeconds: 5
-  body: {fileID: 7286209841039381180}
-  memory: {fileID: 224319907144265982}
-  taskHandlers: {fileID: 11400000, guid: 1d2b2b0f631ed4a409dc543a129af7bd, type: 2}
-  roleTaskHandlers:
-  - Role: 1
-    Handlers: {fileID: 11400000, guid: 1d2b2b0f631ed4a409dc543a129af7bd, type: 2}
-  waypointServiceBehaviour: {fileID: 0}
-  stateController: {fileID: 6491073062591767818}
-  followerChaseRefreshSeconds: 0.5
-  reactivateArrivalTimeoutSeconds: 8
-  reactivateProximityThreshold: 2
-  logReactivation: 1
 --- !u!114 &8898253893182114851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5777,7 +5707,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::RobotBodyMaintenance
-  memory: {fileID: 224319907144265982}
+  memory: {fileID: 0}
 --- !u!114 &7286209841039381180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5814,7 +5744,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f0d7338427e03c47a8c95ef5d4e9a61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::RobotBodyMaintenance
-  memory: {fileID: 224319907144265982}
+  memory: {fileID: 0}
 --- !u!114 &1659586107722794798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5827,9 +5757,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b34410077004bb9b5d8e80a3866eb09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::PooledEnemy
-  heart: {fileID: 4400964301056722348}
+  heart: {fileID: 0}
   body: {fileID: 7286209841039381180}
-  memory: {fileID: 224319907144265982}
+  memory: {fileID: 0}
   stateController: {fileID: 6491073062591767818}
   animator: {fileID: 1037097164734985754}
 --- !u!114 &841705006244468887
@@ -5885,6 +5815,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::SimpleAttackController
   leftHandHitbox: {fileID: 7389299557223053686}
   rightHandHitbox: {fileID: 844319692812921469}
+--- !u!114 &2373234721261732654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7904953425273788862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49ceeaa695335f448915ff284349a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::RobotMemoryNew
 --- !u!1 &7913802427653980611
 GameObject:
   m_ObjectHideFlags: 0
@@ -7438,4 +7380,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a492d78718bb644cb1dbc7f66d57986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-

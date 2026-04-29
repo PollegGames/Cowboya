@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -13,7 +13,7 @@ public class MachineWorkerManager : MonoBehaviour
     private List<FactoryMachine> machines = new List<FactoryMachine>();
 
     // Track workers waiting on a specific machine
-    private readonly Dictionary<RobotBrain, FactoryMachine> waitingWorkers = new();
+    private readonly Dictionary<RobotBrainNew, FactoryMachine> waitingWorkers = new();
 
     public void RegisterMachine(FactoryMachine machine)
     {
@@ -21,21 +21,41 @@ public class MachineWorkerManager : MonoBehaviour
             return;
         machines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.Worker);
-        machine.OnMachineStateChanged += HandleMachineStateChanged;
-        machine.OnMachineTurningOff += HandleMachineTurningOff;
+        machine.OnMachinePowerChanged += HandleMachinePowerChanged;
+        machine.OnMachineTurnedOff += HandleMachineTurnedOff;
     }
-    private void HandleMachineStateChanged(FactoryMachine machine, bool isOn)
+
+    private void OnDestroy()
     {
-        if (isOn)
+        foreach (var machine in machines)
+        {
+            if (machine == null)
+                continue;
+            machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
+            machine.OnMachineTurnedOff -= HandleMachineTurnedOff;
+        }
+    }
+
+    private void HandleMachinePowerChanged(MachinePowerChangedEvent evt)
+    {
+        if (!evt.IsOn)
+            return;
+        if (evt.Machine is FactoryMachine machine)
             OnMachineTurnedOn(machine);
     }
 
-    private void HandleMachineTurningOff(FactoryMachine machine, RobotBrain worker)
+    private void HandleMachineTurnedOff(MachineTurnedOffEvent evt)
     {
+        if (evt.Machine is not FactoryMachine machine)
+            return;
+
+        var worker = TryResolveRobotBrain(evt.PreviousRobot);
+        if (worker == null)
+            worker = machine.CurrentWorker;
         OnMachineTurnedOff(machine, worker);
     }
 
-    private void OnMachineTurnedOff(FactoryMachine machine, RobotBrain worker)
+    private void OnMachineTurnedOff(FactoryMachine machine, RobotBrainNew worker)
     {
         if (worker == null)
             return;
@@ -53,7 +73,7 @@ public class MachineWorkerManager : MonoBehaviour
             {
                 var worker = pair.Key;
                 waitingWorkers.Remove(worker);
-                PushBrainIntent(worker, RobotTaskType.WorkAtMachine, machine, true);
+                RobotDomainEventBus.PublishMachineStateDispatch(worker, machine, true);
             }
         }
     }
@@ -61,16 +81,24 @@ public class MachineWorkerManager : MonoBehaviour
     /// <summary>
     /// Send worker to nearest rest point. Falls back to start room if none free.
     /// </summary>
-    public void AssignToFirstFreePointAvailable(RobotBrain worker)
-    {
-        worker.OnMachineStateChanged(null, false);
-    }
-
-    private static void PushBrainIntent(RobotBrain worker, RobotTaskType taskType, object payload, bool isOn)
+    public void AssignToFirstFreePointAvailable(RobotBrainNew worker)
     {
         if (worker == null)
             return;
-        worker.OnMachineStateChanged(payload, isOn);
+        RobotDomainEventBus.PublishMachineStateDispatch(worker, null, false);
+    }
+
+    private static RobotBrainNew TryResolveRobotBrain(GameObject robot)
+    {
+        if (robot == null)
+            return null;
+
+        var brain = robot.GetComponent<RobotBrainNew>();
+        if (brain != null)
+            return brain;
+
+        return robot.GetComponentInParent<RobotBrainNew>();
     }
 
 }
+

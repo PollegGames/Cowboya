@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 
@@ -208,7 +208,7 @@ public class RobotStateController : MonoBehaviour, IPooledObject
             savedReported = false;
         }
 
-        var heart = GetComponent<RobotHeart>();
+        var heart = GetComponent<RobotHeartNew>();
         if (heart != null && heart.Role == RobotRole.SecurityGuard)
         {
             Debug.Log($"[RobotStateController] SecurityGuard '{name}' state -> {newState}");
@@ -281,3 +281,4 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     }
 
 }
+

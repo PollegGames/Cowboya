@@ -4,6 +4,7 @@ using UnityEngine;
 public interface IFactoryManager
 {
     event Action<AlarmState> OnFactoryAlarmChanged;
+    event Action OnFactoryAllMachinesOff;
 
     void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup, IEnemiesSpawner enemiesSpawner);
     IWaypointService GetWayPointService();

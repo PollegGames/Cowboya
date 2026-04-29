@@ -13,7 +13,10 @@ public enum MemoryChangeType
     WaypointAvailabilityChanged,
     ConnectedToMachine,
     NotConnectedToMachine,
+    MachineDetachedTransient,
+    MachineDetachedFinal,
     DeadStateChanged,
+    DesiredMachineChanged,
     Normal
 }
 
@@ -43,6 +46,7 @@ public class RobotMemoryStateNew
     public bool IsConnectedToMachine => snapshot.IsConnectedToMachine;
     public bool IsDead => snapshot.IsDead;
     public RoomWaypoint LastVisitedPoint => snapshot.LastVisitedPoint;
+    public MachineType? DesiredMachineType => snapshot.DesiredMachineType;
 
     // roomwaypoint and the bool is if the waypoint is no more accessible
     // for exemple if machine off, if a waypoint is in a blocked room, if already is already there, etc..
@@ -68,7 +72,80 @@ public class RobotMemoryStateNew
     {
         if (snapshot.IsConnectedToMachine == isConnected) return;
         snapshot.IsConnectedToMachine = isConnected;
+        if (isConnected)
+            snapshot.IsMachineTransitionInProgress = false;
         Raise(isConnected ? MemoryChangeType.ConnectedToMachine : MemoryChangeType.NotConnectedToMachine);
+    }
+
+    public void NotifyMachineSlotAttached(RoomWaypoint point)
+    {
+        bool pointChanged = point != null && snapshot.LastVisitedPoint != point;
+        bool connectionChanged = !snapshot.IsConnectedToMachine;
+        bool desiredChanged = snapshot.DesiredMachineType.HasValue;
+        if (point != null)
+            snapshot.LastVisitedPoint = point;
+        snapshot.IsConnectedToMachine = true;
+        snapshot.DesiredMachineType = null;
+        snapshot.IsMachineTransitionInProgress = false;
+
+        if (connectionChanged)
+            Raise(MemoryChangeType.ConnectedToMachine);
+        else if (desiredChanged)
+            Raise(MemoryChangeType.DesiredMachineChanged);
+        else if (pointChanged)
+            Raise(MemoryChangeType.LastVisitedPointChanged);
+        else
+            Raise(MemoryChangeType.Normal);
+    }
+
+    public void NotifyMachineSlotReleased()
+    {
+        NotifyMachineSlotReleasedFinal();
+    }
+
+    public void NotifyMachineSlotReleasedTransient()
+    {
+        bool connectionChanged = snapshot.IsConnectedToMachine;
+        bool transitionChanged = !snapshot.IsMachineTransitionInProgress;
+        snapshot.IsConnectedToMachine = false;
+        snapshot.IsMachineTransitionInProgress = true;
+
+        if (connectionChanged || transitionChanged)
+            Raise(MemoryChangeType.MachineDetachedTransient);
+        else
+            Raise(MemoryChangeType.Normal);
+    }
+
+    public void NotifyMachineSlotReleasedFinal()
+    {
+        bool connectionChanged = snapshot.IsConnectedToMachine;
+        bool desiredChanged = snapshot.DesiredMachineType.HasValue;
+        bool transitionChanged = snapshot.IsMachineTransitionInProgress;
+        snapshot.IsConnectedToMachine = false;
+        snapshot.DesiredMachineType = null;
+        snapshot.IsMachineTransitionInProgress = false;
+
+        if (connectionChanged)
+            Raise(MemoryChangeType.MachineDetachedFinal);
+        else if (transitionChanged)
+            Raise(MemoryChangeType.MachineDetachedFinal);
+        else if (desiredChanged)
+            Raise(MemoryChangeType.DesiredMachineChanged);
+        else
+            Raise(MemoryChangeType.Normal);
+    }
+
+    public void SetDesiredMachineType(MachineType? machineType)
+    {
+        if (snapshot.DesiredMachineType == machineType)
+            return;
+
+        snapshot.DesiredMachineType = machineType;
+        if (machineType.HasValue && !snapshot.IsConnectedToMachine)
+            snapshot.IsMachineTransitionInProgress = true;
+        if (!machineType.HasValue && !snapshot.IsConnectedToMachine)
+            snapshot.IsMachineTransitionInProgress = false;
+        Raise(MemoryChangeType.DesiredMachineChanged);
     }
 
     public void SetDead(bool isDead)
@@ -107,6 +184,9 @@ public class RobotMemoryStateNew
     }
     public void SetRoomWaypointAvailability(RoomWaypoint point, bool isAvailable)
     {
+        if (point == null)
+            return;
+
         if (snapshot.AllAvailableWaypoints == null)
             snapshot.AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>();
         if (snapshot.AllAvailableWaypoints.TryGetValue(point, out bool current) && current == isAvailable) return;
@@ -119,6 +199,26 @@ public class RobotMemoryStateNew
         if (snapshot.PlayerInDetectZone == inZone) return;
         snapshot.PlayerInDetectZone = inZone;
         Raise(MemoryChangeType.PlayerDetectZoneChanged);
+    }
+
+    public void ReplaceWaypointAvailability(IEnumerable<RoomWaypoint> waypoints)
+    {
+        if (snapshot.AllAvailableWaypoints == null)
+            snapshot.AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>();
+        else
+            snapshot.AllAvailableWaypoints.Clear();
+
+        if (waypoints != null)
+        {
+            foreach (var waypoint in waypoints)
+            {
+                if (waypoint == null)
+                    continue;
+                snapshot.AllAvailableWaypoints[waypoint] = waypoint.IsAvailable;
+            }
+        }
+
+        Raise(MemoryChangeType.WaypointAvailabilityChanged);
     }
 
     private void Raise(MemoryChangeType type)
@@ -141,7 +241,9 @@ public class RobotMemoryStateNew
             WasRecentlyAttacked = false,
             IsConnectedToMachine = false,
             LastVisitedPoint = null,
-            AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>()
+            AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>(),
+            DesiredMachineType = null,
+            IsMachineTransitionInProgress = false
         };
         Raise(MemoryChangeType.Normal);
     }

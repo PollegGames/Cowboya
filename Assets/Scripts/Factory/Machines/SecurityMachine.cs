@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 
 [RequireComponent(typeof(MeshRenderer))]
 public class SecurityMachine : BaseMachine
@@ -8,12 +7,9 @@ public class SecurityMachine : BaseMachine
     [SerializeField] private Material materialOff;
 
     private MeshRenderer meshRenderer;
-    private RobotBrain currentGuardBrain;
+    private RobotBrainNew currentGuardBrain;
 
-    public RobotBrain CurrentGuard => currentGuardBrain;
-
-    public event Action<SecurityMachine, bool> OnMachineStateChanged;
-    public event Action<SecurityMachine, RobotBrain> OnMachineTurningOff;
+    public RobotBrainNew CurrentGuard => currentGuardBrain;
 
     protected override void Awake()
     {
@@ -32,23 +28,19 @@ public class SecurityMachine : BaseMachine
     {
         base.PowerOn();
         ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, true);
     }
 
     public override void PowerOff()
     {
         if (!isOn) return;
-        var guard = currentGuardBrain;
-        OnMachineTurningOff?.Invoke(this, guard);
         SendCurrentGuardToRest();
         base.PowerOff();
         ApplyMaterial();
-        OnMachineStateChanged?.Invoke(this, false);
     }
 
     public override void AttachRobot(GameObject robot)
     {
-        var guardBrain = robot.GetComponent<RobotBrain>();
+        var guardBrain = robot.GetComponent<RobotBrainNew>();
         if (guardBrain == null) return;
 
         if (!isOn)
@@ -70,7 +62,7 @@ public class SecurityMachine : BaseMachine
         base.ReleaseRobot();
     }
 
-    public void VacateGuard(RobotBrain guard)
+    public void VacateGuard(RobotBrainNew guard)
     {
         if (guard == null || currentGuardBrain != guard)
             return;
@@ -79,17 +71,16 @@ public class SecurityMachine : BaseMachine
         base.ReleaseRobot();
     }
 
-    private void SendGuardToRest(RobotBrain guard)
+    private void SendGuardToRest(RobotBrainNew guard)
     {
         if (guard == null) return;
-        // Send null so the brain re-evaluates without machine context.
-        guard.OnMachineStateChanged(null, false);
+        RobotDomainEventBus.PublishMachineStateDispatch(guard, null, false);
     }
 
-    private void SetGuardToSecurityPost(RobotBrain guard)
+    private void SetGuardToSecurityPost(RobotBrainNew guard)
     {
         if (guard == null) return;
-        guard.OnMachineStateChanged(this, true);
+        RobotDomainEventBus.PublishMachineStateDispatch(guard, this, true);
     }
 
     private void SendCurrentGuardToRest()
@@ -98,3 +89,6 @@ public class SecurityMachine : BaseMachine
         currentGuardBrain = null;
     }
 }
+
+
+

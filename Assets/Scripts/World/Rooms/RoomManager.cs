@@ -11,6 +11,16 @@ public class RoomManager : MonoBehaviour
     public RoomProperties roomProperties;
 
     public event Action<AlarmState> OnRoomAlarmChanged;
+    public event Action<RoomMachineChangedEvent> OnRoomMachineChanged
+    {
+        add => roomEventHub.OnRoomMachineChanged += value;
+        remove => roomEventHub.OnRoomMachineChanged -= value;
+    }
+    public event Action<RoomThreatChangedEvent> OnRoomThreatChanged
+    {
+        add => roomEventHub.OnRoomThreatChanged += value;
+        remove => roomEventHub.OnRoomThreatChanged -= value;
+    }
     public event Action<RoomManager> PlayerEntered;
     public event Action<RoomManager> PlayerExited;
 
@@ -24,6 +34,13 @@ public class RoomManager : MonoBehaviour
 
     public IWaypointService waypointService;
     private bool alarmSubscribed;
+    private bool machineEventsSubscribed;
+    private readonly RoomEventHub roomEventHub = new RoomEventHub();
+
+    public RoomEventHub RoomEventHub => roomEventHub;
+    public AlarmState CurrentRoomAlarmState => GetFactoryAlarmStatus() != null
+        ? GetFactoryAlarmStatus().CurrentAlarmState
+        : AlarmState.Normal;
 
     /// <summary>
     /// Call this immediately after Instantiate().
@@ -76,7 +93,8 @@ public class RoomManager : MonoBehaviour
                 if (spawningMachine == null)
                     continue;
                 spawningMachine.InitializeWaypointService(waypointService);
-                spawningMachine.InitializeSpawner(enemiesSpawner);
+                if (enemiesSpawner != null)
+                    spawningMachine.InitializeSpawner(enemiesSpawner);
                 spawningMachine.InitializeSecurityManager(machineSecurityManager);
                 spawningWorkerManager?.RegisterMachine(spawningMachine);
             }
@@ -103,10 +121,20 @@ public class RoomManager : MonoBehaviour
             factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
             alarmSubscribed = true;
         }
+
+        SubscribeRoomMachineEvents();
     }
 
     private void OnDestroy()
     {
+        if (triggerZone != null)
+        {
+            triggerZone.onEnter.RemoveListener(OnPlayerEnterRoom);
+            triggerZone.onExit.RemoveListener(OnPlayerExitRoom);
+        }
+
+        UnsubscribeRoomMachineEvents();
+
         if (waypointService != null)
             waypointService.UnregisterRoomWaypoints(this);
         if (FactoryManager != null && alarmSubscribed)
@@ -141,7 +169,6 @@ public class RoomManager : MonoBehaviour
         if (roomProperties == null)
         {
             Debug.LogError($"RoomManager '{gameObject.name}' is missing a RoomProperties reference.");
-            return;
         }
 
         if (FactoryManager != null && !alarmSubscribed)
@@ -156,6 +183,8 @@ public class RoomManager : MonoBehaviour
             triggerZone.onExit.AddListener(OnPlayerExitRoom);
 
         }
+
+        SubscribeRoomMachineEvents();
     }
 
     private void HandleFactoryAlarmChanged(AlarmState newAlarmState)
@@ -173,6 +202,47 @@ public class RoomManager : MonoBehaviour
         PlayerExited?.Invoke(this);
     }
 
+    public void RaiseRoomThreat(AlarmState desiredAlarmState, RoomThreatSource source)
+    {
+        RaiseRoomThreat(desiredAlarmState, source, hasKnownPlayerPosition: false, knownPlayerPosition: Vector3.zero);
+    }
+
+    public void RaiseRoomThreat(AlarmState desiredAlarmState, RoomThreatSource source, Vector3 knownPlayerPosition)
+    {
+        RaiseRoomThreat(desiredAlarmState, source, hasKnownPlayerPosition: true, knownPlayerPosition);
+    }
+
+    public void RaiseRoomThreat(AlarmState desiredAlarmState, RoomThreatSource source, bool hasKnownPlayerPosition, Vector3 knownPlayerPosition)
+    {
+        var evt = new RoomThreatChangedEvent(
+            this,
+            desiredAlarmState,
+            source,
+            hasKnownPlayerPosition,
+            knownPlayerPosition);
+
+        roomEventHub.PublishThreatChanged(evt);
+        ApplyThreatToFactoryAlarm(evt);
+    }
+
+    public void UpdateTrackedPlayerPositionIfAlarmActive(Vector3 playerPosition)
+    {
+        var alarmStatus = GetFactoryAlarmStatus();
+        if (alarmStatus == null || alarmStatus.CurrentAlarmState == AlarmState.Normal)
+            return;
+
+        UpdateLastKnownPlayerPosition(playerPosition);
+    }
+
+    public void UpdateLastKnownPlayerPosition(Vector3 playerPosition)
+    {
+        var alarmStatus = GetFactoryAlarmStatus();
+        if (alarmStatus != null)
+            alarmStatus.LastPlayerPosition = playerPosition;
+
+        waypointService?.UpdateClosestWaypointToPlayer(playerPosition);
+    }
+
     public Bounds GetRoomBounds()
     {
         if (triggerZone == null)
@@ -185,5 +255,138 @@ public class RoomManager : MonoBehaviour
         Vector2 size = triggerZone.zoneSize;
 
         return new Bounds(center, size);
+    }
+
+    private void SubscribeRoomMachineEvents()
+    {
+        if (machineEventsSubscribed)
+            return;
+
+        SubscribeMachines(factorymMachinesInRoom);
+        SubscribeMachines(restingMachinesInRoom);
+        SubscribeMachines(securityMachinesInRoom);
+        SubscribeMachines(spawningMachinesInRoom);
+
+        machineEventsSubscribed = true;
+    }
+
+    private void UnsubscribeRoomMachineEvents()
+    {
+        if (!machineEventsSubscribed)
+            return;
+
+        UnsubscribeMachines(factorymMachinesInRoom);
+        UnsubscribeMachines(restingMachinesInRoom);
+        UnsubscribeMachines(securityMachinesInRoom);
+        UnsubscribeMachines(spawningMachinesInRoom);
+
+        machineEventsSubscribed = false;
+    }
+
+    private void SubscribeMachines<TMachine>(IEnumerable<TMachine> machines) where TMachine : BaseMachine
+    {
+        if (machines == null)
+            return;
+
+        foreach (var machine in machines)
+        {
+            if (machine == null)
+                continue;
+            machine.OnMachinePowerChanged += HandleMachinePowerChanged;
+            machine.OnMachineOccupancyChanged += HandleMachineOccupancyChanged;
+            machine.OnMachineTurnedOff += HandleMachineTurnedOff;
+        }
+    }
+
+    private void UnsubscribeMachines<TMachine>(IEnumerable<TMachine> machines) where TMachine : BaseMachine
+    {
+        if (machines == null)
+            return;
+
+        foreach (var machine in machines)
+        {
+            if (machine == null)
+                continue;
+            machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
+            machine.OnMachineOccupancyChanged -= HandleMachineOccupancyChanged;
+            machine.OnMachineTurnedOff -= HandleMachineTurnedOff;
+        }
+    }
+
+    private void HandleMachinePowerChanged(MachinePowerChangedEvent evt)
+    {
+        var roomEvent = new RoomMachineChangedEvent(
+            this,
+            evt.Machine,
+            RoomMachineEventKind.PowerChanged,
+            evt.IsOn,
+            isOccupied: null,
+            robot: null,
+            previousRobot: null);
+        roomEventHub.PublishMachineChanged(roomEvent);
+    }
+
+    private void HandleMachineOccupancyChanged(MachineOccupancyChangedEvent evt)
+    {
+        var roomEvent = new RoomMachineChangedEvent(
+            this,
+            evt.Machine,
+            RoomMachineEventKind.OccupancyChanged,
+            isOn: null,
+            evt.IsOccupied,
+            evt.Robot,
+            previousRobot: null);
+        roomEventHub.PublishMachineChanged(roomEvent);
+    }
+
+    private void HandleMachineTurnedOff(MachineTurnedOffEvent evt)
+    {
+        var roomEvent = new RoomMachineChangedEvent(
+            this,
+            evt.Machine,
+            RoomMachineEventKind.TurnedOff,
+            isOn: false,
+            isOccupied: null,
+            robot: null,
+            evt.PreviousRobot);
+        roomEventHub.PublishMachineChanged(roomEvent);
+    }
+
+    private void ApplyThreatToFactoryAlarm(RoomThreatChangedEvent evt)
+    {
+        var alarmStatus = GetFactoryAlarmStatus();
+        if (alarmStatus == null)
+            return;
+
+        if (evt.HasKnownPlayerPosition)
+            UpdateLastKnownPlayerPosition(evt.KnownPlayerPosition);
+
+        switch (evt.DesiredAlarmState)
+        {
+            case AlarmState.Wanted:
+                if (alarmStatus.CurrentAlarmState == AlarmState.Normal)
+                    alarmStatus.CurrentAlarmState = AlarmState.Wanted;
+                break;
+            case AlarmState.Lockdown:
+                if (alarmStatus.CurrentAlarmState == AlarmState.Normal
+                    || alarmStatus.CurrentAlarmState == AlarmState.Wanted)
+                {
+                    alarmStatus.CurrentAlarmState = AlarmState.Lockdown;
+                }
+                break;
+            case AlarmState.Revolt:
+                alarmStatus.CurrentAlarmState = AlarmState.Revolt;
+                break;
+            case AlarmState.Normal:
+            default:
+                break;
+        }
+    }
+
+    private FactoryAlarmStatus GetFactoryAlarmStatus()
+    {
+        if (FactoryManager == null)
+            return null;
+        return FactoryManager.factoryAlarmStatus;
     }
 }

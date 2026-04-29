@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class SecurityCamera : MonoBehaviour
@@ -21,8 +21,8 @@ public class SecurityCamera : MonoBehaviour
 
     [Header("Room & Player References")]
     public RoomManager roomManager;
-    private List<IRobotMemory> enemiesInZone = new List<IRobotMemory>();
-    private HashSet<IRobotMemory> alarmedMemories = new HashSet<IRobotMemory>();
+    private List<IRobotMemoryNew> enemiesInZone = new List<IRobotMemoryNew>();
+    private HashSet<IRobotMemoryNew> alarmedMemories = new HashSet<IRobotMemoryNew>();
 
     private void Awake()
     {
@@ -72,17 +72,18 @@ public class SecurityCamera : MonoBehaviour
 
     private void UpdateWantedPlayerPosition()
     {
-        var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
-        if (factoryAlarm != null && factoryAlarm.CurrentAlarmState != AlarmState.Normal)
-        {
-            Vector2 playerPos = player.transform.position;
-            factoryAlarm.LastPlayerPosition = playerPos;
-            roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
-        }
+        if (player == null || roomManager == null)
+            return;
+
+        Vector2 playerPos = player.transform.position;
+        roomManager.UpdateTrackedPlayerPositionIfAlarmActive(playerPos);
     }
 
     private void OnPlayerEnterZone(Collider2D playerCollider)
     {
+        if (roomManager == null)
+            return;
+
         if (player == null && roomManager.FactoryManager != null)
             player = roomManager.FactoryManager.playerHeadTransform;
 
@@ -93,18 +94,26 @@ public class SecurityCamera : MonoBehaviour
         {
             targetToFollow = player;
             isFollowing = true;
-            var controller = roomManager.FactoryManager.playerInstance
-                .GetComponent<RobotStateController>();
-            float morality = controller.Stats.Morality;
+            float morality = 0f;
+            var playerInstance = roomManager.FactoryManager != null
+                ? roomManager.FactoryManager.playerInstance
+                : null;
+            var controller = playerInstance != null
+                ? playerInstance.GetComponent<RobotStateController>()
+                : null;
+            if (controller != null && controller.Stats != null)
+                morality = controller.Stats.Morality;
+
             if (morality <= -10f)
             {
-                var factoryAlarm = roomManager.FactoryManager.factoryAlarmStatus;
-                factoryAlarm.LastPlayerPosition = player.position;
-                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
+                roomManager.RaiseRoomThreat(
+                    AlarmState.Wanted,
+                    RoomThreatSource.SecurityCamera,
+                    player.position);
             }
 
             Vector2 playerPos = player.transform.position;
-            roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
+            roomManager.UpdateLastKnownPlayerPosition(playerPos);
         }
         else
         {
@@ -117,32 +126,35 @@ public class SecurityCamera : MonoBehaviour
         isFollowing = false;
         targetToFollow = null;
 
-        Vector2 playerPos = player.transform.position;
-        roomManager.waypointService.UpdateClosestWaypointToPlayer(playerPos);
+        if (player != null && roomManager != null)
+        {
+            Vector2 playerPos = player.transform.position;
+            roomManager.UpdateLastKnownPlayerPosition(playerPos);
+        }
     }
 
     private void OnSecondaryZoneEnter(Collider2D enemyCollider)
     {
-        var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
-        if (factoryAlarm != null)
+        if (roomManager == null || enemyCollider == null)
+            return;
+
+        var brain = enemyCollider.GetComponentInParent<RobotBrainNew>();
+        var mem = brain != null ? brain.Memory as IRobotMemoryNew : enemyCollider.GetComponentInParent<IRobotMemoryNew>();
+        if (mem != null && !enemiesInZone.Contains(mem))
+            enemiesInZone.Add(mem);
+        if (mem != null && mem.WasRecentlyAttacked)
         {
-            var brain = enemyCollider.GetComponentInParent<RobotBrain>();
-            var mem = brain != null ? brain.Memory as IRobotMemory : enemyCollider.GetComponentInParent<IRobotMemory>();
-            if (mem != null && !enemiesInZone.Contains(mem))
-                enemiesInZone.Add(mem);
-            if (mem != null && mem.WasRecentlyAttacked)
-            {
-                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
-                if (mem.LastKnownPlayerPosition != Vector3.zero)
-                    factoryAlarm.LastPlayerPosition = mem.LastKnownPlayerPosition;
-            }
+            if (mem.LastKnownPlayerPosition != Vector3.zero)
+                roomManager.RaiseRoomThreat(AlarmState.Wanted, RoomThreatSource.SecurityCamera, mem.LastKnownPlayerPosition);
+            else
+                roomManager.RaiseRoomThreat(AlarmState.Wanted, RoomThreatSource.SecurityCamera);
         }
     }
 
     private void CheckEnemiesAttackedInZone()
     {
-        var factoryAlarm = roomManager?.FactoryManager?.factoryAlarmStatus;
-        if (factoryAlarm == null || factoryAlarm.CurrentAlarmState == AlarmState.Wanted) return;
+        if (roomManager == null || roomManager.CurrentRoomAlarmState == AlarmState.Wanted)
+            return;
 
         foreach (var mem in enemiesInZone)
         {
@@ -161,11 +173,13 @@ public class SecurityCamera : MonoBehaviour
 
                 if (alarmPos != Vector3.zero)
                 {
-                    factoryAlarm.LastPlayerPosition = alarmPos;
-                    roomManager.waypointService.UpdateClosestWaypointToPlayer(alarmPos);
+                    roomManager.RaiseRoomThreat(AlarmState.Wanted, RoomThreatSource.SecurityCamera, alarmPos);
+                }
+                else
+                {
+                    roomManager.RaiseRoomThreat(AlarmState.Wanted, RoomThreatSource.SecurityCamera);
                 }
 
-                factoryAlarm.CurrentAlarmState = AlarmState.Wanted;
                 alarmedMemories.Add(mem);
                 break;
             }
@@ -195,3 +209,4 @@ public class SecurityCamera : MonoBehaviour
         }
     }
 }
+

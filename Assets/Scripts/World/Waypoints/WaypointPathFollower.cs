@@ -179,11 +179,16 @@ public class WaypointPathFollower : IRobotNavigationListener
         var agentY = body.position.y;
 
         var source = includeUnavailable ? waypointQueries.GetAllWaypoints() : waypointQueries.GetActiveWaypoints();
-        var candidates = includeUnavailable
-            ? source.Where(wp => wp != exclude)
-                .OrderBy(wp => Vector2.Distance(body.position, wp.WorldPos))
-                .ToList()
-            : source.Where(wp => Mathf.Abs(wp.WorldPos.y - agentY) < 5f && wp != exclude)
+        var sameFloorCandidates = source
+            .Where(wp => wp != exclude && Mathf.Abs(wp.WorldPos.y - agentY) < 5f)
+            .OrderBy(wp => Vector2.Distance(body.position, wp.WorldPos))
+            .ToList();
+
+        // Even when includeUnavailable=true, prefer local floor starts first.
+        // Cross-floor nearest should only be used as a fallback when no local candidate exists.
+        var candidates = sameFloorCandidates.Count > 0
+            ? sameFloorCandidates
+            : source.Where(wp => wp != exclude)
                 .OrderBy(wp => Vector2.Distance(body.position, wp.WorldPos))
                 .ToList();
 
