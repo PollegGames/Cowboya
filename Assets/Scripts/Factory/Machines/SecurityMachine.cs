@@ -8,8 +8,17 @@ public class SecurityMachine : BaseMachine
 
     private MeshRenderer meshRenderer;
     private RobotBrainNew currentGuardBrain;
+    private MachineSecurityManager securityManager;
 
     public RobotBrainNew CurrentGuard => currentGuardBrain;
+
+    /// <summary>
+    /// Connects this security machine to the manager that owns guard dispatch decisions.
+    /// </summary>
+    public void InitializeSecurityManager(MachineSecurityManager manager)
+    {
+        securityManager = manager;
+    }
 
     protected override void Awake()
     {
@@ -45,14 +54,44 @@ public class SecurityMachine : BaseMachine
 
         if (!isOn)
         {
+            RobotEcosystemProbe.RecordSlotDecision(
+                this,
+                "SecurityMachine",
+                "attach_rejected_power_off",
+                guardBrain,
+                this,
+                guardBrain.Heart != null ? guardBrain.Heart.CurrentTask : null);
             SendGuardToRest(guardBrain);
             return;
         }
 
+        if (ReferenceEquals(currentGuardBrain, guardBrain))
+        {
+            RobotEcosystemProbe.RecordSlotDecision(
+                this,
+                "SecurityMachine",
+                "attach_ignored_same_guard",
+                guardBrain,
+                this,
+                guardBrain.Heart != null ? guardBrain.Heart.CurrentTask : null);
+            return;
+        }
+
+        RobotBrainNew previousGuard = currentGuardBrain;
         SendGuardToRest(currentGuardBrain);
         SetGuardToSecurityPost(guardBrain);
         currentGuardBrain = guardBrain;
         base.AttachRobot(robot);
+
+        RobotEcosystemProbe.RecordSlotDecision(
+            this,
+            "SecurityMachine",
+            previousGuard != null ? "replaced_current" : "attached_empty",
+            guardBrain,
+            this,
+            guardBrain.Heart != null ? guardBrain.Heart.CurrentTask : null);
+
+        securityManager?.HandleGuardConnectedToSecurityMachine(this, guardBrain);
     }
 
     public override void ReleaseRobot()
@@ -74,6 +113,8 @@ public class SecurityMachine : BaseMachine
     private void SendGuardToRest(RobotBrainNew guard)
     {
         if (guard == null) return;
+        if (guard.Memory != null)
+            guard.Memory.SetDesiredMachineType(MachineType.RestStation);
         RobotDomainEventBus.PublishMachineStateDispatch(guard, null, false);
     }
 

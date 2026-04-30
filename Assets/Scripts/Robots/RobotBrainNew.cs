@@ -70,7 +70,13 @@ public class RobotBrainNew : MonoBehaviour
         PublishPlan(e.Snapshot);
     }
 
-    public void OnPerceptionChanged(bool playerInDetectZone, bool playerInAttackZone, Vector3 playerPosition, bool hasKnownPosition = true)
+    public void OnPerceptionChanged(
+        bool playerInDetectZone,
+        bool playerInAttackZone,
+        Vector3 playerPosition,
+        bool hasKnownPosition = true,
+        Transform playerTransform = null,
+        RoomWaypoint playerWaypoint = null)
     {
         if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
             return;
@@ -78,14 +84,23 @@ public class RobotBrainNew : MonoBehaviour
         RobotEcosystemProbe.RecordBrainCall(
             this,
             "OnPerceptionChanged",
-            "detect=" + playerInDetectZone + " attack=" + playerInAttackZone + " knownPos=" + hasKnownPosition);
+            "detect=" + playerInDetectZone
+            + " attack=" + playerInAttackZone
+            + " knownPos=" + hasKnownPosition
+            + " playerRef=" + (playerTransform != null ? playerTransform.name : "null")
+            + " playerWaypoint=" + DescribeWaypoint(playerWaypoint));
+
+        if (playerWaypoint != null)
+            memory.RememberPlayerWaypoint(playerWaypoint, playerPosition);
+        else if (playerTransform != null)
+            memory.RememberPlayerTransform(playerTransform);
+        else if (hasKnownPosition)
+            memory.RememberPlayerPosition(playerPosition);
 
         memory.SetPlayerInDetectZone(playerInDetectZone);
         memory.SetPlayerInAttackZone(playerInAttackZone);
 
-        if (hasKnownPosition)
-            memory.RememberPlayerPosition(playerPosition);
-        else if (!playerInDetectZone && !playerInAttackZone)
+        if (!hasKnownPosition && playerTransform == null && !playerInDetectZone && !playerInAttackZone)
             memory.ClearPlayerPosition();
     }
 
@@ -106,7 +121,7 @@ public class RobotBrainNew : MonoBehaviour
     {
         Vector3 playerPosition = playerReference != null ? playerReference.position : Vector3.zero;
         bool playerDetected = memory != null && memory.PlayerInDetectZone;
-        OnPerceptionChanged(playerDetected, inZone, playerPosition, hasKnownPosition: playerReference != null);
+        OnPerceptionChanged(playerDetected, inZone, playerPosition, hasKnownPosition: playerReference != null, playerTransform: playerReference);
     }
 
     public void OnMachineStateEvent(object machinePayload, bool isOn)
@@ -153,13 +168,21 @@ public class RobotBrainNew : MonoBehaviour
     public void CompleteReactivateTask(BaseMachine machine, bool reached)
     {
         _ = reached;
-        if (memory != null && machine != null)
-        {
-            memory.SetMachineWaypointAvailability(machine, true);
-            memory.ChangeConnectionToMachine(machine.IsOn);
-        }
+        MachineType? nextDesiredMachineType = IsSecurityGuard
+            && machine != null
+            && machine.Type != MachineType.SecurityMachine
+            ? MachineType.SecurityMachine
+            : null;
 
         heart?.CompleteCurrentTask();
+
+        if (memory != null && machine != null)
+        {
+            Debug.Log(
+                $"[RobotBrainNew] Reactivation task completed machine={machine.name} nextDesired={(nextDesiredMachineType.HasValue ? nextDesiredMachineType.Value.ToString() : "none")}",
+                this);
+            memory.NotifyReactivationCompleted(machine, nextDesiredMachineType);
+        }
     }
 
     public bool TryGetCurrentPlan(out BrainOption currentOptions, out RobotTask plannedTask)
@@ -246,6 +269,9 @@ public class RobotBrainNew : MonoBehaviour
             if (entry.Key == null)
                 continue;
 
+            if (!entry.Value)
+                continue;
+
             if (entry.Key.type == WaypointType.Work || entry.Key.type == WaypointType.Rest)
                 return true;
         }
@@ -283,12 +309,12 @@ public class RobotBrainNew : MonoBehaviour
                 if (o.HasFlag(BrainOption.NeedMachine))
                 {
                     if (o.HasFlag(BrainOption.MachineUnavailable))
-                        return new RobotTask(RobotTaskType.SearchForMachine);
+                        return new RobotTask(RobotTaskType.ReturnHome, ResolveStartWaypoint());
 
                     int robotId = gameObject.GetInstanceID();
                     var waypoint = FindBestWaypointForRole(RobotRole.Worker, snapshot, robotId);
                     if (waypoint == null)
-                        return new RobotTask(RobotTaskType.Idle);
+                        return new RobotTask(RobotTaskType.ReturnHome, ResolveStartWaypoint());
 
                     RobotMachineDestinationBalancer.AssignDestination(robotId, waypoint);
                     return new RobotTask(RobotTaskType.GoToMachine, waypoint);
@@ -328,7 +354,14 @@ public class RobotBrainNew : MonoBehaviour
                         RobotMachineDestinationBalancer.AssignDestination(gameObject.GetInstanceID(), securityWaypoint);
                     return new RobotTask(RobotTaskType.GoToMachine, securityWaypoint);
                 }
-                return new RobotTask(RobotTaskType.Patrol);
+                if (snapshot.LastVisitedPoint != null)
+                {
+                    if (snapshot.LastVisitedPoint.type == WaypointType.Security)
+                        return new RobotTask(RobotTaskType.GuardPost, snapshot.LastVisitedPoint);
+                    if (snapshot.LastVisitedPoint.type == WaypointType.Rest)
+                        return new RobotTask(RobotTaskType.Rest, snapshot.LastVisitedPoint);
+                }
+                return new RobotTask(RobotTaskType.GuardPost);
 
             case RobotRole.WorkerSpawner:
                 if (o.HasFlag(BrainOption.Dead))
@@ -345,22 +378,31 @@ public class RobotBrainNew : MonoBehaviour
                 return new RobotTask(RobotTaskType.SpawnFollowers);
 
             case RobotRole.Follower:
-                if (o.HasFlag(BrainOption.CanAttack))
-                    return new RobotTask(RobotTaskType.AttackTarget, BuildPlayerPayload(snapshot));
-                if (o.HasFlag(BrainOption.PlayerDetected))
-                    return new RobotTask(RobotTaskType.ChasePlayer, BuildPlayerPayload(snapshot));
+                if (o.HasFlag(BrainOption.PlayerDetected) || o.HasFlag(BrainOption.CanAttack))
+                    return new RobotTask(RobotTaskType.ChasePlayer, BuildFollowerPlayerPayload(snapshot));
                 if (snapshot.HasLastKnownPlayerPosition)
-                    return new RobotTask(RobotTaskType.ChasePlayer, snapshot.LastKnownPlayerPosition);
+                    return new RobotTask(RobotTaskType.ChasePlayer, BuildFollowerPlayerPayload(snapshot));
                 return new RobotTask(RobotTaskType.Idle);
 
             case RobotRole.Boss:
                 if (o.HasFlag(BrainOption.CanAttack))
+                {
+                    Debug.Log(
+                        $"[Boss] Planning attack target={DescribePayload(BuildPlayerPayload(snapshot))}.",
+                        this);
                     return new RobotTask(RobotTaskType.AttackTarget, BuildPlayerPayload(snapshot));
+                }
                 if (o.HasFlag(BrainOption.PlayerDetected))
-                    return new RobotTask(RobotTaskType.ChasePlayer, BuildPlayerPayload(snapshot));
+                {
+                    Debug.Log("[Boss] Player detected outside attack state; staying on end-room patrol instead of chasing.", this);
+                    return new RobotTask(RobotTaskType.Patrol, FindRandomEndRoomWaypoint(snapshot));
+                }
                 if (o.HasFlag(BrainOption.InDanger))
-                    return new RobotTask(RobotTaskType.Flee);
-                return new RobotTask(RobotTaskType.Patrol);
+                {
+                    Debug.Log("[Boss] Damage/danger detected; staying on end-room patrol instead of fleeing.", this);
+                    return new RobotTask(RobotTaskType.Patrol, FindRandomEndRoomWaypoint(snapshot));
+                }
+                return new RobotTask(RobotTaskType.Patrol, FindRandomEndRoomWaypoint(snapshot));
 
             default:
                 throw new ArgumentOutOfRangeException();
@@ -386,25 +428,41 @@ public class RobotBrainNew : MonoBehaviour
     {
         if (snapshot.DesiredMachineType.HasValue)
         {
-            var desired = FindByDesiredMachineTypeBalanced(snapshot, snapshot.DesiredMachineType.Value, availableOnly: true, robotId)
-                ?? FindByDesiredMachineTypeBalanced(snapshot, snapshot.DesiredMachineType.Value, availableOnly: false, robotId);
+            var desired = FindByDesiredMachineTypeBalanced(snapshot, snapshot.DesiredMachineType.Value, availableOnly: true, robotId);
             if (desired != null)
                 return desired;
+
+            var fallback = FindFallbackWaypointForUnavailableDesiredMachine(snapshot, snapshot.DesiredMachineType.Value, robotId);
+            if (fallback != null)
+                return fallback;
         }
 
         // Cycle preference: after Work go to Rest, after Rest go to Work.
         if (snapshot.LastVisitedPoint != null)
         {
             if (snapshot.LastVisitedPoint.type == WaypointType.Work)
-                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Rest, WaypointType.Work)
-                    ?? FindByPriorityBalanced(snapshot, availableOnly: false, robotId, WaypointType.Rest, WaypointType.Work);
+                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Rest, WaypointType.Work);
             if (snapshot.LastVisitedPoint.type == WaypointType.Rest)
-                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Work, WaypointType.Rest)
-                    ?? FindByPriorityBalanced(snapshot, availableOnly: false, robotId, WaypointType.Work, WaypointType.Rest);
+                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Work, WaypointType.Rest);
         }
 
-        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Work, WaypointType.Rest)
-            ?? FindByPriorityBalanced(snapshot, availableOnly: false, robotId, WaypointType.Work, WaypointType.Rest);
+        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Work, WaypointType.Rest);
+    }
+
+    private static RoomWaypoint FindFallbackWaypointForUnavailableDesiredMachine(
+        RobotMemorySnapshotNew snapshot,
+        MachineType desiredMachineType,
+        int robotId)
+    {
+        switch (desiredMachineType)
+        {
+            case MachineType.WorkStation:
+                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Rest);
+            case MachineType.RestStation:
+                return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Work);
+            default:
+                return null;
+        }
     }
 
     private static RoomWaypoint FindByDesiredMachineTypeBalanced(RobotMemorySnapshotNew snapshot, MachineType desiredMachineType, bool availableOnly, int robotId)
@@ -417,6 +475,9 @@ public class RobotBrainNew : MonoBehaviour
                 break;
             case MachineType.RestStation:
                 desiredWaypointType = WaypointType.Rest;
+                break;
+            case MachineType.SecurityMachine:
+                desiredWaypointType = WaypointType.Security;
                 break;
         }
 
@@ -464,8 +525,18 @@ public class RobotBrainNew : MonoBehaviour
 
     private static RoomWaypoint FindBestWaypointForGuard(RobotMemorySnapshotNew snapshot, int robotId)
     {
-        // Priority: Security -> Work/Rest (other machines) -> Center fallback.
-        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Security, WaypointType.Work, WaypointType.Rest, WaypointType.Center);
+        if (snapshot.DesiredMachineType.HasValue)
+        {
+            var desired = FindByDesiredMachineTypeBalanced(snapshot, snapshot.DesiredMachineType.Value, availableOnly: true, robotId);
+            if (desired != null)
+                return desired;
+        }
+
+        if (snapshot.LastVisitedPoint != null && snapshot.LastVisitedPoint.type == WaypointType.Rest)
+            return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Rest, WaypointType.Security, WaypointType.Center);
+
+        // Security guards only use security/rest stations during normal machine cycles.
+        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Security, WaypointType.Rest, WaypointType.Center);
     }
 
     private static bool IsBalancedMachineWaypointType(WaypointType type)
@@ -489,6 +560,29 @@ public class RobotBrainNew : MonoBehaviour
         }
 
         return FindByPriority(snapshot, availableOnly: true, WaypointType.Spawner);
+    }
+
+    private static RoomWaypoint FindRandomEndRoomWaypoint(RobotMemorySnapshotNew snapshot)
+    {
+        if (snapshot.AllAvailableWaypoints == null || snapshot.AllAvailableWaypoints.Count == 0)
+            return null;
+
+        var candidates = new List<RoomWaypoint>();
+        foreach (var pair in snapshot.AllAvailableWaypoints)
+        {
+            var waypoint = pair.Key;
+            if (waypoint == null || waypoint.parentRoom == null || waypoint.parentRoom.roomProperties == null)
+                continue;
+            if (waypoint.parentRoom.roomProperties.usageType != UsageType.End)
+                continue;
+
+            candidates.Add(waypoint);
+        }
+
+        if (candidates.Count == 0)
+            return null;
+
+        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
     }
 
     private static RoomWaypoint FindByPriority(RobotMemorySnapshotNew snapshot, bool availableOnly, params WaypointType[] orderedTypes)
@@ -515,7 +609,28 @@ public class RobotBrainNew : MonoBehaviour
 
     private static object BuildPlayerPayload(RobotMemorySnapshotNew snapshot)
     {
+        if (snapshot.LastKnownPlayerTransform != null)
+            return snapshot.LastKnownPlayerTransform;
+
         return snapshot.HasLastKnownPlayerPosition ? snapshot.LastKnownPlayerPosition : null;
+    }
+
+    private static object BuildFollowerPlayerPayload(RobotMemorySnapshotNew snapshot)
+    {
+        if (snapshot.LastKnownPlayerWaypoint != null)
+        {
+            return new RobotPlayerChaseTarget(
+                snapshot.LastKnownPlayerWaypoint,
+                snapshot.LastKnownPlayerPosition,
+                snapshot.HasLastKnownPlayerPosition);
+        }
+
+        return snapshot.HasLastKnownPlayerPosition ? snapshot.LastKnownPlayerPosition : null;
+    }
+
+    private RoomWaypoint ResolveStartWaypoint()
+    {
+        return body != null ? body.StartPoint : null;
     }
 
     private static bool IsSameTask(RobotTask left, RobotTask right)
@@ -534,7 +649,7 @@ public class RobotBrainNew : MonoBehaviour
             return waypoint;
 
         if (payload is BaseMachine machine && machine != null)
-            return machine.GetComponent<RoomWaypoint>() ?? machine.GetComponentInParent<RoomWaypoint>();
+            return MachineWaypointResolver.Resolve(machine);
 
         if (payload is Component component && component != null)
             return component.GetComponent<RoomWaypoint>() ?? component.GetComponentInParent<RoomWaypoint>();
@@ -558,5 +673,10 @@ public class RobotBrainNew : MonoBehaviour
         if (payload is GameObject gameObject && gameObject != null)
             return "GameObject:" + gameObject.name;
         return payload.GetType().Name;
+    }
+
+    private static string DescribeWaypoint(RoomWaypoint waypoint)
+    {
+        return waypoint != null ? waypoint.type + "@" + waypoint.WorldPos.ToString("F2") : "null";
     }
 }

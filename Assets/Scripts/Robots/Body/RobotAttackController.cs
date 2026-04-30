@@ -30,17 +30,24 @@ public class RobotAttackController : MonoBehaviour
     public bool TryStartAttack(Transform target)
     {
         if (target == null)
+        {
+            Debug.LogWarning($"[{nameof(RobotAttackController)}] Attack request rejected reason=missing_target", this);
             return false;
+        }
 
         currentTarget = target;
         attackRequested = true;
 
         EnsureArmController();
         if (armController == null)
+        {
+            Debug.LogWarning($"[{nameof(RobotAttackController)}] Attack request rejected target={target.name} reason=missing_arm_controller", this);
             return false;
+        }
 
         if (attackRoutine == null)
             attackRoutine = StartCoroutine(AttackLoop());
+        Debug.Log($"[{nameof(RobotAttackController)}] Attack request accepted target={target.name}", this);
         return true;
     }
 

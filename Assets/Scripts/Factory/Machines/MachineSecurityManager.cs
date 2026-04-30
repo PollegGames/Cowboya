@@ -13,6 +13,7 @@ public class MachineSecurityManager : MonoBehaviour
     private readonly List<FactoryMachine> factoryMachines = new();
     private readonly List<RestingMachine> restingMachines = new();
     private readonly List<SecurityMachine> securityMachines = new();
+    private readonly List<BaseMachine> pendingOffMachines = new();
 
     private readonly List<RobotBrainNew> guards = new();
 
@@ -61,6 +62,7 @@ public class MachineSecurityManager : MonoBehaviour
 
         securityMachines.Add(machine);
         reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
+        machine.InitializeSecurityManager(this);
         machine.OnMachinePowerChanged += HandleMachinePowerChanged;
         machine.OnMachineTurnedOff += HandleMachineTurnedOff;
     }
@@ -145,7 +147,12 @@ public class MachineSecurityManager : MonoBehaviour
         if (!isOn)
         {
             OnFactoryMachineTurnedOff?.Invoke(machine);
-            DispatchGuardForFactoryMachine(machine);
+            QueuePendingOffMachine(machine, "factory_power_off");
+            TryDispatchPendingOffMachine("factory_power_off");
+        }
+        else
+        {
+            RemovePendingOffMachine(machine, "factory_power_on");
         }
     }
 
@@ -153,7 +160,12 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (!isOn)
         {
-            DispatchGuardForRestingMachine(machine);
+            QueuePendingOffMachine(machine, "rest_power_off");
+            TryDispatchPendingOffMachine("rest_power_off");
+        }
+        else
+        {
+            RemovePendingOffMachine(machine, "rest_power_on");
         }
     }
 
@@ -168,69 +180,146 @@ public class MachineSecurityManager : MonoBehaviour
         }
     }
 
-    private void DispatchGuardForFactoryMachine(FactoryMachine machine)
+    /// <summary>
+    /// Checks queued powered-off machines when a guard reaches and attaches to a security machine.
+    /// </summary>
+    public void HandleGuardConnectedToSecurityMachine(SecurityMachine securityMachine, RobotBrainNew guard)
     {
-        Debug.Log($"Dispatching guard for machine: {machine.name}");
-        if (machine == null || guards.Count == 0) return;
-
-        RobotBrainNew best = null;
-        float bestDist = float.MaxValue;
-        var pos = machine.transform.position;
-
-        foreach (var guard in guards)
-        {
-            if (guard == null) continue;
-            if (!IsGuardStationedAtSecurityMachine(guard)) continue;
-
-            float dist = Vector2.Distance(guard.transform.position, pos);
-            if (dist < bestDist)
-            {
-                best = guard;
-                bestDist = dist;
-            }
-        }
-
-        if (best == null)
+        if (securityMachine == null || guard == null)
             return;
 
-        PublishGuardDispatch(best, machine, false);
+        PruneResolvedPendingOffMachines("security_connect_prune");
+        Debug.Log(
+            $"[MachineSecurityManager] Guard connected to security machine guard={guard.name} securityMachine={securityMachine.name} pendingCount={pendingOffMachines.Count}",
+            securityMachine);
+
+        RobotEcosystemProbe.RecordBrainCall(
+            guard,
+            "MachineSecurityManager.SecurityMachineConnected",
+            "securityPost=" + DescribeMachine(securityMachine)
+            + " pendingCount=" + pendingOffMachines.Count
+            + " currentTask=" + DescribeTask(guard.Heart != null ? guard.Heart.CurrentTask : null));
+
+        if (TryDispatchPendingOffMachineToGuard(guard, "pending_power_off_security_connect"))
+            return;
+
+        Debug.Log(
+            $"[MachineSecurityManager] No pending powered-off machine for connected guard={guard.name} securityMachine={securityMachine.name}",
+            securityMachine);
     }
 
-    private void DispatchGuardForRestingMachine(RestingMachine machine)
+    private void QueuePendingOffMachine(BaseMachine machine, string reason)
     {
-        Debug.Log($"Dispatching guard for machine: {machine.name}");
-        if (machine == null || guards.Count == 0) return;
+        if (machine == null || machine.IsOn)
+            return;
 
-        RobotBrainNew best = null;
-        float bestDist = float.MaxValue;
-        var pos = machine.transform.position;
+        if (!pendingOffMachines.Contains(machine))
+            pendingOffMachines.Add(machine);
 
-        foreach (var guard in guards)
+        Debug.Log(
+            $"[MachineSecurityManager] Pending powered-off machine queued reason={reason} machine={machine.name} pendingCount={pendingOffMachines.Count}",
+            machine);
+    }
+
+    private void RemovePendingOffMachine(BaseMachine machine, string reason)
+    {
+        if (machine == null)
+            return;
+
+        if (!pendingOffMachines.Remove(machine))
+            return;
+
+        Debug.Log(
+            $"[MachineSecurityManager] Pending powered-off machine removed reason={reason} machine={machine.name} pendingCount={pendingOffMachines.Count}",
+            machine);
+    }
+
+    private void PruneResolvedPendingOffMachines(string reason)
+    {
+        for (int i = pendingOffMachines.Count - 1; i >= 0; i--)
         {
-            if (guard == null) continue;
-            if (!IsGuardStationedAtSecurityMachine(guard)) continue;
-            float dist = Vector2.Distance(guard.transform.position, pos);
+            var pending = pendingOffMachines[i];
+            if (pending != null && !pending.IsOn)
+                continue;
+
+            pendingOffMachines.RemoveAt(i);
+            Debug.Log(
+                $"[MachineSecurityManager] Pending powered-off machine pruned reason={reason} machine={DescribeMachine(pending)} pendingCount={pendingOffMachines.Count}",
+                pending);
+        }
+    }
+
+    private bool TryDispatchPendingOffMachine(string reason)
+    {
+        PruneResolvedPendingOffMachines(reason + "_prune");
+        BaseMachine machine = FindClosestPendingOffMachine(null);
+        if (machine == null)
+            return false;
+
+        Debug.Log($"Dispatching guard for pending machine: {machine.name}");
+
+        RobotBrainNew best = FindClosestStationedGuard(machine.transform.position, reason, machine);
+        if (best == null)
+        {
+            Debug.Log(
+                $"[MachineSecurityManager] No stationed guard available for pending machine={machine.name} reason={reason} pendingCount={pendingOffMachines.Count}",
+                machine);
+            return false;
+        }
+
+        pendingOffMachines.Remove(machine);
+        DispatchGuardToReactivateMachine(best, machine, reason);
+        return true;
+    }
+
+    private bool TryDispatchPendingOffMachineToGuard(RobotBrainNew guard, string reason)
+    {
+        if (guard == null)
+            return false;
+
+        PruneResolvedPendingOffMachines(reason + "_prune");
+        BaseMachine machine = FindClosestPendingOffMachine(guard.transform.position);
+        if (machine == null)
+            return false;
+
+        pendingOffMachines.Remove(machine);
+        Debug.Log(
+            $"[MachineSecurityManager] Dispatching connected guard to pending machine guard={guard.name} reason={reason} machine={machine.name} pendingCount={pendingOffMachines.Count}",
+            machine);
+        DispatchGuardToReactivateMachine(guard, machine, reason);
+        return true;
+    }
+
+    private BaseMachine FindClosestPendingOffMachine(Vector3? position)
+    {
+        BaseMachine best = null;
+        float bestDist = float.MaxValue;
+
+        foreach (var pending in pendingOffMachines)
+        {
+            if (pending == null || pending.IsOn)
+                continue;
+
+            if (!position.HasValue)
+                return pending;
+
+            float dist = Vector2.Distance(position.Value, pending.transform.position);
             if (dist < bestDist)
             {
-                best = guard;
+                best = pending;
                 bestDist = dist;
             }
         }
 
-        if (best == null)
-            return;
-
-        PublishGuardDispatch(best, machine, false);
+        return best;
     }
 
     private bool DispatchGuardForSecurityMachine(SecurityMachine machine, RobotBrainNew skipGuard)
     {
-        Debug.Log($"Dispatching guard for security machine: {machine.name}");
         if (machine == null || guards.Count == 0) return false;
+        Debug.Log($"Dispatching guard for security machine: {machine.name}");
 
         RobotBrainNew best = null;
-        float bestDist = float.MaxValue;
-        var pos = machine.transform.position;
         bool skippedEligible = false;
 
         foreach (var guard in guards)
@@ -243,12 +332,7 @@ public class MachineSecurityManager : MonoBehaviour
                 continue;
             }
 
-            float dist = Vector2.Distance(guard.transform.position, pos);
-            if (dist < bestDist)
-            {
-                best = guard;
-                bestDist = dist;
-            }
+            best = SelectCloserGuard(best, guard, machine.transform.position);
         }
 
         if (best == null && skippedEligible)
@@ -257,7 +341,7 @@ public class MachineSecurityManager : MonoBehaviour
         if (best == null)
             return false;
 
-        PublishGuardDispatch(best, machine, false);
+        DispatchGuardToReactivateMachine(best, machine, "security_power_off");
         return true;
     }
 
@@ -374,11 +458,99 @@ public class MachineSecurityManager : MonoBehaviour
         return true;
     }
 
-    private static bool IsGuardStationedAtSecurityMachine(RobotBrainNew guard)
+    private RobotBrainNew FindClosestStationedGuard(Vector3 position, string reason, BaseMachine targetMachine)
+    {
+        RobotBrainNew best = null;
+
+        foreach (var guard in guards)
+        {
+            if (guard == null)
+                continue;
+
+            bool stationed = IsGuardStationedAtSecurityMachine(guard);
+            RobotEcosystemProbe.RecordBrainCall(
+                guard,
+                "MachineSecurityManager.EvaluateGuardDispatch",
+                "reason=" + reason
+                + " target=" + DescribeMachine(targetMachine)
+                + " stationed=" + stationed
+                + " currentTask=" + DescribeTask(guard.Heart != null ? guard.Heart.CurrentTask : null)
+                + " lastVisited=" + DescribeWaypoint(guard.Memory != null ? guard.Memory.LastVisitedPoint : null)
+                + " securityPost=" + DescribeMachine(FindSecurityMachineForGuard(guard)));
+
+            if (!stationed)
+                continue;
+
+            best = SelectCloserGuard(best, guard, position);
+        }
+
+        return best;
+    }
+
+    private static RobotBrainNew SelectCloserGuard(RobotBrainNew currentBest, RobotBrainNew candidate, Vector3 position)
+    {
+        if (candidate == null)
+            return currentBest;
+
+        if (currentBest == null)
+            return candidate;
+
+        float candidateDistance = Vector2.Distance(candidate.transform.position, position);
+        float bestDistance = Vector2.Distance(currentBest.transform.position, position);
+        return candidateDistance < bestDistance ? candidate : currentBest;
+    }
+
+    private void DispatchGuardToReactivateMachine(RobotBrainNew guard, BaseMachine machine, string reason)
+    {
+        if (guard == null || machine == null)
+            return;
+
+        RoomWaypoint waypoint = MachineWaypointResolver.Resolve(machine);
+        SecurityMachine securityPost = FindSecurityMachineForGuard(guard);
+        if (securityPost != null)
+            securityPost.VacateGuard(guard);
+
+        RobotTask reactivateTask = new RobotTask(RobotTaskType.ReactivateMachine, machine);
+        RobotEcosystemProbe.RecordBrainCall(
+            guard,
+            "MachineSecurityManager.DispatchGuardToReactivateMachine",
+            "reason=" + reason
+            + " machine=" + DescribeMachine(machine)
+            + " waypoint=" + DescribeWaypoint(waypoint)
+            + " vacatedSecurityPost=" + DescribeMachine(securityPost)
+            + " queuedTask=" + DescribeTask(reactivateTask));
+
+        RobotNewTrace.Log(
+            guard,
+            eventSource: "MachineSecurityManager.DispatchGuard",
+            memoryDelta: "none",
+            brainOptions: guard.CurrentOptions,
+            plannedTask: reactivateTask,
+            heartCurrentTask: guard.Heart != null ? guard.Heart.CurrentTask : null,
+            taskSignal: "security_dispatch:" + reason);
+
+        if (guard.Heart != null)
+            guard.Heart.QueueTask(reactivateTask);
+    }
+
+    private bool IsGuardStationedAtSecurityMachine(RobotBrainNew guard)
     {
         if (guard == null)
             return false;
-        return false;
+
+        if (FindSecurityMachineForGuard(guard) != null)
+            return true;
+
+        RobotTask currentTask = guard.Heart != null ? guard.Heart.CurrentTask : null;
+        if (currentTask == null || currentTask.Type != RobotTaskType.GuardPost)
+            return false;
+
+        RoomWaypoint lastVisited = guard.Memory != null ? guard.Memory.LastVisitedPoint : null;
+        if (lastVisited != null && lastVisited.type == WaypointType.Security)
+            return true;
+
+        RoomWaypoint bodyTarget = guard.Body != null ? guard.Body.CurrentTarget : null;
+        return bodyTarget != null && bodyTarget.type == WaypointType.Security;
     }
 
     private static void PublishGuardDispatch(RobotBrainNew guard, object payload, bool isOn)
@@ -400,6 +572,66 @@ public class MachineSecurityManager : MonoBehaviour
             return brain;
 
         return robot.GetComponentInParent<RobotBrainNew>();
+    }
+
+    private SecurityMachine FindSecurityMachineForGuard(RobotBrainNew guard)
+    {
+        if (guard == null)
+            return null;
+
+        foreach (var machine in securityMachines)
+        {
+            if (machine == null)
+                continue;
+            if (ReferenceEquals(machine.CurrentGuard, guard))
+                return machine;
+        }
+
+        return null;
+    }
+
+    private static string DescribeMachine(BaseMachine machine)
+    {
+        if (machine == null)
+            return "none";
+
+        return machine.name + ":" + machine.Type + ":on=" + machine.IsOn;
+    }
+
+    private static string DescribeWaypoint(RoomWaypoint waypoint)
+    {
+        if (waypoint == null)
+            return "none";
+
+        return waypoint.type + "@" + waypoint.WorldPos.ToString("F2");
+    }
+
+    private static string DescribeTask(RobotTask task)
+    {
+        if (task == null)
+            return "none";
+
+        return task.Type + ":" + DescribePayload(task.Payload);
+    }
+
+    private static string DescribePayload(object payload)
+    {
+        if (payload == null)
+            return "none";
+
+        if (payload is BaseMachine machine)
+            return DescribeMachine(machine);
+
+        if (payload is RoomWaypoint waypoint)
+            return DescribeWaypoint(waypoint);
+
+        if (payload is Component component && component != null)
+            return component.name;
+
+        if (payload is GameObject go && go != null)
+            return go.name;
+
+        return payload.ToString();
     }
 }
 

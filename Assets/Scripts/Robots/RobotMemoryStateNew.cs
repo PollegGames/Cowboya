@@ -8,6 +8,7 @@ public enum MemoryChangeType
 {
     PlayerAttackZoneChanged,
     PlayerDetectZoneChanged,
+    PlayerWaypointChanged,
     TookDamage,
     LastVisitedPointChanged,
     WaypointAvailabilityChanged,
@@ -15,6 +16,7 @@ public enum MemoryChangeType
     NotConnectedToMachine,
     MachineDetachedTransient,
     MachineDetachedFinal,
+    ReactivationCompleted,
     DeadStateChanged,
     DesiredMachineChanged,
     Normal
@@ -40,6 +42,8 @@ public class RobotMemoryStateNew
     public RobotMemorySnapshotNew Snapshot => snapshot;
 
     public Vector3 LastKnownPlayerPosition => snapshot.LastKnownPlayerPosition;
+    public Transform LastKnownPlayerTransform => snapshot.LastKnownPlayerTransform;
+    public RoomWaypoint LastKnownPlayerWaypoint => snapshot.LastKnownPlayerWaypoint;
     public bool PlayerInAttackZone => snapshot.PlayerInAttackZone;
     public bool PlayerInDetectZone => snapshot.PlayerInDetectZone;
     public bool WasRecentlyAttacked => snapshot.WasRecentlyAttacked;
@@ -58,12 +62,37 @@ public class RobotMemoryStateNew
         Raise(MemoryChangeType.Normal);
     }
 
+    public void RememberPlayerTransform(Transform playerTransform)
+    {
+        if (playerTransform == null)
+            return;
+
+        snapshot.LastKnownPlayerTransform = playerTransform;
+        snapshot.LastKnownPlayerPosition = playerTransform.position;
+        snapshot.HasLastKnownPlayerPosition = true;
+        Raise(MemoryChangeType.Normal);
+    }
+
+    public void RememberPlayerWaypoint(RoomWaypoint playerWaypoint, Vector3 playerPosition)
+    {
+        if (playerWaypoint == null)
+            return;
+
+        bool waypointChanged = snapshot.LastKnownPlayerWaypoint != playerWaypoint;
+        snapshot.LastKnownPlayerWaypoint = playerWaypoint;
+        snapshot.LastKnownPlayerPosition = playerPosition;
+        snapshot.HasLastKnownPlayerPosition = true;
+        Raise(waypointChanged ? MemoryChangeType.PlayerWaypointChanged : MemoryChangeType.Normal);
+    }
+
     public void ClearPlayerPosition()
     {
         if (!snapshot.HasLastKnownPlayerPosition)
             return;
 
         snapshot.lastKnownPlayerPosition = Vector3.zero;
+        snapshot.LastKnownPlayerTransform = null;
+        snapshot.LastKnownPlayerWaypoint = null;
         snapshot.HasLastKnownPlayerPosition = false;
         Raise(MemoryChangeType.Normal);
     }
@@ -194,6 +223,22 @@ public class RobotMemoryStateNew
         Raise(MemoryChangeType.WaypointAvailabilityChanged);
     }
 
+    public void NotifyReactivationCompleted(RoomWaypoint point, MachineType? nextDesiredMachineType, bool connectedToReactivatedMachine)
+    {
+        if (point != null)
+        {
+            if (snapshot.AllAvailableWaypoints == null)
+                snapshot.AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>();
+            snapshot.AllAvailableWaypoints[point] = true;
+        }
+
+        snapshot.IsConnectedToMachine = connectedToReactivatedMachine;
+        snapshot.DesiredMachineType = nextDesiredMachineType;
+        snapshot.IsMachineTransitionInProgress = nextDesiredMachineType.HasValue && !connectedToReactivatedMachine;
+
+        Raise(MemoryChangeType.ReactivationCompleted);
+    }
+
     public void SetPlayerInDetectZone(bool inZone)
     {
         if (snapshot.PlayerInDetectZone == inZone) return;
@@ -235,6 +280,8 @@ public class RobotMemoryStateNew
         snapshot = new RobotMemorySnapshotNew
         {
             LastKnownPlayerPosition = Vector3.zero,
+            LastKnownPlayerTransform = null,
+            LastKnownPlayerWaypoint = null,
             HasLastKnownPlayerPosition = false,
             PlayerInAttackZone = false,
             PlayerInDetectZone = false,

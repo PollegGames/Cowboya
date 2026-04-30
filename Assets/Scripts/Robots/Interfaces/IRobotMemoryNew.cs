@@ -4,6 +4,7 @@ using UnityEngine;
 public interface IRobotMemoryNew
 {
     Vector3 LastKnownPlayerPosition { get; }
+    RoomWaypoint LastKnownPlayerWaypoint { get; }
     bool PlayerInAttackZone { get; }
     bool PlayerInDetectZone { get; }
     bool WasRecentlyAttacked { get; }
@@ -12,6 +13,7 @@ public interface IRobotMemoryNew
 
     void SetLastVisitedPoint(RoomWaypoint point);
     void RememberPlayerPosition(Vector3 playerPosition);
+    void RememberPlayerWaypoint(RoomWaypoint playerWaypoint, Vector3 playerPosition);
     void ClearPlayerPosition();
     void SetPlayerInAttackZone(bool inZone);
     void SetPlayerInDetectZone(bool inZone);

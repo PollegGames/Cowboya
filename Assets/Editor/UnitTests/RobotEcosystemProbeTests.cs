@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
@@ -249,6 +250,40 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
+    public void MachineWorkerManager_PowerOn_RestoresWorkerWaypointFromMachineService()
+    {
+        var workWaypoint = CreateWaypoint("WorkWP_Restored", WaypointType.Work, true, Vector3.right);
+        var restWaypoint = CreateWaypoint("RestWP_Restored", WaypointType.Rest, true, Vector3.zero);
+
+        var workerA = CreateRobotWithBrain("Robot_WorkerRestore_A");
+        var workerB = CreateRobotWithBrain("Robot_WorkerRestore_B");
+        PrepareWorkerForUnavailableWorkMachine(workerA.brain.Memory, workWaypoint, restWaypoint);
+        PrepareWorkerForUnavailableWorkMachine(workerB.brain.Memory, workWaypoint, restWaypoint);
+
+        AssertWorkerPlansWaypoint(workerA.brain, restWaypoint, "Worker should use fallback while work waypoint is unavailable.");
+        AssertWorkerPlansWaypoint(workerB.brain, restWaypoint, "Worker should use fallback while work waypoint is unavailable.");
+
+        var machineGo = new GameObject("WorkingDesk_ServiceWaypoint");
+        machineGo.transform.position = Vector3.right * 1.2f;
+        machineGo.AddComponent<BoxCollider2D>();
+        var machine = machineGo.AddComponent<FactoryMachine>();
+        machine.InitializeWaypointService(new FakeWaypointService(workWaypoint, restWaypoint));
+
+        var managerGo = new GameObject("MachineWorkerManager_Restore");
+        var manager = managerGo.AddComponent<MachineWorkerManager>();
+        manager.RegisterMachine(machine);
+
+        machine.PowerOff();
+        machine.PowerOn();
+
+        Assert.IsTrue(workerA.brain.Memory.AllAvailableWaypoints[workWaypoint]);
+        Assert.IsTrue(workerB.brain.Memory.AllAvailableWaypoints[workWaypoint]);
+        AssertWorkerPlansWaypoint(workerA.brain, workWaypoint, "Worker A should retarget the restored work waypoint.");
+        AssertWorkerPlansWaypoint(workerB.brain, workWaypoint, "Worker B should retarget the restored work waypoint.");
+        Assert.GreaterOrEqual(RobotEcosystemProbe.GetCallCount("Brain.MachineWorkerManager.NotifyWorkersMachinePoweredOn"), 2);
+    }
+
+    [Test]
     public void WorkerPlan_TransientDetach_DoesNotForceNeedMachineLoop()
     {
         var setup = CreateRobotWithBrain("Robot_TransientDetach");
@@ -266,6 +301,76 @@ public class RobotEcosystemProbeTests
         Assert.IsTrue(ok);
         Assert.IsNotNull(task);
         Assert.IsFalse(options.HasFlag(BrainOption.NeedMachine), "Transient detach should not immediately mark NeedMachine.");
+    }
+
+    [Test]
+    public void SecurityGuardPerception_AttackPlanUsesPlayerTransformPayload()
+    {
+        var setup = CreateRobotWithBrain("Robot_GuardAttackPayload");
+        setup.heart.ConfigureRole(RobotRole.SecurityGuard, resetStack: true);
+        var player = new GameObject("PlayerBody").transform;
+        player.position = new Vector3(2f, 0f, 0f);
+
+        setup.brain.OnPerceptionChanged(
+            playerInDetectZone: true,
+            playerInAttackZone: true,
+            playerPosition: player.position,
+            hasKnownPosition: true,
+            playerTransform: player);
+
+        bool ok = setup.brain.TryGetCurrentPlan(out var options, out var task);
+        Assert.IsTrue(ok);
+        Assert.IsTrue(options.HasFlag(BrainOption.CanAttack));
+        Assert.IsNotNull(task);
+        Assert.AreEqual(RobotTaskType.AttackTarget, task.Type);
+        Assert.AreEqual(player, task.Payload, "AttackTarget must carry the live player Transform so RobotTaskNew can call TryStartAttack.");
+    }
+
+    [Test]
+    public void FollowerPerception_UsesPlayerWaypointAndDoesNotAttack()
+    {
+        var setup = CreateRobotWithBrain("Robot_FollowerWaypointChase");
+        setup.heart.ConfigureRole(RobotRole.Follower, resetStack: true);
+        var playerWaypoint = CreateWaypoint("PlayerNearestWP", WaypointType.Center, true, new Vector3(5f, 0f, 0f));
+        Vector3 playerPosition = new Vector3(5.5f, 0.5f, 0f);
+
+        setup.brain.OnPerceptionChanged(
+            playerInDetectZone: true,
+            playerInAttackZone: true,
+            playerPosition: playerPosition,
+            hasKnownPosition: true,
+            playerWaypoint: playerWaypoint);
+
+        bool ok = setup.brain.TryGetCurrentPlan(out var options, out var task);
+        Assert.IsTrue(ok);
+        Assert.IsTrue(options.HasFlag(BrainOption.CanAttack));
+        Assert.IsNotNull(task);
+        Assert.AreEqual(RobotTaskType.ChasePlayer, task.Type);
+        Assert.IsInstanceOf<RobotPlayerChaseTarget>(task.Payload);
+
+        var target = (RobotPlayerChaseTarget)task.Payload;
+        Assert.AreEqual(playerWaypoint, target.Waypoint);
+        Assert.AreEqual(playerPosition, target.PlayerPosition);
+    }
+
+    [Test]
+    public void FollowPlayerTriggerHandler_AwakeResolvesRobotComponentsFromParent()
+    {
+        var robot = new GameObject("Robot_WithChildTrigger");
+        var memory = robot.AddComponent<RobotMemoryNew>();
+        var heart = robot.AddComponent<RobotHeartNew>();
+        var brain = robot.AddComponent<RobotBrainNew>();
+        var child = new GameObject("TriggerHandlerChild");
+        child.transform.SetParent(robot.transform);
+        var handler = child.AddComponent<FollowPlayerTriggerHandler>();
+
+        InvokePrivate(handler, "Awake");
+
+        Assert.AreEqual(brain, GetPrivateField<RobotBrainNew>(handler, "brain"));
+        Assert.AreEqual(brain, GetPrivateField<RobotBrainNew>(handler, "brainNew"));
+        Assert.AreEqual(memory, GetPrivateField<RobotMemoryNew>(handler, "memory"));
+        Assert.AreEqual(memory, GetPrivateField<RobotMemoryNew>(handler, "memoryNew"));
+        Assert.AreEqual(RobotRole.Worker, heart.Role);
     }
 
     [Test]
@@ -420,11 +525,38 @@ public class RobotEcosystemProbeTests
         return wp;
     }
 
+    private static void PrepareWorkerForUnavailableWorkMachine(RobotMemoryNew memory, RoomWaypoint workWaypoint, RoomWaypoint restWaypoint)
+    {
+        Assert.IsNotNull(memory);
+
+        memory.InitializeWaypointAvailability(new[] { workWaypoint, restWaypoint });
+        memory.SetLastVisitedPoint(restWaypoint);
+        memory.SetRoomWaypointAvailability(workWaypoint, false);
+        memory.ChangeConnectionToMachine(false);
+        memory.SetDesiredMachineType(MachineType.WorkStation);
+    }
+
+    private static void AssertWorkerPlansWaypoint(RobotBrainNew brain, RoomWaypoint waypoint, string message)
+    {
+        bool ok = brain.TryGetCurrentPlan(out _, out var task);
+        Assert.IsTrue(ok);
+        Assert.IsNotNull(task);
+        Assert.AreEqual(RobotTaskType.GoToMachine, task.Type);
+        Assert.AreEqual(waypoint, task.Payload, message);
+    }
+
     private static void SetPrivateField(object target, string fieldName, object value)
     {
         var field = target.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.IsNotNull(field, $"Field '{fieldName}' not found on {target.GetType().Name}.");
         field.SetValue(target, value);
+    }
+
+    private static T GetPrivateField<T>(object target, string fieldName)
+    {
+        var field = target.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+        Assert.IsNotNull(field, $"Field '{fieldName}' not found on {target.GetType().Name}.");
+        return (T)field.GetValue(target);
     }
 
     private static void InvokePrivate(object target, string methodName, params object[] args)
@@ -433,5 +565,50 @@ public class RobotEcosystemProbeTests
         var method = target.GetType().GetMethod(methodName, flags);
         Assert.IsNotNull(method, $"Method '{methodName}' not found on {target.GetType().Name}.");
         method.Invoke(target, args);
+    }
+
+    private sealed class FakeWaypointService : IWaypointService
+    {
+        private readonly List<RoomWaypoint> waypoints;
+        public event Action<RoomWaypoint, Vector2> OnClosestWaypointToPlayerChanged;
+
+        public FakeWaypointService(params RoomWaypoint[] waypoints)
+        {
+            this.waypoints = new List<RoomWaypoint>(waypoints);
+        }
+
+        public RoomWaypoint ClosestWaypointToPlayer { get; private set; }
+
+        public void RegisterRoomWaypoints(RoomManager room, IEnumerable<RoomWaypoint> waypoints) { }
+        public void UnregisterRoomWaypoints(RoomManager room) { }
+        public void BuildAllNeighbors(bool includeUnavailable = false) { }
+        public void Subscribe(IRobotNavigationListener robot) { }
+        public void Unsubscribe(IRobotNavigationListener robot) { }
+        public void NotifyWaypointStatusChanged(RoomWaypoint changed, bool isAvailable) { }
+        public List<RoomWaypoint> GetAllWaypoints() => new List<RoomWaypoint>(waypoints);
+        public List<RoomWaypoint> GetActiveWaypoints() => waypoints.FindAll(waypoint => waypoint != null && waypoint.IsAvailable);
+        public List<RoomWaypoint> FindWorldPath(RoomWaypoint start, RoomWaypoint end) => new List<RoomWaypoint> { start, end };
+        public RoomWaypoint GetClosestWaypoint(Vector2 position, bool includeUnavailable = false) => waypoints.Count > 0 ? waypoints[0] : null;
+        public RoomWaypoint GetEndPoint() => null;
+        public RoomWaypoint GetStartPoint() => null;
+        public void UpdateClosestWaypointToPlayer(Vector2 playerPosition)
+        {
+            var previous = ClosestWaypointToPlayer;
+            ClosestWaypointToPlayer = GetClosestWaypoint(playerPosition, true);
+            if (ClosestWaypointToPlayer != null && ClosestWaypointToPlayer != previous)
+                OnClosestWaypointToPlayerChanged?.Invoke(ClosestWaypointToPlayer, playerPosition);
+        }
+        public RoomWaypoint GetLeastUsedFreeWorkPoint(RoomWaypoint exclude = null) => null;
+        public RoomWaypoint GetAnyOnWorkPoint(RoomWaypoint exclude = null) => null;
+        public FactoryMachine GetAnyOnFactoryMachine() => null;
+        public RoomWaypoint GetWorkOrRestPoint(RoomWaypoint exclude = null) => null;
+        public RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null) => null;
+        public RoomWaypoint GetFirstFreeSecurityPoint() => null;
+        public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null) => null;
+        public RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null) => null;
+        public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null) => null;
+        public bool IsPOIReserved(RoomWaypoint poi) => false;
+        public void ReleaseInvalidReservations() { }
+        public void ReleasePOI(RoomWaypoint poi) { }
     }
 }

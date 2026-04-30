@@ -118,7 +118,7 @@ public abstract class AnimatorBaseAgentController : MonoBehaviour, IMover, ILook
 
         if (hipRb != null)
         {
-            Vector2 desiredVelocity = new Vector2(verticalDirection * 1f, hipRb.linearVelocity.y);
+            Vector2 desiredVelocity = new Vector2(hipRb.linearVelocity.x, verticalDirection * moveSpeed);
             Vector2 velocityChange = desiredVelocity - hipRb.linearVelocity;
             Vector2 force = velocityChange * hipRb.mass / Time.fixedDeltaTime;
             hipRb.AddForce(force);

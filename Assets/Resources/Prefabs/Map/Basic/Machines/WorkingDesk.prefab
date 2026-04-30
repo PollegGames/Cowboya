@@ -201,6 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   machine: {fileID: 1403945648289567780}
+  machineWaypoint: {fileID: 0}
   logSlotDecisions: 1
   logIgnoredTasks: 0
 --- !u!61 &429215285151596846
@@ -1128,7 +1129,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1403945648289567780}
         m_TargetAssemblyTypeName: BaseMachine, Game
-        m_MethodName: ToggleState
+        m_MethodName: PowerOffOnly
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

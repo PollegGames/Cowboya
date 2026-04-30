@@ -48,6 +48,12 @@ public class WorkerSlot : MonoBehaviour
         if (machine == null)
             return;
 
+        if (!machine.IsOn)
+        {
+            HandlePoweredOffMachineArrival(brain, heart.CurrentTask);
+            return;
+        }
+
         RobotEcosystemProbe.RecordSlotDecision(this, "WorkerSlot", "attach_requested", brain, machine, heart.CurrentTask);
 
         if (TryAttachOrReplace(brain))
@@ -99,6 +105,24 @@ public class WorkerSlot : MonoBehaviour
         }
 
         return machine.TryAttachWorker(incoming, "enter_attach");
+    }
+
+    private void HandlePoweredOffMachineArrival(RobotBrainNew brain, RobotTask currentTask)
+    {
+        RecordTargetingDecision(brain, currentTask, "rejected_machine_off_replan");
+
+        if (brain != null && brain.Memory != null)
+        {
+            RoomWaypoint machinePoint = ResolveMachineWaypoint();
+            if (machinePoint != null)
+                brain.Memory.SetRoomWaypointAvailability(machinePoint, false);
+            else
+                brain.Memory.SetMachineWaypointAvailability(machine, false);
+            brain.Memory.ChangeConnectionToMachine(false);
+            brain.Memory.SetDesiredMachineType(machine.Type);
+        }
+
+        brain?.Heart?.BlockCurrentTask();
     }
 
     private bool TryTrackEnter(RobotBrainNew brain, RobotHeartNew heart)
@@ -261,7 +285,7 @@ public class WorkerSlot : MonoBehaviour
             return cachedMachineWaypoint;
         }
 
-        WaypointType? targetType = MapMachineTypeToWaypointType(machine.Type);
+        WaypointType? targetType = MachineWaypointResolver.MapMachineTypeToWaypointType(machine.Type);
         if (!targetType.HasValue)
             return null;
 
@@ -295,23 +319,6 @@ public class WorkerSlot : MonoBehaviour
         }
 
         return best;
-    }
-
-    private static WaypointType? MapMachineTypeToWaypointType(MachineType type)
-    {
-        switch (type)
-        {
-            case MachineType.WorkStation:
-                return WaypointType.Work;
-            case MachineType.RestStation:
-                return WaypointType.Rest;
-            case MachineType.SecurityMachine:
-                return WaypointType.Security;
-            case MachineType.SpawningMachine:
-                return WaypointType.Spawner;
-            default:
-                return null;
-        }
     }
 
     private static bool WaypointsMatch(RoomWaypoint left, RoomWaypoint right)

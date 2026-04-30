@@ -104,6 +104,7 @@ public class RoomManager : MonoBehaviour
                 if (restingMachine == null)
                     continue;
                 restingMachine.InitializeWaypointService(waypointService);
+                machineWorkerManager?.RegisterMachine(restingMachine);
                 machineSecurityManager?.RegisterRestingMachine(restingMachine);
             }
 

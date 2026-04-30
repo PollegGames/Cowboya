@@ -84,6 +84,12 @@ public class RobotHeartNew : MonoBehaviour
         if (body == null || activeTopTask == null)
             return;
 
+        if (activeTopTask.Type == RobotTaskType.ReactivateMachine && body.HasArrivedAtDestination())
+        {
+            CompleteReactivateTaskOnArrival(activeTopTask);
+            return;
+        }
+
         if (ShouldCompleteOnArrival(activeTopTask.Type) && body.HasArrivedAtDestination())
             CompleteCurrentTask();
     }
@@ -207,6 +213,9 @@ public class RobotHeartNew : MonoBehaviour
     {
         EnsureInitialized();
         CancelScheduledTaskSignal();
+        if (!isActiveAndEnabled)
+            return;
+
         scheduledTaskSignal = StartCoroutine(CompleteCurrentTaskAfterDelay(Mathf.Max(0f, delaySeconds)));
     }
 
@@ -227,12 +236,18 @@ public class RobotHeartNew : MonoBehaviour
             taskStack.PushOrRefresh(BuildDefaultTask());
 
         activeTopTask = null;
+        if (!isActiveAndEnabled)
+            return;
+
         StartTopTaskIfChanged();
     }
 
     private void StartTopTaskIfChanged()
     {
         EnsureInitialized();
+        if (!isActiveAndEnabled)
+            return;
+
         var newTop = taskStack.Current;
         if (IsSameTask(activeTopTask, newTop))
             return;
@@ -343,10 +358,52 @@ public class RobotHeartNew : MonoBehaviour
         {
             case RobotTaskType.GoToMachine:
             case RobotTaskType.ReturnHome:
+            case RobotTaskType.Patrol:
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void CompleteReactivateTaskOnArrival(RobotTask task)
+    {
+        BaseMachine machine = ResolveMachine(task != null ? task.Payload : null);
+        if (machine == null)
+            return;
+
+        if (!machine.IsOn)
+            machine.PowerOn();
+
+        RobotNewTrace.Log(
+            this,
+            eventSource: "HeartNew.ReactivateMachine.Arrived",
+            memoryDelta: "none",
+            brainOptions: currentOptions,
+            plannedTask: task,
+            heartCurrentTask: CurrentTask,
+            taskSignal: "reactivate_arrived");
+
+        if (brain != null)
+            brain.CompleteReactivateTask(machine, reached: true);
+        else
+            CompleteCurrentTask();
+    }
+
+    private static BaseMachine ResolveMachine(object payload)
+    {
+        if (payload is BaseMachine baseMachine)
+            return baseMachine;
+
+        if (payload is RoomWaypoint waypoint && waypoint != null)
+            return waypoint.GetComponent<BaseMachine>() ?? waypoint.GetComponentInParent<BaseMachine>();
+
+        if (payload is Component component && component != null)
+            return component.GetComponent<BaseMachine>() ?? component.GetComponentInParent<BaseMachine>();
+
+        if (payload is GameObject go && go != null)
+            return go.GetComponent<BaseMachine>() ?? go.GetComponentInParent<BaseMachine>();
+
+        return null;
     }
 
 }

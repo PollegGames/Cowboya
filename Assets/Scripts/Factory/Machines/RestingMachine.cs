@@ -46,16 +46,20 @@ public sealed class RestingMachine : BaseMachine
         if (!isOn) return;
 
         CancelRestCountdown();
+        var releasedWorker = currentWorker;
+        Debug.Log(
+            $"[RestingMachine] PowerOff begin machine={name} worker={(releasedWorker != null ? releasedWorker.name : "none")} occupied={isOccupied}",
+            this);
 
-        // Preserve old behavior: worker still visible to listeners at this point.
+        base.PowerOff();
 
         if (isOccupied)
             ReleaseRobot();
 
-        base.PowerOff();
-        RefreshVisual();
+        if (releasedWorker != null)
+            NotifyWorkerReleased(releasedWorker, this, "power_off");
 
-        // Preserve old behavior: CurrentWorker still readable here.
+        RefreshVisual();
 
         ClearWorkerSlot();
     }
@@ -152,6 +156,8 @@ public sealed class RestingMachine : BaseMachine
     public bool CanAcceptWorker(RobotBrainNew worker)
     {
         if (worker == null || !isOn) return false;
+        if (worker.Heart == null) return false;
+        if (worker.Heart.Role != RobotRole.Worker && worker.Heart.Role != RobotRole.SecurityGuard) return false;
         if (currentWorker != null && !ReferenceEquals(currentWorker, worker)) return false;
         return true;
     }

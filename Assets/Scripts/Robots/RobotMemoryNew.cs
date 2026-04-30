@@ -11,6 +11,8 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
 
     private readonly RobotMemoryStateNew memoryState = new RobotMemoryStateNew();
     public Vector3 LastKnownPlayerPosition => memoryState.LastKnownPlayerPosition;
+    public Transform LastKnownPlayerTransform => memoryState.LastKnownPlayerTransform;
+    public RoomWaypoint LastKnownPlayerWaypoint => memoryState.LastKnownPlayerWaypoint;
     public bool PlayerInAttackZone => memoryState.PlayerInAttackZone;
     public bool PlayerInDetectZone => memoryState.PlayerInDetectZone;
 
@@ -56,11 +58,24 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
         if (machine == null)
             return;
 
-        var waypoint = machine.GetComponent<RoomWaypoint>() ?? machine.GetComponentInParent<RoomWaypoint>();
+        var waypoint = MachineWaypointResolver.Resolve(machine);
         if (waypoint == null)
             return;
 
         memoryState.SetRoomWaypointAvailability(waypoint, isAvailable);
+    }
+
+    public void NotifyReactivationCompleted(BaseMachine machine, MachineType? nextDesiredMachineType)
+    {
+        if (machine == null)
+            return;
+
+        var waypoint = MachineWaypointResolver.Resolve(machine);
+        bool connectedToReactivatedMachine = machine.IsOn && !nextDesiredMachineType.HasValue;
+        Debug.Log(
+            $"[RobotMemoryNew] Reactivation completed machine={machine.name} nextDesired={(nextDesiredMachineType.HasValue ? nextDesiredMachineType.Value.ToString() : "none")} connectedToReactivatedMachine={connectedToReactivatedMachine}",
+            this);
+        memoryState.NotifyReactivationCompleted(waypoint, nextDesiredMachineType, connectedToReactivatedMachine);
     }
 
     public void SetLastVisitedPoint(RoomWaypoint point) => memoryState.SetLastVisitedPoint(point);
@@ -70,6 +85,20 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     /// </summary>
     /// <param name="playerPosition">Detected player position.</param>
     public void RememberPlayerPosition(Vector3 playerPosition) => memoryState.RememberPlayerPosition(playerPosition);
+
+    /// <summary>
+    /// Updates the currently detected player target reference and position.
+    /// </summary>
+    /// <param name="playerTransform">Detected player transform.</param>
+    public void RememberPlayerTransform(Transform playerTransform) => memoryState.RememberPlayerTransform(playerTransform);
+
+    /// <summary>
+    /// Updates the waypoint currently nearest to the player for navigation-based chasing.
+    /// </summary>
+    /// <param name="playerWaypoint">Nearest waypoint to the player.</param>
+    /// <param name="playerPosition">Current player position.</param>
+    public void RememberPlayerWaypoint(RoomWaypoint playerWaypoint, Vector3 playerPosition) =>
+        memoryState.RememberPlayerWaypoint(playerWaypoint, playerPosition);
 
     /// <summary>
     /// Clears the memory of the player's position.

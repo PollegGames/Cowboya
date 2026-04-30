@@ -20,11 +20,11 @@ public class RestingSlot : MonoBehaviour
             return;
 
         var heart = brain.Heart;
-        bool incomingTargetsThisSlot = IsIncomingWorkerTargetingThisSlot(brain);
+        bool incomingTargetsThisSlot = IsIncomingRobotTargetingThisSlot(brain);
         if (!TryTrackEnter(brain, heart))
             return;
 
-        if (heart == null || heart.Role != RobotRole.Worker)
+        if (!CanUseRestSlot(heart))
         {
             RobotEcosystemProbe.RecordSlotDecision(this, "RestingSlot", "ignored_role", brain, machine, heart != null ? heart.CurrentTask : null);
             if (logSlotDecisions)
@@ -66,25 +66,35 @@ public class RestingSlot : MonoBehaviour
 
     private bool TryAttachOrReplace(RobotBrainNew incoming)
     {
-        if (machine is RestingMachine restingMachine)
+        if (machine == null || incoming == null)
+            return false;
+
+        RobotBrainNew current = ResolveCurrentRobot();
+        if (current == null)
         {
-            if (restingMachine.CurrentWorker == null)
-                return restingMachine.TryAttachWorker(incoming, "enter_attach");
-            if (ReferenceEquals(restingMachine.CurrentWorker, incoming))
-                return true;
-            return restingMachine.TryReplaceWorker(incoming, "enter_replace");
+            bool attached = machine.TryAttachWorker(incoming, "enter_attach");
+            RobotEcosystemProbe.RecordSlotDecision(
+                this,
+                "RestingSlot",
+                attached ? "attached_empty" : "attach_rejected_empty",
+                incoming,
+                machine,
+                incoming.Heart != null ? incoming.Heart.CurrentTask : null);
+            return attached;
         }
 
-        if (machine is FactoryMachine factoryMachine)
-        {
-            if (factoryMachine.CurrentWorker == null)
-                return factoryMachine.TryAttachWorker(incoming, "enter_attach");
-            if (ReferenceEquals(factoryMachine.CurrentWorker, incoming))
-                return true;
-            return factoryMachine.TryReplaceWorker(incoming, "enter_replace");
-        }
+        if (ReferenceEquals(current, incoming))
+            return true;
 
-        return machine.TryAttachWorker(incoming, "enter_attach");
+        bool replaced = machine.TryReplaceWorker(incoming, "enter_replace");
+        RobotEcosystemProbe.RecordSlotDecision(
+            this,
+            "RestingSlot",
+            replaced ? "replaced_current" : "replace_rejected",
+            incoming,
+            machine,
+            incoming.Heart != null ? incoming.Heart.CurrentTask : null);
+        return replaced;
     }
 
     private bool TryTrackEnter(RobotBrainNew brain, RobotHeartNew heart)
@@ -118,7 +128,7 @@ public class RestingSlot : MonoBehaviour
         return true;
     }
 
-    private bool IsIncomingWorkerTargetingThisSlot(RobotBrainNew brain)
+    private bool IsIncomingRobotTargetingThisSlot(RobotBrainNew brain)
     {
         if (brain == null || machine == null || brain.Heart == null)
             return false;
@@ -135,5 +145,25 @@ public class RestingSlot : MonoBehaviour
 
         return brain.Memory.DesiredMachineType.HasValue
             && brain.Memory.DesiredMachineType.Value == machine.Type;
+    }
+
+    private static bool CanUseRestSlot(RobotHeartNew heart)
+    {
+        if (heart == null)
+            return false;
+
+        return heart.Role == RobotRole.Worker
+            || heart.Role == RobotRole.SecurityGuard;
+    }
+
+    private RobotBrainNew ResolveCurrentRobot()
+    {
+        if (machine is RestingMachine restingMachine)
+            return restingMachine.CurrentWorker;
+
+        if (machine is FactoryMachine factoryMachine)
+            return factoryMachine.CurrentWorker;
+
+        return null;
     }
 }

@@ -29,6 +29,23 @@ public enum RobotTaskType
 }
 
 /// <summary>
+/// Navigation target used when a robot follows the player through the waypoint graph.
+/// </summary>
+public readonly struct RobotPlayerChaseTarget
+{
+    public RobotPlayerChaseTarget(RoomWaypoint waypoint, Vector3 playerPosition, bool hasPlayerPosition)
+    {
+        Waypoint = waypoint;
+        PlayerPosition = playerPosition;
+        HasPlayerPosition = hasPlayerPosition;
+    }
+
+    public RoomWaypoint Waypoint { get; }
+    public Vector3 PlayerPosition { get; }
+    public bool HasPlayerPosition { get; }
+}
+
+/// <summary>
 /// Represents a single intent entry in the Heart stack.
 /// </summary>
 [Serializable]

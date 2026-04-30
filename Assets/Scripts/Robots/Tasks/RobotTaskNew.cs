@@ -236,6 +236,9 @@ public class RobotTaskNew : IRobotTaskNew
         RoomWaypoint waypoint = FindBestWaypointForRole(context.Role, context.Memory.Snapshot, robotId);
         if (waypoint == null)
         {
+            if (context.Role == RobotRole.Worker && TryQueueReturnHome(context))
+                return;
+
             Block(context);
             return;
         }
@@ -264,18 +267,66 @@ public class RobotTaskNew : IRobotTaskNew
             return;
         }
 
-        if (RobotNewPipelineRuntime.ShouldDriveGameplay && !machine.IsOn)
-            machine.PowerOn();
-
-        if (context.Memory != null)
+        if (machine.IsOn)
         {
-            RoomWaypoint waypoint = machine.GetComponent<RoomWaypoint>();
-            if (waypoint != null)
-                context.Memory.SetRoomWaypointAvailability(waypoint, true);
-            context.Memory.ChangeConnectionToMachine(machine.IsOn);
+            CompleteReactivateMachineTask(context, machine);
+            return;
         }
 
+        if (RobotNewPipelineRuntime.ShouldDriveGameplay && !IsAtReactivateTarget(context, machine))
+        {
+            if (!TryMoveToPayload(context, machine, includeUnavailable: true))
+            {
+                Block(context);
+                return;
+            }
+
+            RobotNewTrace.Log(
+                context.Heart,
+                eventSource: "TaskNew.ReactivateMachine.MoveToTarget",
+                memoryDelta: "none",
+                brainOptions: context.Options,
+                plannedTask: context.CurrentTask,
+                heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+                taskSignal: "move_to_reactivate");
+            return;
+        }
+
+        if (RobotNewPipelineRuntime.ShouldDriveGameplay)
+            machine.PowerOn();
+
+        CompleteReactivateMachineTask(context, machine);
+    }
+
+    private static void CompleteReactivateMachineTask(RobotTaskContextNew context, BaseMachine machine)
+    {
+        MachineType? nextDesiredMachineType = context.Role == RobotRole.SecurityGuard
+            && machine != null
+            && machine.Type != MachineType.SecurityMachine
+            ? MachineType.SecurityMachine
+            : null;
+
         Complete(context);
+
+        if (context.Memory != null && machine != null)
+        {
+            Debug.Log(
+                $"[RobotTaskNew] Reactivation task completed machine={machine.name} nextDesired={(nextDesiredMachineType.HasValue ? nextDesiredMachineType.Value.ToString() : "none")}",
+                machine);
+            context.Memory.NotifyReactivationCompleted(machine, nextDesiredMachineType);
+        }
+    }
+
+    private static bool IsAtReactivateTarget(RobotTaskContextNew context, BaseMachine machine)
+    {
+        if (context.Body == null || machine == null)
+            return false;
+
+        RoomWaypoint waypoint = machine.GetComponent<RoomWaypoint>() ?? machine.GetComponentInParent<RoomWaypoint>();
+        if (waypoint != null && ReferenceEquals(context.Body.CurrentTarget, waypoint) && context.Body.HasArrivedAtDestination())
+            return true;
+
+        return Vector2.Distance(context.Body.transform.position, machine.transform.position) <= 2f;
     }
 
     private static void HandleWaitAtMachine(RobotTaskContextNew context)
@@ -288,6 +339,21 @@ public class RobotTaskNew : IRobotTaskNew
     {
         if (context.Memory != null)
             context.Memory.SetDesiredMachineType(ResolveDesiredMachineType(context.Payload));
+
+        BaseMachine machine = ResolveMachine(context.Payload);
+        if (machine != null && !machine.IsOn)
+        {
+            if (context.Memory != null)
+            {
+                RoomWaypoint waypoint = machine.GetComponent<RoomWaypoint>() ?? machine.GetComponentInParent<RoomWaypoint>();
+                if (waypoint != null)
+                    context.Memory.SetRoomWaypointAvailability(waypoint, false);
+                context.Memory.ChangeConnectionToMachine(false);
+            }
+
+            Block(context);
+            return;
+        }
 
         if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
         {
@@ -322,7 +388,11 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static void HandleReturnHome(RobotTaskContextNew context)
     {
-        if (!TryMoveToPayload(context, context.Payload, includeUnavailable: true))
+        object payload = context.Payload;
+        if (payload == null && context.Body != null)
+            payload = context.Body.StartPoint;
+
+        if (!TryMoveToPayload(context, payload, includeUnavailable: true))
         {
             // Fallback: pas de payload, on ne bloque pas immédiatement pour éviter un hard-lock.
             ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 0.5f);
@@ -392,8 +462,31 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static void HandlePatrol(RobotTaskContextNew context)
     {
-        if (context.Payload != null)
-            TryMoveToPayload(context, context.Payload, includeUnavailable: true);
+        object payload = context.Payload;
+        if (context.Role == RobotRole.Boss && payload == null)
+            payload = FindRandomEndRoomWaypoint(context.Memory);
+
+        if (payload != null && TryMoveToPayload(context, payload, includeUnavailable: true))
+        {
+            RobotNewTrace.Log(
+                context.Heart,
+                eventSource: "TaskNew.BossPatrol",
+                memoryDelta: "none",
+                brainOptions: context.Options,
+                plannedTask: context.CurrentTask,
+                heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+                taskSignal: "patrol_target=" + DescribePayload(payload));
+
+            if (context.Role == RobotRole.Boss)
+                Debug.Log($"[Boss] Patrol target set: {DescribePayload(payload)}.", context.Heart);
+            return;
+        }
+
+        if (context.Role == RobotRole.Boss)
+        {
+            Debug.LogWarning("[Boss] No end-room patrol waypoint available; idling in place.", context.Heart);
+            context.Body?.StopMovement();
+        }
 
         ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 2f);
     }
@@ -406,13 +499,29 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static void HandleAttackTarget(RobotTaskContextNew context)
     {
+        Transform target = context.Payload as Transform;
+        bool started = false;
+        context.Body?.StopMovement();
+
         if (RobotNewPipelineRuntime.ShouldDriveGameplay
             && context.Body != null
             && context.Body.AttackController != null
-            && context.Payload is Transform target)
+            && target != null)
         {
-            context.Body.AttackController.TryStartAttack(target);
+            started = context.Body.AttackController.TryStartAttack(target);
         }
+
+        RobotNewTrace.Log(
+            context.Heart,
+            eventSource: "TaskNew.AttackTarget",
+            memoryDelta: "none",
+            brainOptions: context.Options,
+            plannedTask: context.CurrentTask,
+            heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+            taskSignal: "attack_started=" + started
+                + " hasBody=" + (context.Body != null)
+                + " hasAttackController=" + (context.Body != null && context.Body.AttackController != null)
+                + " payload=" + DescribePayload(context.Payload));
 
         ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 1f);
     }
@@ -424,6 +533,38 @@ public class RobotTaskNew : IRobotTaskNew
             ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 0.25f);
             return;
         }
+
+        if (context.Payload is RobotPlayerChaseTarget chaseTarget)
+        {
+            if (chaseTarget.Waypoint == null || context.Body == null)
+            {
+                Block(context);
+                return;
+            }
+
+            Vector3? finalPosition = chaseTarget.HasPlayerPosition ? chaseTarget.PlayerPosition : null;
+            context.Body.SetDestination(chaseTarget.Waypoint, finalPosition, includeUnavailable: true);
+            RobotNewTrace.Log(
+                context.Heart,
+                eventSource: "TaskNew.ChasePlayer",
+                memoryDelta: "none",
+                brainOptions: context.Options,
+                plannedTask: context.CurrentTask,
+                heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+                taskSignal: "targetWaypoint=" + DescribeWaypoint(chaseTarget.Waypoint)
+                    + " hasFinalPosition=" + chaseTarget.HasPlayerPosition
+                    + " finalPosition=" + (chaseTarget.HasPlayerPosition ? chaseTarget.PlayerPosition.ToString("F2") : "none"));
+            return;
+        }
+
+        RobotNewTrace.Log(
+            context.Heart,
+            eventSource: "TaskNew.ChasePlayer",
+            memoryDelta: "none",
+            brainOptions: context.Options,
+            plannedTask: context.CurrentTask,
+            heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+            taskSignal: "fallbackPayload=" + DescribePayload(context.Payload));
 
         if (!TryMoveToPayload(context, context.Payload, includeUnavailable: true))
         {
@@ -464,11 +605,16 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static bool ShouldWaitForWorkerMachineLifecycle(RobotTaskContextNew context)
     {
-        if (context.Role != RobotRole.Worker || context.CurrentTask == null)
+        if (context.CurrentTask == null)
             return false;
 
-        return context.CurrentTask.Type == RobotTaskType.WorkAtMachine
-            || context.CurrentTask.Type == RobotTaskType.Rest;
+        if (context.CurrentTask.Type == RobotTaskType.WorkAtMachine)
+            return context.Role == RobotRole.Worker;
+
+        if (context.CurrentTask.Type == RobotTaskType.Rest)
+            return context.Role == RobotRole.Worker || context.Role == RobotRole.SecurityGuard;
+
+        return false;
     }
 
     private static bool TryMoveToPayload(RobotTaskContextNew context, object payload, bool includeUnavailable)
@@ -513,7 +659,35 @@ public class RobotTaskNew : IRobotTaskNew
             return true;
         }
 
+        if (payload is RobotPlayerChaseTarget chaseTarget)
+        {
+            if (chaseTarget.Waypoint == null)
+                return false;
+
+            Vector3? finalPosition = chaseTarget.HasPlayerPosition ? chaseTarget.PlayerPosition : null;
+            context.Body.SetDestination(chaseTarget.Waypoint, finalPosition, includeUnavailable);
+            return true;
+        }
+
         return false;
+    }
+
+    private static bool TryQueueReturnHome(RobotTaskContextNew context)
+    {
+        RoomWaypoint startPoint = context.Body != null ? context.Body.StartPoint : null;
+        if (context.Heart == null || startPoint == null)
+            return false;
+
+        RobotNewTrace.Log(
+            context.Heart,
+            eventSource: "TaskNew.SearchForMachineFallback",
+            memoryDelta: "none",
+            brainOptions: context.Options,
+            plannedTask: new RobotTask(RobotTaskType.ReturnHome, startPoint),
+            heartCurrentTask: context.Heart.CurrentTask,
+            taskSignal: "return_home");
+        context.Heart.QueueTask(new RobotTask(RobotTaskType.ReturnHome, startPoint));
+        return true;
     }
 
     private static RoomWaypoint FindBestWaypointForRole(RobotRole role, RobotMemorySnapshotNew snapshot, int robotId)
@@ -523,7 +697,7 @@ public class RobotTaskNew : IRobotTaskNew
             case RobotRole.Worker:
                 return FindByPriorityBalanced(snapshot, robotId, WaypointType.Work, WaypointType.Rest, WaypointType.Center);
             case RobotRole.SecurityGuard:
-                return FindByPriorityBalanced(snapshot, robotId, WaypointType.Security, WaypointType.Work, WaypointType.Rest, WaypointType.Center);
+                return FindByPriorityBalanced(snapshot, robotId, WaypointType.Security, WaypointType.Rest, WaypointType.Center);
             case RobotRole.WorkerSpawner:
                 return FindByPriority(snapshot, WaypointType.Spawner, WaypointType.Center);
             default:
@@ -603,6 +777,33 @@ public class RobotTaskNew : IRobotTaskNew
         return null;
     }
 
+    private static RoomWaypoint FindRandomEndRoomWaypoint(RobotMemoryNew memory)
+    {
+        if (memory == null)
+            return null;
+
+        var waypoints = memory.Snapshot.AllAvailableWaypoints;
+        if (waypoints == null || waypoints.Count == 0)
+            return null;
+
+        var candidates = new List<RoomWaypoint>();
+        foreach (var pair in waypoints)
+        {
+            var waypoint = pair.Key;
+            if (waypoint == null || waypoint.parentRoom == null || waypoint.parentRoom.roomProperties == null)
+                continue;
+            if (waypoint.parentRoom.roomProperties.usageType != UsageType.End)
+                continue;
+
+            candidates.Add(waypoint);
+        }
+
+        if (candidates.Count == 0)
+            return null;
+
+        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+    }
+
     private static BaseMachine ResolveMachine(object payload)
     {
         if (payload is BaseMachine baseMachine)
@@ -618,6 +819,32 @@ public class RobotTaskNew : IRobotTaskNew
             return go.GetComponent<BaseMachine>() ?? go.GetComponentInParent<BaseMachine>();
 
         return null;
+    }
+
+    private static string DescribePayload(object payload)
+    {
+        if (payload == null)
+            return "null";
+        if (payload is Transform transform && transform != null)
+            return "Transform:" + transform.name;
+        if (payload is RobotPlayerChaseTarget chaseTarget)
+            return "PlayerChaseTarget:" + DescribeWaypoint(chaseTarget.Waypoint)
+                + " final=" + (chaseTarget.HasPlayerPosition ? chaseTarget.PlayerPosition.ToString("F2") : "none");
+        if (payload is Vector3 v3)
+            return "Vector3:" + v3.ToString("F2");
+        if (payload is Vector2 v2)
+            return "Vector2:" + v2.ToString("F2");
+        if (payload is Component component && component != null)
+            return component.GetType().Name + ":" + component.name;
+        if (payload is GameObject gameObject && gameObject != null)
+            return "GameObject:" + gameObject.name;
+
+        return payload.GetType().Name;
+    }
+
+    private static string DescribeWaypoint(RoomWaypoint waypoint)
+    {
+        return waypoint != null ? waypoint.type + "@" + waypoint.WorldPos.ToString("F2") : "null";
     }
 
     private static MachineType? ResolveDesiredMachineType(object payload)

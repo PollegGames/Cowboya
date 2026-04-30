@@ -1011,7 +1011,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7498098384453806404}
         m_TargetAssemblyTypeName: BaseMachine, Game
-        m_MethodName: ToggleState
+        m_MethodName: PowerOffOnly
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

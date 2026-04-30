@@ -98,6 +98,22 @@ public abstract class BaseMachine : MonoBehaviour
     /// Toggles the machine state.
     /// </summary>
     public void ToggleState() => SetState(!isOn);
+
+    /// <summary>
+    /// Player-facing interaction that can only switch a machine off.
+    /// </summary>
+    public void PowerOffOnly()
+    {
+        if (!isOn)
+        {
+            Debug.Log($"[BaseMachine] PowerOffOnly ignored machine={name} alreadyOff=True", this);
+            return;
+        }
+
+        Debug.Log($"[BaseMachine] PowerOffOnly requested machine={name}", this);
+        PowerOff();
+    }
+
     public virtual void PowerOn()
     {
         isOn = true;
@@ -157,10 +173,10 @@ public abstract class BaseMachine : MonoBehaviour
         if (machine == null)
             return null;
 
-        return machine.GetComponent<RoomWaypoint>() ?? machine.GetComponentInParent<RoomWaypoint>();
+        return MachineWaypointResolver.Resolve(machine);
     }
 
-    protected static MachineType? ResolveNextDesiredMachineType(BaseMachine machine)
+    protected static MachineType? ResolveNextDesiredMachineType(BaseMachine machine, RobotBrainNew robot)
     {
         if (machine == null)
             return null;
@@ -170,7 +186,11 @@ public abstract class BaseMachine : MonoBehaviour
             case MachineType.WorkStation:
                 return MachineType.RestStation;
             case MachineType.RestStation:
+                if (robot != null && robot.IsSecurityGuard)
+                    return MachineType.SecurityMachine;
                 return MachineType.WorkStation;
+            case MachineType.SecurityMachine:
+                return MachineType.RestStation;
             default:
                 return null;
         }
@@ -189,7 +209,11 @@ public abstract class BaseMachine : MonoBehaviour
         if (worker == null || worker.Memory == null)
             return;
 
-        MachineType? nextMachineType = ResolveNextDesiredMachineType(machine);
+        MachineType? nextMachineType = ResolveNextDesiredMachineType(machine, worker);
+        Debug.Log(
+            $"[BaseMachine] NotifyWorkerReleased worker={worker.name} machine={(machine != null ? machine.name : "null")} reason={reason} nextDesired={(nextMachineType.HasValue ? nextMachineType.Value.ToString() : "none")}",
+            machine);
+
         if (nextMachineType.HasValue)
             worker.Memory.SetDesiredMachineType(nextMachineType.Value);
 

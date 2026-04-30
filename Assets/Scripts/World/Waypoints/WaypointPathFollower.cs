@@ -14,6 +14,7 @@ public class WaypointPathFollower : IRobotNavigationListener
     private List<RoomWaypoint> currentWaypoints;
     private int pathIndex;
     private Vector3? finalTarget;
+    private bool currentIncludeUnavailable;
 
     private readonly float arrivalX;
     private readonly float arrivalY;
@@ -94,7 +95,7 @@ public class WaypointPathFollower : IRobotNavigationListener
         }
         else if (status == MovementStatus.ShouldAttemptRecovery && currentWaypoints?.Count > 0)
         {
-            SetDestination(currentWaypoints[^1], finalTarget);
+            SetDestination(currentWaypoints[^1], finalTarget, currentIncludeUnavailable);
         }
     }
 
@@ -116,6 +117,7 @@ public class WaypointPathFollower : IRobotNavigationListener
             svc.BuildAllNeighbors(true);
 
         finalTarget = finalPosition;
+        currentIncludeUnavailable = includeUnavailable;
 
         RoomWaypoint start = GetClosestWaypoint(target, includeUnavailable);
         if (start == target)
@@ -126,20 +128,31 @@ public class WaypointPathFollower : IRobotNavigationListener
                 currentWaypoints = new List<RoomWaypoint> { start };
                 currentPath = new List<Vector3> { start.WorldPos, finalPosition.Value };
                 pathIndex = 1;
+                LogPathDecision("WaypointPathFollower.SetDestination", start, target, "alreadyAtWaypoint finalPosition=" + finalPosition.Value.ToString("F2") + " pathCount=" + currentPath.Count);
                 return;
             }
 
-            Debug.LogWarning($"Already at destination {target.name}, no pathfinding needed.");
+            lastAttemptedWaypoint = start;
+            currentWaypoints = new List<RoomWaypoint> { start };
+            currentPath = new List<Vector3> { start.WorldPos };
+            pathIndex = currentPath.Count;
+            mover.SetMovement(0f);
+            mover.SetVerticalMovement(0f);
+            LogPathDecision("WaypointPathFollower.SetDestination", start, target, "alreadyAtWaypoint pathCount=" + currentPath.Count);
             return;
         }
         if (start == null)
         {
             Debug.LogWarning("Start is null, no pathfinding");
+            LogPathDecision("WaypointPathFollower.NoPath", null, target, "reason=start_null includeUnavailable=" + includeUnavailable);
+            ClearPath();
             return;
         }
         if (target == null)
         {
-            Debug.LogWarning("Start is null, no pathfinding");
+            Debug.LogWarning("Target is null, no pathfinding");
+            LogPathDecision("WaypointPathFollower.NoPath", start, null, "reason=target_null includeUnavailable=" + includeUnavailable);
+            ClearPath();
             return;
         }
 
@@ -149,6 +162,8 @@ public class WaypointPathFollower : IRobotNavigationListener
         if (raw == null || raw.Count == 0)
         {
             Debug.LogError($"No path from {start.name} to {target.name}.");
+            LogPathDecision("WaypointPathFollower.NoPath", start, target, "reason=find_world_path_empty includeUnavailable=" + includeUnavailable);
+            ClearPath();
             return;
         }
 
@@ -164,6 +179,14 @@ public class WaypointPathFollower : IRobotNavigationListener
                 currentPath.Add(finalPosition.Value);
         }
         pathIndex = 1;
+        LogPathDecision(
+            "WaypointPathFollower.SetDestination",
+            start,
+            target,
+            "pathCount=" + currentPath.Count
+                + " waypointCount=" + currentWaypoints.Count
+                + " finalPosition=" + (finalPosition.HasValue ? finalPosition.Value.ToString("F2") : "none")
+                + " includeUnavailable=" + includeUnavailable);
     }
 
     public bool HasArrived =>
@@ -206,17 +229,17 @@ public class WaypointPathFollower : IRobotNavigationListener
 
     public void DrawGizmos()
     {
-        if (currentWaypoints == null || currentWaypoints.Count <= pathIndex)
+        if (currentPath == null || currentPath.Count <= pathIndex)
             return;
 
         Gizmos.color = Color.magenta;
         Vector3 prev = body.position;
-        for (int i = pathIndex; i < currentWaypoints.Count; i++)
+        for (int i = pathIndex; i < currentPath.Count; i++)
         {
-            var wp = currentWaypoints[i];
-            Gizmos.DrawLine(prev, wp.WorldPos);
-            Gizmos.DrawSphere(wp.WorldPos, 0.1f);
-            prev = wp.WorldPos;
+            Vector3 point = currentPath[i];
+            Gizmos.DrawLine(prev, point);
+            Gizmos.DrawSphere(point, 0.1f);
+            prev = point;
         }
     }
 
@@ -226,6 +249,7 @@ public class WaypointPathFollower : IRobotNavigationListener
         currentWaypoints = null;
         pathIndex = 0;
         finalTarget = null;
+        currentIncludeUnavailable = false;
         monitor.Reset(body.position);
         mover.SetMovement(0f);
         mover.SetVerticalMovement(0f);
@@ -235,5 +259,11 @@ public class WaypointPathFollower : IRobotNavigationListener
     {
         return Mathf.Abs(finalPosition.x - lastWaypointPosition.x) > arrivalX
             || Mathf.Abs(finalPosition.y - lastWaypointPosition.y) > arrivalY;
+    }
+
+    private void LogPathDecision(string eventName, RoomWaypoint start, RoomWaypoint target, string detail)
+    {
+        if (mover is MonoBehaviour owner)
+            RobotEcosystemProbe.RecordWaypointDecision(owner, eventName, start, target, detail);
     }
 }

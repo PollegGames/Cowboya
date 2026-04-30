@@ -156,6 +156,67 @@ public static class RobotEcosystemProbe
         Log(robotId, "Spawner.InitializeRobot", "role=" + role + " waypoint=" + waypointText);
     }
 
+    public static void RecordSpawnReservationDecision(MonoBehaviour owner, RobotRole role, RoomWaypoint waypoint, string outcome)
+    {
+        if (!RobotNewPipelineRuntime.EnableEcosystemProbe)
+            return;
+
+        string robotId = ResolveRobotId(owner);
+        string waypointText = waypoint != null
+            ? waypoint.type + "@" + waypoint.WorldPos.ToString("F2")
+            : "null";
+        string eventName = "Spawner.Reservation." + role;
+
+        lock (gate)
+        {
+            Increment(eventName);
+        }
+
+        Log(robotId, eventName, "outcome=" + outcome + " waypoint=" + waypointText);
+    }
+
+    public static void RecordWaypointDecision(
+        MonoBehaviour owner,
+        string eventName,
+        RoomWaypoint previous,
+        RoomWaypoint current,
+        string detail)
+    {
+        if (!RobotNewPipelineRuntime.EnableEcosystemProbe)
+            return;
+
+        string robotId = ResolveRobotId(owner);
+        string previousText = previous != null
+            ? previous.type + "@" + previous.WorldPos.ToString("F2")
+            : "null";
+        string currentText = current != null
+            ? current.type + "@" + current.WorldPos.ToString("F2")
+            : "null";
+
+        lock (gate)
+        {
+            Increment(eventName);
+        }
+
+        Log(robotId, eventName, "previous=" + previousText + " current=" + currentText + " " + detail);
+    }
+
+    public static void RecordBodyNavigationReference(MonoBehaviour owner, Transform bodyReference, string reason)
+    {
+        if (!RobotNewPipelineRuntime.EnableEcosystemProbe)
+            return;
+
+        string robotId = ResolveRobotId(owner);
+        string referenceText = bodyReference != null ? bodyReference.name : "null";
+
+        lock (gate)
+        {
+            Increment("Body.NavigationReference");
+        }
+
+        Log(robotId, "Body.NavigationReference", "reference=" + referenceText + " reason=" + reason);
+    }
+
     public static void RecordBrainCall(MonoBehaviour owner, string methodName, string payload)
     {
         if (!RobotNewPipelineRuntime.EnableEcosystemProbe)
@@ -510,6 +571,17 @@ public static class RobotEcosystemProbe
 
         if (task.Payload is RoomWaypoint waypoint && waypoint != null)
             return waypoint.type + "@" + waypoint.WorldPos.ToString("F2");
+
+        if (task.Payload is RobotPlayerChaseTarget chaseTarget)
+        {
+            string waypointText = chaseTarget.Waypoint != null
+                ? chaseTarget.Waypoint.type + "@" + chaseTarget.Waypoint.WorldPos.ToString("F2")
+                : "null";
+            string finalText = chaseTarget.HasPlayerPosition
+                ? chaseTarget.PlayerPosition.ToString("F2")
+                : "none";
+            return "playerWaypoint:" + waypointText + " final:" + finalText;
+        }
 
         if (task.Payload is BaseMachine machine && machine != null)
         {

@@ -62,10 +62,18 @@ public sealed class FactoryMachine : BaseMachine
     {
         if (!isOn) return;
 
+        var releasedWorker = currentWorker;
+        Debug.Log(
+            $"[FactoryMachine] PowerOff begin machine={name} worker={(releasedWorker != null ? releasedWorker.name : "none")} occupied={isOccupied}",
+            this);
+
+        base.PowerOff();
+
         if (isOccupied)
             ReleaseRobot();
 
-        base.PowerOff();
+        if (releasedWorker != null)
+            NotifyWorkerReleased(releasedWorker, this, "power_off");
 
         ApplyMaterial();
 

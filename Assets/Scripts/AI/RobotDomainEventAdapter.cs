@@ -34,13 +34,15 @@ public readonly struct RobotPerceptionDispatchEvent
         bool playerInDetectZone,
         bool playerInAttackZone,
         Vector3 playerPosition,
-        bool hasKnownPosition)
+        bool hasKnownPosition,
+        RoomWaypoint playerWaypoint = null)
     {
         Brain = brain;
         PlayerInDetectZone = playerInDetectZone;
         PlayerInAttackZone = playerInAttackZone;
         PlayerPosition = playerPosition;
         HasKnownPosition = hasKnownPosition;
+        PlayerWaypoint = playerWaypoint;
     }
 
     public RobotBrainNew Brain { get; }
@@ -48,6 +50,7 @@ public readonly struct RobotPerceptionDispatchEvent
     public bool PlayerInAttackZone { get; }
     public Vector3 PlayerPosition { get; }
     public bool HasKnownPosition { get; }
+    public RoomWaypoint PlayerWaypoint { get; }
 }
 
 public readonly struct RobotCompleteReactivateDispatchEvent
@@ -90,7 +93,8 @@ public static class RobotDomainEventBus
         bool playerInDetectZone,
         bool playerInAttackZone,
         Vector3 playerPosition,
-        bool hasKnownPosition = true)
+        bool hasKnownPosition = true,
+        RoomWaypoint playerWaypoint = null)
     {
         if (brain == null)
             return;
@@ -100,7 +104,8 @@ public static class RobotDomainEventBus
             playerInDetectZone,
             playerInAttackZone,
             playerPosition,
-            hasKnownPosition));
+            hasKnownPosition,
+            playerWaypoint));
     }
 
     public static void PublishCompleteReactivateDispatch(RobotBrainNew brain, BaseMachine machine, bool reached)
@@ -164,7 +169,8 @@ public sealed class RobotDomainEventAdapter : MonoBehaviour
             evt.PlayerInDetectZone,
             evt.PlayerInAttackZone,
             evt.PlayerPosition,
-            evt.HasKnownPosition);
+            evt.HasKnownPosition,
+            playerWaypoint: evt.PlayerWaypoint);
     }
 
     private static void HandleCompleteReactivateDispatchRequested(RobotCompleteReactivateDispatchEvent evt)

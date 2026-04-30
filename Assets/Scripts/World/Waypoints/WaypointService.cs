@@ -38,6 +38,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     // Listeners
     private readonly HashSet<IRobotNavigationListener> robots = new();
+    public event Action<RoomWaypoint, Vector2> OnClosestWaypointToPlayerChanged;
 
     private void Awake()
     {
@@ -121,13 +122,18 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     public void UpdateClosestWaypointToPlayer(Vector2 playerPosition)
     {
-        if (playerPosition != null)
+        var point = GetClosestWaypoint(playerPosition);
+        if (point != null && point != ClosestWaypointToPlayer)
         {
-            var point = GetClosestWaypoint(playerPosition);
-            if (point != null)
-            {
-                ClosestWaypointToPlayer = point;
-            }
+            RoomWaypoint previous = ClosestWaypointToPlayer;
+            ClosestWaypointToPlayer = point;
+            RobotEcosystemProbe.RecordWaypointDecision(
+                this,
+                "WaypointService.PlayerClosestChanged",
+                previous,
+                point,
+                "playerPosition=" + playerPosition.ToString("F2"));
+            OnClosestWaypointToPlayerChanged?.Invoke(point, playerPosition);
         }
     }
 
@@ -412,6 +418,9 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 && wp.type == WaypointType.Security
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp)
+                && wp.parentRoom.securityMachinesInRoom.Any(m =>
+                    m != null && m.IsOn && !m.IsOccupied
+                )
             )
             .ToList();
 
@@ -429,7 +438,29 @@ public class WaypointService : MonoBehaviour, IWaypointService
             return best;
         }
 
-        return GetFirstRestPoint(exclude);
+        var restPoint = GetFirstRestPoint(exclude);
+        if (restPoint != null)
+        {
+            Debug.Log(
+                $"[WaypointReservation] No FREE security; assigned FREE REST '{restPoint.WorldPos}'."
+            );
+            return restPoint;
+        }
+
+        restPoint = GetAnyRestPoint(exclude);
+        if (restPoint != null)
+        {
+            Debug.Log(
+                $"[WaypointReservation] No FREE security/rest; shared REST fallback '{restPoint.WorldPos}'."
+            );
+            return restPoint;
+        }
+
+        var start = GetStartPoint();
+        Debug.LogWarning(
+            $"[WaypointReservation] No security/rest point available; fallback={(start != null ? start.name : "null")}."
+        );
+        return start;
     }
 
     public RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null)

@@ -23,6 +23,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     private SecurityBadgeSpawner securityBadgeSpawner;
     private BatterySpawner batterySpawner;
     private GameUIViewModel gameUIViewModel;
+    private FactoryAlarmStatus followerAlarmStatus;
 
     private readonly List<GameObject> spawnedWorkers = new();
     private readonly List<GameObject> spawnedWorkerSpawners = new();
@@ -45,9 +46,15 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         BatterySpawner batterySpawner)
     {
         this.mapManager = mapManager;
+        if (this.waypointService != null)
+            this.waypointService.OnClosestWaypointToPlayerChanged -= HandleClosestWaypointToPlayerChanged;
+
         this.waypointService = waypointService;
         this.gameUIViewModel = viewModel;
         this.respawnService = respawnService;
+        if (this.factoryManager != null)
+            this.factoryManager.OnFactoryAllMachinesOff -= HandleAllMachinesOff;
+
         this.factoryManager = factoryManager;
         this.securityManager = securityManager;
         this.securityBadgeSpawner = securityBadgeSpawner;
@@ -55,6 +62,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
         if (this.factoryManager != null)
             this.factoryManager.OnFactoryAllMachinesOff += HandleAllMachinesOff;
+        if (this.waypointService != null)
+            this.waypointService.OnClosestWaypointToPlayerChanged += HandleClosestWaypointToPlayerChanged;
 
         if (respawnService is RobotRespawnService service)
             service.Initialize(this);
@@ -195,25 +204,16 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var brain = go.GetComponent<RobotBrainNew>();
         if (brain != null)
         {
+            followerAlarmStatus = alarmStatus;
             Vector3 targetPosition = alarmStatus != null ? alarmStatus.LastPlayerPosition : Vector3.zero;
             if (targetPosition != Vector3.zero)
+                waypointService?.UpdateClosestWaypointToPlayer(targetPosition);
+
+            RoomWaypoint playerWaypoint = waypointService != null ? waypointService.ClosestWaypointToPlayer : null;
+            if (playerWaypoint != null)
             {
-                RobotDomainEventBus.PublishPerceptionDispatch(
-                    brain,
-                    playerInDetectZone: true,
-                    playerInAttackZone: false,
-                    playerPosition: targetPosition,
-                    hasKnownPosition: true);
-            }
-            else if (waypointService != null && waypointService.ClosestWaypointToPlayer != null)
-            {
-                var playerWaypoint = waypointService.ClosestWaypointToPlayer;
-                RobotDomainEventBus.PublishPerceptionDispatch(
-                    brain,
-                    playerInDetectZone: true,
-                    playerInAttackZone: false,
-                    playerPosition: playerWaypoint.WorldPos,
-                    hasKnownPosition: true);
+                Vector3 dispatchPosition = targetPosition != Vector3.zero ? targetPosition : playerWaypoint.WorldPos;
+                DispatchFollowerPerception(brain, playerWaypoint, dispatchPosition, "spawn_initial");
             }
         }
 
@@ -247,8 +247,18 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         foreach (var eg in spawnedSecurityGuards)
         {
             var p = waypointService.GetSecurityOrRestPoint();
+            RobotEcosystemProbe.RecordSpawnReservationDecision(
+                this,
+                RobotRole.SecurityGuard,
+                p,
+                p != null ? "reserved_for_initial_guard_spawn" : "no_security_or_rest_spawn_point");
+            if (p == null)
+            {
+                Debug.LogWarning("[EnemiesSpawner] Cannot spawn security guard: no security/rest waypoint available.", this);
+                continue;
+            }
+
             PositionForSpawn(eg, p.WorldPos);
-            waypointService.ReleasePOI(p);
             InitializeRobot(eg, RobotRole.SecurityGuard, p);
             Wake(eg);
         }
@@ -350,6 +360,64 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     {
         if (factoryManager != null)
             factoryManager.OnFactoryAllMachinesOff -= HandleAllMachinesOff;
+        if (waypointService != null)
+            waypointService.OnClosestWaypointToPlayerChanged -= HandleClosestWaypointToPlayerChanged;
+    }
+
+    private void HandleClosestWaypointToPlayerChanged(RoomWaypoint playerWaypoint, Vector2 playerPosition)
+    {
+        if (playerWaypoint == null || spawnedFollowers.Count == 0)
+            return;
+        if (followerAlarmStatus != null && followerAlarmStatus.CurrentAlarmState == AlarmState.Normal)
+            return;
+
+        for (int i = spawnedFollowers.Count - 1; i >= 0; i--)
+        {
+            var follower = spawnedFollowers[i];
+            if (follower == null)
+            {
+                spawnedFollowers.RemoveAt(i);
+                continue;
+            }
+
+            if (!follower.activeInHierarchy)
+                continue;
+
+            var brain = follower.GetComponent<RobotBrainNew>();
+            if (brain == null || brain.Heart == null || brain.Heart.Role != RobotRole.Follower)
+                continue;
+            if (brain.Memory != null && brain.Memory.IsDead)
+                continue;
+
+            DispatchFollowerPerception(brain, playerWaypoint, playerPosition, "player_waypoint_changed");
+        }
+    }
+
+    private void DispatchFollowerPerception(
+        RobotBrainNew brain,
+        RoomWaypoint playerWaypoint,
+        Vector3 playerPosition,
+        string source)
+    {
+        if (brain == null || playerWaypoint == null)
+            return;
+
+        RobotEcosystemProbe.RecordWaypointDecision(
+            this,
+            "FollowerPerception.PlayerWaypointDispatch",
+            null,
+            playerWaypoint,
+            "source=" + source
+                + " follower=" + brain.name
+                + " playerPosition=" + playerPosition.ToString("F2"));
+
+        RobotDomainEventBus.PublishPerceptionDispatch(
+            brain,
+            playerInDetectZone: true,
+            playerInAttackZone: false,
+            playerPosition: playerPosition,
+            hasKnownPosition: true,
+            playerWaypoint: playerWaypoint);
     }
 
     private void InitializeRobot(GameObject go, RobotRole role, RoomWaypoint lastVisited = null)
@@ -371,6 +439,14 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 securityManager.RegisterGuard(brain);
         }
 
+        var heart = go.GetComponent<RobotHeartNew>();
+        if (heart != null)
+        {
+            heart.ConfigureRole(role, resetStack: true);
+            if (heart.Role != role)
+                Debug.LogWarning($"[EnemiesSpawner] RobotHeartNew on {go.name} failed role configuration. Expected={role} Actual={heart.Role}");
+        }
+
         var bodyController = go.GetComponent<RobotBodyController>();
         if (bodyController != null)
         {
@@ -387,14 +463,6 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var maintenance = go.GetComponent<RobotBodyMaintenance>();
         if (maintenance != null && respawnService != null)
             maintenance.SetRespawnService(respawnService);
-
-        var heart = go.GetComponent<RobotHeartNew>();
-        if (heart != null)
-        {
-            heart.ConfigureRole(role, resetStack: true);
-            if (heart.Role != role)
-                Debug.LogWarning($"[EnemiesSpawner] RobotHeartNew on {go.name} failed role configuration. Expected={role} Actual={heart.Role}");
-        }
 
         var memory = go.GetComponent<RobotMemoryNew>();
         if (memory != null && lastVisited != null)
@@ -429,8 +497,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             }
         }
 
-        // Attach a security badge to guards so it can be stolen later.
-        if (role == RobotRole.SecurityGuard && securityBadgeSpawner != null)
+        // Attach a security badge to guards and the boss so it can be stolen later.
+        if ((role == RobotRole.SecurityGuard || role == RobotRole.Boss) && securityBadgeSpawner != null)
         {
             Transform anchor = go.transform;
             var body = go.GetComponent<RobotBodyController>();
@@ -440,7 +508,17 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             var badge = securityBadgeSpawner.SpawnBadge(anchor);
             var inventory = go.GetComponent<Inventory>();
             if (badge != null && inventory != null)
+            {
                 inventory.SetItem(PickupType.SecurityBadge, badge);
+                if (role == RobotRole.Boss)
+                    Debug.Log($"[Boss] Security badge attached to '{go.name}' anchor='{anchor.name}'.", go);
+            }
+            else if (role == RobotRole.Boss)
+            {
+                Debug.LogWarning(
+                    $"[Boss] Failed to attach security badge to '{go.name}' badge={(badge != null ? badge.name : "null")} inventory={(inventory != null ? inventory.name : "null")}.",
+                    go);
+            }
         }
     }
 

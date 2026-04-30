@@ -51,6 +51,15 @@ public class SecurityBadgeSpawner : MonoBehaviour
         // Make the badge follow the parent transform
         badge.SetFollowTarget(parent);
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        var joint = badge.GetComponent<TargetJoint2D>();
+        Debug.Log(
+            $"[SecurityBadgeSpawner] Spawned badge '{badge.name}' parent='{parent.name}' " +
+            $"local={badge.transform.localPosition} world={badge.transform.position} " +
+            $"bodyType={badgeRb.bodyType} jointTarget={(joint != null ? joint.target.ToString() : "none")}",
+            badge);
+#endif
+
         return badge;
     }
 }

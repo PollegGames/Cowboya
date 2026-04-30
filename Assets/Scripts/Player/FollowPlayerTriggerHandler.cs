@@ -34,21 +34,19 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     private void Awake()
     {
         mainCamera = Camera.main;
-        if (brain == null)
-            brain = GetComponent<RobotBrainNew>();
-        if (memoryNew == null)
-            memoryNew = GetComponent<RobotMemoryNew>();
-        if (brainNew == null)
-            brainNew = GetComponent<RobotBrainNew>();
+        ResolveRobotReferences();
     }
 
     private void OnDisable()
     {
+        bool hadPlayerPerceptionState = playerInDetectZone || playerInAttackZone || playerBodyReference != null;
+
         if (brain != null && playerInAttackZone && playerBodyReference != null)
             brain.OnPlayerInAttackZoneChanged(false, playerBodyReference);
-        if (RobotNewPipelineRuntime.IsNewPipelineActive && brainNew != null)
-            brainNew.OnPerceptionChanged(false, false, Vector3.zero, hasKnownPosition: false);
+        if (hadPlayerPerceptionState)
+            PublishNewPipelinePerception(false, false, Vector3.zero, false, null, "disable");
 
+        playerInDetectZone = false;
         playerInAttackZone = false;
         if (memory != null)
         {
@@ -81,20 +79,20 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
     private void OnPlayerEnterDetectZone(Collider2D collider)
     {
         CachePlayerReference(collider);
+        playerInDetectZone = true;
         if (playerBodyReference != null)
         {
             memory?.RememberPlayerPosition(playerBodyReference.position);
             memory?.SetCanSeePlayer(true);
-            if (RobotNewPipelineRuntime.IsNewPipelineActive)
-                brainNew?.OnPerceptionChanged(true, playerInAttackZone, playerBodyReference.position, hasKnownPosition: true);
+            PublishNewPipelinePerception(true, playerInAttackZone, playerBodyReference.position, true, playerBodyReference, "enter_detect");
         }
-        playerInDetectZone = true;
 
         if (ShouldUseDetectZoneForAttack() && playerBodyReference != null)
         {
             memory?.SetPlayerInAttackZone(true);
             brain?.OnPlayerInAttackZoneChanged(true, playerBodyReference);
             playerInAttackZone = true;
+            PublishNewPipelinePerception(true, true, playerBodyReference.position, true, playerBodyReference, "enter_detect_as_attack");
             brain?.Body?.StopMovement();
         }
 
@@ -114,8 +112,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         playerBodyReference = null;
         memory?.ClearPlayerPosition();
         memory?.SetCanSeePlayer(false);
-        if (RobotNewPipelineRuntime.IsNewPipelineActive)
-            brainNew?.OnPerceptionChanged(false, false, Vector3.zero, hasKnownPosition: false);
+        PublishNewPipelinePerception(false, false, Vector3.zero, false, null, "exit_detect");
     }
 
 
@@ -128,8 +125,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             memory?.SetCanSeePlayer(true);
             brain?.OnPlayerInAttackZoneChanged(true, playerBodyReference);
             playerInAttackZone = true;
-            if (RobotNewPipelineRuntime.IsNewPipelineActive)
-                brainNew?.OnPerceptionChanged(playerInDetectZone, true, playerBodyReference.position, hasKnownPosition: true);
+            PublishNewPipelinePerception(playerInDetectZone, true, playerBodyReference.position, true, playerBodyReference, "enter_attack");
         }
         OnPlayerDetectInAttackZoneChanged?.Invoke(true);
 
@@ -147,8 +143,13 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             brain?.OnPlayerInAttackZoneChanged(false, playerBodyReference);
         memory?.SetPlayerInAttackZone(false);
         playerInAttackZone = false;
-        if (RobotNewPipelineRuntime.IsNewPipelineActive)
-            brainNew?.OnPerceptionChanged(playerInDetectZone, false, playerBodyReference != null ? playerBodyReference.position : Vector3.zero, hasKnownPosition: playerBodyReference != null);
+        PublishNewPipelinePerception(
+            playerInDetectZone,
+            false,
+            playerBodyReference != null ? playerBodyReference.position : Vector3.zero,
+            playerBodyReference != null,
+            playerBodyReference,
+            "exit_attack");
         OnPlayerDetectInAttackZoneChanged?.Invoke(false);
 
     }
@@ -163,8 +164,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
             Vector3 playerPosition = playerBodyReference.position;
             memory?.RememberPlayerPosition(playerPosition);
             memory?.SetCanSeePlayer(true);
-            if (RobotNewPipelineRuntime.IsNewPipelineActive)
-                brainNew?.OnPerceptionChanged(playerInDetectZone, playerInAttackZone, playerPosition, hasKnownPosition: true);
+            PublishNewPipelinePerception(playerInDetectZone, playerInAttackZone, playerPosition, true, playerBodyReference, "update");
 
             Vector3 direction = (playerPosition - circleCenter.position).normalized;
             Vector3 targetPos = circleCenter.position + direction * radius;
@@ -197,9 +197,66 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
                 : playerControl.transform;
             memory?.RememberPlayerPosition(playerBodyReference.position);
             memory?.SetCanSeePlayer(true);
-            if (RobotNewPipelineRuntime.IsNewPipelineActive)
-                brainNew?.OnPerceptionChanged(true, playerInAttackZone, playerBodyReference.position, hasKnownPosition: true);
+            PublishNewPipelinePerception(true, playerInAttackZone, playerBodyReference.position, true, playerBodyReference, "cache_player");
         }
+    }
+
+    private void ResolveRobotReferences()
+    {
+        if (brain == null)
+            brain = ResolveRobotComponent<RobotBrainNew>();
+        if (memory == null)
+            memory = ResolveRobotComponent<RobotMemoryNew>();
+        if (memoryNew == null)
+            memoryNew = ResolveRobotComponent<RobotMemoryNew>();
+        if (brainNew == null)
+            brainNew = ResolveRobotComponent<RobotBrainNew>();
+    }
+
+    private T ResolveRobotComponent<T>() where T : Component
+    {
+        T component = GetComponent<T>();
+        if (component != null)
+            return component;
+
+        component = GetComponentInParent<T>();
+        if (component != null)
+            return component;
+
+        Transform root = transform.root;
+        return root != null ? root.GetComponentInChildren<T>() : null;
+    }
+
+    private void PublishNewPipelinePerception(
+        bool detect,
+        bool attack,
+        Vector3 position,
+        bool hasKnownPosition,
+        Transform playerTransform,
+        string source)
+    {
+        if (!RobotNewPipelineRuntime.IsNewPipelineActive)
+            return;
+
+        if (brainNew == null)
+            ResolveRobotReferences();
+
+        if (brainNew == null)
+        {
+            Debug.LogWarning(
+                $"[{nameof(FollowPlayerTriggerHandler)}] New pipeline perception skipped source={source} detect={detect} attack={attack} reason=missing_brain",
+                this);
+            return;
+        }
+
+        if (source != "update")
+        {
+            Debug.Log(
+                $"[{nameof(FollowPlayerTriggerHandler)}] New pipeline perception source={source} detect={detect} attack={attack} hasPlayerRef={playerTransform != null}",
+                this);
+        }
+
+        brainNew.OnPerceptionChanged(detect, attack, position, hasKnownPosition, playerTransform);
     }
 
     private bool ShouldUseDetectZoneForAttack()

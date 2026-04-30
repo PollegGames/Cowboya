@@ -4,6 +4,34 @@ using UnityEngine;
 public class SecurityBadgePickupTests
 {
     [Test]
+    public void Badge_SetFollowTargetAttachesToTarget()
+    {
+        var anchorGO = new GameObject("anchor");
+        anchorGO.transform.position = new Vector3(3f, 4f, 0f);
+
+        var obj = new GameObject("badge");
+        var rb = obj.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.gravityScale = 1f;
+        var badge = obj.AddComponent<SecurityBadgePickup>();
+
+        badge.SetFollowTarget(anchorGO.transform);
+
+        var joint = obj.GetComponent<TargetJoint2D>();
+        Assert.IsTrue(joint.enabled);
+        Assert.AreEqual(RigidbodyType2D.Kinematic, rb.bodyType);
+        Assert.AreEqual(0f, rb.gravityScale);
+        Assert.AreEqual((Vector2)anchorGO.transform.position, joint.target);
+        Assert.AreEqual(anchorGO.transform.position, obj.transform.position);
+
+        badge.OnRelease(Vector2.zero);
+
+        Assert.IsFalse(joint.enabled);
+        Assert.AreEqual(RigidbodyType2D.Dynamic, rb.bodyType);
+        Assert.AreEqual(1f, rb.gravityScale);
+    }
+
+    [Test]
     public void Badge_AttachAndReleaseChangesPhysics()
     {
         var handGO = new GameObject("hand");

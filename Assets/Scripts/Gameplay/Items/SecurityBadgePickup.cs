@@ -70,6 +70,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     bool attached = false;
     RigidbodyType2D originalBodyType;
     float originalGravityScale;
+    bool originalPhysicsCached = false;
 
     // Flag to ensure stolen logic only runs once
     bool wasStolen = false;
@@ -79,11 +80,12 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     void CacheOriginalPhysicsState()
     {
-        if (rb == null)
+        if (rb == null || originalPhysicsCached)
             return;
 
         originalBodyType = rb.bodyType;
         originalGravityScale = rb.gravityScale;
+        originalPhysicsCached = true;
     }
 
 
@@ -123,9 +125,29 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         }
     }
 
+    /// <summary>
+    /// Attaches the badge to a transform until it is grabbed or released.
+    /// </summary>
     public void SetFollowTarget(Transform target)
     {
         followTarget = target;
+        attached = followTarget != null;
+
+        if (rb == null)
+            rb = GetComponent<Rigidbody2D>();
+
+        if (rb != null && attached)
+        {
+            CacheOriginalPhysicsState();
+            rb.simulated = true;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.gravityScale = 0f;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.position = followTarget.position;
+            transform.position = followTarget.position;
+        }
+
         // Ensure we have a joint reference. This can be null if the badge
         // prefab didn't include a TargetJoint2D and the component was added
         // after Awake ran.
@@ -134,10 +156,10 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
         if (joint != null)
         {
-            if (followTarget != null)
+            if (attached)
                 joint.target = followTarget.position;
 
-            joint.enabled = true;
+            joint.enabled = attached;
         }
         else
         {
@@ -197,7 +219,6 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
         if (rb != null)
         {
-            CacheOriginalPhysicsState();
             rb.simulated = true;
             rb.bodyType = RigidbodyType2D.Kinematic;
             rb.gravityScale = 0f;

@@ -52,6 +52,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         if (bodyMaintenance != null && respawnService != null)
             bodyMaintenance.SetRespawnService(respawnService);
 
+        AlignBodyReferenceForRole();
         if (pathFollower == null)
             SetupPathFollower();
         if (this.waypointNotifier != null && pathFollower != null)
@@ -91,6 +92,22 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         pathFollower.OnStuck += stuckHandler;
     }
 
+    private void AlignBodyReferenceForRole()
+    {
+        if (heart == null)
+            heart = GetComponent<RobotHeartNew>();
+
+        if (heart == null || heart.Role != RobotRole.Follower)
+            return;
+        if (hipRb == null)
+            return;
+        if (bodyReference != transform)
+            return;
+
+        bodyReference = hipRb.transform;
+        RobotEcosystemProbe.RecordBodyNavigationReference(this, bodyReference, "follower_hip_reference");
+    }
+
     private void HandlePathFollowerStuck()
     {
         bodyMaintenance?.OnStuck(this, isBoss);
@@ -99,6 +116,11 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
     public void SetDestination(RoomWaypoint target, bool includeUnavailable = false)
     {
         pathFollower?.SetDestination(target, includeUnavailable);
+    }
+
+    public void SetDestination(RoomWaypoint target, Vector3? finalPosition, bool includeUnavailable = false)
+    {
+        pathFollower?.SetDestination(target, finalPosition, includeUnavailable);
     }
 
     public void SetDestination(Vector3 worldPosition, bool includeUnavailable = false)
@@ -115,6 +137,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
 
     public bool HasArrivedAtDestination() => pathFollower != null && pathFollower.HasArrived;
     public RoomWaypoint CurrentTarget => pathFollower != null ? pathFollower.CurrentTarget : null;
+    public RoomWaypoint StartPoint => waypointQueries?.GetStartPoint();
     public bool HasActivePath =>
         pathFollower != null
         && pathFollower.CurrentPathCount > 0
@@ -130,6 +153,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
 
     public void OnReleaseToPool()
     {
+        StopMovement();
         if (pathFollower != null)
         {
             pathFollower.OnStuck -= stuckHandler;
@@ -141,8 +165,13 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
 
     public void OnAcquireFromPool()
     {
+        SetMovement(0f);
+        SetVerticalMovement(0f);
         if (pathFollower == null && waypointQueries != null)
+        {
+            AlignBodyReferenceForRole();
             SetupPathFollower();
+        }
     }
 
     public void StopMovement()

@@ -7,6 +7,8 @@ using UnityEngine;
 public struct RobotMemorySnapshotNew
 {
     public Vector3 LastKnownPlayerPosition;
+    public Transform LastKnownPlayerTransform;
+    public RoomWaypoint LastKnownPlayerWaypoint;
     public bool HasLastKnownPlayerPosition;
     public bool PlayerInAttackZone;
     public bool PlayerInDetectZone;
