@@ -1,26 +1,21 @@
-# Puppet binding drift analysis
+# Puppet Binding Notes
 
-The map scene loads two workers through the enemy spawner. One puppet stayed glued to its worker, while the other (with a Rigidbody) drifted—the puppet sprites walked away even though the master's sprites remained aligned. This document explains why, what changed in `SimplePuppetBinder`, and how the fix was derived.
+`SimplePuppetBinder` is a rotation-only binder. It exists to make selected puppet bones follow the orientation of matching animated master bones while leaving position control to the rest of the robot setup.
 
-## What went wrong
-- **Transform-only puppets were fine.** For bones without physics components, the binder wrote `Transform.position` and `Transform.rotation` directly in `LateUpdate`, so their sprites matched their masters each frame.
-- **Physics-driven puppets were missing a position copy.** Rigidbodies ignore `Transform` writes outside the physics loop. The binder deferred rotations to `FixedUpdate` for bodies, but it never stored a matching position target, leaving Unity's physics to integrate the rigidbodies independently. That independent motion created the visible drift between the puppet sprites and the worker master.
+## Current Design
+- **Only selected bones are bound.** The `Pairs` list is manual. This is intentional so a prefab can bind only the puppet bodies that should be driven by the animated master.
+- **Rotations are mirrored through roots.** The binder converts each master bone's rotation from `MasterRoot` space into `PuppetRoot` space, then applies that rotation to the puppet bone.
+- **Rigidbody bones are handled in physics time.** When a puppet bone has `Rigidbody2D` or `Rigidbody`, the binder stores the target rotation during `LateUpdate` and applies it with `MoveRotation` during `FixedUpdate`.
+- **Non-rigidbody bones are written directly.** Puppet bones without a rigidbody receive `Transform.rotation` in `LateUpdate`.
+- **Positions are not mirrored.** The binder does not cache target positions and does not call `MovePosition`.
 
-## What the solution changes
-- **Capture both rotation and position for physics bones.** Each `BonePair` now caches the master's pose every frame and marks targets for `FixedUpdate` when a Rigidbody is present.
-- **Apply targets with physics-safe APIs.** `FixedUpdate` now sends cached poses to rigidbodies using `MovePosition`/`MoveRotation`, keeping physics-driven puppets exactly in sync with their masters just like the transform-only path.
-- **Consistent root mirroring.** Poses are mirrored relative to the configured master and puppet roots before caching, so offset rigs still match regardless of where the roots live in the hierarchy.
+## Why Position Is Not Bound
+Position syncing is deliberately outside this class. The puppet's position can be driven by hierarchy movement, locomotion, joints, collisions, or other gameplay scripts. Copying positions here would make the binder take control of more of the puppet than intended and could fight the existing physics setup.
 
-## How the fix was derived
-1. **Reproduced the drift:** Observed that only the worker whose puppet had a Rigidbody wandered while the transform-only worker stayed aligned.
-2. **Traced update paths:** Reviewed `SimplePuppetBinder` and saw that rotations for rigidbodies were deferred to `FixedUpdate` but positions were only applied for transform-only rigs.
-3. **Checked Unity physics rules:** Confirmed that Rigidbody transforms must be driven through physics methods inside `FixedUpdate`; otherwise, the physics simulation overwrites manual transform changes.
-4. **Symmetric data flow:** Added cached position targets alongside rotation targets so the physics path receives the same data as the transform path, ensuring both puppet types consume identical pose information.
-5. **Validated the outcome:** With both position and rotation pushed through `FixedUpdate`, the physics-driven puppet tracks its worker like the transform-only rig, eliminating the one-sided drift.
+If a puppet body needs positional correction, add that behavior in a separate controller or adjust the prefab's hierarchy/physics configuration. `SimplePuppetBinder` should remain focused on rotation mirroring for manually selected bodies.
 
-## Why the Cowboy player did not visibly drift
-The Cowboy prefab also uses `SimplePuppetBinder`, but its hierarchy meant the missing Rigidbody position copy was effectively masked:
-
-- The master (`Cowboy_Master`) lives under the puppet root (`Cowboy_Puppet`), so any locomotion applied to the puppet root already drags the master along. 【F:Assets/Resources/Prefabs/Robots/Player/Cowboy_Player.prefab†L1200-L1225】【F:Assets/Resources/Prefabs/Robots/Player/Cowboy_Player.prefab†L3065-L3084】
-- Gameplay scripts steer the Cowboy by driving those puppet rigidbodies directly, so even though the binder was only copying rotations for physics bones, the roots stayed superimposed and no gap appeared. 【F:Assets/Resources/Prefabs/Robots/Player/Cowboy_Player.prefab†L180-L259】【F:Docs/MasterPuppetLink.md†L1-L24】
-- The worker prefab lacked that shared root motion; its master moved independently, exposing the missing Rigidbody position sync that the binder change now fixes for all rigs.
+## Practical Expectations
+- A bound puppet bone should rotate like its matching master bone.
+- An unbound puppet bone should not be touched by this script.
+- A bound rigidbody can still move according to physics or other scripts; this binder only guides its rotation.
+- If visible drift is a problem, investigate the systems responsible for body positions rather than this binder's rotation path.

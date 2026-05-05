@@ -5,8 +5,8 @@ using UnityEngine;
 namespace CowBoya.Robots
 {
     /// <summary>
-    /// Minimal master to puppet pose binding that simply copies transforms.
-    /// Useful when a physically simulated rig is not required.
+    /// Minimal master to puppet rotation binding for manually paired bones.
+    /// Useful when selected puppet bones should follow an animated master without position binding.
     /// </summary>
     public class SimplePuppetBinder : MonoBehaviour
     {
@@ -21,22 +21,21 @@ namespace CowBoya.Robots
             public Rigidbody PuppetBody3D;
 
             [NonSerialized]
-            internal Vector3 targetPosition;
-            [NonSerialized]
             internal Quaternion targetRotation;
-            [NonSerialized]
-            internal bool hasPositionTarget;
             [NonSerialized]
             internal bool hasRotationTarget;
         }
 
-        [Tooltip("Root transform used to search for master bones when auto populating.")]
+        [Tooltip("Root transform used as the rotation reference for master bones.")]
         public Transform MasterRoot;
 
-        [Tooltip("Root transform used to search for puppet bones when auto populating.")]
+        [Tooltip("Root transform used as the rotation reference for puppet bones.")]
         public Transform PuppetRoot;
 
-        [Tooltip("Ordered list of master/puppet transform pairs to keep aligned.")]
+        [Tooltip("2D rotation sharpness. Use 0 or less for exact target rotation.")]
+        public float RotationSharpness;
+
+        [Tooltip("Manual list of master/puppet transform pairs whose rotations should stay aligned.")]
         public List<BonePair> Pairs = new List<BonePair>();
 
         private void Reset()
@@ -89,8 +88,6 @@ namespace CowBoya.Robots
                     pair.PuppetBody3D = rb3D;
                 }
 
-                pair.hasPositionTarget = false;
-
                 Quaternion localMasterRotation = masterRootInverseRotation * pair.Master.rotation;
                 Quaternion rotation = puppetRootRotation * localMasterRotation;
                 // Rigs that include a Rigidbody need their targets deferred to FixedUpdate;
@@ -124,7 +121,14 @@ namespace CowBoya.Robots
                 {
                     if (rb2D != null)
                     {
-                        rb2D.MoveRotation(pair.targetRotation.eulerAngles.z);
+                        float targetAngle = pair.targetRotation.eulerAngles.z;
+                        if (RotationSharpness > 0f)
+                        {
+                            float t = 1f - Mathf.Exp(-RotationSharpness * Time.fixedDeltaTime);
+                            targetAngle = Mathf.LerpAngle(rb2D.rotation, targetAngle, t);
+                        }
+
+                        rb2D.MoveRotation(targetAngle);
                     }
                     else if (rb3D != null)
                     {
