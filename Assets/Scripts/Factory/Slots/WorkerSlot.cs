@@ -120,6 +120,14 @@ public class WorkerSlot : MonoBehaviour
                 brain.Memory.SetMachineWaypointAvailability(machine, false);
             brain.Memory.ChangeConnectionToMachine(false);
             brain.Memory.SetDesiredMachineType(machine.Type);
+            RobotEcosystemProbe.RecordBrainCall(
+                brain,
+                "WorkerSlot.HandlePoweredOffMachineArrival",
+                "machine=" + machine.name
+                + " localObservation=True"
+                + " memoryUpdated=True"
+                + " taskBlocked=True"
+                + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None"));
         }
 
         brain?.Heart?.BlockCurrentTask();

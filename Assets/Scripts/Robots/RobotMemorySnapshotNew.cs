@@ -13,6 +13,8 @@ public struct RobotMemorySnapshotNew
     public bool PlayerInAttackZone;
     public bool PlayerInDetectZone;
     public bool WasRecentlyAttacked;
+    public Vector3 LastAttackPosition;
+    public bool HasLastAttackPosition;
     public bool IsConnectedToMachine;
     public bool IsDead;
     public RoomWaypoint LastVisitedPoint;

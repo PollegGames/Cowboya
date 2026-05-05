@@ -106,12 +106,25 @@ public class RobotBrainNew : MonoBehaviour
 
     public void OnDamageTaken(int damage)
     {
+        OnDamageTaken(damage, null);
+    }
+
+    public void OnDamageTaken(int damage, Vector3? attackerPosition)
+    {
         _ = damage;
         if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
             return;
 
-        RobotEcosystemProbe.RecordBrainCall(this, "OnDamageTaken", "damage=" + damage);
-        memory.RegisterAttack();
+        RobotEcosystemProbe.RecordBrainCall(
+            this,
+            "OnDamageTaken",
+            "damage=" + damage
+            + " attackerPosition=" + (attackerPosition.HasValue ? attackerPosition.Value.ToString("F2") : "unknown"));
+
+        if (attackerPosition.HasValue)
+            memory.RegisterAttack(attackerPosition.Value);
+        else
+            memory.RegisterAttack();
     }
 
     /// <summary>
@@ -575,12 +588,17 @@ public class RobotBrainNew : MonoBehaviour
                 continue;
             if (waypoint.parentRoom.roomProperties.usageType != UsageType.End)
                 continue;
+            if (waypoint.type != WaypointType.Center)
+                continue;
 
             candidates.Add(waypoint);
         }
 
         if (candidates.Count == 0)
             return null;
+
+        if (snapshot.LastVisitedPoint != null && candidates.Count > 1)
+            candidates.Remove(snapshot.LastVisitedPoint);
 
         return candidates[UnityEngine.Random.Range(0, candidates.Count)];
     }

@@ -104,6 +104,7 @@ public class RobotHeartNew : MonoBehaviour
         if (planned == null)
             return;
 
+        RemoveStaleAttackTasksBeforePlan(planned);
         taskStack.PushOrRefresh(planned);
         RobotEcosystemProbe.RecordHeartPlannedTask(this, planned, taskStack.Current);
         RobotNewTrace.Log(
@@ -127,11 +128,15 @@ public class RobotHeartNew : MonoBehaviour
             return;
 
         var before = taskStack.Current;
-        ApplyMemoryTransitionsOnTaskCompletion(before);
+        bool resetAttackMemoryAfterPop = before != null && before.Type == RobotTaskType.Flee;
+        if (!resetAttackMemoryAfterPop)
+            ApplyMemoryTransitionsOnTaskCompletion(before);
         CancelScheduledTaskSignal();
         taskStack.CompleteCurrent();
         if (taskStack.Current == null)
             taskStack.PushOrRefresh(BuildDefaultTask());
+        if (resetAttackMemoryAfterPop)
+            memory?.ResetAttackMemory();
 
         RobotNewTrace.Log(
             this,
@@ -158,6 +163,21 @@ public class RobotHeartNew : MonoBehaviour
                 if (body != null && body.CurrentTarget != null)
                     memory.SetLastVisitedPoint(body.CurrentTarget);
                 memory.ChangeConnectionToMachine(true);
+                break;
+
+            case RobotTaskType.Patrol:
+                if (role == RobotRole.Boss)
+                {
+                    var patrolTarget = ResolveWaypoint(completed.Payload);
+                    if (patrolTarget == null && body != null)
+                        patrolTarget = body.CurrentTarget;
+
+                    if (patrolTarget != null)
+                    {
+                        memory.SetLastVisitedPoint(patrolTarget);
+                        Debug.Log($"[Boss] Patrol completed at '{patrolTarget.name}'.", this);
+                    }
+                }
                 break;
 
             case RobotTaskType.WorkAtMachine:
@@ -229,7 +249,7 @@ public class RobotHeartNew : MonoBehaviour
         CancelScheduledTaskSignal();
 
         if (activeTopTask != null && taskRuntime != null)
-            taskRuntime.Exit(TaskExitReason.Replanned);
+            taskRuntime.Exit(BuildTaskContext(activeTopTask), TaskExitReason.Replanned);
 
         taskStack = new RobotTaskStackNew();
         if (repopulateDefaultTask)
@@ -257,7 +277,7 @@ public class RobotHeartNew : MonoBehaviour
         if (activeTopTask != null)
         {
             var reason = newTop == null ? TaskExitReason.Completed : TaskExitReason.Replanned;
-            taskRuntime.Exit(reason);
+            taskRuntime.Exit(BuildTaskContext(activeTopTask), reason);
         }
 
         activeTopTask = newTop;
@@ -269,17 +289,7 @@ public class RobotHeartNew : MonoBehaviour
         if (activeTopTask == null)
             return;
 
-        var context = new RobotTaskContextNew
-        {
-            Role = role,
-            CurrentTask = activeTopTask,
-            Payload = activeTopTask.Payload,
-            Options = currentOptions,
-            Heart = this,
-            Body = body,
-            Memory = memory
-        };
-        taskRuntime.Enter(context);
+        taskRuntime.Enter(BuildTaskContext(activeTopTask));
     }
 
     private void EnsureInitialized()
@@ -352,6 +362,42 @@ public class RobotHeartNew : MonoBehaviour
         return defaultTask;
     }
 
+    private RobotTaskContextNew BuildTaskContext(RobotTask task)
+    {
+        return new RobotTaskContextNew
+        {
+            Role = role,
+            CurrentTask = task,
+            Payload = task != null ? task.Payload : null,
+            Options = currentOptions,
+            Heart = this,
+            Body = body,
+            Memory = memory
+        };
+    }
+
+    private void RemoveStaleAttackTasksBeforePlan(RobotTask planned)
+    {
+        if (taskStack == null || planned == null)
+            return;
+
+        if (planned.Type == RobotTaskType.AttackTarget || currentOptions.HasFlag(BrainOption.CanAttack))
+            return;
+
+        bool removed = taskStack.RemoveTasksOfType(RobotTaskType.AttackTarget);
+        if (!removed)
+            return;
+
+        RobotNewTrace.Log(
+            this,
+            eventSource: "HeartNew.RemoveStaleAttackTasks",
+            memoryDelta: "none",
+            brainOptions: currentOptions,
+            plannedTask: planned,
+            heartCurrentTask: taskStack.Current,
+            taskSignal: "remove:AttackTarget");
+    }
+
     private static bool ShouldCompleteOnArrival(RobotTaskType type)
     {
         switch (type)
@@ -359,6 +405,7 @@ public class RobotHeartNew : MonoBehaviour
             case RobotTaskType.GoToMachine:
             case RobotTaskType.ReturnHome:
             case RobotTaskType.Patrol:
+            case RobotTaskType.Flee:
                 return true;
             default:
                 return false;
@@ -402,6 +449,20 @@ public class RobotHeartNew : MonoBehaviour
 
         if (payload is GameObject go && go != null)
             return go.GetComponent<BaseMachine>() ?? go.GetComponentInParent<BaseMachine>();
+
+        return null;
+    }
+
+    private static RoomWaypoint ResolveWaypoint(object payload)
+    {
+        if (payload is RoomWaypoint waypoint)
+            return waypoint;
+
+        if (payload is Component component && component != null)
+            return component.GetComponent<RoomWaypoint>() ?? component.GetComponentInParent<RoomWaypoint>();
+
+        if (payload is GameObject go && go != null)
+            return go.GetComponent<RoomWaypoint>() ?? go.GetComponentInParent<RoomWaypoint>();
 
         return null;
     }

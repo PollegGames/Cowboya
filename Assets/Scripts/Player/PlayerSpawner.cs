@@ -39,16 +39,18 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
         // Setup behaviour and save-data info
         playerRobotBehaviour = playerTemplate.InitializePlayerStateController(playerInstance);
         playerRobotInfo = playerTemplate.InitializePlayerStats(saveService.CurrentSaveData);
-        if (runStats == null && RunProgressManager.Instance != null)
-        {
-            runStats = RunProgressManager.Instance.RunStats;
-        }
+        ResolveRunStats();
         // Apply stats before gameplay so HUD and AI use updated values
         if (runStats != null && runStats.HasValues)
         {
             EnergyBot energyBot = playerInstance.GetComponent<EnergyBot>();
             Attack attack = playerRobotInfo.Attacks.Count > 0 ? playerRobotInfo.Attacks[0] : null;
-            runStats.Apply(playerRobotInfo, energyBot, attack);
+            AttackHitbox[] attackHitboxes = playerInstance.GetComponentsInChildren<AttackHitbox>(true);
+            runStats.Apply(playerRobotInfo, energyBot, attack, attackHitboxes);
+        }
+        else
+        {
+            Debug.Log("[PlayerSpawner] No captured run stats to apply.");
         }
 
         Transform resolvedHead = ResolveHeadFromMovementController();
@@ -65,6 +67,20 @@ public class PlayerSpawner : MonoBehaviour, IPlayerSpawner
 
         playerHeadTransform = resolvedHead;
     }
+
+    private void ResolveRunStats()
+    {
+        if (RunProgressManager.Instance == null || RunProgressManager.Instance.RunStats == null)
+            return;
+
+        if (runStats != null && runStats != RunProgressManager.Instance.RunStats)
+        {
+            Debug.LogWarning("[PlayerSpawner] Replacing serialized PlayerRunStats with RunProgressManager.RunStats for run continuity.");
+        }
+
+        runStats = RunProgressManager.Instance.RunStats;
+    }
+
     private Transform ResolveHeadFromMovementController()
     {
         var movementController = playerInstance.GetComponent<PlayerMovementController>();

@@ -22,7 +22,7 @@ public struct RobotTaskContextNew
 public interface IRobotTaskNew
 {
     void Enter(RobotTaskContextNew context);
-    void Exit(TaskExitReason reason);
+    void Exit(RobotTaskContextNew context, TaskExitReason reason);
 }
 
 /// <summary>
@@ -30,6 +30,9 @@ public interface IRobotTaskNew
 /// </summary>
 public class RobotTaskNew : IRobotTaskNew
 {
+    private const float FleeDistance = 14f;
+    private const float FleeFallbackSeconds = 2.5f;
+
     public void Enter(RobotTaskContextNew context)
     {
         if (context.CurrentTask == null)
@@ -219,9 +222,25 @@ public class RobotTaskNew : IRobotTaskNew
         }
     }
 
-    public void Exit(TaskExitReason reason)
+    public void Exit(RobotTaskContextNew context, TaskExitReason reason)
     {
-        // Exit est un hook d'arret/cleanup, pas un signal de completion.
+        if (context.CurrentTask == null)
+            return;
+
+        switch (context.CurrentTask.Type)
+        {
+            case RobotTaskType.AttackTarget:
+                context.Body?.AttackController?.StopAttacking();
+                RobotNewTrace.Log(
+                    context.Heart,
+                    eventSource: "TaskNew.Exit.AttackTarget",
+                    memoryDelta: "none",
+                    brainOptions: context.Options,
+                    plannedTask: context.CurrentTask,
+                    heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+                    taskSignal: "stop_attack reason=" + reason);
+                break;
+        }
     }
 
     private static void HandleSearchForMachine(RobotTaskContextNew context)
@@ -464,7 +483,15 @@ public class RobotTaskNew : IRobotTaskNew
     {
         object payload = context.Payload;
         if (context.Role == RobotRole.Boss && payload == null)
+        {
             payload = FindRandomEndRoomWaypoint(context.Memory);
+            if (payload != null && context.Heart != null)
+            {
+                Debug.Log($"[Boss] Queued concrete patrol target: {DescribePayload(payload)}.", context.Heart);
+                context.Heart.QueueTask(new RobotTask(RobotTaskType.Patrol, payload));
+                return;
+            }
+        }
 
         if (payload != null && TryMoveToPayload(context, payload, includeUnavailable: true))
         {
@@ -479,6 +506,9 @@ public class RobotTaskNew : IRobotTaskNew
 
             if (context.Role == RobotRole.Boss)
                 Debug.Log($"[Boss] Patrol target set: {DescribePayload(payload)}.", context.Heart);
+
+            if (context.Role == RobotRole.Boss)
+                ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 3f);
             return;
         }
 
@@ -577,8 +607,79 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static void HandleFlee(RobotTaskContextNew context)
     {
-        context.Body?.StopMovement();
-        ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 1f);
+        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
+        {
+            ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: FleeFallbackSeconds);
+            return;
+        }
+
+        if (context.Body == null)
+        {
+            Block(context);
+            return;
+        }
+
+        Vector3 robotPosition = context.Body.transform.position;
+        Vector3 threatPosition;
+        bool hasThreatPosition = TryGetThreatPosition(context, out threatPosition);
+
+        if (!hasThreatPosition)
+        {
+            context.Body.StopMovement();
+            RobotNewTrace.Log(
+                context.Heart,
+                eventSource: "TaskNew.Flee",
+                memoryDelta: "none",
+                brainOptions: context.Options,
+                plannedTask: context.CurrentTask,
+                heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+                taskSignal: "fallback_stop no_threat_position");
+            ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: FleeFallbackSeconds);
+            return;
+        }
+
+        Vector3 away = robotPosition - threatPosition;
+        away.y = 0f;
+        away.z = 0f;
+        if (away.sqrMagnitude < 0.01f)
+            away = Vector3.right;
+
+        Vector3 fleeDestination = robotPosition + away.normalized * FleeDistance;
+        context.Body.SetDestination(fleeDestination, includeUnavailable: true);
+
+        RobotNewTrace.Log(
+            context.Heart,
+            eventSource: "TaskNew.Flee",
+            memoryDelta: "none",
+            brainOptions: context.Options,
+            plannedTask: context.CurrentTask,
+            heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+            taskSignal: "threat=" + threatPosition.ToString("F2")
+                + " destination=" + fleeDestination.ToString("F2"));
+
+        ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: FleeFallbackSeconds);
+    }
+
+    private static bool TryGetThreatPosition(RobotTaskContextNew context, out Vector3 threatPosition)
+    {
+        if (context.Memory != null)
+        {
+            var snapshot = context.Memory.Snapshot;
+            if (snapshot.HasLastAttackPosition)
+            {
+                threatPosition = snapshot.LastAttackPosition;
+                return true;
+            }
+
+            if (snapshot.HasLastKnownPlayerPosition)
+            {
+                threatPosition = snapshot.LastKnownPlayerPosition;
+                return true;
+            }
+        }
+
+        threatPosition = Vector3.zero;
+        return false;
     }
 
     private static void HandleFaint(RobotTaskContextNew context)
@@ -794,12 +895,18 @@ public class RobotTaskNew : IRobotTaskNew
                 continue;
             if (waypoint.parentRoom.roomProperties.usageType != UsageType.End)
                 continue;
+            if (waypoint.type != WaypointType.Center)
+                continue;
 
             candidates.Add(waypoint);
         }
 
         if (candidates.Count == 0)
             return null;
+
+        var lastVisited = memory.LastVisitedPoint;
+        if (lastVisited != null && candidates.Count > 1)
+            candidates.Remove(lastVisited);
 
         return candidates[UnityEngine.Random.Range(0, candidates.Count)];
     }

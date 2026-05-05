@@ -88,54 +88,79 @@ public class MachineWorkerManager : MonoBehaviour
             return;
 
         var machineWaypoint = MachineWaypointResolver.Resolve(machine);
-        var workers = FindObjectsByType<RobotBrainNew>(FindObjectsSortMode.None);
+        if (releasedWorker == null)
+        {
+            Debug.Log($"[MachineWorkerManager] Powered-off machine has no attached worker to notify machine={machine.name}", machine);
+            RecordDeferredWorkerKnowledge(machine, machineWaypoint, null, null);
+            return;
+        }
+
+        RecordDeferredWorkerKnowledge(machine, machineWaypoint, null, releasedWorker);
+
+        if (releasedWorker.Heart == null || releasedWorker.Heart.Role != RobotRole.Worker || releasedWorker.Memory == null)
+        {
+            RobotEcosystemProbe.RecordBrainCall(
+                releasedWorker,
+                "MachineWorkerManager.NotifyWorkersMachinePoweredOff",
+                "machine=" + machine.name
+                + " attachedWorkerNotified=True"
+                + " memoryUpdated=False"
+                + " taskBlocked=False"
+                + " skippedInvalidWorkerState=True");
+            return;
+        }
+
+        RobotTask currentTask = releasedWorker.Heart.CurrentTask;
+        if (machineWaypoint != null)
+            releasedWorker.Memory.SetRoomWaypointAvailability(machineWaypoint, false);
+        else
+            releasedWorker.Memory.SetMachineWaypointAvailability(machine, false);
+
+        releasedWorker.Memory.ChangeConnectionToMachine(false);
+        releasedWorker.Memory.SetDesiredMachineType(machine.Type);
+        RobotEcosystemProbe.RecordBrainCall(
+            releasedWorker,
+            "MachineWorkerManager.NotifyWorkersMachinePoweredOff",
+            "machine=" + machine.name
+            + " attachedWorkerNotified=True"
+            + " memoryUpdated=True"
+            + " taskBlocked=True"
+            + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None")
+            + " currentTarget=" + DescribeTaskTarget(currentTask));
+        releasedWorker.Heart.BlockCurrentTask();
+    }
+
+    private static void RecordDeferredWorkerKnowledge(
+        BaseMachine machine,
+        RoomWaypoint machineWaypoint,
+        RobotBrainNew specificWorker,
+        RobotBrainNew excludedWorker)
+    {
+        var workers = specificWorker != null
+            ? new[] { specificWorker }
+            : FindObjectsByType<RobotBrainNew>(FindObjectsSortMode.None);
+
         foreach (var brain in workers)
         {
             if (brain == null || brain.Heart == null || brain.Heart.Role != RobotRole.Worker || brain.Memory == null)
                 continue;
+            if (ReferenceEquals(brain, excludedWorker))
+                continue;
 
             RobotTask currentTask = brain.Heart.CurrentTask;
-            bool targetsPoweredOffMachine = !ReferenceEquals(brain, releasedWorker)
-                && IsWorkerTargetingMachine(brain, machine, machineWaypoint);
-            if (currentTask != null
-                && currentTask.Type == RobotTaskType.GoToMachine
-                && !targetsPoweredOffMachine)
-            {
-                if (machineWaypoint != null)
-                    brain.Memory.SetRoomWaypointAvailability(machineWaypoint, false);
-                else
-                    brain.Memory.SetMachineWaypointAvailability(machine, false);
-
-                RobotEcosystemProbe.RecordBrainCall(
-                    brain,
-                    "MachineWorkerManager.NotifyWorkersMachinePoweredOff",
-                    "machine=" + machine.name
-                    + " targetInvalidationDeferred=True"
-                    + " destinationPreserved=" + DescribeTaskTarget(currentTask));
-                continue;
-            }
-
-            if (machineWaypoint != null)
-                brain.Memory.SetRoomWaypointAvailability(machineWaypoint, false);
-            else
-                brain.Memory.SetMachineWaypointAvailability(machine, false);
-
-            if (!targetsPoweredOffMachine)
-            {
-                RobotEcosystemProbe.RecordBrainCall(
-                    brain,
-                    "MachineWorkerManager.NotifyWorkersMachinePoweredOff",
-                    "machine=" + machine.name + " waypointInvalidated=True");
-                continue;
-            }
-
-            brain.Memory.ChangeConnectionToMachine(false);
-            brain.Memory.SetDesiredMachineType(machine.Type);
+            bool targetsPoweredOffMachine = IsWorkerTargetingMachine(brain, machine, machineWaypoint);
+            bool isTraveling = currentTask != null && currentTask.Type == RobotTaskType.GoToMachine;
             RobotEcosystemProbe.RecordBrainCall(
                 brain,
-                "MachineWorkerManager.NotifyWorkersMachinePoweredOff",
-                "machine=" + machine.name + " targetInvalidated=True");
-            brain.Heart.BlockCurrentTask();
+                "MachineWorkerManager.DeferPoweredOffMachineKnowledge",
+                "machine=" + machine.name
+                + " localKnowledgeOnly=True"
+                + " memoryUpdated=False"
+                + " taskBlocked=False"
+                + " traveling=" + isTraveling
+                + " targetsPoweredOffMachine=" + targetsPoweredOffMachine
+                + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None")
+                + " currentTarget=" + DescribeTaskTarget(currentTask));
         }
     }
 

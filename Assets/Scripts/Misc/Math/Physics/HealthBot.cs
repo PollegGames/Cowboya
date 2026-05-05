@@ -14,26 +14,32 @@ public class HealthBot : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        TakeDamage(damage, null);
+    }
+
+    public void TakeDamage(int damage, Vector3? attackerPosition)
+    {
         Debug.Log("HealthBot: Health changed by " + damage);
         OnHealthChanged?.Invoke(-damage);
         if (damageFeedback != null)
             damageFeedback.Flash();
 
         CacheBrains();
-        memory?.RegisterAttack();
-        if (RobotNewPipelineRuntime.IsNewPipelineActive)
-        {
-            memoryNew?.RegisterAttack();
-            brainNew?.OnDamageTaken(damage);
-        }
-
         if (playerBrain != null)
         {
             playerBrain.OnPlayerDamaged(damage);
             return;
         }
 
-        brain?.OnDamageTaken(damage);
+        if (RobotNewPipelineRuntime.IsNewPipelineActive)
+        {
+            RegisterAttack(memoryNew, attackerPosition);
+            brainNew?.OnDamageTaken(damage, attackerPosition);
+            return;
+        }
+
+        RegisterAttack(memory, attackerPosition);
+        brain?.OnDamageTaken(damage, attackerPosition);
     }
 
     public void TakePlayerDamage(int damage)
@@ -58,6 +64,17 @@ public class HealthBot : MonoBehaviour
             brainNew = GetComponent<RobotBrainNew>();
         if (memoryNew == null)
             memoryNew = GetComponent<RobotMemoryNew>();
+    }
+
+    private static void RegisterAttack(RobotMemoryNew robotMemory, Vector3? attackerPosition)
+    {
+        if (robotMemory == null)
+            return;
+
+        if (attackerPosition.HasValue)
+            robotMemory.RegisterAttack(attackerPosition.Value);
+        else
+            robotMemory.RegisterAttack();
     }
 }
 

@@ -35,10 +35,32 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
         // CurrentSaveData.experience = controller.Stats.Experience;
         // Map other fields as needed
 
-        var json = JsonUtility.ToJson(CurrentSaveData);
-        File.WriteAllText(saveFilePath, json);
-        // In WebGL builds the write happens in memory and is synced to IndexedDB.
-        Debug.Log("Game saved at " + saveFilePath);
+        WriteCurrentSaveData("Game saved");
+    }
+
+    /// <summary>
+    /// Save permanent stats while keeping temporary run cube bonuses out of the save file.
+    /// </summary>
+    /// <param name="controller">The active robot controller whose non-run stats will be saved.</param>
+    /// <param name="runStats">Captured run stats containing the permanent baseline and temporary bonuses.</param>
+    public void SaveGame(RobotStateController controller, PlayerRunStats runStats)
+    {
+        if (runStats == null || !runStats.HasValues)
+        {
+            SaveGame(controller);
+            return;
+        }
+
+        if (CurrentSaveData == null)
+        {
+            CurrentSaveData = new SaveData();
+        }
+
+        CurrentSaveData.MaxHealth = runStats.MaxHealth;
+        CurrentSaveData.MaxEnergy = runStats.MaxEnergy;
+        CurrentSaveData.AttackEnergyCost = controller.Stats.AttackEnergyCost;
+
+        WriteCurrentSaveData($"Game saved with run baseline. Bonuses kept temporary: {runStats.DescribeBonuses()}");
     }
 
     // Load the game data from a file
@@ -70,5 +92,13 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
         var json = JsonUtility.ToJson(CurrentSaveData);
         File.WriteAllText(saveFilePath, json);
         Debug.Log("Save data reset.");
+    }
+
+    private void WriteCurrentSaveData(string message)
+    {
+        var json = JsonUtility.ToJson(CurrentSaveData);
+        File.WriteAllText(saveFilePath, json);
+        // In WebGL builds the write happens in memory and is synced to IndexedDB.
+        Debug.Log(message + " at " + saveFilePath);
     }
 }

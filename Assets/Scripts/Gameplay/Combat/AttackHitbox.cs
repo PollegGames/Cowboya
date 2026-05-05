@@ -52,7 +52,8 @@ public class AttackHitbox : MonoBehaviour
 
 
         // Apply damage
-        target.Health.TakeDamage(damage);
+        Vector3 attackerPosition = attacker != null ? attacker.transform.position : transform.position;
+        target.Health.TakeDamage(damage, attackerPosition);
 
         // Apply physical push
         Rigidbody2D rb = other.attachedRigidbody;

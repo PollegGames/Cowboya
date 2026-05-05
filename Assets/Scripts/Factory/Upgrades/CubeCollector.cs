@@ -37,6 +37,7 @@ public class CubeCollector : MonoBehaviour
         if (pickup == null || cube == null)
             return;
 
+        Debug.Log($"[CubeCollector] Collected {cube.UpgradeType} cube from {pickup.name}.", this);
         StoreUpgrade(cube.UpgradeType);
         ApplyRunBonuses(cube.UpgradeType);
 
@@ -69,23 +70,25 @@ public class CubeCollector : MonoBehaviour
         var manager = RunProgressManager.Instance;
         var runStats = manager != null ? manager.RunStats : null;
         var store = ActiveUpgradeStore;
-        if (runStats == null || store == null)
-            return;
-
-        switch (upgrade)
+        if (manager == null)
         {
-            case CubeUpgradeType.MaxHealth:
-                runStats.MaxHealthBonus += store.UpgradeMaxHealthValue;
-                break;
-            case CubeUpgradeType.MaxEnergy:
-                runStats.MaxEnergyBonus += store.UpgradeMaxEnergyValue;
-                break;
-            case CubeUpgradeType.EnergyRecharge:
-                runStats.AddEnergyRechargeBonus(store.UpgradeEnergyRechargeValue);
-                break;
-            case CubeUpgradeType.AttackDamage:
-                runStats.AttackDamageBonus += store.UpgradeAttackDamageValue;
-                break;
+            Debug.LogWarning("[CubeCollector] Run bonus skipped because RunProgressManager is missing.", this);
+            return;
         }
+
+        if (runStats == null)
+        {
+            Debug.LogWarning("[CubeCollector] Run bonus skipped because PlayerRunStats is missing on RunProgressManager.", this);
+            return;
+        }
+
+        if (store == null)
+        {
+            Debug.LogWarning("[CubeCollector] Run bonus skipped because CubeUpgradeSO is missing.", this);
+            return;
+        }
+
+        runStats.AddCubeBonus(upgrade, store);
+        Debug.Log($"[CubeCollector] Run bonus stored for {upgrade}. Totals: {runStats.DescribeBonuses()}", this);
     }
 }

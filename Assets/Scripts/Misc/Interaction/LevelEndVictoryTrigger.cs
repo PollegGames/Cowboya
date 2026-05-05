@@ -13,10 +13,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     [Range(0f, 1f)] public float disabledAlpha = 0.3f;
     private void Awake()
     {
-        if (runStats == null && RunProgressManager.Instance != null)
-        {
-            runStats = RunProgressManager.Instance.RunStats;
-        }
+        ResolveRunStats();
 
         if (saveService == null)
         {
@@ -49,6 +46,8 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        ResolveRunStats();
+
         if (doorNext != null)
         {
             isVictoryDoor = doorNext.isVictoryDoor;
@@ -83,10 +82,12 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                 {
                     EnergyBot energyBot = controller.GetComponent<EnergyBot>();
                     Attack attack = controller.Stats.Attacks.Count > 0 ? controller.Stats.Attacks[0] : null;
-                    runStats.Capture(controller.Stats, energyBot, attack);
+                    AttackHitbox[] attackHitboxes = controller.GetComponentsInChildren<AttackHitbox>(true);
+                    runStats.Capture(controller.Stats, energyBot, attack, attackHitboxes);
+                    Debug.Log($"[LevelEndVictoryTrigger] Captured run stats before level transition. Bonuses: {runStats.DescribeBonuses()}", this);
                     if (saveService != null)
                     {
-                        saveService.SaveGame(controller);
+                        saveService.SaveGame(controller, runStats);
                     }
                 }
                 else if (controller == null)
@@ -94,9 +95,30 @@ public class LevelEndVictoryTrigger : MonoBehaviour
                     Debug.LogWarning("LevelEndVictoryTrigger: RobotStateController component is missing on Player or its parent.");
                 }
 
-                RunProgressManager.Instance.LoadNextLevel();
+                if (RunProgressManager.Instance != null)
+                {
+                    Debug.Log($"[LevelEndVictoryTrigger] Loading next level from run level {RunProgressManager.Instance.CurrentLevelIndex}.", this);
+                    RunProgressManager.Instance.LoadNextLevel();
+                }
+                else
+                {
+                    Debug.LogError("LevelEndVictoryTrigger: RunProgressManager instance is missing.");
+                }
             }
 
         }
+    }
+
+    private void ResolveRunStats()
+    {
+        if (RunProgressManager.Instance == null || RunProgressManager.Instance.RunStats == null)
+            return;
+
+        if (runStats != null && runStats != RunProgressManager.Instance.RunStats)
+        {
+            Debug.LogWarning("LevelEndVictoryTrigger: Replacing serialized PlayerRunStats with RunProgressManager.RunStats for run continuity.");
+        }
+
+        runStats = RunProgressManager.Instance.RunStats;
     }
 }

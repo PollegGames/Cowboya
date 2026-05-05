@@ -18,6 +18,8 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
 
     [Header("Aggression Memory")]
     public bool WasRecentlyAttacked => memoryState.WasRecentlyAttacked;
+    public Vector3 LastAttackPosition => memoryState.LastAttackPosition;
+    public bool HasLastAttackPosition => memoryState.HasLastAttackPosition;
     public bool IsConnectedToMachine => memoryState.IsConnectedToMachine;
     public bool IsDead => memoryState.IsDead;
     public RoomWaypoint LastVisitedPoint => memoryState.LastVisitedPoint;
@@ -133,6 +135,12 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     /// Records that the enemy has just been attacked.
     /// </summary>
     public void RegisterAttack() => memoryState.RegisterAttack();
+
+    /// <summary>
+    /// Records that the enemy has just been attacked from a known position.
+    /// </summary>
+    /// <param name="attackerPosition">World position of the attacker.</param>
+    public void RegisterAttack(Vector3 attackerPosition) => memoryState.RegisterAttack(attackerPosition);
 
     /// <summary>
     /// Resets the aggression state after a certain period.

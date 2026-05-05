@@ -47,6 +47,8 @@ public class RobotMemoryStateNew
     public bool PlayerInAttackZone => snapshot.PlayerInAttackZone;
     public bool PlayerInDetectZone => snapshot.PlayerInDetectZone;
     public bool WasRecentlyAttacked => snapshot.WasRecentlyAttacked;
+    public Vector3 LastAttackPosition => snapshot.LastAttackPosition;
+    public bool HasLastAttackPosition => snapshot.HasLastAttackPosition;
     public bool IsConnectedToMachine => snapshot.IsConnectedToMachine;
     public bool IsDead => snapshot.IsDead;
     public RoomWaypoint LastVisitedPoint => snapshot.LastVisitedPoint;
@@ -186,7 +188,28 @@ public class RobotMemoryStateNew
 
     public void RegisterAttack()
     {
-        if (snapshot.WasRecentlyAttacked) return;
+        RegisterAttack(null);
+    }
+
+    public void RegisterAttack(Vector3 attackerPosition)
+    {
+        RegisterAttack((Vector3?)attackerPosition);
+    }
+
+    private void RegisterAttack(Vector3? attackerPosition)
+    {
+        bool alreadyAttacked = snapshot.WasRecentlyAttacked;
+        bool attackPositionChanged = false;
+
+        if (attackerPosition.HasValue)
+        {
+            attackPositionChanged = !snapshot.HasLastAttackPosition
+                || snapshot.LastAttackPosition != attackerPosition.Value;
+            snapshot.LastAttackPosition = attackerPosition.Value;
+            snapshot.HasLastAttackPosition = true;
+        }
+
+        if (alreadyAttacked && !attackPositionChanged) return;
         snapshot.WasRecentlyAttacked = true;
         Raise(MemoryChangeType.TookDamage);
     }
@@ -195,6 +218,8 @@ public class RobotMemoryStateNew
     {
         if (!snapshot.WasRecentlyAttacked) return;
         snapshot.WasRecentlyAttacked = false;
+        snapshot.LastAttackPosition = Vector3.zero;
+        snapshot.HasLastAttackPosition = false;
         Raise(MemoryChangeType.Normal);
     }
 
@@ -286,6 +311,8 @@ public class RobotMemoryStateNew
             PlayerInAttackZone = false,
             PlayerInDetectZone = false,
             WasRecentlyAttacked = false,
+            LastAttackPosition = Vector3.zero,
+            HasLastAttackPosition = false,
             IsConnectedToMachine = false,
             LastVisitedPoint = null,
             AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>(),

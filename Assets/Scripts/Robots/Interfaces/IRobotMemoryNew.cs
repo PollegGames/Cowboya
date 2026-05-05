@@ -8,6 +8,8 @@ public interface IRobotMemoryNew
     bool PlayerInAttackZone { get; }
     bool PlayerInDetectZone { get; }
     bool WasRecentlyAttacked { get; }
+    Vector3 LastAttackPosition { get; }
+    bool HasLastAttackPosition { get; }
     RoomWaypoint LastVisitedPoint { get; }
     Dictionary<RoomWaypoint, bool> AllAvailableWaypoints { get; }
 
@@ -18,5 +20,6 @@ public interface IRobotMemoryNew
     void SetPlayerInAttackZone(bool inZone);
     void SetPlayerInDetectZone(bool inZone);
     void RegisterAttack();
+    void RegisterAttack(Vector3 attackerPosition);
     void ResetAttackMemory();
 }
