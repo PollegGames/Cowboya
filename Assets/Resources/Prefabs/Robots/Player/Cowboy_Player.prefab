@@ -2524,10 +2524,10 @@ MonoBehaviour:
   autoRecharge: 1
   rechargeRate: 5
   tickDelay: 1
-  rechargeDelayAfterUse: 1
+  rechargeDelayAfterUse: 0.75
   faintRecoveryEnergy: 20
-  walkEnergyCostPerSecond: 1
-  jumpEnergyCost: 3
+  walkEnergyCostPerSecond: 0.25
+  jumpEnergyCost: 1.5
   crouchEnergyCostPerSecond: 1
   grabEnergyCost: 1
 --- !u!114 &1070615312316343489
@@ -2606,7 +2606,7 @@ MonoBehaviour:
   jumpBoolParameter: IsJumping
   crouchBoolParameter: IsCrouching
   jumpAnimationDuration: 0.4
-  energyCostPerJump: 3
+  energyCostPerJump: 1.5
   energyCostPerCrouch: 3
   isPlayerControlled: 1
 --- !u!114 &193686182613551049

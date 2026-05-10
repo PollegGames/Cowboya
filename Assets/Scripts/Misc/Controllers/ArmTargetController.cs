@@ -564,7 +564,7 @@ private bool attackEnergySpentThisPress;
     private void ApplySolverFlip(bool targetIsRightSide)
     {
         SetSolverFlip(leftArmIkSolver, targetIsRightSide);
-        SetSolverFlip(rightArmIkSolver, false);
+        SetSolverFlip(rightArmIkSolver, targetIsRightSide);
     }
 
     private void SetSolverFlip(Behaviour solver, bool flipValue)

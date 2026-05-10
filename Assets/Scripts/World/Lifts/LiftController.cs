@@ -12,6 +12,8 @@ public class LiftController : MonoBehaviour
     public Collider2D floorCollider;
     [Tooltip("Root GameObject holding AreaEffector2D and 'going up' visuals.")]
     public GameObject movingObject;
+    [SerializeField] private GameObject leftWallShaft;
+    [SerializeField] private GameObject rightWallShaft;
 
     [Header("Movement")]
     public Vector2 moveDirection = Vector2.up;
@@ -143,11 +145,8 @@ public class LiftController : MonoBehaviour
         // Disable moving object during return movement
         SetMovingObjectActive(false);
 
-        if (moveDirection == Vector2.down)
-        {
-            if (floorCollider) floorCollider.enabled = false;
-            if (lightRenderer) lightRenderer.enabled = false;
-        }
+        if (floorCollider) floorCollider.enabled = false;
+        if (lightRenderer) lightRenderer.enabled = false;
 
         yield return MoveLightTo(lightStartPos);
         onReturnArrival?.Invoke();
@@ -209,6 +208,8 @@ public class LiftController : MonoBehaviour
     private void SetMovingObjectActive(bool active)
     {
         if (movingObject) movingObject.SetActive(active);
+        if (leftWallShaft) leftWallShaft.SetActive(active);
+        if (rightWallShaft) rightWallShaft.SetActive(active);
     }
 
     private void OnValidate()
