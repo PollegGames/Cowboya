@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using CowBoya.Robots;
 using UnityEngine;
 
 public class RobotStateController : MonoBehaviour, IPooledObject
@@ -13,6 +15,9 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     [SerializeField] private HealthBot healthBot;
     public HealthBot Health => healthBot;
     [SerializeField] private JointBreaker jointBreaker;
+    [SerializeField] private RobotMemoryNew memory;
+    [SerializeField] private RobotBodyController bodyController;
+    [SerializeField] private RobotAttackController attackController;
     [SerializeField] private RobotStats stats;
 
     public RobotStats Stats
@@ -38,6 +43,9 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     private bool deathReported;
     private bool savedReported;
     private WorkerCondition workerCondition = WorkerCondition.Active;
+    private readonly Dictionary<Rigidbody2D, RigidbodyConstraints2D> defaultConstraints2D = new();
+    private SimplePuppetBinder[] puppetBinders;
+    private Rigidbody2D[] rigidbodies2D;
 
     public WorkerCondition WorkerConditionState => workerCondition;
     [Header("Saving")]
@@ -52,6 +60,14 @@ public class RobotStateController : MonoBehaviour, IPooledObject
             healthBot = GetComponent<HealthBot>();
         if (jointBreaker == null)
             jointBreaker = GetComponent<JointBreaker>();
+        if (memory == null)
+            memory = GetComponent<RobotMemoryNew>();
+        if (bodyController == null)
+            bodyController = GetComponent<RobotBodyController>();
+        if (attackController == null)
+            attackController = GetComponent<RobotAttackController>();
+
+        CacheDeathPhysicsDefaults();
 
         if (healthBot != null)
             healthBot.OnHealthChanged += HandleHealthChange;
@@ -195,15 +211,18 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         if (CurrentState == newState) return;
 
         CurrentState = newState;
-        OnStateChanged?.Invoke(newState);
 
         if (newState == RobotState.Dead)
         {
+            ApplyEnemyDeathState();
+            OnStateChanged?.Invoke(newState);
             jointBreaker?.BreakAll();
             ReportDeathOnce();
         }
         else
         {
+            RestoreEnemyAliveState();
+            OnStateChanged?.Invoke(newState);
             deathReported = false;
             savedReported = false;
         }
@@ -222,6 +241,7 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         deathReported = false;
         savedReported = false;
         workerCondition = WorkerCondition.Active;
+        RestoreEnemyAliveState();
         if (Stats != null)
         {
             Stats.CurrentHealth = Stats.MaxHealth;
@@ -278,6 +298,85 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
         savedReported = true;
         OnAnyRobotSaved?.Invoke(this);
+    }
+
+    private void ApplyEnemyDeathState()
+    {
+        if (IsPlayerRobot())
+            return;
+
+        memory?.SetDead(true);
+        bodyController?.StopMovement();
+        attackController?.StopAttacking();
+        SetPuppetBindersEnabled(false);
+        ReleaseRotationConstraints();
+    }
+
+    private void RestoreEnemyAliveState()
+    {
+        if (IsPlayerRobot())
+            return;
+
+        memory?.SetDead(false);
+        SetPuppetBindersEnabled(true);
+        RestoreRotationConstraints();
+    }
+
+    private bool IsPlayerRobot()
+    {
+        return GetComponent<PlayerBrain>() != null;
+    }
+
+    private void CacheDeathPhysicsDefaults()
+    {
+        puppetBinders = GetComponentsInChildren<SimplePuppetBinder>(true);
+        rigidbodies2D = GetComponentsInChildren<Rigidbody2D>(true);
+
+        foreach (Rigidbody2D body in rigidbodies2D)
+        {
+            if (body != null && !defaultConstraints2D.ContainsKey(body))
+                defaultConstraints2D.Add(body, body.constraints);
+        }
+    }
+
+    private void SetPuppetBindersEnabled(bool enabled)
+    {
+        if (puppetBinders == null)
+            CacheDeathPhysicsDefaults();
+
+        foreach (SimplePuppetBinder binder in puppetBinders)
+        {
+            if (binder != null)
+                binder.enabled = enabled;
+        }
+    }
+
+    private void ReleaseRotationConstraints()
+    {
+        if (rigidbodies2D == null)
+            CacheDeathPhysicsDefaults();
+
+        foreach (Rigidbody2D body in rigidbodies2D)
+        {
+            if (body == null)
+                continue;
+
+            if (!defaultConstraints2D.ContainsKey(body))
+                defaultConstraints2D.Add(body, body.constraints);
+
+            body.linearVelocity = Vector2.zero;
+            body.angularVelocity = 0f;
+            body.constraints &= ~RigidbodyConstraints2D.FreezeRotation;
+        }
+    }
+
+    private void RestoreRotationConstraints()
+    {
+        foreach (var pair in defaultConstraints2D)
+        {
+            if (pair.Key != null)
+                pair.Key.constraints = pair.Value;
+        }
     }
 
 }
