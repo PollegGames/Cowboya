@@ -3482,7 +3482,7 @@ MonoBehaviour:
   rightWallShaft: {fileID: 2179757472820810864}
   moveDirection: {x: 0, y: -1}
   moveDistance: 11
-  moveSpeed: 2
+  moveSpeed: 5
   waitAtTop: 1
   greenDelay: 1.5
   orangeDelay: 1.5
@@ -6261,7 +6261,7 @@ MonoBehaviour:
   rightWallShaft: {fileID: 1977777627836530707}
   moveDirection: {x: 0, y: 1}
   moveDistance: 11.5
-  moveSpeed: 2
+  moveSpeed: 5
   waitAtTop: 1
   greenDelay: 1.5
   orangeDelay: 1.5

@@ -3,6 +3,12 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class CowboyGrabController : MonoBehaviour
 {
+    private struct GrabDetection
+    {
+        public IGrabbable Grabbable;
+        public Collider2D SourceCollider;
+    }
+
     [Header("Grab Settings")]
     [SerializeField] private float grabRadius = 0.4f;
     [SerializeField] private LayerMask grabbableLayers = ~0;
@@ -49,13 +55,19 @@ public class CowboyGrabController : MonoBehaviour
             return false;
         }
 
-        IGrabbable candidate = DetectGrabbable(anchor.position);
+        GrabDetection detection = DetectGrabbable(anchor.position);
+        IGrabbable candidate = detection.Grabbable;
         if (candidate == null)
         {
             return false;
         }
 
         Inventory currentInventory = GetInventory();
+        if (candidate is IGrabContextReceiver contextReceiver)
+        {
+            contextReceiver.SetGrabContext(detection.SourceCollider, anchor.position);
+        }
+
         if (!candidate.CanBeGrabbed(currentInventory))
         {
             return false;
@@ -171,7 +183,7 @@ public class CowboyGrabController : MonoBehaviour
         SetHandAttractorState(arm, false);
     }
 
-    private IGrabbable DetectGrabbable(Vector3 origin)
+    private GrabDetection DetectGrabbable(Vector3 origin)
     {
         int mask = grabbableLayers.value;
         if (mask == 0)
@@ -181,6 +193,7 @@ public class CowboyGrabController : MonoBehaviour
 
         Collider2D[] colliders = Physics2D.OverlapCircleAll(origin, grabRadius, mask);
         IGrabbable closest = null;
+        Collider2D closestCollider = null;
         float closestDistance = float.MaxValue;
 
         foreach (Collider2D collider in colliders)
@@ -207,15 +220,21 @@ public class CowboyGrabController : MonoBehaviour
                 continue;
             }
 
-            float distance = Vector2.Distance(origin, behaviour.transform.position);
+            Vector2 closestPoint = collider.ClosestPoint(origin);
+            float distance = Vector2.Distance(origin, closestPoint);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
                 closest = grabbable;
+                closestCollider = collider;
             }
         }
 
-        return closest;
+        return new GrabDetection
+        {
+            Grabbable = closest,
+            SourceCollider = closestCollider
+        };
     }
 
     private static PickupType? ResolvePickupSlot(IGrabbable grabbable)

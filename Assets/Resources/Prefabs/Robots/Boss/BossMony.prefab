@@ -2738,6 +2738,7 @@ GameObject:
   - component: {fileID: 6659830223704625551}
   - component: {fileID: 298235982843602329}
   - component: {fileID: 4779150262777816012}
+  - component: {fileID: 3325069555325083367}
   m_Layer: 7
   m_Name: BossMony
   m_TagString: Enemy
@@ -2775,59 +2776,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::CowBoya.Robots.SimplePuppetBinder
   MasterRoot: {fileID: 2290623977710028700}
   PuppetRoot: {fileID: 6720655779116877054}
+  RotationSharpness: 0
   Pairs:
   - Master: {fileID: 7811221416644539449}
     Puppet: {fileID: 2737376850554573035}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 830316106599361004}
     Puppet: {fileID: 1597072755967693620}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 8096576993977842318}
     Puppet: {fileID: 8685244929936616097}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 4702451622807557690}
     Puppet: {fileID: 6495128365634737989}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 9056274063539078734}
     Puppet: {fileID: 8419297039649373316}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 8630765712526065707}
     Puppet: {fileID: 1644172698709219067}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 6254581533089563566}
     Puppet: {fileID: 8055502977060741728}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 4602278820333239002}
     Puppet: {fileID: 987344548270904218}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 8401718121786430346}
     Puppet: {fileID: 987344548270904218}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 3225530579805921498}
     Puppet: {fileID: 221450182793490140}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 4843921429171290989}
     Puppet: {fileID: 25583866404762000}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 3031587079043802484}
     Puppet: {fileID: 7663402448747916265}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
   - Master: {fileID: 5893259567039800658}
     Puppet: {fileID: 3587278972892523665}
     PuppetBody2D: {fileID: 0}
-    PuppetBody3D: {fileID: 0}
 --- !u!114 &7298898667421222504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3045,6 +3034,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49ceeaa695335f448915ff284349a7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::RobotMemoryNew
+--- !u!114 &3325069555325083367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629763386926311630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f2f2b9c0b1f41d4bb695d36c7e4f4d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::EnemyGrabbable
+  frequency: 10
+  dampingRatio: 0.9
+  maxForce: 2500
+  releaseVelocityLimit: 12
+  extraBehavioursToPause: []
+  resetIntentOnRelease: 1
 --- !u!1 &3636523153973176014
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,3 +7,8 @@ public interface IGrabbable
     void OnRelease(Vector2 throwForce);
     void OnAttract(Vector2 attractPoint);
 }
+
+public interface IGrabContextReceiver
+{
+    void SetGrabContext(Collider2D sourceCollider, Vector2 grabOrigin);
+}

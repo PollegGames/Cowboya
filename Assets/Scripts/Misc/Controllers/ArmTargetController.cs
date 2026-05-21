@@ -43,6 +43,8 @@ private Coroutine externalAttackPulseRoutine;
     private bool attackInputHeld;
 private bool attackSuppressedUntilRelease;
 private bool preferRightArm = true;
+private CowboyArmSide? interactLockedArm;
+private CowboyArmSide? attackLockedArm;
 private CowboyArmSide? attackActiveArm;
 private bool attackEnergySpentThisPress;
     private bool externalAttackInput;
@@ -79,6 +81,8 @@ private bool attackEnergySpentThisPress;
         attackHeld = false;
         attackInputHeld = false;
         attackSuppressedUntilRelease = false;
+        interactLockedArm = null;
+        attackLockedArm = null;
         attackActiveArm = null;
         attackEnergySpentThisPress = false;
         attackController?.DeactivateAll();
@@ -90,12 +94,15 @@ private bool attackEnergySpentThisPress;
     {
         bool currentlyHeld = IsRightMouseHeld();
         bool attackInput = useExternalAttackInput ? externalAttackInput : IsLeftMouseHeld();
+        bool attackPressedThisFrame = !attackInputHeld && attackInput;
+        bool attackReleasedThisFrame = attackInputHeld && !attackInput;
 
         attackInputHeld = attackInput;
         if (!attackInputHeld)
         {
             attackSuppressedUntilRelease = false;
             attackEnergySpentThisPress = false;
+            attackLockedArm = null;
         }
 
         attackHeld = allowAttackAim && attackInputHeld && !attackSuppressedUntilRelease;
@@ -104,8 +111,28 @@ private bool attackEnergySpentThisPress;
         interactReleasedThisFrame = interactHeld && !currentlyHeld;
         interactHeld = currentlyHeld;
 
+        if (interactPressedThisFrame)
+        {
+            LockInteractArm();
+        }
+
+        if (attackPressedThisFrame)
+        {
+            LockAttackArm();
+        }
+
         HandleGrabInput();
         HandleAttackInput();
+
+        if (interactReleasedThisFrame)
+        {
+            interactLockedArm = null;
+        }
+
+        if (attackReleasedThisFrame)
+        {
+            attackLockedArm = null;
+        }
     }
 
     private void CacheRestPose()
@@ -195,6 +222,11 @@ private bool attackEnergySpentThisPress;
             return holdingArm.Value;
         }
 
+        if (interactLockedArm.HasValue)
+        {
+            return interactLockedArm.Value;
+        }
+
         if (bodyReference != null && targetTransform != null)
         {
             UpdatePreferredSide();
@@ -209,6 +241,16 @@ private bool attackEnergySpentThisPress;
         if (holdingArm.HasValue)
         {
             return holdingArm.Value;
+        }
+
+        if (attackLockedArm.HasValue)
+        {
+            return attackLockedArm.Value;
+        }
+
+        if (interactLockedArm.HasValue)
+        {
+            return interactLockedArm.Value;
         }
 
         if (bodyReference != null && targetTransform != null)
@@ -344,7 +386,7 @@ private bool attackEnergySpentThisPress;
         if (hasTargets)
         {
             UpdatePreferredSide();
-            ApplySolverFlip(preferRightArm);
+            ApplySolverFlip(GetSolverArmSide() == CowboyArmSide.Right);
         }
 
         ApplySolverStates(canDrive);
@@ -363,9 +405,7 @@ private bool attackEnergySpentThisPress;
 
         Vector3 destination = targetTransform.position;
 
-        bool useRightArm = grabController != null && grabController.HasHeldObject()
-            ? grabController.GetHoldingArm() == CowboyArmSide.Right
-            : ShouldUseRightArm();
+        bool useRightArm = GetSolverArmSide() == CowboyArmSide.Right;
         Transform activeArm = useRightArm ? rightArmSolverTarget : leftArmSolverTarget;
         Transform inactiveArm = useRightArm ? leftArmSolverTarget : rightArmSolverTarget;
 
@@ -473,9 +513,7 @@ private bool attackEnergySpentThisPress;
             return;
         }
 
-        bool useRightArm = grabController != null && grabController.HasHeldObject()
-            ? grabController.GetHoldingArm() == CowboyArmSide.Right
-            : ShouldUseRightArm();
+        bool useRightArm = GetSolverArmSide() == CowboyArmSide.Right;
 
         if (useRightArm)
         {
@@ -502,6 +540,60 @@ private bool attackEnergySpentThisPress;
     private bool ShouldUseRightArm()
     {
         return preferRightArm;
+    }
+
+    private void LockInteractArm()
+    {
+        if (bodyReference != null && targetTransform != null)
+        {
+            UpdatePreferredSide();
+        }
+
+        interactLockedArm = ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
+    }
+
+    private void LockAttackArm()
+    {
+        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
+        if (holdingArm.HasValue)
+        {
+            attackLockedArm = holdingArm.Value;
+            return;
+        }
+
+        if (interactLockedArm.HasValue)
+        {
+            attackLockedArm = interactLockedArm.Value;
+            return;
+        }
+
+        if (bodyReference != null && targetTransform != null)
+        {
+            UpdatePreferredSide();
+        }
+
+        attackLockedArm = ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
+    }
+
+    private CowboyArmSide GetSolverArmSide()
+    {
+        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
+        if (holdingArm.HasValue)
+        {
+            return holdingArm.Value;
+        }
+
+        if (attackLockedArm.HasValue)
+        {
+            return attackLockedArm.Value;
+        }
+
+        if (interactLockedArm.HasValue)
+        {
+            return interactLockedArm.Value;
+        }
+
+        return ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
     }
 
     private static CowboyArmSide GetOppositeArm(CowboyArmSide arm)

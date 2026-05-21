@@ -17,8 +17,6 @@ namespace CowBoya.Robots
             public Transform Puppet;
             [Tooltip("Optional cached Rigidbody2D reference on the puppet for smooth moves.")]
             public Rigidbody2D PuppetBody2D;
-            [Tooltip("Optional cached Rigidbody reference on the puppet for smooth moves.")]
-            public Rigidbody PuppetBody3D;
 
             [NonSerialized]
             internal Quaternion targetRotation;
@@ -81,25 +79,14 @@ namespace CowBoya.Robots
                     pair.PuppetBody2D = rb2D;
                 }
 
-                Rigidbody rb3D = pair.PuppetBody3D;
-                if (rb3D == null)
-                {
-                    pair.Puppet.TryGetComponent(out rb3D);
-                    pair.PuppetBody3D = rb3D;
-                }
-
                 Quaternion localMasterRotation = masterRootInverseRotation * pair.Master.rotation;
                 Quaternion rotation = puppetRootRotation * localMasterRotation;
                 // Rigs that include a Rigidbody need their targets deferred to FixedUpdate;
                 // transform writes in LateUpdate only stick on bones without physics.
-                if (rb2D != null || rb3D != null)
+                if (rb2D != null)
                 {
                     pair.targetRotation = rotation;
                     pair.hasRotationTarget = true;
-                }
-                else
-                {
-                    pair.Puppet.rotation = rotation;
                 }
             }
         }
@@ -115,7 +102,6 @@ namespace CowBoya.Robots
                 }
 
                 Rigidbody2D rb2D = pair.PuppetBody2D;
-                Rigidbody rb3D = pair.PuppetBody3D;
 
                 if (pair.hasRotationTarget)
                 {
@@ -129,10 +115,6 @@ namespace CowBoya.Robots
                         }
 
                         rb2D.MoveRotation(targetAngle);
-                    }
-                    else if (rb3D != null)
-                    {
-                        rb3D.MoveRotation(pair.targetRotation);
                     }
                 }
             }
