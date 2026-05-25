@@ -23,6 +23,7 @@ public class MachineWorkerManager : MonoBehaviour
         reservationService?.RegisterMachine(machine, RobotRole.Worker);
         machine.OnMachinePowerChanged += HandleMachinePowerChanged;
         machine.OnMachineTurnedOff += HandleMachineTurnedOff;
+        machine.OnRobotFreed += HandleMachineFreed;
     }
 
     public void RegisterMachine(RestingMachine machine)
@@ -33,6 +34,7 @@ public class MachineWorkerManager : MonoBehaviour
         machines.Add(machine);
         machine.OnMachinePowerChanged += HandleMachinePowerChanged;
         machine.OnMachineTurnedOff += HandleMachineTurnedOff;
+        machine.OnRobotFreed += HandleMachineFreed;
     }
 
     private void OnDestroy()
@@ -43,7 +45,14 @@ public class MachineWorkerManager : MonoBehaviour
                 continue;
             machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
             machine.OnMachineTurnedOff -= HandleMachineTurnedOff;
+            machine.OnRobotFreed -= HandleMachineFreed;
         }
+    }
+
+    private void HandleMachineFreed(BaseMachine machine)
+    {
+        if (machine != null && machine.IsOn)
+            NotifyWorkersMachinePoweredOn(machine);
     }
 
     private void HandleMachinePowerChanged(MachinePowerChangedEvent evt)

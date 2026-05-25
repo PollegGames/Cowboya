@@ -444,19 +444,19 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             owner = go.GetComponent<MonoBehaviour>();
         RobotEcosystemProbe.RecordSpawn(owner, role, lastVisited);
 
-        var brain = go.GetComponent<RobotBrainNew>();
-        if (brain != null)
-        {
-            if (role == RobotRole.SecurityGuard && securityManager != null)
-                securityManager.RegisterGuard(brain);
-        }
-
         var heart = go.GetComponent<RobotHeartNew>();
         if (heart != null)
         {
             heart.ConfigureRole(role, resetStack: true);
             if (heart.Role != role)
                 Debug.LogWarning($"[EnemiesSpawner] RobotHeartNew on {go.name} failed role configuration. Expected={role} Actual={heart.Role}");
+        }
+
+        var brain = go.GetComponent<RobotBrainNew>();
+        if (brain != null)
+        {
+            if (role == RobotRole.SecurityGuard && securityManager != null)
+                securityManager.RegisterGuard(brain);
         }
 
         var bodyController = go.GetComponent<RobotBodyController>();

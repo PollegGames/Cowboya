@@ -17,6 +17,7 @@ public enum MemoryChangeType
     MachineDetachedTransient,
     MachineDetachedFinal,
     ReactivationCompleted,
+    ReactivationAssigned,
     DeadStateChanged,
     DesiredMachineChanged,
     Normal
@@ -53,6 +54,7 @@ public class RobotMemoryStateNew
     public bool IsDead => snapshot.IsDead;
     public RoomWaypoint LastVisitedPoint => snapshot.LastVisitedPoint;
     public MachineType? DesiredMachineType => snapshot.DesiredMachineType;
+    public BaseMachine PendingReactivationMachine => snapshot.PendingReactivationMachine;
 
     // roomwaypoint and the bool is if the waypoint is no more accessible
     // for exemple if machine off, if a waypoint is in a blocked room, if already is already there, etc..
@@ -179,6 +181,15 @@ public class RobotMemoryStateNew
         Raise(MemoryChangeType.DesiredMachineChanged);
     }
 
+    public void AssignReactivationMachine(BaseMachine machine)
+    {
+        if (snapshot.PendingReactivationMachine == machine)
+            return;
+
+        snapshot.PendingReactivationMachine = machine;
+        Raise(MemoryChangeType.ReactivationAssigned);
+    }
+
     public void SetDead(bool isDead)
     {
         if (snapshot.IsDead == isDead) return;
@@ -260,6 +271,7 @@ public class RobotMemoryStateNew
         snapshot.IsConnectedToMachine = connectedToReactivatedMachine;
         snapshot.DesiredMachineType = nextDesiredMachineType;
         snapshot.IsMachineTransitionInProgress = nextDesiredMachineType.HasValue && !connectedToReactivatedMachine;
+        snapshot.PendingReactivationMachine = null;
 
         Raise(MemoryChangeType.ReactivationCompleted);
     }
@@ -317,7 +329,8 @@ public class RobotMemoryStateNew
             LastVisitedPoint = null,
             AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>(),
             DesiredMachineType = null,
-            IsMachineTransitionInProgress = false
+            IsMachineTransitionInProgress = false,
+            PendingReactivationMachine = null
         };
         Raise(MemoryChangeType.Normal);
     }

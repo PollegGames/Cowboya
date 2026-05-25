@@ -21,6 +21,7 @@ public struct RobotMemorySnapshotNew
     public Dictionary<RoomWaypoint, bool> AllAvailableWaypoints;
     public MachineType? DesiredMachineType;
     public bool IsMachineTransitionInProgress;
+    public BaseMachine PendingReactivationMachine;
     // Backward-compatible alias for older code that uses lower camel case.
     public Vector3 lastKnownPlayerPosition
     {

@@ -320,7 +320,6 @@ public class MachineSecurityManager : MonoBehaviour
         Debug.Log($"Dispatching guard for security machine: {machine.name}");
 
         RobotBrainNew best = null;
-        bool skippedEligible = false;
 
         foreach (var guard in guards)
         {
@@ -328,14 +327,13 @@ public class MachineSecurityManager : MonoBehaviour
             if (!IsGuardStationedAtSecurityMachine(guard)) continue;
             if (skipGuard != null && ReferenceEquals(guard, skipGuard))
             {
-                skippedEligible = true;
                 continue;
             }
 
             best = SelectCloserGuard(best, guard, machine.transform.position);
         }
 
-        if (best == null && skippedEligible)
+        if (best == null && skipGuard != null)
             best = skipGuard;
 
         if (best == null)
@@ -523,14 +521,21 @@ public class MachineSecurityManager : MonoBehaviour
         RobotNewTrace.Log(
             guard,
             eventSource: "MachineSecurityManager.DispatchGuard",
-            memoryDelta: "none",
+            memoryDelta: "ReactivationAssigned",
             brainOptions: guard.CurrentOptions,
             plannedTask: reactivateTask,
             heartCurrentTask: guard.Heart != null ? guard.Heart.CurrentTask : null,
             taskSignal: "security_dispatch:" + reason);
 
-        if (guard.Heart != null)
-            guard.Heart.QueueTask(reactivateTask);
+        if (guard.Memory == null)
+        {
+            Debug.LogWarning(
+                $"[MachineSecurityManager] Cannot dispatch reactivation through Memory -> Brain -> Heart -> Task because guard={guard.name} has no {nameof(RobotMemoryNew)}.",
+                guard);
+            return;
+        }
+
+        guard.Memory.AssignReactivationMachine(machine);
     }
 
     private bool IsGuardStationedAtSecurityMachine(RobotBrainNew guard)

@@ -3,6 +3,8 @@ using UnityEngine;
 public class GrabHandAttractor : MonoBehaviour
 {
     public float detectionRadius = 0.5f;
+    [SerializeField, Min(0f), Tooltip("Maximum preview distance for a badge attached to a living enemy.")]
+    private float livingEnemyBadgeDetectionRadius = 0.25f;
     public LayerMask detectionLayer;
     public System.Action<IGrabbable> OnObjectDetected;
 
@@ -33,8 +35,10 @@ public class GrabHandAttractor : MonoBehaviour
             mask = ~0;
 
         Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, detectionRadius);
-        IGrabbable closestGrabbable = null;
-        float closestDistance = float.MaxValue;
+        IGrabbable closestBadge = null;
+        float closestBadgeDistance = float.MaxValue;
+        IGrabbable closestOther = null;
+        float closestOtherDistance = float.MaxValue;
 
         foreach (Collider2D col in cols)
         {
@@ -57,15 +61,31 @@ public class GrabHandAttractor : MonoBehaviour
                     continue;
                 }
 
-                float distance = Vector2.Distance(transform.position, grabbableMono.transform.position);
-                if (distance < closestDistance)
+                float distance = Vector2.Distance(transform.position, col.ClosestPoint(transform.position));
+                if (grabbable is SecurityBadgePickup badge)
                 {
-                    closestDistance = distance;
-                    closestGrabbable = grabbable;
+                    if (badge.RequiresCloseRangeWhileAttachedToEnemy()
+                        && distance > livingEnemyBadgeDetectionRadius)
+                    {
+                        continue;
+                    }
+                    if (distance < closestBadgeDistance)
+                    {
+                        closestBadgeDistance = distance;
+                        closestBadge = grabbable;
+                    }
+                    continue;
+                }
+
+                if (distance < closestOtherDistance)
+                {
+                    closestOtherDistance = distance;
+                    closestOther = grabbable;
                 }
             }
         }
 
+        IGrabbable closestGrabbable = closestBadge ?? closestOther;
         if (closestGrabbable != null)
         {
             OnObjectDetected?.Invoke(closestGrabbable);

@@ -178,6 +178,23 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         return true;
     }
 
+    /// <summary>
+    /// Returns whether this badge is still attached to an enemy that has not died.
+    /// Badges on living or incapacitated enemies require deliberate close-range selection.
+    /// </summary>
+    public bool RequiresCloseRangeWhileAttachedToEnemy()
+    {
+        RobotHeartNew enemyHeart = GetComponentInParent<RobotHeartNew>();
+        if (enemyHeart == null
+            || (enemyHeart.Role != RobotRole.SecurityGuard && enemyHeart.Role != RobotRole.Boss))
+        {
+            return false;
+        }
+
+        RobotStateController stateController = enemyHeart.GetComponent<RobotStateController>();
+        return stateController == null || stateController.CurrentState != RobotState.Dead;
+    }
+
     public void OnGrab(Transform grabParent)
     {
         if (grabParent == null)

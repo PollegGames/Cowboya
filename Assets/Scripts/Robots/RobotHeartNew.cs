@@ -104,7 +104,7 @@ public class RobotHeartNew : MonoBehaviour
         if (planned == null)
             return;
 
-        RemoveStaleAttackTasksBeforePlan(planned);
+        RemoveStalePerceptionTasksBeforePlan(planned);
         taskStack.PushOrRefresh(planned);
         RobotEcosystemProbe.RecordHeartPlannedTask(this, planned, taskStack.Current);
         RobotNewTrace.Log(
@@ -376,26 +376,42 @@ public class RobotHeartNew : MonoBehaviour
         };
     }
 
-    private void RemoveStaleAttackTasksBeforePlan(RobotTask planned)
+    private void RemoveStalePerceptionTasksBeforePlan(RobotTask planned)
     {
         if (taskStack == null || planned == null)
             return;
 
-        if (planned.Type == RobotTaskType.AttackTarget || currentOptions.HasFlag(BrainOption.CanAttack))
-            return;
+        if (planned.Type != RobotTaskType.AttackTarget && !currentOptions.HasFlag(BrainOption.CanAttack))
+        {
+            bool removedAttack = taskStack.RemoveTasksOfType(RobotTaskType.AttackTarget);
+            if (removedAttack)
+            {
+                RobotNewTrace.Log(
+                    this,
+                    eventSource: "HeartNew.RemoveStalePerceptionTasks",
+                    memoryDelta: "none",
+                    brainOptions: currentOptions,
+                    plannedTask: planned,
+                    heartCurrentTask: taskStack.Current,
+                    taskSignal: "remove:AttackTarget");
+            }
+        }
 
-        bool removed = taskStack.RemoveTasksOfType(RobotTaskType.AttackTarget);
-        if (!removed)
-            return;
-
-        RobotNewTrace.Log(
-            this,
-            eventSource: "HeartNew.RemoveStaleAttackTasks",
-            memoryDelta: "none",
-            brainOptions: currentOptions,
-            plannedTask: planned,
-            heartCurrentTask: taskStack.Current,
-            taskSignal: "remove:AttackTarget");
+        if (planned.Type != RobotTaskType.ChasePlayer && !currentOptions.HasFlag(BrainOption.PlayerDetected))
+        {
+            bool removedChase = taskStack.RemoveTasksOfType(RobotTaskType.ChasePlayer);
+            if (removedChase)
+            {
+                RobotNewTrace.Log(
+                    this,
+                    eventSource: "HeartNew.RemoveStalePerceptionTasks",
+                    memoryDelta: "none",
+                    brainOptions: currentOptions,
+                    plannedTask: planned,
+                    heartCurrentTask: taskStack.Current,
+                    taskSignal: "remove:ChasePlayer");
+            }
+        }
     }
 
     private static bool ShouldCompleteOnArrival(RobotTaskType type)

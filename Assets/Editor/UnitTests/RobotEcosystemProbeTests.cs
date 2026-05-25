@@ -427,6 +427,92 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
+    public void WorkerSlot_OccupiedFactoryMachine_ReplacesOwnerAndSendsPreviousWorkerToRest()
+    {
+        var owner = CreateRobotWithBrain("Robot_WorkOwner");
+        var incoming = CreateRobotWithBrain("Robot_WorkIncoming");
+
+        var machineGo = new GameObject("OccupiedFactoryMachine");
+        var machine = machineGo.AddComponent<FactoryMachine>();
+        var occupiedWaypoint = machineGo.AddComponent<RoomWaypoint>();
+        occupiedWaypoint.type = WaypointType.Work;
+        occupiedWaypoint.IsAvailable = true;
+        var restWaypoint = CreateWaypoint("RestWaypoint_AfterReplacement", WaypointType.Rest, true, Vector3.right);
+
+        owner.brain.Memory.InitializeWaypointAvailability(new[] { occupiedWaypoint, restWaypoint });
+        incoming.brain.Memory.InitializeWaypointAvailability(new[] { occupiedWaypoint, restWaypoint });
+        owner.heart.ResetIntentStack(repopulateDefaultTask: true);
+        incoming.heart.ResetIntentStack(repopulateDefaultTask: true);
+        owner.heart.QueueTask(new RobotTask(RobotTaskType.GoToMachine, occupiedWaypoint));
+        incoming.heart.QueueTask(new RobotTask(RobotTaskType.GoToMachine, occupiedWaypoint));
+
+        var managerGo = new GameObject("MachineWorkerManager_Occupied");
+        var manager = managerGo.AddComponent<MachineWorkerManager>();
+        manager.RegisterMachine(machine);
+
+        var slotGo = new GameObject("OccupiedWorkerSlot");
+        var slot = slotGo.AddComponent<WorkerSlot>();
+        SetPrivateField(slot, "machine", machine);
+
+        InvokePrivate(slot, "OnTriggerEnter2D", owner.collider);
+        InvokePrivate(slot, "OnTriggerEnter2D", incoming.collider);
+
+        Assert.AreEqual(incoming.brain, machine.CurrentWorker, "The arriving worker should take the occupied work station.");
+        Assert.IsTrue(incoming.brain.Memory.IsConnectedToMachine);
+        Assert.IsFalse(owner.brain.Memory.IsConnectedToMachine);
+        AssertWorkerPlansWaypoint(owner.brain, restWaypoint, "The replaced worker should leave the station and go rest.");
+    }
+
+    [Test]
+    public void SecurityMachine_PowerOff_LoneCurrentGuardReceivesReactivateTask()
+    {
+        var setup = CreateRobotWithBrain("Robot_LoneSecurityGuard");
+        setup.heart.ConfigureRole(RobotRole.SecurityGuard, resetStack: true);
+
+        var managerGo = new GameObject("MachineSecurityManager_LoneGuard");
+        var manager = managerGo.AddComponent<MachineSecurityManager>();
+        var machineGo = new GameObject("SecurityPost_LoneGuard");
+        var machine = machineGo.AddComponent<SecurityMachine>();
+
+        manager.RegisterSecurityMachine(machine);
+        manager.RegisterGuard(setup.brain);
+        machine.AttachRobot(setup.brain.gameObject);
+
+        machine.PowerOff();
+
+        Assert.IsNotNull(setup.heart.CurrentTask);
+        Assert.AreEqual(RobotTaskType.ReactivateMachine, setup.heart.CurrentTask.Type);
+        Assert.AreEqual(machine, setup.heart.CurrentTask.Payload, "The displaced current guard must be eligible to restart its security post.");
+    }
+
+    [Test]
+    public void SecurityGuard_ReactivationAssignment_ResumesAfterCombatInterrupt()
+    {
+        var setup = CreateRobotWithBrain("Robot_InterruptedSecurityGuard");
+        setup.heart.ConfigureRole(RobotRole.SecurityGuard, resetStack: true);
+
+        var managerGo = new GameObject("MachineSecurityManager_InterruptResume");
+        var manager = managerGo.AddComponent<MachineSecurityManager>();
+        var machineGo = new GameObject("WorkMachine_ToReactivate");
+        var machine = machineGo.AddComponent<FactoryMachine>();
+        machine.PowerOff();
+
+        InvokePrivate(manager, "DispatchGuardToReactivateMachine", setup.brain, machine, "test_interrupt_resume");
+
+        Assert.AreEqual(machine, setup.brain.Memory.PendingReactivationMachine, "The repair target must be stored in memory before the guard acts.");
+        Assert.AreEqual(RobotTaskType.ReactivateMachine, setup.heart.CurrentTask.Type);
+
+        var player = new GameObject("Player_InterruptingGuard").transform;
+        setup.brain.OnPerceptionChanged(true, true, player.position, true, player);
+        Assert.AreEqual(RobotTaskType.AttackTarget, setup.heart.CurrentTask.Type, "Combat may temporarily interrupt the remembered repair.");
+
+        setup.brain.OnPerceptionChanged(false, false, Vector3.zero, false, null);
+
+        Assert.AreEqual(RobotTaskType.ReactivateMachine, setup.heart.CurrentTask.Type, "When the player is lost, the guard must resume the remembered repair.");
+        Assert.AreEqual(machine, setup.heart.CurrentTask.Payload);
+    }
+
+    [Test]
     public void RestingSlot_ArrivalAtPoweredOffMachine_MarksUnavailableAndReplans()
     {
         var setup = CreateRobotWithBrain("Robot_RestPoweredOffArrival");

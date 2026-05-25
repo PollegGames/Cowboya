@@ -354,6 +354,8 @@ public class RobotBrainNew : MonoBehaviour
                     return new RobotTask(RobotTaskType.ChasePlayer, BuildPlayerPayload(snapshot));
                 if (o.HasFlag(BrainOption.InDanger))
                     return new RobotTask(RobotTaskType.Flee);
+                if (snapshot.PendingReactivationMachine != null)
+                    return new RobotTask(RobotTaskType.ReactivateMachine, snapshot.PendingReactivationMachine);
                 if (o.HasFlag(BrainOption.NeedMachine))
                 {
                     if (o.HasFlag(BrainOption.MachineUnavailable))

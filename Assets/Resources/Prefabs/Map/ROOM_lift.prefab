@@ -5630,7 +5630,7 @@ AreaEffector2D:
     m_Bits: 192
   m_UseGlobalAngle: 0
   m_ForceAngle: 90
-  m_ForceMagnitude: 10
+  m_ForceMagnitude: 20
   m_ForceVariation: 0
   m_ForceTarget: 0
   m_LinearDamping: 0

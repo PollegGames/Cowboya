@@ -24,6 +24,7 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     public bool IsDead => memoryState.IsDead;
     public RoomWaypoint LastVisitedPoint => memoryState.LastVisitedPoint;
     public MachineType? DesiredMachineType => memoryState.DesiredMachineType;
+    public BaseMachine PendingReactivationMachine => memoryState.PendingReactivationMachine;
     public Dictionary<RoomWaypoint, bool> AllAvailableWaypoints => memoryState.AllAvailableWaypoints;
     public event Action<MemoryChangeEvent> OnMemoryChanged;
     public RobotMemorySnapshotNew Snapshot => memoryState.Snapshot;
@@ -79,6 +80,11 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
             this);
         memoryState.NotifyReactivationCompleted(waypoint, nextDesiredMachineType, connectedToReactivatedMachine);
     }
+
+    /// <summary>
+    /// Remembers the powered-off machine this guard must reactivate after interruptions.
+    /// </summary>
+    public void AssignReactivationMachine(BaseMachine machine) => memoryState.AssignReactivationMachine(machine);
 
     public void SetLastVisitedPoint(RoomWaypoint point) => memoryState.SetLastVisitedPoint(point);
 

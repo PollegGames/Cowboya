@@ -11,6 +11,8 @@ public class CowboyGrabController : MonoBehaviour
 
     [Header("Grab Settings")]
     [SerializeField] private float grabRadius = 0.4f;
+    [SerializeField, Min(0f), Tooltip("Maximum distance for stealing a badge that is attached to a living enemy.")]
+    private float livingEnemyBadgeGrabRadius = 0.25f;
     [SerializeField] private LayerMask grabbableLayers = ~0;
     [SerializeField] private float throwStrength = 5f;
     [SerializeField] private Transform leftHandGrabAnchor;
@@ -55,14 +57,14 @@ public class CowboyGrabController : MonoBehaviour
             return false;
         }
 
-        GrabDetection detection = DetectGrabbable(anchor.position);
+        Inventory currentInventory = GetInventory();
+        GrabDetection detection = DetectGrabbable(anchor.position, currentInventory);
         IGrabbable candidate = detection.Grabbable;
         if (candidate == null)
         {
             return false;
         }
 
-        Inventory currentInventory = GetInventory();
         if (candidate is IGrabContextReceiver contextReceiver)
         {
             contextReceiver.SetGrabContext(detection.SourceCollider, anchor.position);
@@ -183,7 +185,7 @@ public class CowboyGrabController : MonoBehaviour
         SetHandAttractorState(arm, false);
     }
 
-    private GrabDetection DetectGrabbable(Vector3 origin)
+    private GrabDetection DetectGrabbable(Vector3 origin, Inventory currentInventory)
     {
         int mask = grabbableLayers.value;
         if (mask == 0)
@@ -192,9 +194,12 @@ public class CowboyGrabController : MonoBehaviour
         }
 
         Collider2D[] colliders = Physics2D.OverlapCircleAll(origin, grabRadius, mask);
-        IGrabbable closest = null;
-        Collider2D closestCollider = null;
-        float closestDistance = float.MaxValue;
+        IGrabbable closestBadge = null;
+        Collider2D closestBadgeCollider = null;
+        float closestBadgeDistance = float.MaxValue;
+        IGrabbable closestOther = null;
+        Collider2D closestOtherCollider = null;
+        float closestOtherDistance = float.MaxValue;
 
         foreach (Collider2D collider in colliders)
         {
@@ -222,18 +227,39 @@ public class CowboyGrabController : MonoBehaviour
 
             Vector2 closestPoint = collider.ClosestPoint(origin);
             float distance = Vector2.Distance(origin, closestPoint);
-            if (distance < closestDistance)
+            if (grabbable is SecurityBadgePickup badge)
             {
-                closestDistance = distance;
-                closest = grabbable;
-                closestCollider = collider;
+                if (!badge.CanBeGrabbed(currentInventory))
+                    continue;
+                if (badge.RequiresCloseRangeWhileAttachedToEnemy()
+                    && distance > livingEnemyBadgeGrabRadius)
+                {
+                    continue;
+                }
+                if (distance < closestBadgeDistance)
+                {
+                    closestBadgeDistance = distance;
+                    closestBadge = grabbable;
+                    closestBadgeCollider = collider;
+                }
+                continue;
+            }
+
+            if (!grabbable.CanBeGrabbed(currentInventory))
+                continue;
+
+            if (distance < closestOtherDistance)
+            {
+                closestOtherDistance = distance;
+                closestOther = grabbable;
+                closestOtherCollider = collider;
             }
         }
 
         return new GrabDetection
         {
-            Grabbable = closest,
-            SourceCollider = closestCollider
+            Grabbable = closestBadge ?? closestOther,
+            SourceCollider = closestBadge != null ? closestBadgeCollider : closestOtherCollider
         };
     }
 
