@@ -43,6 +43,12 @@ public class RestingSlot : MonoBehaviour
         if (machine == null)
             return;
 
+        if (!machine.IsOn)
+        {
+            HandlePoweredOffMachineArrival(brain, heart.CurrentTask);
+            return;
+        }
+
         RobotEcosystemProbe.RecordSlotDecision(this, "RestingSlot", "attach_requested", brain, machine, heart.CurrentTask);
 
         if (TryAttachOrReplace(brain))
@@ -97,6 +103,32 @@ public class RestingSlot : MonoBehaviour
         return replaced;
     }
 
+    private void HandlePoweredOffMachineArrival(RobotBrainNew brain, RobotTask currentTask)
+    {
+        RobotEcosystemProbe.RecordSlotDecision(this, "RestingSlot", "rejected_machine_off_replan", brain, machine, currentTask);
+
+        if (brain != null && brain.Memory != null)
+        {
+            RoomWaypoint machinePoint = MachineWaypointResolver.Resolve(machine);
+            if (machinePoint != null)
+                brain.Memory.SetRoomWaypointAvailability(machinePoint, false);
+            else
+                brain.Memory.SetMachineWaypointAvailability(machine, false);
+            brain.Memory.ChangeConnectionToMachine(false);
+            brain.Memory.SetDesiredMachineType(machine.Type);
+            RobotEcosystemProbe.RecordBrainCall(
+                brain,
+                "RestingSlot.HandlePoweredOffMachineArrival",
+                "machine=" + machine.name
+                + " localObservation=True"
+                + " memoryUpdated=True"
+                + " taskBlocked=True"
+                + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None"));
+        }
+
+        brain?.Heart?.BlockCurrentTask();
+    }
+
     private bool TryTrackEnter(RobotBrainNew brain, RobotHeartNew heart)
     {
         int id = brain.GetInstanceID();
@@ -143,8 +175,14 @@ public class RestingSlot : MonoBehaviour
         if (currentTask.Type != RobotTaskType.GoToMachine || brain.Memory == null)
             return false;
 
-        return brain.Memory.DesiredMachineType.HasValue
-            && brain.Memory.DesiredMachineType.Value == machine.Type;
+        RoomWaypoint targetWaypoint = currentTask.Payload as RoomWaypoint;
+        if (targetWaypoint == null && brain.Body != null)
+            targetWaypoint = brain.Body.CurrentTarget;
+
+        RoomWaypoint machinePoint = MachineWaypointResolver.Resolve(machine);
+        return targetWaypoint != null
+            && machinePoint != null
+            && ReferenceEquals(targetWaypoint, machinePoint);
     }
 
     private static bool CanUseRestSlot(RobotHeartNew heart)

@@ -284,6 +284,34 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
+    public void MachineWorkerManager_PowerOff_RetargetsWorkerTravelingToRestMachine()
+    {
+        var setup = CreateRobotWithBrain("Robot_TargetedRestPowerOff");
+
+        var machineGo = new GameObject("RestDesk_TargetedPowerOff");
+        var machine = machineGo.AddComponent<RestingMachine>();
+        var restWaypoint = machineGo.AddComponent<RoomWaypoint>();
+        restWaypoint.type = WaypointType.Rest;
+        restWaypoint.IsAvailable = true;
+        var workWaypoint = CreateWaypoint("WorkFallback_TargetedPowerOff", WaypointType.Work, true, Vector3.right);
+
+        setup.brain.Memory.InitializeWaypointAvailability(new[] { restWaypoint, workWaypoint });
+        setup.brain.Memory.SetDesiredMachineType(MachineType.RestStation);
+        setup.heart.ResetIntentStack(repopulateDefaultTask: true);
+        setup.heart.QueueTask(new RobotTask(RobotTaskType.GoToMachine, restWaypoint));
+
+        var managerGo = new GameObject("MachineWorkerManager_TargetedPowerOff");
+        var manager = managerGo.AddComponent<MachineWorkerManager>();
+        manager.RegisterMachine(machine);
+
+        machine.PowerOff();
+
+        Assert.IsFalse(setup.brain.Memory.AllAvailableWaypoints[restWaypoint], "A worker targeting the machine should learn immediately that it powered off.");
+        AssertWorkerPlansWaypoint(setup.brain, workWaypoint, "A worker targeting an off rest machine should reroute without waiting for another slot entry.");
+        Assert.GreaterOrEqual(RobotEcosystemProbe.GetCallCount("Brain.MachineWorkerManager.NotifyWorkersMachinePoweredOff"), 1);
+    }
+
+    [Test]
     public void WorkerPlan_TransientDetach_DoesNotForceNeedMachineLoop()
     {
         var setup = CreateRobotWithBrain("Robot_TransientDetach");
@@ -396,6 +424,61 @@ public class RobotEcosystemProbeTests
 
         Assert.IsTrue(machine.IsOccupied);
         Assert.AreEqual(1, RobotEcosystemProbe.GetCallCount("Slot.WorkerSlot.attach_requested"));
+    }
+
+    [Test]
+    public void RestingSlot_ArrivalAtPoweredOffMachine_MarksUnavailableAndReplans()
+    {
+        var setup = CreateRobotWithBrain("Robot_RestPoweredOffArrival");
+
+        var machineGo = new GameObject("PoweredOffRestMachine");
+        var machine = machineGo.AddComponent<RestingMachine>();
+        var restWaypoint = machineGo.AddComponent<RoomWaypoint>();
+        restWaypoint.type = WaypointType.Rest;
+        restWaypoint.IsAvailable = true;
+        var workWaypoint = CreateWaypoint("WorkFallback", WaypointType.Work, true, Vector3.right);
+
+        setup.brain.Memory.InitializeWaypointAvailability(new[] { restWaypoint, workWaypoint });
+        setup.heart.ResetIntentStack(repopulateDefaultTask: true);
+        setup.heart.QueueTask(new RobotTask(RobotTaskType.GoToMachine, restWaypoint));
+        machine.PowerOff();
+
+        var slotGo = new GameObject("PoweredOffRestSlot");
+        var slot = slotGo.AddComponent<RestingSlot>();
+        SetPrivateField(slot, "machine", machine);
+
+        InvokePrivate(slot, "OnTriggerEnter2D", setup.collider);
+
+        Assert.IsNull(machine.CurrentWorker, "Powered-off rest machines must reject arriving workers.");
+        Assert.IsFalse(setup.brain.Memory.AllAvailableWaypoints[restWaypoint], "The arriving worker should learn that the rest machine is unavailable.");
+        AssertWorkerPlansWaypoint(setup.brain, workWaypoint, "A rejected rest arrival should replan to the available fallback machine.");
+        Assert.AreEqual(1, RobotEcosystemProbe.GetCallCount("Slot.RestingSlot.rejected_machine_off_replan"));
+    }
+
+    [Test]
+    public void RestingSlot_GoToMachineTargetingAnotherRestWaypoint_DoesNotAttach()
+    {
+        var setup = CreateRobotWithBrain("Robot_RestExactTarget");
+        var targetedWaypoint = CreateWaypoint("TargetedRestWaypoint", WaypointType.Rest, true, Vector3.left);
+
+        var wrongMachineGo = new GameObject("WrongRestMachine");
+        var wrongMachine = wrongMachineGo.AddComponent<RestingMachine>();
+        var wrongWaypoint = wrongMachineGo.AddComponent<RoomWaypoint>();
+        wrongWaypoint.type = WaypointType.Rest;
+        wrongWaypoint.IsAvailable = true;
+
+        setup.brain.Memory.InitializeWaypointAvailability(new[] { targetedWaypoint, wrongWaypoint });
+        setup.heart.ResetIntentStack(repopulateDefaultTask: true);
+        setup.heart.QueueTask(new RobotTask(RobotTaskType.GoToMachine, targetedWaypoint));
+
+        var slotGo = new GameObject("WrongRestSlot");
+        var slot = slotGo.AddComponent<RestingSlot>();
+        SetPrivateField(slot, "machine", wrongMachine);
+
+        InvokePrivate(slot, "OnTriggerEnter2D", setup.collider);
+
+        Assert.IsNull(wrongMachine.CurrentWorker, "A rest slot must reject workers travelling to a different rest waypoint.");
+        Assert.AreEqual(0, RobotEcosystemProbe.GetCallCount("Slot.RestingSlot.attach_requested"));
     }
 
     [Test]

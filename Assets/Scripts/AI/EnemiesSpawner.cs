@@ -228,6 +228,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 continue;
 
             var p = waypointService.GetWorkOrRestPoint();
+            if (p == null)
+            {
+                Debug.LogWarning("[EnemiesSpawner] Cannot spawn worker: no work/rest waypoint available.", this);
+                continue;
+            }
+
             PositionForSpawn(w, p.WorldPos);
             InitializeRobot(w, RobotRole.Worker, p);
             Wake(w);
@@ -239,6 +245,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 continue;
 
             var p = waypointService.GetBlockedRoomSecuritySpawning();
+            if (p == null)
+            {
+                Debug.LogWarning("[EnemiesSpawner] Cannot spawn worker spawner: no blocked-room spawn waypoint available.", this);
+                continue;
+            }
+
             PositionForSpawn(ws, p.WorldPos);
             InitializeRobot(ws, RobotRole.WorkerSpawner, p);
             Wake(ws);

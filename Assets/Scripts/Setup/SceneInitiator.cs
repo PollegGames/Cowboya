@@ -63,11 +63,11 @@ public class SceneInitiator : GameInitiator
     protected override void InitializeSceneSpecificObjects()
     {
         InitializeSharedObjects();
+        InitializeVictorySetup();
         InitializeFactory();
         InitializeSceneController();
         InitializePlayer();
         InitializeEnemies();
-        InitializeVictorySetup();
         InitializeMiniMap();
     }
 

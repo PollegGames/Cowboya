@@ -150,6 +150,31 @@ public class MachineWorkerManager : MonoBehaviour
             RobotTask currentTask = brain.Heart.CurrentTask;
             bool targetsPoweredOffMachine = IsWorkerTargetingMachine(brain, machine, machineWaypoint);
             bool isTraveling = currentTask != null && currentTask.Type == RobotTaskType.GoToMachine;
+
+            if (targetsPoweredOffMachine)
+            {
+                if (machineWaypoint != null)
+                    brain.Memory.SetRoomWaypointAvailability(machineWaypoint, false);
+                else
+                    brain.Memory.SetMachineWaypointAvailability(machine, false);
+
+                brain.Memory.ChangeConnectionToMachine(false);
+                brain.Memory.SetDesiredMachineType(machine.Type);
+                RobotEcosystemProbe.RecordBrainCall(
+                    brain,
+                    "MachineWorkerManager.NotifyWorkersMachinePoweredOff",
+                    "machine=" + machine.name
+                    + " attachedWorkerNotified=False"
+                    + " targetedWorkerNotified=True"
+                    + " memoryUpdated=True"
+                    + " taskBlocked=True"
+                    + " traveling=" + isTraveling
+                    + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None")
+                    + " currentTarget=" + DescribeTaskTarget(currentTask));
+                brain.Heart.BlockCurrentTask();
+                continue;
+            }
+
             RobotEcosystemProbe.RecordBrainCall(
                 brain,
                 "MachineWorkerManager.DeferPoweredOffMachineKnowledge",

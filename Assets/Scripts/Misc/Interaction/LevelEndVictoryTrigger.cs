@@ -7,6 +7,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     [SerializeField] private PlayerSaveService saveService;
 
     private bool isVictoryDoor = false;
+    private bool hasRequestedLevelTransition;
 
     [Header("Visuals")]
     [SerializeField] private SpriteRenderer doorSprite;   // assign in Inspector
@@ -56,8 +57,9 @@ public class LevelEndVictoryTrigger : MonoBehaviour
         {
             bool isVictory = victorySetup.currentKilled >= victorySetup.robotsKilledTarget
                 || victorySetup.currentSaved >= victorySetup.robotsSavedTarget;
-            if (isVictoryDoor && isVictory && collision.CompareTag("Player"))
+            if (isVictoryDoor && isVictory && collision.CompareTag("Player") && !hasRequestedLevelTransition)
             {
+                hasRequestedLevelTransition = true;
                 RobotStateController controller = collision.GetComponentInParent<RobotStateController>();
                 CowboyGrabController grabController = collision.GetComponentInParent<CowboyGrabController>();
                 Inventory inventory = collision.GetComponentInParent<Inventory>();
