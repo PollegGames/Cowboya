@@ -36,7 +36,6 @@ public class SimpleAttackController : MonoBehaviour
         }
 
         ActivateArm(arm);
-        DeactivateArm(arm == CowboyArmSide.Left ? CowboyArmSide.Right : CowboyArmSide.Left);
     }
 
     public void DeactivateAll()

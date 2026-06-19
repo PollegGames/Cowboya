@@ -3,6 +3,11 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class CowboyGrabController : MonoBehaviour
 {
+    private sealed class ArmGrabState
+    {
+        public IGrabbable HeldObject;
+    }
+
     private struct GrabDetection
     {
         public IGrabbable Grabbable;
@@ -28,8 +33,8 @@ public class CowboyGrabController : MonoBehaviour
     [SerializeField] private EnergyBot energyBot;
     [SerializeField] private PlayerBrain playerBrain;
 
-    private IGrabbable heldObject;
-    private CowboyArmSide holdingArm;
+    private readonly ArmGrabState leftGrab = new ArmGrabState();
+    private readonly ArmGrabState rightGrab = new ArmGrabState();
 
     private void Awake()
     {
@@ -51,6 +56,11 @@ public class CowboyGrabController : MonoBehaviour
 
     public bool TryGrab(CowboyArmSide arm)
     {
+        if (HasHeldObject(arm))
+        {
+            return false;
+        }
+
         Transform anchor = GetGrabAnchor(arm);
         if (anchor == null)
         {
@@ -81,11 +91,6 @@ public class CowboyGrabController : MonoBehaviour
             return false;
         }
 
-        if (!SpendGrabEnergy())
-        {
-            return false;
-        }
-
         Transform parent = GetHoldParent(arm) ?? anchor;
         candidate.OnGrab(parent);
 
@@ -99,9 +104,9 @@ public class CowboyGrabController : MonoBehaviour
             return true;
         }
 
-        heldObject = candidate;
-        holdingArm = arm;
+        GetGrabState(arm).HeldObject = candidate;
         SetHandAttractorState(arm, true);
+        MaintainHold(arm);
 
         return true;
     }
@@ -110,6 +115,23 @@ public class CowboyGrabController : MonoBehaviour
     {
         if (!HasHeldObject(arm))
         {
+            return;
+        }
+
+        IGrabbable heldObject = GetGrabState(arm).HeldObject;
+        if (heldObject == null)
+        {
+            return;
+        }
+
+        CowboyArmSide otherArm = GetOppositeArm(arm);
+        if (HasHeldObject(otherArm) && GetGrabState(otherArm).HeldObject == heldObject)
+        {
+            Vector2 midpoint;
+            if (TryGetTwoHandMidpoint(out midpoint))
+            {
+                heldObject.OnAttract(midpoint);
+            }
             return;
         }
 
@@ -134,39 +156,61 @@ public class CowboyGrabController : MonoBehaviour
 
     public void ReleaseAllImmediate()
     {
-        if (!HasHeldObject())
+        IGrabbable leftObject = HasHeldObject(CowboyArmSide.Left) ? leftGrab.HeldObject : null;
+        IGrabbable rightObject = HasHeldObject(CowboyArmSide.Right) ? rightGrab.HeldObject : null;
+
+        if (leftObject != null)
         {
-            return;
+            leftGrab.HeldObject = null;
+            leftObject.OnRelease(Vector2.zero);
         }
 
-        ReleaseInternal(holdingArm, 0f);
+        if (rightObject != null && rightObject != leftObject)
+        {
+            rightObject.OnRelease(Vector2.zero);
+        }
+
+        rightGrab.HeldObject = null;
+        SetHandAttractorState(CowboyArmSide.Left, false);
+        SetHandAttractorState(CowboyArmSide.Right, false);
     }
 
     public bool HasHeldObject()
     {
-        if (heldObject == null)
+        return HasHeldObject(CowboyArmSide.Left) || HasHeldObject(CowboyArmSide.Right);
+    }
+
+    public bool HasHeldObject(CowboyArmSide arm)
+    {
+        ArmGrabState state = GetGrabState(arm);
+        if (state.HeldObject == null)
         {
             return false;
         }
 
-        UnityEngine.Object unityObject = heldObject as UnityEngine.Object;
+        UnityEngine.Object unityObject = state.HeldObject as UnityEngine.Object;
         if (unityObject == null)
         {
-            heldObject = null;
+            state.HeldObject = null;
             return false;
         }
 
         return true;
     }
 
-    public bool HasHeldObject(CowboyArmSide arm)
+    public IGrabbable GetHeldObject(CowboyArmSide arm)
     {
-        return HasHeldObject() && holdingArm == arm;
+        return HasHeldObject(arm) ? GetGrabState(arm).HeldObject : null;
     }
 
     public CowboyArmSide? GetHoldingArm()
     {
-        return HasHeldObject() ? holdingArm : (CowboyArmSide?)null;
+        if (HasHeldObject(CowboyArmSide.Left))
+        {
+            return CowboyArmSide.Left;
+        }
+
+        return HasHeldObject(CowboyArmSide.Right) ? CowboyArmSide.Right : (CowboyArmSide?)null;
     }
 
     private void ReleaseInternal(CowboyArmSide arm, float strength)
@@ -176,13 +220,42 @@ public class CowboyGrabController : MonoBehaviour
             return;
         }
 
+        ArmGrabState state = GetGrabState(arm);
+        IGrabbable releasedObject = state.HeldObject;
+        state.HeldObject = null;
+        SetHandAttractorState(arm, false);
+
+        CowboyArmSide otherArm = GetOppositeArm(arm);
+        if (HasHeldObject(otherArm) && GetGrabState(otherArm).HeldObject == releasedObject)
+        {
+            Transform remainingParent = GetHoldParent(otherArm) ?? GetGrabAnchor(otherArm);
+            if (remainingParent != null)
+            {
+                releasedObject.OnGrab(remainingParent);
+                releasedObject.OnAttract(remainingParent.position);
+            }
+            return;
+        }
+
         Transform reference = GetHoldParent(arm) ?? GetGrabAnchor(arm);
         Vector2 throwForce = reference != null ? (Vector2)reference.right * strength : Vector2.zero;
 
-        RemoveInventoryEntry(heldObject);
-        heldObject.OnRelease(throwForce);
-        heldObject = null;
-        SetHandAttractorState(arm, false);
+        RemoveInventoryEntry(releasedObject);
+        releasedObject.OnRelease(throwForce);
+    }
+
+    private bool TryGetTwoHandMidpoint(out Vector2 midpoint)
+    {
+        Transform leftAnchor = GetGrabAnchor(CowboyArmSide.Left);
+        Transform rightAnchor = GetGrabAnchor(CowboyArmSide.Right);
+        if (leftAnchor == null || rightAnchor == null)
+        {
+            midpoint = Vector2.zero;
+            return false;
+        }
+
+        midpoint = ((Vector2)leftAnchor.position + (Vector2)rightAnchor.position) * 0.5f;
+        return true;
     }
 
     private GrabDetection DetectGrabbable(Vector3 origin, Inventory currentInventory)
@@ -502,20 +575,14 @@ public class CowboyGrabController : MonoBehaviour
             playerBrain = GetComponent<PlayerBrain>();
     }
 
-    private bool SpendGrabEnergy()
+    private ArmGrabState GetGrabState(CowboyArmSide arm)
     {
-        CacheRobotSystems();
+        return arm == CowboyArmSide.Right ? rightGrab : leftGrab;
+    }
 
-        if (playerBrain != null)
-            return playerBrain.TrySpendEnergy(EnergyAction.Grab);
-
-        if (energyBot != null)
-            return energyBot.TryConsume(EnergyAction.Grab);
-
-        if (robotBehaviour != null)
-            return robotBehaviour.CanPerformEnergy(EnergyAction.Grab);
-
-        return true;
+    private static CowboyArmSide GetOppositeArm(CowboyArmSide arm)
+    {
+        return arm == CowboyArmSide.Right ? CowboyArmSide.Left : CowboyArmSide.Right;
     }
 
     private void RemoveInventoryEntry(IGrabbable grabbable)

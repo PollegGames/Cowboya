@@ -15,6 +15,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
     [SerializeField] private bool resetIntentOnRelease = true;
 
     private readonly List<PausedBehaviour> pausedBehaviours = new List<PausedBehaviour>();
+    private readonly List<Rigidbody2D> rotationFrozenBodies = new List<Rigidbody2D>();
     private RobotStateController stateController;
     private RobotBodyController bodyController;
     private RobotHeartNew heart;
@@ -82,6 +83,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
         grabbed = true;
         StopRobotActions();
         PauseRobotBehaviours();
+        ReleaseFrozenRotations();
         EnableJoint(grabParent.position);
     }
 
@@ -104,6 +106,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
 
         DisableJoint();
         ApplyThrow(throwForce);
+        RestoreFrozenRotations();
         ResumeRobotBehaviours();
         RestartRobotIntent();
         DestroyCreatedJoint();
@@ -313,6 +316,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
     private void ReleaseWithoutThrow()
     {
         DisableJoint();
+        RestoreFrozenRotations();
         ResumeRobotBehaviours();
         grabbed = false;
 
@@ -322,6 +326,38 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
         }
 
         ClearGrabContext();
+    }
+
+    private void ReleaseFrozenRotations()
+    {
+        rotationFrozenBodies.Clear();
+
+        Rigidbody2D[] bodies = GetComponentsInChildren<Rigidbody2D>(true);
+        for (int i = 0; i < bodies.Length; i++)
+        {
+            Rigidbody2D body = bodies[i];
+            if (body == null || !body.freezeRotation)
+            {
+                continue;
+            }
+
+            rotationFrozenBodies.Add(body);
+            body.freezeRotation = false;
+        }
+    }
+
+    private void RestoreFrozenRotations()
+    {
+        for (int i = 0; i < rotationFrozenBodies.Count; i++)
+        {
+            Rigidbody2D body = rotationFrozenBodies[i];
+            if (body != null)
+            {
+                body.freezeRotation = true;
+            }
+        }
+
+        rotationFrozenBodies.Clear();
     }
 
     private void DestroyCreatedJoint()

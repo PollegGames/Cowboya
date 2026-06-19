@@ -5,12 +5,29 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Moves the Cowboy master's arm solver targets toward a cursor/target prefab while the interact button (right click) is held.
-/// The arm that is selected is based on the horizontal offset of the target relative to the body reference and hands return to
-/// their default pose as soon as the button is released.
+/// Drives the Cowboy arm solver targets from direct mouse input.
+/// No-click movement selects an arm by mouse side, while mouse buttons force grab mode on the clicked arm.
+/// Empty hands become attack-active when they move fast enough in movement mode.
 /// </summary>
 public class ArmTargetController : MonoBehaviour
 {
+    private sealed class ArmRuntimeState
+    {
+        public bool DriveInput;
+        public bool HeldInput;
+        public bool WasHeldInput;
+        public float NextHoldEnergyTime;
+        public float RegrabLockedUntil;
+        public Vector3 LastTargetPosition;
+        public bool HasLastTargetPosition;
+        public float AimSpeed;
+        public bool AttackActive;
+        public bool AttackEnergySpent;
+        public float AttackGraceUntil;
+        public float AttackLockedUntil;
+        public bool AttackHitConsumed;
+    }
+
     [Header("References")]
     [SerializeField] private Transform bodyReference;
     [SerializeField] private Transform targetTransform;
@@ -23,31 +40,34 @@ public class ArmTargetController : MonoBehaviour
     [SerializeField] private float followSpeed = 15f;
     [SerializeField] private float returnSpeed = 10f;
     [SerializeField] private float rotationReturnSpeed = 720f;
-    [SerializeField] private float sideSwitchThreshold = 0.1f;
+    [SerializeField] private float automaticArmSwitchDelay = 2f;
 
-[Header("Controllers")]
-[SerializeField] private CowboyGrabController grabController;
-[SerializeField] private SimpleAttackController attackController;
-[SerializeField] private bool allowAttackAim = true;
-[Header("Energy")]
-[SerializeField] private PlayerBrain playerBrain;
-[SerializeField] private RobotStateController stateController;
-[Header("AI Attack Control")]
-[SerializeField] private bool useExternalAttackInput;
-private Coroutine externalAttackPulseRoutine;
+    [Header("Controllers")]
+    [SerializeField] private CowboyGrabController grabController;
+    [SerializeField] private SimpleAttackController attackController;
+    [SerializeField] private bool allowAttackAim = true;
 
-    private bool interactHeld;
-    private bool interactPressedThisFrame;
-    private bool interactReleasedThisFrame;
-    private bool attackHeld;
-    private bool attackInputHeld;
-private bool attackSuppressedUntilRelease;
-private bool preferRightArm = true;
-private CowboyArmSide? interactLockedArm;
-private CowboyArmSide? attackLockedArm;
-private CowboyArmSide? attackActiveArm;
-private bool attackEnergySpentThisPress;
+    [Header("Energy")]
+    [SerializeField] private PlayerBrain playerBrain;
+    [SerializeField] private RobotStateController stateController;
+    [SerializeField] private float holdEnergyInterval = 1f;
+    [SerializeField] private float holdEnergyCostPerInterval = 0.1f;
+
+    [Header("Attack")]
+    [SerializeField] private float attackSpeedThreshold = 60f;
+    [SerializeField] private float attackHoldAfterSlowDuration = 0.1f;
+    [SerializeField] private float attackCooldownAfterHoldReleaseDuration = 2f;
+
+    [Header("Grab")]
+    [SerializeField] private float regrabLockoutDuration = 2f;
+
+    [Header("AI Attack Control")]
+    [SerializeField] private bool useExternalAttackInput;
+    private Coroutine externalAttackPulseRoutine;
     private bool externalAttackInput;
+
+    private readonly ArmRuntimeState leftArm = new ArmRuntimeState();
+    private readonly ArmRuntimeState rightArm = new ArmRuntimeState();
 
     private Vector3 leftRestLocalPosition;
     private Vector3 rightRestLocalPosition;
@@ -58,6 +78,12 @@ private bool attackEnergySpentThisPress;
     private bool leftSolverDefaultEnabled = true;
     private bool rightSolverDefaultEnabled = true;
     private bool solverDefaultsCaptured;
+    private CowboyArmSide activeMovementArm = CowboyArmSide.Right;
+    private CowboyArmSide clickSelectedArm;
+    private bool hasClickSelectedArm;
+    private CowboyArmSide pendingAutomaticArm;
+    private bool hasPendingAutomaticArm;
+    private float pendingAutomaticArmStartedAt;
     private readonly Dictionary<Behaviour, Action<bool>> solverFlipSetters = new Dictionary<Behaviour, Action<bool>>();
 
     private void Awake()
@@ -69,70 +95,88 @@ private bool attackEnergySpentThisPress;
     {
         CacheControllers();
         CacheRestPose();
+        ResetArmState(leftArm, leftArmSolverTarget);
+        ResetArmState(rightArm, rightArmSolverTarget);
+        activeMovementArm = GetTargetSide();
+        hasClickSelectedArm = false;
+        hasPendingAutomaticArm = false;
         attackController?.DeactivateAll();
         SubscribeToAttackEvents();
+        SubscribeToStateEvents();
     }
 
     private void OnDisable()
     {
-        interactHeld = false;
-        interactPressedThisFrame = false;
-        interactReleasedThisFrame = false;
-        attackHeld = false;
-        attackInputHeld = false;
-        attackSuppressedUntilRelease = false;
-        interactLockedArm = null;
-        attackLockedArm = null;
-        attackActiveArm = null;
-        attackEnergySpentThisPress = false;
+        leftArm.DriveInput = false;
+        rightArm.DriveInput = false;
+        leftArm.HeldInput = false;
+        rightArm.HeldInput = false;
+        DeactivateAttack(CowboyArmSide.Left, leftArm);
+        DeactivateAttack(CowboyArmSide.Right, rightArm);
         attackController?.DeactivateAll();
         grabController?.ReleaseAllImmediate();
         UnsubscribeFromAttackEvents();
+        UnsubscribeFromStateEvents();
     }
 
     private void Update()
     {
-        bool currentlyHeld = IsRightMouseHeld();
-        bool attackInput = useExternalAttackInput ? externalAttackInput : IsLeftMouseHeld();
-        bool attackPressedThisFrame = !attackInputHeld && attackInput;
-        bool attackReleasedThisFrame = attackInputHeld && !attackInput;
+        bool leftHeld = IsLeftMouseHeld();
+        bool rightHeld = IsRightMouseHeld();
+        bool leftPressed = IsLeftMousePressedThisFrame();
+        bool rightPressed = IsRightMousePressedThisFrame();
 
-        attackInputHeld = attackInput;
-        if (!attackInputHeld)
+        UpdateClickSelectedArm(leftHeld, rightHeld, leftPressed, rightPressed);
+
+        CowboyArmSide drivenArm = useExternalAttackInput && externalAttackInput
+            ? CowboyArmSide.Left
+            : ResolveDrivenArm();
+        bool leftDrive = IsAlive() && drivenArm == CowboyArmSide.Left;
+        bool rightDrive = IsAlive() && drivenArm == CowboyArmSide.Right;
+        bool leftGrabMode = IsSelectedClickArm(CowboyArmSide.Left) && leftHeld && IsAlive();
+        bool rightGrabMode = IsSelectedClickArm(CowboyArmSide.Right) && rightHeld && IsAlive();
+
+        UpdateArmInput(CowboyArmSide.Left, leftArm, leftDrive, leftGrabMode);
+        UpdateArmInput(CowboyArmSide.Right, rightArm, rightDrive, rightGrabMode);
+
+        HandleManualRelease(CowboyArmSide.Left, leftArm, IsLeftReleasePressed());
+        HandleManualRelease(CowboyArmSide.Right, rightArm, IsRightReleasePressed());
+
+        HandleHoldEnergy(CowboyArmSide.Left, leftArm);
+        HandleHoldEnergy(CowboyArmSide.Right, rightArm);
+
+        HandleGrabInput(CowboyArmSide.Left, leftArm);
+        HandleGrabInput(CowboyArmSide.Right, rightArm);
+
+        MaintainHeldObjects();
+    }
+
+    private void LateUpdate()
+    {
+        bool hasTargets = bodyReference != null && targetTransform != null;
+
+        if (hasTargets)
         {
-            attackSuppressedUntilRelease = false;
-            attackEnergySpentThisPress = false;
-            attackLockedArm = null;
+            ApplySolverFlip(targetTransform.position.x >= bodyReference.position.x);
         }
 
-        attackHeld = allowAttackAim && attackInputHeld && !attackSuppressedUntilRelease;
+        ApplySolverStates();
 
-        interactPressedThisFrame = !interactHeld && currentlyHeld;
-        interactReleasedThisFrame = interactHeld && !currentlyHeld;
-        interactHeld = currentlyHeld;
-
-        if (interactPressedThisFrame)
+        if (!hasTargets)
         {
-            LockInteractArm();
+            return;
         }
 
-        if (attackPressedThisFrame)
-        {
-            LockAttackArm();
-        }
+        DriveArm(CowboyArmSide.Left, leftArm, leftArmSolverTarget,
+            leftRestLocalPosition, leftRestLocalRotation, leftRestCaptured);
+        DriveArm(CowboyArmSide.Right, rightArm, rightArmSolverTarget,
+            rightRestLocalPosition, rightRestLocalRotation, rightRestCaptured);
 
-        HandleGrabInput();
-        HandleAttackInput();
+        UpdateAimSpeed(leftArm, leftArmSolverTarget);
+        UpdateAimSpeed(rightArm, rightArmSolverTarget);
 
-        if (interactReleasedThisFrame)
-        {
-            interactLockedArm = null;
-        }
-
-        if (attackReleasedThisFrame)
-        {
-            attackLockedArm = null;
-        }
+        HandleAttackState(CowboyArmSide.Left, leftArm);
+        HandleAttackState(CowboyArmSide.Right, rightArm);
     }
 
     private void CacheRestPose()
@@ -214,233 +258,259 @@ private bool attackEnergySpentThisPress;
         }
     }
 
-    private CowboyArmSide DetermineArmForGrab()
+    private void SubscribeToStateEvents()
     {
-        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
-        if (holdingArm.HasValue)
+        UnsubscribeFromStateEvents();
+        if (stateController != null)
         {
-            return holdingArm.Value;
+            stateController.OnStateChanged += HandleRobotStateChanged;
         }
-
-        if (interactLockedArm.HasValue)
-        {
-            return interactLockedArm.Value;
-        }
-
-        if (bodyReference != null && targetTransform != null)
-        {
-            UpdatePreferredSide();
-        }
-
-        return ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
     }
 
-    private CowboyArmSide GetCurrentActiveArmSide()
+    private void UnsubscribeFromStateEvents()
     {
-        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
-        if (holdingArm.HasValue)
+        if (stateController != null)
         {
-            return holdingArm.Value;
+            stateController.OnStateChanged -= HandleRobotStateChanged;
         }
-
-        if (attackLockedArm.HasValue)
-        {
-            return attackLockedArm.Value;
-        }
-
-        if (interactLockedArm.HasValue)
-        {
-            return interactLockedArm.Value;
-        }
-
-        if (bodyReference != null && targetTransform != null)
-        {
-            UpdatePreferredSide();
-        }
-
-        return ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
     }
 
-    private void HandleGrabInput()
+    private void UpdateArmInput(CowboyArmSide arm, ArmRuntimeState state, bool driven, bool held)
+    {
+        state.DriveInput = driven;
+        state.WasHeldInput = state.HeldInput;
+        state.HeldInput = held && driven && IsAlive();
+
+        if (state.HeldInput && !state.WasHeldInput)
+        {
+            state.NextHoldEnergyTime = Time.time + Mathf.Max(0.01f, holdEnergyInterval);
+        }
+
+        if (!state.HeldInput && state.WasHeldInput)
+        {
+            state.AttackLockedUntil = Time.time + Mathf.Max(0f, attackCooldownAfterHoldReleaseDuration);
+        }
+
+        if (!state.HeldInput && state.WasHeldInput && HeldObjectRequiresActiveInput(arm))
+        {
+            grabController?.Release(arm, 0f);
+            state.RegrabLockedUntil = Time.time + Mathf.Max(0f, regrabLockoutDuration);
+        }
+
+        if (!state.HeldInput && state.WasHeldInput && !ArmHasHeldObject(arm))
+        {
+            grabController?.SetHandAttractorState(arm, false);
+        }
+    }
+
+    private void HandleManualRelease(CowboyArmSide arm, ArmRuntimeState state, bool releasePressed)
+    {
+        if (!releasePressed || grabController == null)
+        {
+            return;
+        }
+
+        grabController.Release(arm);
+        state.RegrabLockedUntil = Time.time + Mathf.Max(0f, regrabLockoutDuration);
+    }
+
+    private void HandleHoldEnergy(CowboyArmSide arm, ArmRuntimeState state)
+    {
+        if (!state.HeldInput || holdEnergyCostPerInterval <= 0f)
+        {
+            return;
+        }
+
+        float interval = Mathf.Max(0.01f, holdEnergyInterval);
+        if (Time.time < state.NextHoldEnergyTime)
+        {
+            return;
+        }
+
+        if (!TrySpendHoldEnergy())
+        {
+            state.HeldInput = false;
+            grabController?.SetHandAttractorState(arm, false);
+            return;
+        }
+
+        state.NextHoldEnergyTime = Time.time + interval;
+    }
+
+    private void HandleGrabInput(CowboyArmSide arm, ArmRuntimeState state)
     {
         if (grabController == null)
         {
             return;
         }
 
-        CowboyArmSide armForGrab = DetermineArmForGrab();
-        bool hasHeldObject = grabController.HasHeldObject();
-
-        if (!hasHeldObject)
+        if (grabController.HasHeldObject(arm))
         {
-            bool highlightActive = interactHeld || interactPressedThisFrame;
-            grabController.SetHandAttractorState(armForGrab, highlightActive);
-            grabController.SetHandAttractorState(GetOppositeArm(armForGrab), false);
-        }
-
-        if (interactPressedThisFrame && !hasHeldObject)
-        {
-            grabController.TryGrab(armForGrab);
-            hasHeldObject = grabController.HasHeldObject();
-        }
-
-        CowboyArmSide? holdingArm = grabController.GetHoldingArm();
-        if (!holdingArm.HasValue)
-        {
-            if (!interactHeld && !interactPressedThisFrame)
-            {
-                grabController.SetAllHandAttractorsInactive();
-            }
-
+            grabController.SetHandAttractorState(arm, true);
             return;
         }
 
-        if (interactHeld)
+        if (!state.HeldInput)
         {
-            grabController.MaintainHold(holdingArm.Value);
+            grabController.SetHandAttractorState(arm, false);
+            return;
         }
 
-        if (interactReleasedThisFrame)
+        bool canTryGrab = Time.time >= state.RegrabLockedUntil;
+        grabController.SetHandAttractorState(arm, canTryGrab);
+        if (canTryGrab)
         {
-            grabController.Release(holdingArm.Value);
+            grabController.TryGrab(arm);
         }
     }
 
-    private void HandleAttackInput()
+    private void MaintainHeldObjects()
+    {
+        if (grabController == null)
+        {
+            return;
+        }
+
+        grabController.MaintainHold(CowboyArmSide.Left);
+        grabController.MaintainHold(CowboyArmSide.Right);
+    }
+
+    private void DriveArm(
+        CowboyArmSide arm,
+        ArmRuntimeState state,
+        Transform solverTarget,
+        Vector3 restLocalPosition,
+        Quaternion restLocalRotation,
+        bool hasRest)
+    {
+        _ = arm;
+
+        if (solverTarget == null)
+        {
+            return;
+        }
+
+        if (state.DriveInput)
+        {
+            FollowTarget(solverTarget, targetTransform.position);
+            return;
+        }
+
+        ReturnToRest(solverTarget, restLocalPosition, restLocalRotation, hasRest);
+    }
+
+    private void UpdateAimSpeed(ArmRuntimeState state, Transform solverTarget)
+    {
+        if (solverTarget == null)
+        {
+            state.AimSpeed = 0f;
+            state.HasLastTargetPosition = false;
+            return;
+        }
+
+        Vector3 currentPosition = solverTarget.position;
+        if (!state.HasLastTargetPosition || Time.deltaTime <= 0f)
+        {
+            state.AimSpeed = 0f;
+            state.LastTargetPosition = currentPosition;
+            state.HasLastTargetPosition = true;
+            return;
+        }
+
+        state.AimSpeed = Vector3.Distance(currentPosition, state.LastTargetPosition) / Time.deltaTime;
+        state.LastTargetPosition = currentPosition;
+    }
+
+    private void HandleAttackState(CowboyArmSide arm, ArmRuntimeState state)
     {
         if (attackController == null)
         {
             return;
         }
 
-        if (attackSuppressedUntilRelease)
+        bool canAttack = allowAttackAim
+            && state.DriveInput
+            && !state.HeldInput
+            && Time.time >= state.AttackLockedUntil
+            && !ArmHasHeldObject(arm)
+            && IsAlive();
+
+        if (!canAttack)
         {
-            if (attackActiveArm.HasValue)
+            DeactivateAttack(arm, state);
+            return;
+        }
+
+        if (state.AttackActive)
+        {
+            if (state.AimSpeed >= attackSpeedThreshold)
             {
-                attackController.SetArmAttackActive(attackActiveArm.Value, false);
-                attackActiveArm = null;
+                state.AttackGraceUntil = Time.time + Mathf.Max(0f, attackHoldAfterSlowDuration);
+            }
+
+            if (Time.time > state.AttackGraceUntil)
+            {
+                DeactivateAttack(arm, state);
             }
 
             return;
         }
 
-        if (!attackInputHeld)
-        {
-            if (attackActiveArm.HasValue)
-            {
-                attackController.SetArmAttackActive(attackActiveArm.Value, false);
-                attackActiveArm = null;
-            }
-
-            return;
-        }
-
-        CowboyArmSide desiredArm = GetCurrentActiveArmSide();
-
-        if (!attackActiveArm.HasValue)
-        {
-            if (!attackEnergySpentThisPress && !TrySpendEnergyForAttack())
-            {
-                attackSuppressedUntilRelease = true;
-                return;
-            }
-
-            attackController.SetArmAttackActive(desiredArm, true);
-            attackActiveArm = desiredArm;
-            attackEnergySpentThisPress = true;
-            return;
-        }
-
-        if (attackActiveArm.Value == desiredArm)
+        if (state.AimSpeed < attackSpeedThreshold)
         {
             return;
         }
 
-        attackController.SetArmAttackActive(attackActiveArm.Value, false);
-        attackController.SetArmAttackActive(desiredArm, true);
-        attackActiveArm = desiredArm;
+        if (!state.AttackEnergySpent && !TrySpendEnergyForAttack())
+        {
+            return;
+        }
+
+        state.AttackActive = true;
+        state.AttackEnergySpent = true;
+        state.AttackHitConsumed = false;
+        state.AttackGraceUntil = Time.time + Mathf.Max(0f, attackHoldAfterSlowDuration);
+        attackController.SetArmAttackActive(arm, true);
+    }
+
+    private void DeactivateAttack(CowboyArmSide arm, ArmRuntimeState state)
+    {
+        if (attackController != null && state.AttackActive)
+        {
+            attackController.SetArmAttackActive(arm, false);
+        }
+
+        state.AttackActive = false;
+        state.AttackEnergySpent = false;
+        state.AttackHitConsumed = false;
+        state.AttackGraceUntil = 0f;
     }
 
     private void OnAttackHit(CowboyArmSide arm)
     {
-        attackSuppressedUntilRelease = true;
-        attackHeld = false;
+        ArmRuntimeState state = GetArmState(arm);
+        state.AttackHitConsumed = true;
 
         if (attackController != null)
         {
             attackController.SetArmAttackActive(arm, false);
         }
-
-        if (attackActiveArm.HasValue)
-        {
-            attackActiveArm = null;
-        }
     }
 
-
-    private void LateUpdate()
+    private void HandleRobotStateChanged(RobotState newState)
     {
-        bool hasTargets = bodyReference != null && targetTransform != null;
-        bool canDrive = hasTargets && (interactHeld || attackHeld);
-
-        if (hasTargets)
-        {
-            UpdatePreferredSide();
-            ApplySolverFlip(GetSolverArmSide() == CowboyArmSide.Right);
-        }
-
-        ApplySolverStates(canDrive);
-
-        if (!hasTargets)
+        if (newState == RobotState.Alive)
         {
             return;
         }
 
-        if (!canDrive)
-        {
-            ReturnToRest(leftArmSolverTarget, leftRestLocalPosition, leftRestLocalRotation, leftRestCaptured);
-            ReturnToRest(rightArmSolverTarget, rightRestLocalPosition, rightRestLocalRotation, rightRestCaptured);
-            return;
-        }
-
-        Vector3 destination = targetTransform.position;
-
-        bool useRightArm = GetSolverArmSide() == CowboyArmSide.Right;
-        Transform activeArm = useRightArm ? rightArmSolverTarget : leftArmSolverTarget;
-        Transform inactiveArm = useRightArm ? leftArmSolverTarget : rightArmSolverTarget;
-
-        if (activeArm == null && inactiveArm != null)
-        {
-            // Fallback to whichever arm exists, but still rest the non-active one.
-            activeArm = inactiveArm;
-            inactiveArm = null;
-        }
-
-        if (activeArm != null)
-        {
-            FollowTarget(activeArm, destination);
-        }
-
-        if (inactiveArm != null)
-        {
-            ReturnToRest(inactiveArm,
-                inactiveArm == leftArmSolverTarget ? leftRestLocalPosition : rightRestLocalPosition,
-                inactiveArm == leftArmSolverTarget ? leftRestLocalRotation : rightRestLocalRotation,
-                inactiveArm == leftArmSolverTarget ? leftRestCaptured : rightRestCaptured);
-        }
-    }
-
-    private void UpdatePreferredSide()
-    {
-        float delta = targetTransform.position.x - bodyReference.position.x;
-        if (delta > sideSwitchThreshold)
-        {
-            preferRightArm = true;
-        }
-        else if (delta < -sideSwitchThreshold)
-        {
-            preferRightArm = false;
-        }
+        leftArm.HeldInput = false;
+        rightArm.HeldInput = false;
+        leftArm.DriveInput = false;
+        rightArm.DriveInput = false;
+        DeactivateAttack(CowboyArmSide.Left, leftArm);
+        DeactivateAttack(CowboyArmSide.Right, rightArm);
+        grabController?.ReleaseAllImmediate();
     }
 
     private void FollowTarget(Transform arm, Vector3 destination)
@@ -479,6 +549,46 @@ private bool attackEnergySpentThisPress;
         return Input.GetMouseButton(0);
     }
 
+    private bool IsRightMousePressedThisFrame()
+    {
+        if (Mouse.current != null)
+        {
+            return Mouse.current.rightButton.wasPressedThisFrame;
+        }
+
+        return Input.GetMouseButtonDown(1);
+    }
+
+    private bool IsLeftMousePressedThisFrame()
+    {
+        if (Mouse.current != null)
+        {
+            return Mouse.current.leftButton.wasPressedThisFrame;
+        }
+
+        return Input.GetMouseButtonDown(0);
+    }
+
+    private bool IsLeftReleasePressed()
+    {
+        if (Keyboard.current != null)
+        {
+            return Keyboard.current.qKey.wasPressedThisFrame;
+        }
+
+        return Input.GetKeyDown(KeyCode.Q);
+    }
+
+    private bool IsRightReleasePressed()
+    {
+        if (Keyboard.current != null)
+        {
+            return Keyboard.current.eKey.wasPressedThisFrame;
+        }
+
+        return Input.GetKeyDown(KeyCode.E);
+    }
+
     private void CacheSolverDefaults()
     {
         if (solverDefaultsCaptured)
@@ -499,32 +609,10 @@ private bool attackEnergySpentThisPress;
         solverDefaultsCaptured = true;
     }
 
-    private void ApplySolverStates(bool allowActiveSolver)
+    private void ApplySolverStates()
     {
-        if (leftArmIkSolver == null && rightArmIkSolver == null)
-        {
-            return;
-        }
-
-        if (!allowActiveSolver)
-        {
-            SetSolverEnabled(leftArmIkSolver, leftSolverDefaultEnabled);
-            SetSolverEnabled(rightArmIkSolver, rightSolverDefaultEnabled);
-            return;
-        }
-
-        bool useRightArm = GetSolverArmSide() == CowboyArmSide.Right;
-
-        if (useRightArm)
-        {
-            SetSolverEnabled(rightArmIkSolver, rightSolverDefaultEnabled);
-            SetSolverEnabled(leftArmIkSolver, false);
-        }
-        else
-        {
-            SetSolverEnabled(leftArmIkSolver, leftSolverDefaultEnabled);
-            SetSolverEnabled(rightArmIkSolver, false);
-        }
+        SetSolverEnabled(leftArmIkSolver, leftSolverDefaultEnabled);
+        SetSolverEnabled(rightArmIkSolver, rightSolverDefaultEnabled);
     }
 
     private static void SetSolverEnabled(Behaviour solver, bool enabled)
@@ -537,68 +625,30 @@ private bool attackEnergySpentThisPress;
         solver.enabled = enabled;
     }
 
-    private bool ShouldUseRightArm()
+    private bool TrySpendHoldEnergy()
     {
-        return preferRightArm;
-    }
-
-    private void LockInteractArm()
-    {
-        if (bodyReference != null && targetTransform != null)
+        if (!IsAlive())
         {
-            UpdatePreferredSide();
+            return false;
         }
 
-        interactLockedArm = ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
-    }
-
-    private void LockAttackArm()
-    {
-        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
-        if (holdingArm.HasValue)
+        if (playerBrain != null)
         {
-            attackLockedArm = holdingArm.Value;
-            return;
+            return playerBrain.TrySpendEnergy(EnergyAction.Grab, 0f, holdEnergyCostPerInterval);
         }
 
-        if (interactLockedArm.HasValue)
+        if (stateController != null)
         {
-            attackLockedArm = interactLockedArm.Value;
-            return;
+            if (!stateController.CanPerformEnergy(holdEnergyCostPerInterval))
+            {
+                return false;
+            }
+
+            stateController.ConsumeEnergy(holdEnergyCostPerInterval);
+            return true;
         }
 
-        if (bodyReference != null && targetTransform != null)
-        {
-            UpdatePreferredSide();
-        }
-
-        attackLockedArm = ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
-    }
-
-    private CowboyArmSide GetSolverArmSide()
-    {
-        CowboyArmSide? holdingArm = grabController?.GetHoldingArm();
-        if (holdingArm.HasValue)
-        {
-            return holdingArm.Value;
-        }
-
-        if (attackLockedArm.HasValue)
-        {
-            return attackLockedArm.Value;
-        }
-
-        if (interactLockedArm.HasValue)
-        {
-            return interactLockedArm.Value;
-        }
-
-        return ShouldUseRightArm() ? CowboyArmSide.Right : CowboyArmSide.Left;
-    }
-
-    private static CowboyArmSide GetOppositeArm(CowboyArmSide arm)
-    {
-        return arm == CowboyArmSide.Right ? CowboyArmSide.Left : CowboyArmSide.Right;
+        return true;
     }
 
     private bool TrySpendEnergyForAttack()
@@ -626,6 +676,11 @@ private bool attackEnergySpentThisPress;
         return stateController.PerformAttackByEnergy(energyCost);
     }
 
+    private bool IsAlive()
+    {
+        return stateController == null || stateController.CurrentState == RobotState.Alive;
+    }
+
     /// <summary>
     /// Allows AI/Brain to drive attack input instead of player mouse.
     /// </summary>
@@ -648,7 +703,7 @@ private bool attackEnergySpentThisPress;
     private System.Collections.IEnumerator ExternalAttackPulse()
     {
         externalAttackInput = true;
-        yield return null; // one frame
+        yield return null;
         externalAttackInput = false;
         externalAttackPulseRoutine = null;
     }
@@ -696,5 +751,127 @@ private bool attackEnergySpentThisPress;
         }
 
         return null;
+    }
+
+    private ArmRuntimeState GetArmState(CowboyArmSide arm)
+    {
+        return arm == CowboyArmSide.Right ? rightArm : leftArm;
+    }
+
+    private bool ArmHasHeldObject(CowboyArmSide arm)
+    {
+        return grabController != null && grabController.HasHeldObject(arm);
+    }
+
+    private bool HeldObjectRequiresActiveInput(CowboyArmSide arm)
+    {
+        return grabController != null && grabController.GetHeldObject(arm) is EnemyGrabbable;
+    }
+
+    private void ResetArmState(ArmRuntimeState state, Transform solverTarget)
+    {
+        state.DriveInput = false;
+        state.HeldInput = false;
+        state.WasHeldInput = false;
+        state.NextHoldEnergyTime = Time.time + Mathf.Max(0.01f, holdEnergyInterval);
+        state.RegrabLockedUntil = 0f;
+        state.LastTargetPosition = solverTarget != null ? solverTarget.position : Vector3.zero;
+        state.HasLastTargetPosition = solverTarget != null;
+        state.AimSpeed = 0f;
+        state.AttackActive = false;
+        state.AttackEnergySpent = false;
+        state.AttackGraceUntil = 0f;
+        state.AttackLockedUntil = 0f;
+        state.AttackHitConsumed = false;
+    }
+
+    private void UpdateClickSelectedArm(bool leftHeld, bool rightHeld, bool leftPressed, bool rightPressed)
+    {
+        if (!leftHeld && !rightHeld)
+        {
+            hasClickSelectedArm = false;
+            return;
+        }
+
+        if (leftPressed)
+        {
+            SetClickSelectedArm(CowboyArmSide.Left);
+        }
+
+        if (rightPressed)
+        {
+            SetClickSelectedArm(CowboyArmSide.Right);
+        }
+
+        if (!hasClickSelectedArm)
+        {
+            SetClickSelectedArm(leftHeld ? CowboyArmSide.Left : CowboyArmSide.Right);
+            return;
+        }
+
+        if (clickSelectedArm == CowboyArmSide.Left && !leftHeld && rightHeld)
+        {
+            SetClickSelectedArm(CowboyArmSide.Right);
+        }
+        else if (clickSelectedArm == CowboyArmSide.Right && !rightHeld && leftHeld)
+        {
+            SetClickSelectedArm(CowboyArmSide.Left);
+        }
+    }
+
+    private void SetClickSelectedArm(CowboyArmSide arm)
+    {
+        clickSelectedArm = arm;
+        hasClickSelectedArm = true;
+        activeMovementArm = arm;
+        hasPendingAutomaticArm = false;
+    }
+
+    private CowboyArmSide ResolveDrivenArm()
+    {
+        if (hasClickSelectedArm)
+        {
+            return clickSelectedArm;
+        }
+
+        CowboyArmSide targetSide = GetTargetSide();
+        if (targetSide == activeMovementArm)
+        {
+            hasPendingAutomaticArm = false;
+            return activeMovementArm;
+        }
+
+        if (!hasPendingAutomaticArm || pendingAutomaticArm != targetSide)
+        {
+            pendingAutomaticArm = targetSide;
+            pendingAutomaticArmStartedAt = Time.time;
+            hasPendingAutomaticArm = true;
+            return activeMovementArm;
+        }
+
+        if (Time.time - pendingAutomaticArmStartedAt >= Mathf.Max(0f, automaticArmSwitchDelay))
+        {
+            activeMovementArm = targetSide;
+            hasPendingAutomaticArm = false;
+        }
+
+        return activeMovementArm;
+    }
+
+    private CowboyArmSide GetTargetSide()
+    {
+        if (bodyReference == null || targetTransform == null)
+        {
+            return activeMovementArm;
+        }
+
+        return targetTransform.position.x >= bodyReference.position.x
+            ? CowboyArmSide.Right
+            : CowboyArmSide.Left;
+    }
+
+    private bool IsSelectedClickArm(CowboyArmSide arm)
+    {
+        return hasClickSelectedArm && clickSelectedArm == arm;
     }
 }

@@ -62,6 +62,8 @@ public class CubePickup : MonoBehaviour, IGrabbable
     private Rigidbody2D rb;
     private TargetJoint2D joint;
     private Transform followTarget;
+    private Vector2 overrideAttractPoint;
+    private bool hasOverrideAttractPoint;
     private bool attached = false;
     private bool wasStolen = false;
 
@@ -90,6 +92,13 @@ public class CubePickup : MonoBehaviour, IGrabbable
     {
         if (joint == null || !joint.enabled || followTarget == null)
             return;
+
+        if (hasOverrideAttractPoint)
+        {
+            joint.target = overrideAttractPoint;
+            hasOverrideAttractPoint = false;
+            return;
+        }
 
         joint.target = followTarget.position;
     }
@@ -152,8 +161,12 @@ public class CubePickup : MonoBehaviour, IGrabbable
         if (joint == null)
             return;
 
-        if (attached && joint.enabled && followTarget == null)
+        if (attached && joint.enabled)
+        {
+            overrideAttractPoint = attractPoint;
+            hasOverrideAttractPoint = true;
             joint.target = attractPoint;
+        }
     }
 
     public void OnRelease(Vector2 throwForce)
@@ -163,6 +176,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
             joint.enabled = false;
 
         followTarget = null;
+        hasOverrideAttractPoint = false;
         transform.SetParent(null, true);
 
         OnReleased?.Invoke(this);
