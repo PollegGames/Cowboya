@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// Displays the current level number on the canvas.
+/// Keeps the legacy level label empty because run level numbers are not player-facing.
 /// </summary>
 public class CanvasLevelUI : MonoBehaviour
 {
@@ -14,7 +14,7 @@ public class CanvasLevelUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Refreshes the level label text based on RunProgressManager.
+    /// Clears the legacy level label.
     /// </summary>
     public void UpdateLevelLabel()
     {
@@ -24,10 +24,7 @@ public class CanvasLevelUI : MonoBehaviour
             return;
         }
 
-        int index = RunProgressManager.Instance != null ? RunProgressManager.Instance.CurrentLevelIndex : 0;
-        int realLevel = index - 1;
-        string label = index <= 1 ? "Level Tutorial" : $"Level {realLevel}";
-        _levelText.text = label;
+        _levelText.text = string.Empty;
     }
 }
 

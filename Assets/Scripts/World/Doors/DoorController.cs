@@ -46,21 +46,7 @@ public class DoorController : MonoBehaviour
 
     private void Start()
     {
-        if (roomManager != null)
-        {
-            if (moveDirection == Vector2.left)
-            {
-                isWall = !roomManager.roomProperties.HasLeftDoor;
-                normalRequiresBadge = roomManager.roomProperties.HasLeftDoorLocked;
-                isVictoryDoor = roomManager.roomProperties.IsVictoryDoorLeft;
-            }
-            else if (moveDirection == Vector2.right)
-            {
-                isWall = !roomManager.roomProperties.HasRightDoor;
-                normalRequiresBadge = roomManager.roomProperties.HasRightDoorLocked;
-                isVictoryDoor = roomManager.roomProperties.IsVictoryDoorRight;
-            }
-        }
+        RefreshFromRoomProperties();
         CachePanelPositions();
 
         if (solidCollider != null)
@@ -72,6 +58,27 @@ public class DoorController : MonoBehaviour
         UpdateStatusPanel();
         // Start the safety check coroutine
         StartCoroutine(SafetyCheckRoutine());
+    }
+
+    public void RefreshFromRoomProperties()
+    {
+        if (roomManager == null || roomManager.roomProperties == null)
+            return;
+
+        if (moveDirection == Vector2.left)
+        {
+            isWall = !roomManager.roomProperties.HasLeftDoor;
+            normalRequiresBadge = roomManager.roomProperties.HasLeftDoorLocked;
+            isVictoryDoor = roomManager.roomProperties.IsVictoryDoorLeft;
+        }
+        else if (moveDirection == Vector2.right)
+        {
+            isWall = !roomManager.roomProperties.HasRightDoor;
+            normalRequiresBadge = roomManager.roomProperties.HasRightDoorLocked;
+            isVictoryDoor = roomManager.roomProperties.IsVictoryDoorRight;
+        }
+
+        UpdateStatusPanel();
     }
 
     private IEnumerator SafetyCheckRoutine()

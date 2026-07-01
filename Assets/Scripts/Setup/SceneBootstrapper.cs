@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // Navigation services
 public class SceneBootstrapper : MonoBehaviour
@@ -20,6 +21,11 @@ public class SceneBootstrapper : MonoBehaviour
             Instantiate(config.runProgressManagerPrefab);
         }
 
+        RunProgressManager.Instance?.EnsureRunContextForActiveScene(SceneManager.GetActiveScene().name);
+        SceneSetupMode setupMode = RunProgressManager.Instance != null
+            ? RunProgressManager.Instance.GetSetupModeForActiveScene(config.setupMode)
+            : config.setupMode;
+
         if (AudioManager.Instance == null)
         {
             var audioPrefab = Resources.Load<GameObject>(AudioManagerResourcePath);
@@ -35,16 +41,27 @@ public class SceneBootstrapper : MonoBehaviour
 
         var factory = Instantiate(config.factoryManagerPrefab);
         var playerSpawner = Instantiate(config.playerSpawnerPrefab);
-        var enemiesSpawner = Instantiate(config.enemiesSpawnerPrefab);
-        var mapManager = Instantiate(config.mapManagerPrefab);
-        var gridBuilder = mapManager.gameObject.AddComponent<GridBuilder>();
-        var roomRenderer = mapManager.gameObject.AddComponent<RoomRenderer>();
-        var roomProcessor = mapManager.gameObject.AddComponent<RoomProcessor>();
-        mapManager.Construct(gridBuilder, roomRenderer, roomProcessor);
-        var waypointService = Instantiate(config.waypointServicePrefab);
-        var respawnService = Instantiate(config.respawnServicePrefab);
-        var badgeSpawner = Instantiate(config.badgeSpawnerPrefab);
-        var batterySpawner = Instantiate(config.batterySpawnerPrefab);
+        EnemiesSpawner enemiesSpawner = null;
+        MapManager mapManager = null;
+        WaypointService waypointService = null;
+        RobotRespawnService respawnService = null;
+        SecurityBadgeSpawner badgeSpawner = null;
+        BatterySpawner batterySpawner = null;
+
+        if (setupMode == SceneSetupMode.GeneratedMap)
+        {
+            enemiesSpawner = Instantiate(config.enemiesSpawnerPrefab);
+            mapManager = Instantiate(config.mapManagerPrefab);
+            var gridBuilder = mapManager.gameObject.AddComponent<GridBuilder>();
+            var roomRenderer = mapManager.gameObject.AddComponent<RoomRenderer>();
+            var roomProcessor = mapManager.gameObject.AddComponent<RoomProcessor>();
+            mapManager.Construct(gridBuilder, roomRenderer, roomProcessor);
+            waypointService = Instantiate(config.waypointServicePrefab);
+            respawnService = Instantiate(config.respawnServicePrefab);
+            badgeSpawner = Instantiate(config.badgeSpawnerPrefab);
+            batterySpawner = Instantiate(config.batterySpawnerPrefab);
+        }
+
         var hintManager = Instantiate(config.hintManagerPrefab);
 
         if (SceneController.instance == null)
@@ -73,7 +90,8 @@ public class SceneBootstrapper : MonoBehaviour
                 saveService,
                 badgeSpawner,
                 batterySpawner,
-                hintManager
+                hintManager,
+                setupMode
             );
         }
 

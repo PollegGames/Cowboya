@@ -96,6 +96,39 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         EmitMachineSummary();
     }
 
+    public void InitializeStatic(VictorySetup victorySetup)
+    {
+        this.mapManager = null;
+        this.waypointService = null;
+        this.victorySetup = victorySetup;
+        SetupFactoryState();
+        roomManagers.Clear();
+        machinePowerStates.Clear();
+        allMachinesOffRaised = false;
+        EmitMachineSummary();
+    }
+
+    public void RegisterStaticRooms(IEnumerable<RoomManager> rooms, Transform playerHead)
+    {
+        var registeredRooms = new List<RoomManager>();
+        if (rooms != null)
+        {
+            foreach (RoomManager room in rooms)
+            {
+                if (room == null)
+                    continue;
+
+                var doorConfig = room.GetComponent<StaticRoomDoorConfig>();
+                doorConfig?.Apply(room);
+                room.InitializeStatic(this, playerHead);
+                registeredRooms.Add(room);
+            }
+        }
+
+        RegisterRooms(registeredRooms);
+        EmitMachineSummary();
+    }
+
     public IWaypointService GetWayPointService()
     {
         return waypointService;

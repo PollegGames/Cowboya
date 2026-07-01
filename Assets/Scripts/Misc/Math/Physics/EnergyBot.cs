@@ -37,6 +37,8 @@ public class EnergyBot : MonoBehaviour
 
     public float FaintRecoveryThreshold => GetFaintRecoveryThreshold();
 
+    public bool AutoRechargeEnabled => autoRecharge;
+
     private void Awake()
     {
         if (stateController == null)
@@ -72,6 +74,28 @@ public class EnergyBot : MonoBehaviour
     public void SetPlayerMode(bool isPlayerControlled)
     {
         playerControlled = isPlayerControlled;
+    }
+
+    public void SetAutoRecharge(bool enabled)
+    {
+        autoRecharge = enabled;
+        if (!autoRecharge)
+        {
+            StopRecharge();
+            return;
+        }
+
+        nextRechargeStartTime = Time.time;
+        StartRechargeIfNeeded();
+    }
+
+    public void SetCurrentEnergy(float value)
+    {
+        if (stats == null)
+            return;
+
+        float target = Mathf.Clamp(value, 0f, stats.MaxEnergy);
+        ApplyEnergyChange(target - stats.CurrentEnergy);
     }
 
     public void SetActionCost(EnergyAction action, float cost)

@@ -18,6 +18,7 @@ public class SceneInitiator : GameInitiator
     private SecurityBadgeSpawner securityBadgeSpawner;
     private BatterySpawner batterySpawner;
     private HintManager hintManager;
+    private SceneSetupMode setupMode;
 
     public void Construct(
         IFactoryManager factoryManager,
@@ -31,7 +32,8 @@ public class SceneInitiator : GameInitiator
         ISaveService saveService,
         SecurityBadgeSpawner securityBadgeSpawner,
         BatterySpawner batterySpawner,
-        HintManager hintManager)
+        HintManager hintManager,
+        SceneSetupMode setupMode = SceneSetupMode.GeneratedMap)
     {
         this.factoryManager = factoryManager;
         this.gameUIViewModel = gameUIViewModel;
@@ -45,6 +47,7 @@ public class SceneInitiator : GameInitiator
         this.securityBadgeSpawner = securityBadgeSpawner;
         this.batterySpawner = batterySpawner;
         this.hintManager = hintManager;
+        this.setupMode = setupMode;
 
         if (RunProgressManager.Instance != null)
         {
@@ -64,11 +67,25 @@ public class SceneInitiator : GameInitiator
     {
         InitializeSharedObjects();
         InitializeVictorySetup();
-        InitializeFactory();
+        if (setupMode == SceneSetupMode.GeneratedMap)
+        {
+            InitializeFactory();
+        }
+        else
+        {
+            InitializeStaticFactory();
+        }
         InitializeSceneController();
-        InitializePlayer();
-        InitializeEnemies();
-        InitializeMiniMap();
+        if (setupMode == SceneSetupMode.GeneratedMap)
+        {
+            InitializePlayer();
+            InitializeEnemies();
+            InitializeMiniMap();
+        }
+        else
+        {
+            InitializeStaticPlayer();
+        }
     }
 
     private void InitializeFactory()
@@ -101,6 +118,19 @@ public class SceneInitiator : GameInitiator
         Debug.Log("FactoryManager initialized.");
     }
 
+    private void InitializeStaticFactory()
+    {
+        if (factoryManager == null)
+        {
+            Debug.LogWarning("SceneInitiator: FactoryManager is not assigned; skipping static factory initialization.");
+            return;
+        }
+
+        RobotDomainEventAdapter.EnsureInScene();
+        factoryManager.InitializeStatic(victorySetup);
+        Debug.Log("Static FactoryManager initialized.");
+    }
+
     private void InitializePlayer()
     {
         if (playerInitiator == null || factoryManager == null)
@@ -123,6 +153,76 @@ public class SceneInitiator : GameInitiator
         InitializeHintManager();
 
         Debug.Log("Player initialized.");
+    }
+
+    private void InitializeStaticPlayer()
+    {
+        if (playerInitiator == null || factoryManager == null)
+        {
+            Debug.LogWarning("SceneInitiator: Player dependencies are missing; skipping static player initialization.");
+            return;
+        }
+
+        Vector3 startPos = ResolveStaticPlayerStartPosition();
+        playerInitiator.SetPlayerStartPosition(startPos);
+        playerInitiator.InitializePlayer(saveService);
+        factoryManager.SetPlayerInstanceHead(playerInitiator.playerInstance, playerInitiator.playerHeadTransform);
+        InitializeStaticRooms();
+
+        gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
+        SetCinemachineTarget(playerInitiator.playerHeadTransform);
+        InitializeHintManager();
+        ApplyStaticStartState();
+        InitializeStaticMiniMap();
+
+        Debug.Log("Static player initialized.");
+    }
+
+    private void InitializeStaticRooms()
+    {
+        RoomManager[] rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
+        factoryManager.RegisterStaticRooms(rooms, playerInitiator.playerHeadTransform);
+    }
+
+    private Vector3 ResolveStaticPlayerStartPosition()
+    {
+        StaticLevelSpawnPoint spawnPoint = FindFirstObjectByType<StaticLevelSpawnPoint>();
+        if (spawnPoint != null)
+            return spawnPoint.transform.position;
+
+        string fallbackRoomName = setupMode == SceneSetupMode.Laboratory ? "ROOM_Laboratory" : "ROOM_Deads";
+        GameObject fallbackRoom = GameObject.Find(fallbackRoomName);
+        if (fallbackRoom != null)
+            return fallbackRoom.transform.position;
+
+        Debug.LogWarning($"SceneInitiator: no StaticLevelSpawnPoint or {fallbackRoomName} found; using world origin.");
+        return Vector3.zero;
+    }
+
+    private void ApplyStaticStartState()
+    {
+        if (setupMode != SceneSetupMode.StaticLevel || playerInitiator?.playerInstance == null)
+            return;
+
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName != "Level_1")
+            return;
+
+        var energyBot = playerInitiator.playerInstance.GetComponent<EnergyBot>();
+        var movement = playerInitiator.playerInstance.GetComponent<PlayerMovementController>();
+        RobotStateController stateController = playerInitiator.playerRobotBehaviour;
+        if (energyBot == null || stateController == null || movement == null)
+        {
+            Debug.LogWarning("SceneInitiator: Level_1 faint start skipped because player energy/state/input components are missing.");
+            return;
+        }
+
+        energyBot.SetAutoRecharge(false);
+        energyBot.SetCurrentEnergy(0f);
+        stateController.UpdateState(RobotState.Faint);
+
+        var gate = playerInitiator.playerInstance.AddComponent<FirstMovementRechargeGate>();
+        gate.Configure(energyBot, movement.Input);
     }
 
     private void InitializeHintManager()
@@ -220,5 +320,10 @@ public class SceneInitiator : GameInitiator
         {
             gameUIViewModel.SetMiniMapTexture(mapManager);
         }
+    }
+
+    private void InitializeStaticMiniMap()
+    {
+        gameUIViewModel?.SetMiniMapTextureFromScene();
     }
 }

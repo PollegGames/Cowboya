@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class GameUIViewModel : MonoBehaviour
@@ -15,6 +16,7 @@ public class GameUIViewModel : MonoBehaviour
     [SerializeField] private RenderTexture miniMapRT;
     private VisualElement previewVE;      // <VisualElement name="preview">
     private bool minimapCaptured;
+    private bool minimapConfigured;
 
     [Header("PAUSE MENU")]
 
@@ -55,6 +57,7 @@ public class GameUIViewModel : MonoBehaviour
         mainMenuButton.clicked += GoToMainMenu;
 
         minimapCaptured = false;
+        minimapConfigured = false;
     }
 
     void PauseGame()
@@ -204,8 +207,25 @@ public class GameUIViewModel : MonoBehaviour
     /// </summary>
     public void SetMiniMapTexture(MapManager mapManagerInstance)
     {
-        miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
+        if (mapManagerInstance == null)
+            return;
+
         Bounds bounds = mapManagerInstance.GetGridWorldBounds();
+        SetMiniMapTexture(bounds);
+    }
+
+    public void SetMiniMapTextureFromScene()
+    {
+        if (!TryGetActiveSceneBounds(out Bounds bounds))
+            return;
+
+        SetMiniMapTexture(bounds);
+    }
+
+    private void SetMiniMapTexture(Bounds bounds)
+    {
+        minimapConfigured = true;
+        miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 
         var cam = miniMapPreviewInstance.GetComponentInChildren<Camera>();
         if (cam != null)
@@ -227,6 +247,51 @@ public class GameUIViewModel : MonoBehaviour
 
         }
         CaptureMinimapOnce();
+    }
+
+    private bool TryGetActiveSceneBounds(out Bounds bounds)
+    {
+        bounds = default;
+        bool hasBounds = false;
+        int mapPreviewLayer = LayerMask.NameToLayer("MapPreview");
+        Scene scene = SceneManager.GetActiveScene();
+        GameObject[] roots = scene.GetRootGameObjects();
+
+        foreach (GameObject root in roots)
+        {
+            if (root == null)
+                continue;
+
+            if (root.GetComponentInChildren<GameUIViewModel>() != null)
+                continue;
+
+            Renderer[] renderers = root.GetComponentsInChildren<Renderer>(includeInactive: false);
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer == null || renderer.gameObject.name.Contains("Camera"))
+                    continue;
+
+                if (mapPreviewLayer >= 0 && renderer.gameObject.layer != mapPreviewLayer)
+                    continue;
+
+                if (!hasBounds)
+                {
+                    bounds = renderer.bounds;
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(renderer.bounds);
+                }
+            }
+        }
+
+        if (!hasBounds)
+        {
+            Debug.LogWarning("GameUIViewModel: static minimap skipped because no MapPreview renderers were found.");
+        }
+
+        return hasBounds;
     }
 
     public void RefreshMinimapTexture()
@@ -268,6 +333,9 @@ public class GameUIViewModel : MonoBehaviour
 
     private void CaptureMinimapOnce()
     {
+        if (!minimapConfigured)
+            return;
+
         if (minimapCaptured)
             return;
         minimapCaptured = true;

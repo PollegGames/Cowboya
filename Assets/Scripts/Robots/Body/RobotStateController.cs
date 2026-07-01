@@ -234,6 +234,24 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         }
     }
 
+    public void SetInitialDeadState()
+    {
+        if (Stats != null)
+        {
+            Stats.CurrentHealth = 0f;
+        }
+
+        if (CurrentState != RobotState.Dead)
+        {
+            CurrentState = RobotState.Dead;
+            deathReported = true;
+            savedReported = false;
+            ApplyEnemyDeathState();
+            OnStateChanged?.Invoke(RobotState.Dead);
+            jointBreaker?.BreakAll();
+        }
+    }
+
     public void OnAcquireFromPool()
     {
         bool stateChanged = CurrentState != RobotState.Alive;

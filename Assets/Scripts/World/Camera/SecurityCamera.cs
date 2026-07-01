@@ -26,6 +26,9 @@ public class SecurityCamera : MonoBehaviour
 
     private void Awake()
     {
+        if (roomManager == null)
+            roomManager = GetComponentInParent<RoomManager>();
+
         if (cameraHead == null && transform.childCount > 0)
             cameraHead = transform.GetChild(0);
 
@@ -82,6 +85,9 @@ public class SecurityCamera : MonoBehaviour
     private void OnPlayerEnterZone(Collider2D playerCollider)
     {
         if (roomManager == null)
+            roomManager = GetComponentInParent<RoomManager>();
+
+        if (roomManager == null)
             return;
 
         if (player == null && roomManager.FactoryManager != null)
@@ -89,6 +95,13 @@ public class SecurityCamera : MonoBehaviour
 
         if (player == null)
             player = roomManager.PlayerHead;
+
+        if (player == null && playerCollider != null)
+        {
+            var movement = playerCollider.GetComponentInParent<PlayerMovementController>();
+            if (movement != null)
+                player = movement.HeadTransform;
+        }
 
         if (player != null)
         {

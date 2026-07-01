@@ -29,6 +29,9 @@ public class WarpMeshXYSkew : MonoBehaviour
 
     private void Awake()
     {
+        if (roomManager == null)
+            return;
+
         // Get the precise head Transform
         var head = roomManager.PlayerHead;
         if (head != null)
@@ -63,6 +66,9 @@ public class WarpMeshXYSkew : MonoBehaviour
 
     private void OnEnterRoom(Collider2D playerCollider)
     {
+        if (roomManager == null)
+            return;
+
         if (player == null)
         {
             var head = roomManager.FactoryManager != null ? roomManager.FactoryManager.playerHeadTransform : roomManager.PlayerHead;

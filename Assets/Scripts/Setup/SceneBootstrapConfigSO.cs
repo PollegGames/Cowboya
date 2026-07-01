@@ -1,8 +1,16 @@
 using UnityEngine;
 
+public enum SceneSetupMode
+{
+    GeneratedMap,
+    StaticLevel,
+    Laboratory
+}
+
 [CreateAssetMenu(fileName = "SceneBootstrapConfig", menuName = "Setup/Scene Bootstrap Config")]
 public class SceneBootstrapConfigSO : ScriptableObject
 {
+    public SceneSetupMode setupMode = SceneSetupMode.GeneratedMap;
     public FactoryManager factoryManagerPrefab;
     public PlayerSpawner playerSpawnerPrefab;
     public EnemiesSpawner enemiesSpawnerPrefab;

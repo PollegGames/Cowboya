@@ -126,6 +126,27 @@ public class RoomManager : MonoBehaviour
         SubscribeRoomMachineEvents();
     }
 
+    public void InitializeStatic(FactoryManager factoryManager, Transform playerHead)
+    {
+        FactoryManager = factoryManager;
+        PlayerHead = playerHead;
+
+        if (factoryManager != null)
+        {
+            var service = factoryManager.GetWayPointService();
+            if (service != null)
+                waypointService = service;
+        }
+
+        if (factoryManager != null && !alarmSubscribed)
+        {
+            factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
+            alarmSubscribed = true;
+        }
+
+        SubscribeRoomMachineEvents();
+    }
+
     private void OnDestroy()
     {
         if (triggerZone != null)

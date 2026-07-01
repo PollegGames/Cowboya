@@ -49,6 +49,14 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     {
         ResolveRunStats();
 
+        if (collision.CompareTag("Player") && IsAlwaysAllowedRunStep() && !hasRequestedLevelTransition)
+        {
+            hasRequestedLevelTransition = true;
+            CaptureAndSaveBeforeTransition(collision);
+            LoadNextRunStep();
+            return;
+        }
+
         if (doorNext != null)
         {
             isVictoryDoor = doorNext.isVictoryDoor;
@@ -60,54 +68,72 @@ public class LevelEndVictoryTrigger : MonoBehaviour
             if (isVictoryDoor && isVictory && collision.CompareTag("Player") && !hasRequestedLevelTransition)
             {
                 hasRequestedLevelTransition = true;
-                RobotStateController controller = collision.GetComponentInParent<RobotStateController>();
-                CowboyGrabController grabController = collision.GetComponentInParent<CowboyGrabController>();
-                Inventory inventory = collision.GetComponentInParent<Inventory>();
-
-                bool clearedHands = false;
-                if (grabController != null)
-                {
-                    grabController.ReleaseAllImmediate();
-                    clearedHands = true;
-                }
-                else
-                {
-                    Debug.LogWarning("LevelEndVictoryTrigger: GrabSystem or CowboyGrabController component is missing on Player or its parent.");
-                }
-
-                if (clearedHands)
-                {
-                    inventory?.DropAll();
-                }
-
-                if (runStats != null && controller != null)
-                {
-                    EnergyBot energyBot = controller.GetComponent<EnergyBot>();
-                    Attack attack = controller.Stats.Attacks.Count > 0 ? controller.Stats.Attacks[0] : null;
-                    AttackHitbox[] attackHitboxes = controller.GetComponentsInChildren<AttackHitbox>(true);
-                    runStats.Capture(controller.Stats, energyBot, attack, attackHitboxes);
-                    Debug.Log($"[LevelEndVictoryTrigger] Captured run stats before level transition. Bonuses: {runStats.DescribeBonuses()}", this);
-                    if (saveService != null)
-                    {
-                        saveService.SaveGame(controller, runStats);
-                    }
-                }
-                else if (controller == null)
-                {
-                    Debug.LogWarning("LevelEndVictoryTrigger: RobotStateController component is missing on Player or its parent.");
-                }
-
-                if (RunProgressManager.Instance != null)
-                {
-                    Debug.Log($"[LevelEndVictoryTrigger] Loading next level from run level {RunProgressManager.Instance.CurrentLevelIndex}.", this);
-                    RunProgressManager.Instance.LoadNextLevel();
-                }
-                else
-                {
-                    Debug.LogError("LevelEndVictoryTrigger: RunProgressManager instance is missing.");
-                }
+                CaptureAndSaveBeforeTransition(collision);
+                LoadNextRunStep();
             }
 
+        }
+    }
+
+    private bool IsAlwaysAllowedRunStep()
+    {
+        if (RunProgressManager.Instance == null)
+            return false;
+
+        RunStepKind kind = RunProgressManager.Instance.CurrentStepKind;
+        return kind == RunStepKind.StaticLevel || kind == RunStepKind.Laboratory;
+    }
+
+    private void CaptureAndSaveBeforeTransition(Collider2D collision)
+    {
+        RobotStateController controller = collision.GetComponentInParent<RobotStateController>();
+        CowboyGrabController grabController = collision.GetComponentInParent<CowboyGrabController>();
+        Inventory inventory = collision.GetComponentInParent<Inventory>();
+
+        bool clearedHands = false;
+        if (grabController != null)
+        {
+            grabController.ReleaseAllImmediate();
+            clearedHands = true;
+        }
+        else
+        {
+            Debug.LogWarning("LevelEndVictoryTrigger: GrabSystem or CowboyGrabController component is missing on Player or its parent.");
+        }
+
+        if (clearedHands)
+        {
+            inventory?.DropAll();
+        }
+
+        if (runStats != null && controller != null)
+        {
+            EnergyBot energyBot = controller.GetComponent<EnergyBot>();
+            Attack attack = controller.Stats.Attacks.Count > 0 ? controller.Stats.Attacks[0] : null;
+            AttackHitbox[] attackHitboxes = controller.GetComponentsInChildren<AttackHitbox>(true);
+            runStats.Capture(controller.Stats, energyBot, attack, attackHitboxes);
+            Debug.Log($"[LevelEndVictoryTrigger] Captured run stats before level transition. Bonuses: {runStats.DescribeBonuses()}", this);
+            if (saveService != null)
+            {
+                saveService.SaveGame(controller, runStats);
+            }
+        }
+        else if (controller == null)
+        {
+            Debug.LogWarning("LevelEndVictoryTrigger: RobotStateController component is missing on Player or its parent.");
+        }
+    }
+
+    private void LoadNextRunStep()
+    {
+        if (RunProgressManager.Instance != null)
+        {
+            Debug.Log($"[LevelEndVictoryTrigger] Loading next step from run level {RunProgressManager.Instance.CurrentLevelIndex}.", this);
+            RunProgressManager.Instance.LoadNextStep();
+        }
+        else
+        {
+            Debug.LogError("LevelEndVictoryTrigger: RunProgressManager instance is missing.");
         }
     }
 
