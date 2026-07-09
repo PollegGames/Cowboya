@@ -26,6 +26,13 @@ public class DeadRobotSpawner : MonoBehaviour
     [SerializeField] private Vector2 randomOffset = new Vector2(1f, 0.25f);
     [SerializeField] private bool matchSpawnerRotation;
 
+    [Header("Spawn Impulse")]
+    [SerializeField] private bool applySpawnImpulse = true;
+    [SerializeField] private Vector2 horizontalImpulseRange = new Vector2(2f, 5f);
+    [SerializeField] private Vector2 verticalImpulseRange = new Vector2(0.5f, 2f);
+    [SerializeField] private Vector2 angularImpulseRange = new Vector2(-30f, 30f);
+    [SerializeField, Range(0f, 1f)] private float childImpulseScale = 0.25f;
+
     private readonly List<GameObject> spawnedBodies = new List<GameObject>();
     private Coroutine spawnRoutine;
     private int nextPrefabIndex;
@@ -79,6 +86,7 @@ public class DeadRobotSpawner : MonoBehaviour
 
         GameObject body = Instantiate(prefab, position, rotation, parent);
         PrepareDeadBody(body);
+        ApplySpawnImpulse(body);
         spawnedBodies.Add(body);
     }
 
@@ -147,6 +155,60 @@ public class DeadRobotSpawner : MonoBehaviour
 
         JointBreaker jointBreaker = body.GetComponent<JointBreaker>();
         jointBreaker?.BreakAll();
+    }
+
+    private void ApplySpawnImpulse(GameObject body)
+    {
+        if (!applySpawnImpulse || body == null)
+            return;
+
+        Rigidbody2D[] rigidbodies = body.GetComponentsInChildren<Rigidbody2D>();
+        if (rigidbodies.Length == 0)
+            return;
+
+        float direction = Random.value < 0.5f ? -1f : 1f;
+        Rigidbody2D mainBody = body.GetComponent<Rigidbody2D>();
+        if (mainBody == null)
+            mainBody = rigidbodies[0];
+
+        ApplyImpulse(mainBody, CreateImpulse(direction, 1f), RandomRange(angularImpulseRange));
+
+        if (childImpulseScale <= 0f)
+            return;
+
+        foreach (Rigidbody2D rigidbody in rigidbodies)
+        {
+            if (rigidbody == null || rigidbody == mainBody)
+                continue;
+
+            float variation = Random.Range(0.5f, 1f);
+            Vector2 impulse = CreateImpulse(direction, childImpulseScale * variation);
+            float angularImpulse = RandomRange(angularImpulseRange) * childImpulseScale;
+            ApplyImpulse(rigidbody, impulse, angularImpulse);
+        }
+    }
+
+    private Vector2 CreateImpulse(float direction, float scale)
+    {
+        float horizontalImpulse = RandomRange(horizontalImpulseRange) * direction;
+        float verticalImpulse = RandomRange(verticalImpulseRange);
+        return new Vector2(horizontalImpulse, verticalImpulse) * scale;
+    }
+
+    private static void ApplyImpulse(Rigidbody2D rigidbody, Vector2 impulse, float angularImpulse)
+    {
+        if (rigidbody == null || rigidbody.bodyType != RigidbodyType2D.Dynamic)
+            return;
+
+        rigidbody.AddForce(impulse, ForceMode2D.Impulse);
+        rigidbody.AddTorque(angularImpulse, ForceMode2D.Impulse);
+    }
+
+    private static float RandomRange(Vector2 range)
+    {
+        float min = Mathf.Min(range.x, range.y);
+        float max = Mathf.Max(range.x, range.y);
+        return Random.Range(min, max);
     }
 
     private void CleanupMissingBodies()

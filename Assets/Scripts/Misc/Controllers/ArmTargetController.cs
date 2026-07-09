@@ -139,9 +139,6 @@ public class ArmTargetController : MonoBehaviour
         UpdateArmInput(CowboyArmSide.Left, leftArm, leftDrive, leftGrabMode);
         UpdateArmInput(CowboyArmSide.Right, rightArm, rightDrive, rightGrabMode);
 
-        HandleManualRelease(CowboyArmSide.Left, leftArm, IsLeftReleasePressed());
-        HandleManualRelease(CowboyArmSide.Right, rightArm, IsRightReleasePressed());
-
         HandleHoldEnergy(CowboyArmSide.Left, leftArm);
         HandleHoldEnergy(CowboyArmSide.Right, rightArm);
 
@@ -291,9 +288,9 @@ public class ArmTargetController : MonoBehaviour
             state.AttackLockedUntil = Time.time + Mathf.Max(0f, attackCooldownAfterHoldReleaseDuration);
         }
 
-        if (!state.HeldInput && state.WasHeldInput && HeldObjectRequiresActiveInput(arm))
+        if (!state.HeldInput && state.WasHeldInput && ArmHasHeldObject(arm))
         {
-            grabController?.Release(arm, 0f);
+            grabController?.Release(arm);
             state.RegrabLockedUntil = Time.time + Mathf.Max(0f, regrabLockoutDuration);
         }
 
@@ -301,17 +298,6 @@ public class ArmTargetController : MonoBehaviour
         {
             grabController?.SetHandAttractorState(arm, false);
         }
-    }
-
-    private void HandleManualRelease(CowboyArmSide arm, ArmRuntimeState state, bool releasePressed)
-    {
-        if (!releasePressed || grabController == null)
-        {
-            return;
-        }
-
-        grabController.Release(arm);
-        state.RegrabLockedUntil = Time.time + Mathf.Max(0f, regrabLockoutDuration);
     }
 
     private void HandleHoldEnergy(CowboyArmSide arm, ArmRuntimeState state)
@@ -569,26 +555,6 @@ public class ArmTargetController : MonoBehaviour
         return Input.GetMouseButtonDown(0);
     }
 
-    private bool IsLeftReleasePressed()
-    {
-        if (Keyboard.current != null)
-        {
-            return Keyboard.current.qKey.wasPressedThisFrame;
-        }
-
-        return Input.GetKeyDown(KeyCode.Q);
-    }
-
-    private bool IsRightReleasePressed()
-    {
-        if (Keyboard.current != null)
-        {
-            return Keyboard.current.eKey.wasPressedThisFrame;
-        }
-
-        return Input.GetKeyDown(KeyCode.E);
-    }
-
     private void CacheSolverDefaults()
     {
         if (solverDefaultsCaptured)
@@ -761,11 +727,6 @@ public class ArmTargetController : MonoBehaviour
     private bool ArmHasHeldObject(CowboyArmSide arm)
     {
         return grabController != null && grabController.HasHeldObject(arm);
-    }
-
-    private bool HeldObjectRequiresActiveInput(CowboyArmSide arm)
-    {
-        return grabController != null && grabController.GetHeldObject(arm) is EnemyGrabbable;
     }
 
     private void ResetArmState(ArmRuntimeState state, Transform solverTarget)

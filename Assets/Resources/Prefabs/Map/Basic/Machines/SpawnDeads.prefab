@@ -54,6 +54,11 @@ MonoBehaviour:
   spawnedParent: {fileID: 0}
   randomOffset: {x: 1, y: 0.25}
   matchSpawnerRotation: 0
+  applySpawnImpulse: 1
+  horizontalImpulseRange: {x: 2, y: 5}
+  verticalImpulseRange: {x: 0.5, y: 2}
+  angularImpulseRange: {x: -30, y: 30}
+  childImpulseScale: 0.25
 --- !u!1 &4051602913359112641
 GameObject:
   m_ObjectHideFlags: 0
