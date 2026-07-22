@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Moves this transform within configurable limits based on the player's position.
+/// Moves this transform on the X-Z plane within configurable limits based on the player's position.
 /// </summary>
 public class MoveWithPlayerPosition : MonoBehaviour
 {
@@ -20,11 +20,11 @@ public class MoveWithPlayerPosition : MonoBehaviour
 
     [Header("Player Range")]
     [Min(0.01f)]
-    [Tooltip("Player distance from the center at which horizontal movement reaches its limit.")]
+    [Tooltip("Player X distance from the center at which horizontal movement reaches its limit.")]
     public float horizontalRange = 5f;
 
     [Min(0.01f)]
-    [Tooltip("Player distance from the center at which vertical movement reaches its limit.")]
+    [Tooltip("Player Z distance from the center at which vertical movement reaches its limit.")]
     public float verticalRange = 5f;
 
     [Header("Movement Limits")]
@@ -93,7 +93,7 @@ public class MoveWithPlayerPosition : MonoBehaviour
         Vector3 playerOffset = playerPosition - centerPosition;
 
         float horizontalInput = Mathf.Clamp(playerOffset.x / horizontalRange, -1f, 1f);
-        float verticalInput = Mathf.Clamp(playerOffset.y / verticalRange, -1f, 1f);
+        float verticalInput = Mathf.Clamp(playerOffset.z / verticalRange, -1f, 1f);
 
         if (invertHorizontal)
             horizontalInput = -horizontalInput;
@@ -108,7 +108,7 @@ public class MoveWithPlayerPosition : MonoBehaviour
             ? verticalInput * maxDown
             : verticalInput * maxUp;
 
-        Vector3 targetPosition = initialLocalPosition + new Vector3(horizontalOffset, verticalOffset, 0f);
+        Vector3 targetPosition = initialLocalPosition + new Vector3(horizontalOffset, 0f, verticalOffset);
 
         MoveTo(targetPosition);
     }
