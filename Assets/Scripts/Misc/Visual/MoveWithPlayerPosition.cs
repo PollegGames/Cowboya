@@ -15,6 +15,9 @@ public class MoveWithPlayerPosition : MonoBehaviour
     [Tooltip("Optional room manager used to find the player head automatically.")]
     public RoomManager roomManager;
 
+    [Tooltip("Optional zone that activates movement and detects the player. If empty, movement is always active.")]
+    public PositionTriggerZone activationZone;
+
     [Header("Player Range")]
     [Min(0.01f)]
     [Tooltip("Player distance from the center at which horizontal movement reaches its limit.")]
@@ -41,6 +44,7 @@ public class MoveWithPlayerPosition : MonoBehaviour
 
     private Vector3 initialLocalPosition;
     private Vector3 movementVelocity;
+    private bool playerIsInZone;
 
     private void Awake()
     {
@@ -52,8 +56,32 @@ public class MoveWithPlayerPosition : MonoBehaviour
         ResolvePlayer();
     }
 
+    private void OnEnable()
+    {
+        if (activationZone == null)
+            return;
+
+        activationZone.onEnter?.AddListener(OnPlayerEnteredZone);
+        activationZone.onExit?.AddListener(OnPlayerExitedZone);
+    }
+
+    private void OnDisable()
+    {
+        if (activationZone == null)
+            return;
+
+        activationZone.onEnter?.RemoveListener(OnPlayerEnteredZone);
+        activationZone.onExit?.RemoveListener(OnPlayerExitedZone);
+    }
+
     private void LateUpdate()
     {
+        if (activationZone != null && !playerIsInZone)
+        {
+            MoveTo(initialLocalPosition);
+            return;
+        }
+
         if (player == null)
             ResolvePlayer();
 
@@ -82,6 +110,34 @@ public class MoveWithPlayerPosition : MonoBehaviour
 
         Vector3 targetPosition = initialLocalPosition + new Vector3(horizontalOffset, verticalOffset, 0f);
 
+        MoveTo(targetPosition);
+    }
+
+    private void OnPlayerEnteredZone(Collider2D playerCollider)
+    {
+        playerIsInZone = true;
+
+        if (playerCollider != null)
+        {
+            PlayerMovementController movement = playerCollider.GetComponentInParent<PlayerMovementController>();
+            if (movement != null && movement.HeadTransform != null)
+                player = movement.HeadTransform;
+        }
+
+        if (player == null)
+            ResolvePlayer();
+
+        if (player == null && playerCollider != null)
+            player = playerCollider.transform;
+    }
+
+    private void OnPlayerExitedZone()
+    {
+        playerIsInZone = false;
+    }
+
+    private void MoveTo(Vector3 targetPosition)
+    {
         if (smoothTime <= 0f)
         {
             transform.localPosition = targetPosition;
