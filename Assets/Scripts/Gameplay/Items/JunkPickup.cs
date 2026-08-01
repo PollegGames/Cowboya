@@ -19,18 +19,28 @@ public class JunkPickup : MonoBehaviour, IGrabbable
     private Vector2 overrideAttractPoint;
     private bool hasOverrideAttractPoint;
     private bool isHeld;
+    private bool isConveyorControlled;
     private SpriteRenderer[] spriteRenderers;
+    private Collider2D[] colliders;
+    private bool[] originalTriggerStates;
 
     public event Action<JunkPickup> OnGrabbed;
     public event Action<JunkPickup> OnReleased;
 
     public bool IsHeld => isHeld;
+    public bool IsConveyorControlled => isConveyorControlled;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         joint = GetComponent<TargetJoint2D>();
         spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+        colliders = GetComponentsInChildren<Collider2D>(true);
+        originalTriggerStates = new bool[colliders.Length];
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            originalTriggerStates[i] = colliders[i].isTrigger;
+        }
         ApplySortingOrder(idleSortingOrder);
 
         if (joint != null)
@@ -74,6 +84,7 @@ public class JunkPickup : MonoBehaviour, IGrabbable
             return;
         }
 
+        SetConveyorControlled(false);
         isHeld = true;
         rb.simulated = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
@@ -116,6 +127,37 @@ public class JunkPickup : MonoBehaviour, IGrabbable
 
         ApplySortingOrder(idleSortingOrder);
         OnReleased?.Invoke(this);
+    }
+
+    /// <summary>
+    /// Makes junk non-blocking while a machine owns its movement, while keeping its
+    /// colliders available to grab detection.
+    /// </summary>
+    public void SetConveyorControlled(bool controlled)
+    {
+        if (isConveyorControlled == controlled)
+        {
+            return;
+        }
+
+        isConveyorControlled = controlled;
+        if (colliders == null)
+        {
+            colliders = GetComponentsInChildren<Collider2D>(true);
+            originalTriggerStates = new bool[colliders.Length];
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                originalTriggerStates[i] = colliders[i].isTrigger;
+            }
+        }
+
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            if (colliders[i] != null)
+            {
+                colliders[i].isTrigger = controlled || originalTriggerStates[i];
+            }
+        }
     }
 
     private void SetFollowTarget(Transform target)

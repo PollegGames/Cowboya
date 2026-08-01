@@ -17,7 +17,6 @@ public class SceneInitiator : GameInitiator
     private SceneController sceneController;
     private SecurityBadgeSpawner securityBadgeSpawner;
     private BatterySpawner batterySpawner;
-    private HintManager hintManager;
     private SceneSetupMode setupMode;
 
     public void Construct(
@@ -32,7 +31,6 @@ public class SceneInitiator : GameInitiator
         ISaveService saveService,
         SecurityBadgeSpawner securityBadgeSpawner,
         BatterySpawner batterySpawner,
-        HintManager hintManager,
         SceneSetupMode setupMode = SceneSetupMode.GeneratedMap)
     {
         this.factoryManager = factoryManager;
@@ -46,7 +44,6 @@ public class SceneInitiator : GameInitiator
         this.saveService = saveService;
         this.securityBadgeSpawner = securityBadgeSpawner;
         this.batterySpawner = batterySpawner;
-        this.hintManager = hintManager;
         this.setupMode = setupMode;
 
         if (RunProgressManager.Instance != null)
@@ -150,8 +147,6 @@ public class SceneInitiator : GameInitiator
         gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
         SetCinemachineTarget(playerInitiator.playerHeadTransform);
 
-        InitializeHintManager();
-
         Debug.Log("Player initialized.");
     }
 
@@ -171,7 +166,6 @@ public class SceneInitiator : GameInitiator
 
         gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
         SetCinemachineTarget(playerInitiator.playerHeadTransform);
-        InitializeHintManager();
         ApplyStaticStartState();
         InitializeStaticMiniMap();
 
@@ -223,18 +217,6 @@ public class SceneInitiator : GameInitiator
 
         var gate = playerInitiator.playerInstance.AddComponent<FirstMovementRechargeGate>();
         gate.Configure(energyBot, movement.Input);
-    }
-
-    private void InitializeHintManager()
-    {
-        if (hintManager != null && playerInitiator != null && playerInitiator.playerInstance != null)
-        {
-            var playerState = playerInitiator.playerInstance.GetComponent<PlayerMovementController>();
-            var inputSource = playerState != null ? playerState.Input : null;
-            var health = playerInitiator.playerInstance.GetComponent<HealthBot>();
-            var inventory = playerInitiator.playerInstance.GetComponent<Inventory>();
-            hintManager.Setup(inputSource, health, inventory);
-        }
     }
 
     private void InitializeEnemies()

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Moves this transform on the X-Z plane within configurable limits based on the player's position.
+/// Moves this transform on the X-Y plane within configurable limits based on the player's position.
 /// </summary>
 public class MoveWithPlayerPosition : MonoBehaviour
 {
@@ -24,7 +24,7 @@ public class MoveWithPlayerPosition : MonoBehaviour
     public float horizontalRange = 5f;
 
     [Min(0.01f)]
-    [Tooltip("Player Z distance from the center at which vertical movement reaches its limit.")]
+    [Tooltip("Player Y distance from the center at which vertical movement reaches its limit.")]
     public float verticalRange = 5f;
 
     [Header("Movement Limits")]
@@ -43,12 +43,42 @@ public class MoveWithPlayerPosition : MonoBehaviour
     public float smoothTime = 0.1f;
 
     private Vector3 initialLocalPosition;
+    private Vector3 baseLocalPosition;
     private Vector3 movementVelocity;
     private bool playerIsInZone;
+    private bool externalBaseControl;
+
+    /// <summary>
+    /// Updates the neutral local position while preserving the current player-relative offset.
+    /// </summary>
+    public void SetBaseLocalPosition(Vector3 localPosition)
+    {
+        baseLocalPosition = localPosition;
+    }
+
+    /// <summary>
+    /// Resets both the neutral position and the player-tracking origin to a new local position.
+    /// </summary>
+    public void RebaseLocalPosition(Vector3 localPosition)
+    {
+        initialLocalPosition = localPosition;
+        baseLocalPosition = localPosition;
+        movementVelocity = Vector3.zero;
+    }
+
+    /// <summary>
+    /// Uses only the supplied base position while an external movement system controls the path.
+    /// </summary>
+    public void SetExternalBaseControl(bool active)
+    {
+        externalBaseControl = active;
+        movementVelocity = Vector3.zero;
+    }
 
     private void Awake()
     {
         initialLocalPosition = transform.localPosition;
+        baseLocalPosition = initialLocalPosition;
 
         if (roomManager == null)
             roomManager = GetComponentInParent<RoomManager>();
@@ -76,9 +106,15 @@ public class MoveWithPlayerPosition : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (externalBaseControl)
+        {
+            MoveTo(baseLocalPosition);
+            return;
+        }
+
         if (activationZone != null && !playerIsInZone)
         {
-            MoveTo(initialLocalPosition);
+            MoveTo(baseLocalPosition);
             return;
         }
 
@@ -93,7 +129,7 @@ public class MoveWithPlayerPosition : MonoBehaviour
         Vector3 playerOffset = playerPosition - centerPosition;
 
         float horizontalInput = Mathf.Clamp(playerOffset.x / horizontalRange, -1f, 1f);
-        float verticalInput = Mathf.Clamp(playerOffset.z / verticalRange, -1f, 1f);
+        float verticalInput = Mathf.Clamp(playerOffset.y / verticalRange, -1f, 1f);
 
         if (invertHorizontal)
             horizontalInput = -horizontalInput;
@@ -108,7 +144,7 @@ public class MoveWithPlayerPosition : MonoBehaviour
             ? verticalInput * maxDown
             : verticalInput * maxUp;
 
-        Vector3 targetPosition = initialLocalPosition + new Vector3(horizontalOffset, 0f, verticalOffset);
+        Vector3 targetPosition = baseLocalPosition + new Vector3(horizontalOffset, verticalOffset, 0f);
 
         MoveTo(targetPosition);
     }

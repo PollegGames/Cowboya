@@ -51,7 +51,6 @@
         </engine:VisualElement>
         <engine:VisualElement class="hud-bottom-panel" style="align-self: flex-end;">
             <engine:VisualElement name="miniMapPreview" class="mini-map-preview" />
-            <engine:Label name="GameMessageLabel" class="message-container" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

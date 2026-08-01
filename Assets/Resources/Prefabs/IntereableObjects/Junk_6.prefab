@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 7876967260955353992}
   - component: {fileID: 2933447607757072381}
   - component: {fileID: 5163872018457089001}
-  m_Layer: 13
+  - component: {fileID: 7654382109876543210}
+  m_Layer: 22
   m_Name: Junk_6
-  m_TagString: CubeUpgrade
+  m_TagString: Junk
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -179,13 +180,13 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.290000, y: 0.260000}
+    oldSize: {x: 0.290038, y: 0.26}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.290000, y: 0.260000}
+  m_Size: {x: 0.29, y: 0.26}
   m_EdgeRadius: 0
 --- !u!114 &5163872018457089001
 MonoBehaviour:
@@ -204,3 +205,28 @@ MonoBehaviour:
   maxForce: 2000
   heldSortingOrder: 20
   idleSortingOrder: 0
+--- !u!114 &7654382109876543210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934608487537832627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c41349063de74355b6db676cab955f72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  trackingCenter: {fileID: 0}
+  roomManager: {fileID: 0}
+  activationZone: {fileID: 0}
+  horizontalRange: 45
+  verticalRange: 20
+  maxLeft: 0
+  maxRight: 0
+  maxDown: 5
+  maxUp: 5
+  invertHorizontal: 0
+  invertVertical: 0
+  smoothTime: 0.1

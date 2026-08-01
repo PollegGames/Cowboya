@@ -230,7 +230,12 @@ public class SpawnGarbageController : MonoBehaviour
 
             Vector2 scatter = UnityEngine.Random.insideUnitCircle * spawnScatterRadius;
             Vector3 spawnPosition = origin.position + new Vector3(scatter.x, scatter.y, 0f);
-            Instantiate(prefab, spawnPosition, prefab.transform.rotation, parent);
+            GameObject instance = Instantiate(prefab, spawnPosition, prefab.transform.rotation, parent);
+            MoveWithPlayerPosition playerMovement = instance.GetComponent<MoveWithPlayerPosition>();
+            if (playerMovement != null)
+            {
+                playerMovement.enabled = false;
+            }
         }
     }
 

@@ -1236,7 +1236,7 @@ MonoBehaviour:
   livingEnemyBadgeGrabRadius: 0.25
   grabbableLayers:
     serializedVersion: 2
-    m_Bits: 47232
+    m_Bits: 4241536
   throwStrength: 5
   leftHandGrabAnchor: {fileID: 3485799215110128093}
   rightHandGrabAnchor: {fileID: 1114406050761874590}

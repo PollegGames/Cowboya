@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1602069322536624324}
-  - component: {fileID: 7349842346012889931}
   m_Layer: 0
-  m_Name: SpawnGarbage
+  m_Name: SpawnRobotCollector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36,43 +35,6 @@ Transform:
   - {fileID: 1609973063076885466}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7349842346012889931
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4367518467533131}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73f646a195d84d449b39c43f5a135ec3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  panelTransform: {fileID: 7088133692216934631}
-  retractAxis: 2
-  openScaleMultiplier: 0.05
-  openPositionOffset: {x: 0, y: 0, z: 1.9}
-  openWorldUpOffset: 1
-  playOnEnable: 1
-  initialDelay: 0
-  cycleInterval: 5
-  retractDuration: 1
-  openHoldDuration: 1
-  stretchDuration: 1
-  spawnPoint: {fileID: 1609973063076885466}
-  spawnedParent: {fileID: 0}
-  minJunkToSpawn: 2
-  maxJunkToSpawn: 3
-  spawnScatterRadius: 0.35
-  junkPrefabs:
-  - {fileID: 1934608487537832627, guid: 7bb5d4512d07c0e4a834227c10150262, type: 3}
-  - {fileID: 1934608487537832627, guid: 8d69c0d41e2240e7a775350e07422202, type: 3}
-  - {fileID: 1934608487537832627, guid: 8d69c0d41e2240e7a775350e07422203, type: 3}
-  - {fileID: 1934608487537832627, guid: 8d69c0d41e2240e7a775350e07422204, type: 3}
-  - {fileID: 1934608487537832627, guid: 8d69c0d41e2240e7a775350e07422205, type: 3}
-  - {fileID: 1934608487537832627, guid: 8d69c0d41e2240e7a775350e07422206, type: 3}
-  - {fileID: 1934608487537832627, guid: 8d69c0d41e2240e7a775350e07422207, type: 3}
-  - {fileID: 1934608487537832627, guid: 8d69c0d41e2240e7a775350e07422208, type: 3}
 --- !u!1 &329006272346146596
 GameObject:
   m_ObjectHideFlags: 0
@@ -89,7 +51,7 @@ GameObject:
   - component: {fileID: 318696655773639631}
   - component: {fileID: 1898799119857637630}
   m_Layer: 0
-  m_Name: SpawnGarbage Bottom
+  m_Name: Spawn Bottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -691,7 +653,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 17670
+  m_VersionIndex: 17685
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -747,7 +709,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c545ac0b68e126d458523e03a69dcf91, type: 2}
+  - {fileID: 2100000, guid: 436cb4c92d9958d42b57efa76495fdaa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -865,7 +827,7 @@ GameObject:
   - component: {fileID: 142122098723112109}
   - component: {fileID: 4766303202453746598}
   m_Layer: 0
-  m_Name: SpawnGarbage Background
+  m_Name: Spawn Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1467,7 +1429,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 17736
+  m_VersionIndex: 17751
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -1523,7 +1485,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 326b7c9a232349c4f8a74781ef599956, type: 2}
+  - {fileID: 2100000, guid: fe028c2257317cb4cb964b170070a05a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1610,7 +1572,7 @@ GameObject:
   - component: {fileID: 8887998174816741827}
   - component: {fileID: 976899625898286390}
   m_Layer: 0
-  m_Name: SpawnGarbage Top
+  m_Name: Spawn Top
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2212,7 +2174,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 17706
+  m_VersionIndex: 17721
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -2268,7 +2230,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0a7ef08e9ba395a4a821712c69f64572, type: 2}
+  - {fileID: 2100000, guid: 7ae89d2b41d715b48a25fc9239353a7b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

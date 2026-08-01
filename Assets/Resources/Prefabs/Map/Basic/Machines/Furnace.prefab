@@ -619,7 +619,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 16416
+  m_VersionIndex: 16545
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -735,7 +735,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542146199199913260}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cc28e6ac3fe0dc8469bebf1fbf8d73ff, type: 3}
   m_Name: 
@@ -760,11 +760,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5226794923736213634, guid: f4f20f25aedee1f4cb75ac1d6e982846, type: 3}
       propertyPath: m_VersionIndex
-      value: 16413
+      value: 16542
       objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: f4f20f25aedee1f4cb75ac1d6e982846, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.01
+      value: -0.03
       objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: f4f20f25aedee1f4cb75ac1d6e982846, type: 3}
       propertyPath: m_LocalPosition.y
@@ -772,7 +772,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: f4f20f25aedee1f4cb75ac1d6e982846, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.01
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: f4f20f25aedee1f4cb75ac1d6e982846, type: 3}
       propertyPath: m_LocalRotation.w

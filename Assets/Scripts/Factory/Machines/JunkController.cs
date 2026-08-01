@@ -34,8 +34,10 @@ public class JunkController : MonoBehaviour
     {
         public JunkPickup Junk;
         public Rigidbody2D Body;
+        public MoveWithPlayerPosition PlayerMovement;
         public Transform Target;
         public RigidbodyType2D OriginalBodyType;
+        public Vector3 PathPosition;
     }
 
     private void Awake()
@@ -72,6 +74,15 @@ public class JunkController : MonoBehaviour
 
         Rigidbody2D body = junk.GetComponent<Rigidbody2D>();
         RigidbodyType2D originalBodyType = body != null ? body.bodyType : RigidbodyType2D.Dynamic;
+        MoveWithPlayerPosition playerMovement = junk.GetComponent<MoveWithPlayerPosition>();
+        junk.transform.SetParent(transform, true);
+        Vector3 pathPosition = junk.transform.localPosition;
+        if (playerMovement != null)
+        {
+            playerMovement.RebaseLocalPosition(pathPosition);
+            playerMovement.SetExternalBaseControl(true);
+            playerMovement.enabled = true;
+        }
 
         if (body != null)
         {
@@ -80,14 +91,17 @@ public class JunkController : MonoBehaviour
             body.bodyType = RigidbodyType2D.Kinematic;
         }
 
+        junk.SetConveyorControlled(true);
         junk.OnGrabbed += HandleJunkGrabbed;
 
         controlledJunk.Add(new ControlledJunk
         {
             Junk = junk,
             Body = body,
+            PlayerMovement = playerMovement,
             Target = target,
-            OriginalBodyType = originalBodyType
+            OriginalBodyType = originalBodyType,
+            PathPosition = pathPosition
         });
     }
 
@@ -117,16 +131,24 @@ public class JunkController : MonoBehaviour
                 continue;
             }
 
-            Vector2 currentPosition = entry.Body != null ? entry.Body.position : (Vector2)entry.Junk.transform.position;
-            Vector2 targetPosition = entry.Target.position;
-            Vector2 nextPosition = Vector2.MoveTowards(currentPosition, targetPosition, speed * Time.fixedDeltaTime);
+            Vector3 targetPosition = entry.Target.localPosition;
+            entry.PathPosition = Vector3.MoveTowards(
+                entry.PathPosition,
+                targetPosition,
+                speed * Time.fixedDeltaTime);
 
-            if (entry.Body != null)
-                entry.Body.MovePosition(nextPosition);
+            if (entry.PlayerMovement != null)
+            {
+                entry.PlayerMovement.SetBaseLocalPosition(entry.PathPosition);
+            }
             else
-                entry.Junk.transform.position = nextPosition;
+            {
+                entry.Junk.transform.localPosition = entry.PathPosition;
+            }
 
-            if (Vector2.Distance(nextPosition, targetPosition) <= reachDistance)
+            controlledJunk[i] = entry;
+
+            if (Vector3.Distance(entry.PathPosition, targetPosition) <= reachDistance)
             {
                 JunkPickup reachedJunk = entry.Junk;
                 ReleaseControlledJunk(i, false);
@@ -141,6 +163,7 @@ public class JunkController : MonoBehaviour
     {
         return junk != null
             && !junk.IsHeld
+            && !junk.IsConveyorControlled
             && leftPoint != null
             && midPoint != null
             && rightPoint != null;
@@ -238,7 +261,16 @@ public class JunkController : MonoBehaviour
         controlledJunk.RemoveAt(index);
 
         if (entry.Junk != null)
+        {
             entry.Junk.OnGrabbed -= HandleJunkGrabbed;
+            entry.Junk.SetConveyorControlled(false);
+        }
+
+        if (entry.PlayerMovement != null)
+        {
+            entry.PlayerMovement.SetExternalBaseControl(false);
+            entry.PlayerMovement.enabled = false;
+        }
 
         if (restoreBodyType && entry.Body != null)
             entry.Body.bodyType = entry.OriginalBodyType;

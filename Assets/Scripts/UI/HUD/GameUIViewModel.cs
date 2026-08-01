@@ -32,13 +32,6 @@ public class GameUIViewModel : MonoBehaviour
 
         previewVE = ui.Q<VisualElement>("miniMapPreview");
 
-        var service = MessageService.Instance;
-        if (service == null)
-        {
-            service = gameObject.AddComponent<MessageService>();
-        }
-        service.Initialize(ui);
-
         pauseMenuContainer = ui.Q<VisualElement>("PauseMenu");
         gameHUDContainer = ui.Q<VisualElement>("GameHUD");
         pauseButton = ui.Q<Button>("pauseButton");
@@ -104,17 +97,6 @@ public class GameUIViewModel : MonoBehaviour
             Debug.LogError("Pause menu container is null!");
         }
     }
-    private void Start()
-    {
-        var hintManager = FindFirstObjectByType<HintManager>();
-
-        if (hintManager != null)
-        {
-            hintManager.QueueHint(new GameMessage("Move with [A][D]...", MessageSpeaker.Narrator));
-            hintManager.QueueHint(new GameMessage("Energy powers your actions.", MessageSpeaker.Narrator));
-        }
-    }
-
     public void SetPlayer(RobotStateController robot)
     {
         if (robot != null && robot.Stats != null)
@@ -148,7 +130,6 @@ public class GameUIViewModel : MonoBehaviour
     {
         if (newState == RobotState.Dead)
         {
-            MessageService.Instance?.ShowMessage(GameMessages.System.GameOver);
             StartCoroutine(LoadSceneAfterDelay());
         }
     }

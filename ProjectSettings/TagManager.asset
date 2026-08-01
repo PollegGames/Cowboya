@@ -8,6 +8,7 @@ TagManager:
   - BadgeSecurity
   - Battery
   - CubeUpgrade
+  - Junk
   layers:
   - Default
   - TransparentFX
@@ -31,7 +32,7 @@ TagManager:
   - WorkerSlot
   - Dead
   - Saved
-  - 
+  - Junk
   - 
   - 
   - 

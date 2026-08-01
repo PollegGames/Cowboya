@@ -62,8 +62,6 @@ public class SceneBootstrapper : MonoBehaviour
             batterySpawner = Instantiate(config.batterySpawnerPrefab);
         }
 
-        var hintManager = Instantiate(config.hintManagerPrefab);
-
         if (SceneController.instance == null)
         {
             Instantiate(config.sceneControllerPrefab);
@@ -90,7 +88,6 @@ public class SceneBootstrapper : MonoBehaviour
                 saveService,
                 badgeSpawner,
                 batterySpawner,
-                hintManager,
                 setupMode
             );
         }
