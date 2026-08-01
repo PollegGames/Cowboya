@@ -17,6 +17,14 @@ public class PositionTriggerZone : MonoBehaviour
 
     private bool hasEntered = false;
 
+    /// <summary>
+    /// Returns every collider currently inside the configured zone and detection layer.
+    /// </summary>
+    public Collider2D[] GetOverlappingColliders() {
+        Vector2 zoneCenter = (Vector2)transform.position + offset;
+        return Physics2D.OverlapBoxAll(zoneCenter, zoneSize, 0f, detectionLayer);
+    }
+
     private void Update()
     {
         Vector2 zoneCenter = (Vector2)transform.position + offset;

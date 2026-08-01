@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1602069322536624324}
+  - component: {fileID: 910000000000000101}
   m_Layer: 0
   m_Name: SpawnRobotCollector
   m_TagString: Untagged
@@ -33,8 +34,32 @@ Transform:
   - {fileID: 2584981749583150113}
   - {fileID: 7088133692216934631}
   - {fileID: 1609973063076885466}
+  - {fileID: 910000000000000103}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &910000000000000101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4367518467533131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9616bda24094b0ea98670263634ccdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  robotDetectionZone: {fileID: 910000000000000104}
+  scanInterval: 0.2
+  topPanel: {fileID: 2584981749583150113}
+  bottomPanel: {fileID: 7088133692216934631}
+  retractAxis: 2
+  openScaleMultiplier: 0
+  topFixedEdgeLocalPosition: 1.8
+  bottomFixedEdgeLocalPosition: -2
+  openDuration: 1
+  openHoldDuration: 1
+  closeDuration: 1
 --- !u!1 &329006272346146596
 GameObject:
   m_ObjectHideFlags: 0
@@ -50,6 +75,7 @@ GameObject:
   - component: {fileID: 5829492666146016685}
   - component: {fileID: 318696655773639631}
   - component: {fileID: 1898799119857637630}
+  - component: {fileID: 7307758812450838921}
   m_Layer: 0
   m_Name: Spawn Bottom
   m_TagString: Untagged
@@ -653,7 +679,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 17685
+  m_VersionIndex: 17769
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -780,6 +806,79 @@ MonoBehaviour:
   warpFactorZ: 0.3
   maxWarpZ: 1.5
   roomManager: {fileID: 0}
+--- !u!114 &7307758812450838921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 329006272346146596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc28e6ac3fe0dc8469bebf1fbf8d73ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::WarpMeshXYSkew
+  player: {fileID: 0}
+  warpFactorX: 0.1
+  maxWarpX: 2
+  warpFactorZ: 0.1
+  maxWarpZ: 2
+  roomManager: {fileID: 0}
+--- !u!1 &910000000000000102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 910000000000000103}
+  - component: {fileID: 910000000000000104}
+  m_Layer: 0
+  m_Name: RobotDetectionZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &910000000000000103
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910000000000000102}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.47, y: 0, z: -1.69}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1602069322536624324}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &910000000000000104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910000000000000102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a492d78718bb644cb1dbc7f66d57986, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zoneSize: {x: 43, y: 9}
+  offset: {x: 0, y: 0}
+  detectionLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  onEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2399307372968590823
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,6 +888,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1609973063076885466}
+  - component: {fileID: 8283642347418015154}
   m_Layer: 0
   m_Name: SpawnPoint
   m_TagString: Untagged
@@ -805,12 +905,37 @@ Transform:
   m_GameObject: {fileID: 2399307372968590823}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.55, y: 0, z: 2.44}
+  m_LocalPosition: {x: 5.95, y: 0, z: -0.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1602069322536624324}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8283642347418015154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2399307372968590823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c41349063de74355b6db676cab955f72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::MoveWithPlayerPosition
+  player: {fileID: 0}
+  trackingCenter: {fileID: 0}
+  roomManager: {fileID: 0}
+  activationZone: {fileID: 0}
+  horizontalRange: 5
+  verticalRange: 5
+  maxLeft: 1
+  maxRight: 1
+  maxDown: 1
+  maxUp: 1
+  invertHorizontal: 0
+  invertVertical: 0
+  smoothTime: 0.1
 --- !u!1 &4051602913359112641
 GameObject:
   m_ObjectHideFlags: 0
@@ -826,6 +951,7 @@ GameObject:
   - component: {fileID: 7749357651166174517}
   - component: {fileID: 142122098723112109}
   - component: {fileID: 4766303202453746598}
+  - component: {fileID: 2391574828846174702}
   m_Layer: 0
   m_Name: Spawn Background
   m_TagString: Untagged
@@ -1429,7 +1555,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 17751
+  m_VersionIndex: 17835
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -1556,6 +1682,24 @@ MonoBehaviour:
   warpFactorZ: 0.3
   maxWarpZ: 1.5
   roomManager: {fileID: 0}
+--- !u!114 &2391574828846174702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4051602913359112641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc28e6ac3fe0dc8469bebf1fbf8d73ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::WarpMeshXYSkew
+  player: {fileID: 0}
+  warpFactorX: 0.1
+  maxWarpX: 2
+  warpFactorZ: 0.1
+  maxWarpZ: 2
+  roomManager: {fileID: 0}
 --- !u!1 &4443719500450739222
 GameObject:
   m_ObjectHideFlags: 0
@@ -1571,6 +1715,7 @@ GameObject:
   - component: {fileID: 6512255663390041594}
   - component: {fileID: 8887998174816741827}
   - component: {fileID: 976899625898286390}
+  - component: {fileID: 8924711492626564822}
   m_Layer: 0
   m_Name: Spawn Top
   m_TagString: Untagged
@@ -2174,7 +2319,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 17721
+  m_VersionIndex: 17805
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -2300,4 +2445,22 @@ MonoBehaviour:
   maxWarpX: 7.5
   warpFactorZ: 0.3
   maxWarpZ: 1.5
+  roomManager: {fileID: 0}
+--- !u!114 &8924711492626564822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4443719500450739222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc28e6ac3fe0dc8469bebf1fbf8d73ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::WarpMeshXYSkew
+  player: {fileID: 0}
+  warpFactorX: 0.1
+  maxWarpX: 2
+  warpFactorZ: 0.1
+  maxWarpZ: 2
   roomManager: {fileID: 0}
