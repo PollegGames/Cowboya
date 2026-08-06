@@ -12,7 +12,12 @@ public enum BrainOption
     CanAttack = 1 << 2,
     PlayerDetected = 1 << 3,
     NeedMachine = 1 << 4,
-    MachineUnavailable = 1 << 5
+    MachineUnavailable = 1 << 5,
+    CollectorHasMission = 1 << 6,
+    CollectorCargoSecure = 1 << 7,
+    CollectorTargetUnavailable = 1 << 8,
+    CollectorDockAccessGranted = 1 << 9,
+    CollectorFlightFault = 1 << 10
 }
 
 /// <summary>
@@ -33,6 +38,7 @@ public class RobotBrainNew : MonoBehaviour
 
     private BrainOption options;
     private RobotTask lastPlannedTask;
+    private bool planPublicationSuspended;
     public BrainOption CurrentOptions => options;
     public RobotHeartNew Heart => heart;
     public RobotBodyController Body => body;
@@ -40,6 +46,11 @@ public class RobotBrainNew : MonoBehaviour
     public bool IsSecurityGuard => heart != null && heart.Role == RobotRole.SecurityGuard;
 
     private void Awake()
+    {
+        ResolveReferences();
+    }
+
+    private void ResolveReferences()
     {
         if (heart == null)
             heart = GetComponent<RobotHeartNew>();
@@ -53,8 +64,10 @@ public class RobotBrainNew : MonoBehaviour
     {
         if (memory != null)
         {
+            memory.OnMemoryChanged -= UpdateMemoryState;
             memory.OnMemoryChanged += UpdateMemoryState;
-            PublishPlan(memory.Snapshot);
+            if (!planPublicationSuspended)
+                PublishPlan(memory.Snapshot);
         }
     }
 
@@ -178,6 +191,89 @@ public class RobotBrainNew : MonoBehaviour
         return heart.CurrentTask.Type == slotTaskType;
     }
 
+    /// <summary>
+    /// Assigns one claimed mission through Memory without directly manipulating Heart.
+    /// </summary>
+    public bool OnCollectorMissionAssigned(CollectorMissionAssignment assignment)
+    {
+        if (!CanAcceptCollectorIngress() || assignment == null)
+            return false;
+
+        return memory.TryAssignCollectorMission(assignment);
+    }
+
+    /// <summary>
+    /// Records one discrete physical observation from the Collector body.
+    /// </summary>
+    public bool OnCollectorBodyObservation(CollectorBodyObservation observation)
+    {
+        if (!CanAcceptCollectorIngress())
+            return false;
+
+        return memory.TryApplyCollectorObservation(observation);
+    }
+
+    /// <summary>
+    /// Records a dock-access grant or revocation from the owning machine.
+    /// </summary>
+    public bool OnCollectorDockAccessChanged(CollectorMissionAssignment assignment, bool granted)
+    {
+        if (!CanAcceptCollectorIngress() || assignment == null)
+            return false;
+
+        return memory.TrySetCollectorDockAccess(assignment, granted);
+    }
+
+    /// <summary>
+    /// Invalidates the matching Collector target without destroying it.
+    /// </summary>
+    public bool OnCollectorTargetInvalidated(CollectorMissionAssignment assignment)
+    {
+        if (!CanAcceptCollectorIngress() || assignment == null)
+            return false;
+
+        return memory.TryInvalidateCollectorTarget(assignment);
+    }
+
+    /// <summary>
+    /// Confirms a matching normal or abort intake transaction.
+    /// </summary>
+    public bool OnCollectorIntakeConfirmed(CollectorMissionAssignment assignment)
+    {
+        if (!CanAcceptCollectorIngress() || assignment == null)
+            return false;
+
+        return memory.TryConfirmCollectorIntake(assignment);
+    }
+
+    /// <summary>
+    /// Cancels the matching mission through Memory.
+    /// </summary>
+    public bool OnCollectorMissionCancelled(CollectorMissionAssignment assignment)
+    {
+        if (!CanAcceptCollectorIngress() || assignment == null)
+            return false;
+
+        return memory.TryCancelCollectorMission(assignment);
+    }
+
+    /// <summary>
+    /// Temporarily gates Collector ingress and plan publication during pool transactions.
+    /// </summary>
+    public void SetPlanPublicationSuspended(bool suspended)
+    {
+        planPublicationSuspended = suspended;
+    }
+
+    /// <summary>
+    /// Clears cached options and task identity so a pooled use starts from current Memory facts.
+    /// </summary>
+    public void ResetPlanningCache()
+    {
+        options = BrainOption.None;
+        lastPlannedTask = null;
+    }
+
     public void CompleteReactivateTask(BaseMachine machine, bool reached)
     {
         _ = reached;
@@ -215,6 +311,9 @@ public class RobotBrainNew : MonoBehaviour
 
     private void PublishPlan(RobotMemorySnapshotNew snapshot)
     {
+        if (planPublicationSuspended)
+            return;
+
         var nextOptions = BuildOptions(snapshot);
         if (!nextOptions.HasFlag(BrainOption.NeedMachine))
             RobotMachineDestinationBalancer.ReleaseRobot(gameObject.GetInstanceID());
@@ -250,11 +349,25 @@ public class RobotBrainNew : MonoBehaviour
         if (s.WasRecentlyAttacked) o |= BrainOption.InDanger;
         if (s.PlayerInAttackZone) o |= BrainOption.CanAttack;
         if (s.PlayerInDetectZone) o |= BrainOption.PlayerDetected;
-        if (ShouldNeedMachine(s)) o |= BrainOption.NeedMachine;
-        bool machineUnavailable = heart != null && heart.Role == RobotRole.Worker
-            ? !HasAnyWorkerMachineWaypoint(s)
-            : !HasAvailableWaypoint(s);
-        if (machineUnavailable) o |= BrainOption.MachineUnavailable;
+
+        bool isCollector = heart != null && heart.Role == RobotRole.Collector;
+        if (!isCollector)
+        {
+            if (ShouldNeedMachine(s)) o |= BrainOption.NeedMachine;
+            bool machineUnavailable = heart != null && heart.Role == RobotRole.Worker
+                ? !HasAnyWorkerMachineWaypoint(s)
+                : !HasAvailableWaypoint(s);
+            if (machineUnavailable) o |= BrainOption.MachineUnavailable;
+        }
+
+        if (isCollector)
+        {
+            if (s.Collector.Assignment != null) o |= BrainOption.CollectorHasMission;
+            if (s.Collector.CargoSecure) o |= BrainOption.CollectorCargoSecure;
+            if (s.Collector.TargetUnavailable) o |= BrainOption.CollectorTargetUnavailable;
+            if (s.Collector.DockAccessGranted) o |= BrainOption.CollectorDockAccessGranted;
+            if (s.Collector.FlightFault) o |= BrainOption.CollectorFlightFault;
+        }
         return o;
     }
 
@@ -419,9 +532,52 @@ public class RobotBrainNew : MonoBehaviour
                 }
                 return new RobotTask(RobotTaskType.Patrol, FindRandomEndRoomWaypoint(snapshot));
 
+            case RobotRole.Collector:
+                return BuildCollectorTask(snapshot);
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private static RobotTask BuildCollectorTask(RobotMemorySnapshotNew snapshot)
+    {
+        CollectorMissionFacts facts = snapshot.Collector;
+        CollectorMissionAssignment assignment = facts.Assignment;
+        if (assignment == null || facts.IntakeConfirmed)
+            return new RobotTask(RobotTaskType.CollectorStandby);
+
+        bool mustAbort = facts.TargetUnavailable || facts.MissionCancelled || facts.FlightFault;
+        if (mustAbort)
+        {
+            return new RobotTask(
+                facts.DockAccessGranted
+                    ? RobotTaskType.CollectorDock
+                    : RobotTaskType.CollectorAbortAndReturn,
+                assignment);
+        }
+
+        if (!facts.LaunchExitReached)
+            return new RobotTask(RobotTaskType.CollectorLaunch, assignment);
+        if (facts.CargoLost)
+            return new RobotTask(RobotTaskType.CollectorGatherCargo, assignment);
+        if (!facts.TargetApproachReached)
+            return new RobotTask(RobotTaskType.CollectorFlyToTarget, assignment);
+        if (!facts.CargoSecure)
+            return new RobotTask(RobotTaskType.CollectorGatherCargo, assignment);
+        if (!facts.DockAccessGranted)
+            return new RobotTask(RobotTaskType.CollectorReturnHome, assignment);
+        return new RobotTask(RobotTaskType.CollectorDock, assignment);
+    }
+
+    private bool CanAcceptCollectorIngress()
+    {
+        ResolveReferences();
+        return RobotNewPipelineRuntime.IsNewPipelineActive
+            && !planPublicationSuspended
+            && memory != null
+            && heart != null
+            && heart.Role == RobotRole.Collector;
     }
 
     private static RoomWaypoint FindBestWaypointForRole(RobotRole role, RobotMemorySnapshotNew snapshot, int robotId)

@@ -13,6 +13,7 @@ public static class CollectorRobotFlyPrefabBuilder {
     public const string FinalPrefabPath = "Assets/Resources/Prefabs/Robots/Collector/CollectorRobot_Fly.prefab";
     public const string MasterPrefabPath = "Assets/Resources/Prefabs/Robots/Collector/Others/CollectorRobot_Fly_Master.prefab";
     public const string PuppetPrefabPath = "Assets/Resources/Prefabs/Robots/Collector/Others/CollectorRobot_Fly_Puppet.prefab";
+    public const string MachinePrefabPath = "Assets/Resources/Prefabs/Map/Basic/Machines/SpawnRobotCollector.prefab";
 
     private const string EnemyTag = "Enemy";
     private const string EnemyLayerName = "Enemy";
@@ -41,7 +42,11 @@ public static class CollectorRobotFlyPrefabBuilder {
         BuildFinalPrefab(enemyLayer);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        ConfigureMachinePrefab();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         ValidateBuiltPrefab();
+        ValidateMachinePrefab();
         ValidatePhysicsBehaviour();
     }
 
@@ -134,6 +139,32 @@ public static class CollectorRobotFlyPrefabBuilder {
         ValidatePair(binder.Pairs[0], masterBody, puppetBody, bodyRigidbody, "body");
         ValidatePair(binder.Pairs[1], masterMagnet, puppetMagnet, magnetRigidbody, "magnet");
 
+        RobotMemoryNew memory = RequireSingleRootComponent<RobotMemoryNew>(prefab);
+        RobotHeartNew heart = RequireSingleRootComponent<RobotHeartNew>(prefab);
+        RobotBrainNew brain = RequireSingleRootComponent<RobotBrainNew>(prefab);
+        RobotStateController state = RequireSingleRootComponent<RobotStateController>(prefab);
+        HealthBot health = RequireSingleRootComponent<HealthBot>(prefab);
+        JointBreaker jointBreaker = RequireSingleRootComponent<JointBreaker>(prefab);
+        CollectorFlightMotor2D motor = RequireSingleRootComponent<CollectorFlightMotor2D>(prefab);
+        CollectorObstacleSensor2D sensor = RequireSingleRootComponent<CollectorObstacleSensor2D>(prefab);
+        CollectorMagnetController2D magnetController = RequireSingleRootComponent<CollectorMagnetController2D>(prefab);
+        CollectorFlightVisuals visuals = RequireSingleRootComponent<CollectorFlightVisuals>(prefab);
+        CollectorRobotBodyController collectorBody = RequireSingleRootComponent<CollectorRobotBodyController>(prefab);
+        CollectorRobotObservationBridge bridge = RequireSingleRootComponent<CollectorRobotObservationBridge>(prefab);
+        CollectorPoolLifecycle lifecycle = RequireSingleRootComponent<CollectorPoolLifecycle>(prefab);
+        Require(memory != null && brain != null && health != null && jointBreaker != null
+            && sensor != null && magnetController != null && visuals != null
+            && bridge != null && lifecycle != null,
+            "Collector runtime pipeline contains a missing component reference.");
+        Require(heart.Role == RobotRole.Collector, "Collector Heart must serialize the Collector role.");
+        Require(state.Stats != null, "Collector must serialize a non-null baseline RobotStats instance.");
+        Require(collectorBody.BodyRigidbody == bodyRigidbody,
+            "Collector body facade has the wrong body Rigidbody reference.");
+        Require(collectorBody.MagnetRigidbody == magnetRigidbody,
+            "Collector body facade has the wrong magnet Rigidbody reference.");
+        Require(motor.BodyRigidbody == bodyRigidbody,
+            "Collector flight motor has the wrong body Rigidbody reference.");
+
         Require(prefab.GetComponentsInChildren<Animator>(true).Length == 0,
             "Animator is explicitly deferred and must not exist in this prefab.");
         Require(propellerPivot.GetComponentsInChildren<Rigidbody2D>(true).Length == 0,
@@ -163,6 +194,29 @@ public static class CollectorRobotFlyPrefabBuilder {
         }
 
         Require(enabledPuppetRendererCount >= 3, "Puppet must retain its visible Body, Magnet, and Helice renderers.");
+    }
+
+    /// <summary>
+    /// Validates that the spawning machine owns a Collector prefab, live markers, and one query intake.
+    /// </summary>
+    public static void ValidateMachinePrefab() {
+        GameObject machine = AssetDatabase.LoadAssetAtPath<GameObject>(MachinePrefabPath);
+        Require(machine != null, $"Missing Collector machine prefab at '{MachinePrefabPath}'.");
+        SpawnRobotCollectorController controller = machine.GetComponent<SpawnRobotCollectorController>();
+        Require(controller != null, "Collector machine is missing its controller.");
+        GameObject collector = AssetDatabase.LoadAssetAtPath<GameObject>(FinalPrefabPath);
+        Require(controller.CollectorPrefab == collector, "Collector machine has the wrong Collector prefab reference.");
+        Require(controller.LaunchExitPoint != null && controller.LaunchExitPoint.name == "LaunchExitPoint",
+            "Collector machine is missing its live LaunchExitPoint.");
+        Require(controller.DockApproachPoint != null && controller.DockApproachPoint.name == "DockApproachPoint",
+            "Collector machine is missing its live DockApproachPoint.");
+        Require(controller.IntakePoint != null && controller.IntakePoint.name == "IntakePoint",
+            "Collector machine is missing its live IntakePoint.");
+        Require(controller.IntakeZone != null && controller.IntakeZone.isTrigger,
+            "Collector machine needs one trigger intake zone.");
+        Require(controller.LaunchExitPoint.parent == controller.IntakePoint.parent
+            && controller.DockApproachPoint.parent == controller.IntakePoint.parent,
+            "Collector live markers must share the moving SpawnPoint parent.");
     }
 
     /// <summary>
@@ -348,11 +402,78 @@ public static class CollectorRobotFlyPrefabBuilder {
                 }
             };
 
+            RobotMemoryNew memory = finalRoot.AddComponent<RobotMemoryNew>();
+            RobotHeartNew heart = finalRoot.AddComponent<RobotHeartNew>();
+            RobotBrainNew brain = finalRoot.AddComponent<RobotBrainNew>();
+            HealthBot health = finalRoot.AddComponent<HealthBot>();
+            JointBreaker jointBreaker = finalRoot.AddComponent<JointBreaker>();
+            RobotStateController state = finalRoot.AddComponent<RobotStateController>();
+            CollectorFlightMotor2D motor = finalRoot.AddComponent<CollectorFlightMotor2D>();
+            CollectorObstacleSensor2D sensor = finalRoot.AddComponent<CollectorObstacleSensor2D>();
+            CollectorMagnetController2D magnetController = finalRoot.AddComponent<CollectorMagnetController2D>();
+            CollectorFlightVisuals visuals = finalRoot.AddComponent<CollectorFlightVisuals>();
+            CollectorRobotBodyController collectorBody = finalRoot.AddComponent<CollectorRobotBodyController>();
+            CollectorRobotObservationBridge bridge = finalRoot.AddComponent<CollectorRobotObservationBridge>();
+            CollectorPoolLifecycle lifecycle = finalRoot.AddComponent<CollectorPoolLifecycle>();
+
+            Transform propellerPivot = FindDirectChild(puppetBody, "PropellerPivot");
+            heart.ConfigureRole(RobotRole.Collector, resetStack: true);
+            state.Stats = new EnemyRobotFactory().CreateRobot();
+            state.Stats.RobotName = "Collector";
+            motor.ConfigureReferences(bodyRigidbody, magnetRigidbody, sensor);
+            sensor.ConfigureReferences(finalRoot.transform);
+            magnetController.ConfigureReferences(bodyRigidbody, magnetRigidbody);
+            visuals.ConfigureReferences(propellerPivot, motor);
+            collectorBody.ConfigureReferences(bodyRigidbody, magnetRigidbody, masterMagnet,
+                hinge, binder, motor, sensor, magnetController, visuals);
+            bridge.ConfigureReferences(collectorBody, brain);
+            lifecycle.ConfigureReferences(memory, brain, heart, state, jointBreaker, binder,
+                collectorBody, magnetController, visuals, bridge);
+
+            _ = health;
+
             bool success;
             PrefabUtility.SaveAsPrefabAsset(finalRoot, FinalPrefabPath, out success);
             Require(success, $"Unity failed to save final prefab '{FinalPrefabPath}'.");
         } finally {
             EditorSceneManager.ClosePreviewScene(previewScene);
+        }
+    }
+
+    private static void ConfigureMachinePrefab() {
+        GameObject collectorPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(FinalPrefabPath);
+        Require(collectorPrefab != null, "Collector prefab could not be loaded for machine wiring.");
+
+        GameObject machine = PrefabUtility.LoadPrefabContents(MachinePrefabPath);
+        Require(machine != null, "Collector machine prefab could not be opened for runtime wiring.");
+        try {
+            SpawnRobotCollectorController controller = machine.GetComponent<SpawnRobotCollectorController>();
+            Require(controller != null, "Collector machine prefab is missing SpawnRobotCollectorController.");
+            Transform movingSpawnPoint = FindDirectChild(machine.transform, "SpawnPoint");
+            Transform launchPoint = FindOrCreateDirectChild(movingSpawnPoint, "LaunchExitPoint");
+            Transform dockPoint = FindOrCreateDirectChild(movingSpawnPoint, "DockApproachPoint");
+            Transform machineIntakePoint = FindOrCreateDirectChild(movingSpawnPoint, "IntakePoint");
+            Transform intakeZoneTransform = FindOrCreateDirectChild(movingSpawnPoint, "CollectorIntakeZone");
+
+            ConfigureMarker(launchPoint, new Vector3(4f, 1f, 0f));
+            ConfigureMarker(dockPoint, new Vector3(4f, 1f, 0f));
+            ConfigureMarker(machineIntakePoint, Vector3.zero);
+            ConfigureMarker(intakeZoneTransform, Vector3.zero);
+            BoxCollider2D machineIntakeZone = intakeZoneTransform.GetComponent<BoxCollider2D>();
+            if (machineIntakeZone == null)
+                machineIntakeZone = intakeZoneTransform.gameObject.AddComponent<BoxCollider2D>();
+            machineIntakeZone.isTrigger = true;
+            machineIntakeZone.offset = Vector2.zero;
+            machineIntakeZone.size = new Vector2(3.5f, 3.5f);
+
+            controller.ConfigureMissionReferences(collectorPrefab, movingSpawnPoint, launchPoint,
+                dockPoint, machineIntakePoint, machineIntakeZone);
+
+            bool success;
+            PrefabUtility.SaveAsPrefabAsset(machine, MachinePrefabPath, out success);
+            Require(success, $"Unity failed to save machine prefab '{MachinePrefabPath}'.");
+        } finally {
+            PrefabUtility.UnloadPrefabContents(machine);
         }
     }
 
@@ -703,6 +824,23 @@ public static class CollectorRobotFlyPrefabBuilder {
         return result;
     }
 
+    private static Transform FindOrCreateDirectChild(Transform parent, string childName) {
+        Transform result = FindOptionalDirectChild(parent, childName);
+        if (result != null)
+            return result;
+
+        GameObject child = new GameObject(childName);
+        child.transform.SetParent(parent, false);
+        child.layer = parent.gameObject.layer;
+        return child.transform;
+    }
+
+    private static void ConfigureMarker(Transform marker, Vector3 localPosition) {
+        marker.localPosition = localPosition;
+        marker.localRotation = Quaternion.identity;
+        marker.localScale = Vector3.one;
+    }
+
     private static Transform FindDescendantExact(Transform root, string objectName) {
         Transform result = null;
         Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
@@ -725,6 +863,13 @@ public static class CollectorRobotFlyPrefabBuilder {
 
     private static bool Approximately(Quaternion left, Quaternion right) {
         return Quaternion.Angle(left, right) < 0.001f;
+    }
+
+    private static T RequireSingleRootComponent<T>(GameObject root) where T : Component {
+        T[] components = root.GetComponents<T>();
+        Require(components.Length == 1,
+            $"Expected exactly one root {typeof(T).Name}, found {components.Length}.");
+        return components[0];
     }
 
     private static void Require(bool condition, string message) {

@@ -12,12 +12,14 @@ public class RobotHeartNew : MonoBehaviour
 
     [SerializeField] private RobotBrainNew brain;
     [SerializeField] private RobotBodyController body;
+    [SerializeField] private MonoBehaviour collectorBodyBehaviour;
     [SerializeField] private RobotMemoryNew memory;
     [SerializeField] private RobotRole role = RobotRole.Worker;
 
     private RobotTaskStackNew taskStack;
     private RobotTask activeTopTask;
     private IRobotTaskNew taskRuntime;
+    private ICollectorTaskBody collectorBody;
     private BrainOption currentOptions;
     private Coroutine scheduledTaskSignal;
 
@@ -48,10 +50,16 @@ public class RobotHeartNew : MonoBehaviour
     private void OnEnable()
     {
         EnsureInitialized();
-        taskStack.PushOrRefresh(BuildDefaultTask());
+        RobotTask defaultTask = BuildDefaultTask();
+        if (role == RobotRole.Collector)
+            taskStack.ReplaceCollectorFamily(defaultTask);
+        else
+            taskStack.PushOrRefresh(defaultTask);
 
         if (brain != null)
         {
+            brain.UpdateBrainOption -= ReactToBrainOptions;
+            brain.UpdatePlannedTask -= OnPlannedTask;
             brain.UpdateBrainOption += ReactToBrainOptions;
             brain.UpdatePlannedTask += OnPlannedTask;
 
@@ -59,7 +67,7 @@ public class RobotHeartNew : MonoBehaviour
             {
                 currentOptions = initialOptions;
                 if (initialTask != null)
-                    taskStack.PushOrRefresh(initialTask);
+                    ApplyPlannedTask(initialTask, startImmediately: false);
             }
         }
 
@@ -69,6 +77,10 @@ public class RobotHeartNew : MonoBehaviour
     private void OnDisable()
     {
         CancelScheduledTaskSignal();
+
+        if (activeTopTask != null && taskRuntime != null)
+            taskRuntime.Exit(BuildTaskContext(activeTopTask), TaskExitReason.Disabled);
+        activeTopTask = null;
 
         if (brain != null)
         {
@@ -101,11 +113,22 @@ public class RobotHeartNew : MonoBehaviour
 
     private void OnPlannedTask(RobotTask planned)
     {
+        ApplyPlannedTask(planned, startImmediately: true);
+    }
+
+    private void ApplyPlannedTask(RobotTask planned, bool startImmediately)
+    {
         if (planned == null)
             return;
 
         RemoveStalePerceptionTasksBeforePlan(planned);
-        taskStack.PushOrRefresh(planned);
+        bool replacedCollectorFamily = role == RobotRole.Collector
+            && RobotTaskStackNew.IsCollectorFamily(planned.Type);
+        if (replacedCollectorFamily)
+            taskStack.ReplaceCollectorFamily(planned);
+        else
+            taskStack.PushOrRefresh(planned);
+
         RobotEcosystemProbe.RecordHeartPlannedTask(this, planned, taskStack.Current);
         RobotNewTrace.Log(
             this,
@@ -114,8 +137,10 @@ public class RobotHeartNew : MonoBehaviour
             brainOptions: currentOptions,
             plannedTask: planned,
             heartCurrentTask: taskStack.Current,
-            taskSignal: "push_refresh");
-        StartTopTaskIfChanged();
+            taskSignal: replacedCollectorFamily ? "replace_collector_family" : "push_refresh");
+
+        if (startImmediately)
+            StartTopTaskIfChanged();
     }
 
     /// <summary>
@@ -298,6 +323,8 @@ public class RobotHeartNew : MonoBehaviour
             brain = GetComponent<RobotBrainNew>();
         if (body == null)
             body = GetComponent<RobotBodyController>();
+        if (collectorBody == null)
+            ResolveCollectorBody();
         if (memory == null)
             memory = GetComponent<RobotMemoryNew>();
 
@@ -354,6 +381,9 @@ public class RobotHeartNew : MonoBehaviour
             case RobotRole.Boss:
                 defaultTask = new RobotTask(RobotTaskType.Patrol);
                 break;
+            case RobotRole.Collector:
+                defaultTask = new RobotTask(RobotTaskType.CollectorStandby);
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -372,8 +402,29 @@ public class RobotHeartNew : MonoBehaviour
             Options = currentOptions,
             Heart = this,
             Body = body,
+            CollectorBody = collectorBody,
             Memory = memory
         };
+    }
+
+    private void ResolveCollectorBody()
+    {
+        if (collectorBodyBehaviour is ICollectorTaskBody configuredBody)
+        {
+            collectorBody = configuredBody;
+            return;
+        }
+
+        MonoBehaviour[] behaviours = GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            if (behaviours[i] is ICollectorTaskBody discoveredBody)
+            {
+                collectorBodyBehaviour = behaviours[i];
+                collectorBody = discoveredBody;
+                return;
+            }
+        }
     }
 
     private void RemoveStalePerceptionTasksBeforePlan(RobotTask planned)

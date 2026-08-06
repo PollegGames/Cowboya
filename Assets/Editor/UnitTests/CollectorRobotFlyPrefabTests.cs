@@ -10,4 +10,9 @@ public class CollectorRobotFlyPrefabTests {
     public void CollectorRobotFlyPrefabFallsAndRespectsHingeLimits() {
         Assert.DoesNotThrow(CollectorRobotFlyPrefabBuilder.ValidatePhysicsBehaviour);
     }
+
+    [Test]
+    public void SpawnRobotCollectorPrefabHasLiveMissionMarkersAndIntake() {
+        Assert.DoesNotThrow(CollectorRobotFlyPrefabBuilder.ValidateMachinePrefab);
+    }
 }

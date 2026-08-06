@@ -56,6 +56,41 @@ public class RobotTaskStackNew
         return before != stack.Count;
     }
 
+    /// <summary>
+    /// Replaces every sequential Collector phase with one authoritative phase task.
+    /// </summary>
+    public bool ReplaceCollectorFamily(RobotTask task)
+    {
+        if (task == null || !IsCollectorFamily(task.Type))
+            return false;
+
+        var before = Current;
+        stack.RemoveAll(existing => existing != null && IsCollectorFamily(existing.Type));
+        stack.Add(task);
+        TrimToDepth();
+        return !IsSameTask(before, Current);
+    }
+
+    /// <summary>
+    /// Returns whether a task belongs to the sequential Collector mission family.
+    /// </summary>
+    public static bool IsCollectorFamily(RobotTaskType type)
+    {
+        switch (type)
+        {
+            case RobotTaskType.CollectorStandby:
+            case RobotTaskType.CollectorLaunch:
+            case RobotTaskType.CollectorFlyToTarget:
+            case RobotTaskType.CollectorGatherCargo:
+            case RobotTaskType.CollectorReturnHome:
+            case RobotTaskType.CollectorAbortAndReturn:
+            case RobotTaskType.CollectorDock:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private int FindTaskIndex(RobotTask incoming)
     {
         for (int i = 0; i < stack.Count; i++)

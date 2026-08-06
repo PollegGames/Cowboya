@@ -5,7 +5,8 @@ public enum TaskExitReason
 {
     Completed,
     BlockedByHigherPriority,
-    Replanned
+    Replanned,
+    Disabled
 }
 
 public struct RobotTaskContextNew
@@ -16,6 +17,7 @@ public struct RobotTaskContextNew
     public BrainOption Options;
     public RobotHeartNew Heart;
     public RobotBodyController Body;
+    public ICollectorTaskBody CollectorBody;
     public RobotMemoryNew Memory;
 }
 
@@ -206,6 +208,16 @@ public class RobotTaskNew : IRobotTaskNew
                 HandleFaint(context);
                 break;
 
+            case RobotTaskType.CollectorStandby:
+            case RobotTaskType.CollectorLaunch:
+            case RobotTaskType.CollectorFlyToTarget:
+            case RobotTaskType.CollectorGatherCargo:
+            case RobotTaskType.CollectorReturnHome:
+            case RobotTaskType.CollectorAbortAndReturn:
+            case RobotTaskType.CollectorDock:
+                HandleCollectorTask(context);
+                break;
+
             case RobotTaskType.Dead:
                 // Objectif: etat mort final.
                 // 1) Arreter toutes les actions (mouvement/combat/spawn).
@@ -239,6 +251,21 @@ public class RobotTaskNew : IRobotTaskNew
                     plannedTask: context.CurrentTask,
                     heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
                     taskSignal: "stop_attack reason=" + reason);
+                break;
+
+            case RobotTaskType.CollectorStandby:
+            case RobotTaskType.CollectorLaunch:
+            case RobotTaskType.CollectorFlyToTarget:
+            case RobotTaskType.CollectorGatherCargo:
+            case RobotTaskType.CollectorReturnHome:
+            case RobotTaskType.CollectorAbortAndReturn:
+            case RobotTaskType.CollectorDock:
+                ExitCollectorTask(context, reason);
+                break;
+
+            case RobotTaskType.Dead:
+                if (context.Role == RobotRole.Collector)
+                    context.CollectorBody?.StopAllActuators();
                 break;
         }
     }
@@ -690,6 +717,85 @@ public class RobotTaskNew : IRobotTaskNew
     private static void HandleDead(RobotTaskContextNew context)
     {
         context.Body?.StopMovement();
+        if (context.Role == RobotRole.Collector)
+            context.CollectorBody?.StopAllActuators();
+    }
+
+    private static void HandleCollectorTask(RobotTaskContextNew context)
+    {
+        ICollectorTaskBody collectorBody = context.CollectorBody;
+        if (collectorBody == null)
+        {
+            Block(context);
+            return;
+        }
+
+        RobotTaskType type = context.CurrentTask.Type;
+        if (type == RobotTaskType.CollectorStandby)
+        {
+            collectorBody.StopAllActuators();
+            return;
+        }
+
+        CollectorMissionAssignment assignment = context.Payload as CollectorMissionAssignment;
+        if (assignment == null)
+        {
+            collectorBody.StopAllActuators();
+            Block(context);
+            return;
+        }
+
+        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
+            return;
+
+        switch (type)
+        {
+            case RobotTaskType.CollectorLaunch:
+                collectorBody.BeginLaunch(assignment);
+                break;
+            case RobotTaskType.CollectorFlyToTarget:
+                collectorBody.BeginOutbound(assignment);
+                break;
+            case RobotTaskType.CollectorGatherCargo:
+                collectorBody.BeginGathering(assignment);
+                break;
+            case RobotTaskType.CollectorReturnHome:
+                collectorBody.BeginReturn(assignment);
+                break;
+            case RobotTaskType.CollectorAbortAndReturn:
+                collectorBody.BeginAbortReturn(assignment);
+                break;
+            case RobotTaskType.CollectorDock:
+                collectorBody.BeginDocking(assignment);
+                break;
+        }
+    }
+
+    private static void ExitCollectorTask(RobotTaskContextNew context, TaskExitReason reason)
+    {
+        ICollectorTaskBody collectorBody = context.CollectorBody;
+        if (collectorBody == null)
+            return;
+
+        CollectorMissionAssignment assignment = context.Payload as CollectorMissionAssignment;
+        if (reason == TaskExitReason.Disabled
+            || context.CurrentTask.Type == RobotTaskType.CollectorStandby)
+        {
+            collectorBody.StopAllActuators();
+        }
+        else
+        {
+            collectorBody.CancelCurrentCommand(assignment);
+        }
+
+        RobotNewTrace.Log(
+            context.Heart,
+            eventSource: "TaskNew.Exit.Collector",
+            memoryDelta: "none",
+            brainOptions: context.Options,
+            plannedTask: context.CurrentTask,
+            heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
+            taskSignal: "cancel_collector reason=" + reason);
     }
 
     private static void ScheduleOrCompleteByTaskExpiry(RobotTaskContextNew context, float fallbackSeconds)

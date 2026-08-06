@@ -20,7 +20,15 @@ public enum MemoryChangeType
     ReactivationAssigned,
     DeadStateChanged,
     DesiredMachineChanged,
-    Normal
+    Normal,
+    CollectorMissionAssigned,
+    CollectorLaunchChanged,
+    CollectorTargetChanged,
+    CollectorCargoChanged,
+    CollectorDockChanged,
+    CollectorTargetInvalidated,
+    CollectorFlightFaultChanged,
+    CollectorMissionCleared
 }
 
 public struct MemoryChangeEvent
@@ -303,6 +311,210 @@ public class RobotMemoryStateNew
         Raise(MemoryChangeType.WaypointAvailabilityChanged);
     }
 
+    /// <summary>
+    /// Atomically installs a new Collector mission and clears all progress from the previous mission.
+    /// </summary>
+    public bool TryAssignCollectorMission(CollectorMissionAssignment assignment)
+    {
+        if (assignment == null || !assignment.HasRequiredReferences)
+            return false;
+        if (!assignment.Target.IsClaimValid(assignment.Claim))
+            return false;
+        if (ReferenceEquals(snapshot.Collector.Assignment, assignment))
+            return false;
+
+        snapshot.Collector = new CollectorMissionFacts
+        {
+            Assignment = assignment
+        };
+        Raise(MemoryChangeType.CollectorMissionAssigned);
+        return true;
+    }
+
+    /// <summary>
+    /// Applies one discrete, assignment-scoped observation from the Collector body.
+    /// </summary>
+    public bool TryApplyCollectorObservation(CollectorBodyObservation observation)
+    {
+        if (!IsCurrentCollectorAssignment(observation.Assignment) || observation.CommandToken <= 0)
+            return false;
+
+        switch (observation.Type)
+        {
+            case CollectorBodyObservationType.LaunchExitChanged:
+                if (snapshot.Collector.LaunchExitReached == observation.Value)
+                    return false;
+                snapshot.Collector.LaunchExitReached = observation.Value;
+                Raise(MemoryChangeType.CollectorLaunchChanged);
+                return true;
+
+            case CollectorBodyObservationType.TargetApproachChanged:
+                if (!HasValidCollectorClaim(observation.Assignment))
+                    return false;
+                if (snapshot.Collector.TargetApproachReached == observation.Value)
+                    return false;
+                snapshot.Collector.TargetApproachReached = observation.Value;
+                Raise(MemoryChangeType.CollectorTargetChanged);
+                return true;
+
+            case CollectorBodyObservationType.CargoChanged:
+                return TryApplyCollectorCargoObservation(observation);
+
+            case CollectorBodyObservationType.DockApproachChanged:
+                if (snapshot.Collector.DockApproachReached == observation.Value)
+                    return false;
+                snapshot.Collector.DockApproachReached = observation.Value;
+                if (!observation.Value)
+                    snapshot.Collector.DockAccessGranted = false;
+                Raise(MemoryChangeType.CollectorDockChanged);
+                return true;
+
+            case CollectorBodyObservationType.FlightFaultChanged:
+                if (snapshot.Collector.FlightFault == observation.Value)
+                    return false;
+                snapshot.Collector.FlightFault = observation.Value;
+                Raise(MemoryChangeType.CollectorFlightFaultChanged);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Records whether the owning machine currently grants access to its Collector intake.
+    /// </summary>
+    public bool TrySetCollectorDockAccess(CollectorMissionAssignment assignment, bool granted)
+    {
+        if (!IsCurrentCollectorAssignment(assignment))
+            return false;
+        if (granted && !snapshot.Collector.DockApproachReached)
+            return false;
+        if (snapshot.Collector.DockAccessGranted == granted)
+            return false;
+
+        snapshot.Collector.DockAccessGranted = granted;
+        Raise(MemoryChangeType.CollectorDockChanged);
+        return true;
+    }
+
+    /// <summary>
+    /// Confirms an intake transaction after validating the current mission and its success/abort state.
+    /// </summary>
+    public bool TryConfirmCollectorIntake(CollectorMissionAssignment assignment)
+    {
+        if (!IsCurrentCollectorAssignment(assignment)
+            || snapshot.Collector.IntakeConfirmed
+            || !snapshot.Collector.DockAccessGranted)
+        {
+            return false;
+        }
+
+        bool aborting = snapshot.Collector.TargetUnavailable
+            || snapshot.Collector.MissionCancelled
+            || snapshot.Collector.FlightFault;
+        if (!aborting && (!snapshot.Collector.CargoSecure || !HasValidCollectorClaim(assignment)))
+            return false;
+
+        snapshot.Collector.IntakeConfirmed = true;
+        Raise(MemoryChangeType.CollectorDockChanged);
+        return true;
+    }
+
+    /// <summary>
+    /// Invalidates the current target without mutating or destroying the target object.
+    /// </summary>
+    public bool TryInvalidateCollectorTarget(CollectorMissionAssignment assignment)
+    {
+        if (!IsCurrentCollectorAssignment(assignment) || snapshot.Collector.TargetUnavailable)
+            return false;
+
+        snapshot.Collector.TargetUnavailable = true;
+        Raise(MemoryChangeType.CollectorTargetInvalidated);
+        return true;
+    }
+
+    /// <summary>
+    /// Marks the current Collector mission as externally cancelled.
+    /// </summary>
+    public bool TryCancelCollectorMission(CollectorMissionAssignment assignment)
+    {
+        if (!IsCurrentCollectorAssignment(assignment) || snapshot.Collector.MissionCancelled)
+            return false;
+
+        snapshot.Collector.MissionCancelled = true;
+        Raise(MemoryChangeType.CollectorTargetInvalidated);
+        return true;
+    }
+
+    /// <summary>
+    /// Clears the matching Collector mission. A stale assignment cannot clear a newer pooled mission.
+    /// </summary>
+    public bool TryClearCollectorMission(CollectorMissionAssignment assignment, bool notify)
+    {
+        if (!IsCurrentCollectorAssignment(assignment))
+            return false;
+
+        snapshot.Collector = default;
+        if (notify)
+            Raise(MemoryChangeType.CollectorMissionCleared);
+        return true;
+    }
+
+    private bool TryApplyCollectorCargoObservation(CollectorBodyObservation observation)
+    {
+        if (!HasValidCollectorClaim(observation.Assignment))
+            return false;
+        if (observation.RequiredPartCount < 0
+            || observation.SecuredPartCount < 0
+            || observation.SecuredPartCount > observation.RequiredPartCount
+            || (observation.CargoSecure && observation.CargoLost)
+            || (observation.CargoSecure
+                && (observation.RequiredPartCount == 0
+                    || observation.SecuredPartCount != observation.RequiredPartCount)))
+        {
+            return false;
+        }
+
+        bool cargoLost = observation.CargoSecure
+            ? false
+            : snapshot.Collector.CargoLost || observation.CargoLost;
+        bool changed = snapshot.Collector.RequiredPartCount != observation.RequiredPartCount
+            || snapshot.Collector.SecuredPartCount != observation.SecuredPartCount
+            || snapshot.Collector.CargoSecure != observation.CargoSecure
+            || snapshot.Collector.CargoLost != cargoLost;
+        if (!changed)
+            return false;
+
+        snapshot.Collector.RequiredPartCount = observation.RequiredPartCount;
+        snapshot.Collector.SecuredPartCount = observation.SecuredPartCount;
+        snapshot.Collector.CargoSecure = observation.CargoSecure;
+        snapshot.Collector.CargoLost = cargoLost;
+
+        if (cargoLost)
+        {
+            snapshot.Collector.CargoSecure = false;
+            snapshot.Collector.DockApproachReached = false;
+            snapshot.Collector.DockAccessGranted = false;
+        }
+
+        Raise(MemoryChangeType.CollectorCargoChanged);
+        return true;
+    }
+
+    private bool IsCurrentCollectorAssignment(CollectorMissionAssignment assignment)
+    {
+        return assignment != null && ReferenceEquals(snapshot.Collector.Assignment, assignment);
+    }
+
+    private static bool HasValidCollectorClaim(CollectorMissionAssignment assignment)
+    {
+        return assignment != null
+            && assignment.Target != null
+            && assignment.Claim.IsValid
+            && assignment.Target.IsClaimValid(assignment.Claim);
+    }
+
     private void Raise(MemoryChangeType type)
     {
         OnChanged?.Invoke(new MemoryChangeEvent
@@ -312,7 +524,7 @@ public class RobotMemoryStateNew
         });
     }
 
-    public void ResetAll()
+    public void ResetAll(bool notify = true)
     {
         snapshot = new RobotMemorySnapshotNew
         {
@@ -330,9 +542,11 @@ public class RobotMemoryStateNew
             AllAvailableWaypoints = new Dictionary<RoomWaypoint, bool>(),
             DesiredMachineType = null,
             IsMachineTransitionInProgress = false,
-            PendingReactivationMachine = null
+            PendingReactivationMachine = null,
+            Collector = default
         };
-        Raise(MemoryChangeType.Normal);
+        if (notify)
+            Raise(MemoryChangeType.Normal);
     }
 
 }

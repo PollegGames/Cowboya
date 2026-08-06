@@ -119,5 +119,28 @@ namespace CowBoya.Robots
                 }
             }
         }
+
+        /// <summary>
+        /// Clears every deferred physics rotation so a pooled puppet cannot apply a target from its previous use.
+        /// </summary>
+        public void ClearRotationTargets()
+        {
+            if (Pairs == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < Pairs.Count; i++)
+            {
+                BonePair pair = Pairs[i];
+                if (pair == null)
+                {
+                    continue;
+                }
+
+                pair.targetRotation = Quaternion.identity;
+                pair.hasRotationTarget = false;
+            }
+        }
     }
 }

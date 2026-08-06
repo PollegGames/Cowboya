@@ -22,6 +22,8 @@ public struct RobotMemorySnapshotNew
     public MachineType? DesiredMachineType;
     public bool IsMachineTransitionInProgress;
     public BaseMachine PendingReactivationMachine;
+    public CollectorMissionFacts Collector;
+
     // Backward-compatible alias for older code that uses lower camel case.
     public Vector3 lastKnownPlayerPosition
     {

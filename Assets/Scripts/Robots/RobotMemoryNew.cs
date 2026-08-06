@@ -26,11 +26,13 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     public MachineType? DesiredMachineType => memoryState.DesiredMachineType;
     public BaseMachine PendingReactivationMachine => memoryState.PendingReactivationMachine;
     public Dictionary<RoomWaypoint, bool> AllAvailableWaypoints => memoryState.AllAvailableWaypoints;
+    public CollectorMissionFacts Collector => memoryState.Snapshot.Collector;
     public event Action<MemoryChangeEvent> OnMemoryChanged;
     public RobotMemorySnapshotNew Snapshot => memoryState.Snapshot;
 
     private void Awake()
     {
+        memoryState.OnChanged -= HandleStateChanged;
         memoryState.OnChanged += HandleStateChanged;
     }
     private void OnDestroy()
@@ -168,5 +170,52 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     public void NotifyMachineSlotReleasedFinal() => memoryState.NotifyMachineSlotReleasedFinal();
 
     public void SetDesiredMachineType(MachineType? machineType) => memoryState.SetDesiredMachineType(machineType);
+
+    /// <summary>
+    /// Atomically installs a claimed Collector mission and clears prior mission progress.
+    /// </summary>
+    public bool TryAssignCollectorMission(CollectorMissionAssignment assignment) =>
+        memoryState.TryAssignCollectorMission(assignment);
+
+    /// <summary>
+    /// Applies one discrete observation emitted by the Collector body.
+    /// </summary>
+    public bool TryApplyCollectorObservation(CollectorBodyObservation observation) =>
+        memoryState.TryApplyCollectorObservation(observation);
+
+    /// <summary>
+    /// Records whether the owning machine currently grants dock access.
+    /// </summary>
+    public bool TrySetCollectorDockAccess(CollectorMissionAssignment assignment, bool granted) =>
+        memoryState.TrySetCollectorDockAccess(assignment, granted);
+
+    /// <summary>
+    /// Confirms that the current Collector reached a valid success or abort intake.
+    /// </summary>
+    public bool TryConfirmCollectorIntake(CollectorMissionAssignment assignment) =>
+        memoryState.TryConfirmCollectorIntake(assignment);
+
+    /// <summary>
+    /// Marks the matching target unavailable without mutating the target object.
+    /// </summary>
+    public bool TryInvalidateCollectorTarget(CollectorMissionAssignment assignment) =>
+        memoryState.TryInvalidateCollectorTarget(assignment);
+
+    /// <summary>
+    /// Marks the matching Collector mission as externally cancelled.
+    /// </summary>
+    public bool TryCancelCollectorMission(CollectorMissionAssignment assignment) =>
+        memoryState.TryCancelCollectorMission(assignment);
+
+    /// <summary>
+    /// Clears only the matching Collector mission.
+    /// </summary>
+    public bool TryClearCollectorMission(CollectorMissionAssignment assignment, bool notify) =>
+        memoryState.TryClearCollectorMission(assignment, notify);
+
+    /// <summary>
+    /// Clears every remembered fact. Pool cleanup can suppress the change event.
+    /// </summary>
+    public void ResetAll(bool notify = true) => memoryState.ResetAll(notify);
 
 }

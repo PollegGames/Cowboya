@@ -25,7 +25,14 @@ public enum RobotTaskType
     Investigate,
     Cower,
     Faint,
-    Dead
+    Dead,
+    CollectorStandby,
+    CollectorLaunch,
+    CollectorFlyToTarget,
+    CollectorGatherCargo,
+    CollectorReturnHome,
+    CollectorAbortAndReturn,
+    CollectorDock
 }
 
 /// <summary>

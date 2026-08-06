@@ -45,14 +45,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f05f20694e814bfe8d341dbd17be8fa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  robotPrefabs: []
+  robotPrefabs:
+  - {fileID: 7235029246623758551, guid: 61b865c23d5a54142bfc495565de4832, type: 3}
+  - {fileID: 1049137500927649083, guid: 8e422889575496b439b903a3df4660a5, type: 3}
+  - {fileID: 7235029246623758551, guid: 61b865c23d5a54142bfc495565de4832, type: 3}
   spawnInterval: 10
   spawnOnStart: 1
   maxSpawnedBodies: 20
   randomRobot: 1
-  spawnOrigin: {fileID: 1602069322536624324}
+  spawnOrigin: {fileID: 7021033058389464428}
   spawnedParent: {fileID: 0}
-  randomOffset: {x: 1, y: 0.25}
+  randomOffset: {x: 0, y: 0}
   matchSpawnerRotation: 0
   applySpawnImpulse: 1
   horizontalImpulseRange: {x: 2, y: 5}
@@ -678,7 +681,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 17292
+  m_VersionIndex: 17535
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
