@@ -108,7 +108,14 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
         ApplyThrow(throwForce);
         RestoreFrozenRotations();
         ResumeRobotBehaviours();
-        RestartRobotIntent();
+        if (stateController != null && stateController.CurrentState == RobotState.Dead)
+        {
+            stateController.ReapplyDeathState();
+        }
+        else
+        {
+            RestartRobotIntent();
+        }
         DestroyCreatedJoint();
         ClearGrabContext();
         grabbed = false;
@@ -118,6 +125,33 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
     {
         _ = grabOrigin;
         this.sourceCollider = sourceCollider;
+    }
+
+    /// <summary>
+    /// Assigns additional robot-specific behaviours that must pause while held.
+    /// </summary>
+    public void ConfigureExtraBehaviours(params Behaviour[] behaviours) {
+        extraBehavioursToPause = behaviours ?? new Behaviour[0];
+    }
+
+    /// <summary>
+    /// Returns whether a behaviour is part of this grabbable's authored pause set.
+    /// </summary>
+    public bool PausesBehaviour(Behaviour behaviour) {
+        if (behaviour == null || extraBehavioursToPause == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < extraBehavioursToPause.Length; i++)
+        {
+            if (extraBehavioursToPause[i] == behaviour)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void CacheReferences()
@@ -368,7 +402,14 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
             return;
         }
 
-        Destroy(activeJoint);
+        if (Application.isPlaying)
+        {
+            Destroy(activeJoint);
+        }
+        else
+        {
+            DestroyImmediate(activeJoint);
+        }
         activeJoint = null;
         jointWasCreated = false;
     }

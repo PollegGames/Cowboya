@@ -12,6 +12,15 @@ public class HealthBot : MonoBehaviour
     [SerializeField] private RobotBrainNew brainNew = null;
     [SerializeField] private PlayerBrain playerBrain = null;
 
+    public DamageFeedback DamageFeedback => damageFeedback;
+
+    /// <summary>
+    /// Assigns the authored visual feedback used when this health component takes damage.
+    /// </summary>
+    public void ConfigureDamageFeedback(DamageFeedback feedback) {
+        damageFeedback = feedback;
+    }
+
     public void TakeDamage(int damage)
     {
         TakeDamage(damage, null);

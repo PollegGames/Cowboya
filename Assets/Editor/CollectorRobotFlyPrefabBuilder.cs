@@ -143,6 +143,7 @@ public static class CollectorRobotFlyPrefabBuilder {
         RobotHeartNew heart = RequireSingleRootComponent<RobotHeartNew>(prefab);
         RobotBrainNew brain = RequireSingleRootComponent<RobotBrainNew>(prefab);
         RobotStateController state = RequireSingleRootComponent<RobotStateController>(prefab);
+        DamageFeedback damageFeedback = RequireSingleRootComponent<DamageFeedback>(prefab);
         HealthBot health = RequireSingleRootComponent<HealthBot>(prefab);
         JointBreaker jointBreaker = RequireSingleRootComponent<JointBreaker>(prefab);
         CollectorFlightMotor2D motor = RequireSingleRootComponent<CollectorFlightMotor2D>(prefab);
@@ -152,12 +153,20 @@ public static class CollectorRobotFlyPrefabBuilder {
         CollectorRobotBodyController collectorBody = RequireSingleRootComponent<CollectorRobotBodyController>(prefab);
         CollectorRobotObservationBridge bridge = RequireSingleRootComponent<CollectorRobotObservationBridge>(prefab);
         CollectorPoolLifecycle lifecycle = RequireSingleRootComponent<CollectorPoolLifecycle>(prefab);
-        Require(memory != null && brain != null && health != null && jointBreaker != null
+        EnemyGrabbable grabbable = RequireSingleRootComponent<EnemyGrabbable>(prefab);
+        Require(memory != null && brain != null && damageFeedback != null && health != null && jointBreaker != null
             && sensor != null && magnetController != null && visuals != null
-            && bridge != null && lifecycle != null,
+            && bridge != null && lifecycle != null && grabbable != null,
             "Collector runtime pipeline contains a missing component reference.");
         Require(heart.Role == RobotRole.Collector, "Collector Heart must serialize the Collector role.");
         Require(state.Stats != null, "Collector must serialize a non-null baseline RobotStats instance.");
+        Require(state.Health == health, "Collector State must reference its root HealthBot.");
+        Require(health.DamageFeedback == damageFeedback,
+            "Collector HealthBot must reference its root DamageFeedback.");
+        Require(grabbable.PausesBehaviour(collectorBody),
+            "Collector grab must pause its collector-specific body controller.");
+        Require(grabbable.PausesBehaviour(binder),
+            "Collector grab must pause its physics rotation binder.");
         Require(collectorBody.BodyRigidbody == bodyRigidbody,
             "Collector body facade has the wrong body Rigidbody reference.");
         Require(collectorBody.MagnetRigidbody == magnetRigidbody,
@@ -405,6 +414,7 @@ public static class CollectorRobotFlyPrefabBuilder {
             RobotMemoryNew memory = finalRoot.AddComponent<RobotMemoryNew>();
             RobotHeartNew heart = finalRoot.AddComponent<RobotHeartNew>();
             RobotBrainNew brain = finalRoot.AddComponent<RobotBrainNew>();
+            DamageFeedback damageFeedback = finalRoot.AddComponent<DamageFeedback>();
             HealthBot health = finalRoot.AddComponent<HealthBot>();
             JointBreaker jointBreaker = finalRoot.AddComponent<JointBreaker>();
             RobotStateController state = finalRoot.AddComponent<RobotStateController>();
@@ -415,9 +425,12 @@ public static class CollectorRobotFlyPrefabBuilder {
             CollectorRobotBodyController collectorBody = finalRoot.AddComponent<CollectorRobotBodyController>();
             CollectorRobotObservationBridge bridge = finalRoot.AddComponent<CollectorRobotObservationBridge>();
             CollectorPoolLifecycle lifecycle = finalRoot.AddComponent<CollectorPoolLifecycle>();
+            EnemyGrabbable grabbable = finalRoot.AddComponent<EnemyGrabbable>();
 
             Transform propellerPivot = FindDirectChild(puppetBody, "PropellerPivot");
             heart.ConfigureRole(RobotRole.Collector, resetStack: true);
+            health.ConfigureDamageFeedback(damageFeedback);
+            state.ConfigureCoreReferences(health, jointBreaker, memory);
             state.Stats = new EnemyRobotFactory().CreateRobot();
             state.Stats.RobotName = "Collector";
             motor.ConfigureReferences(bodyRigidbody, magnetRigidbody, sensor);
@@ -429,8 +442,7 @@ public static class CollectorRobotFlyPrefabBuilder {
             bridge.ConfigureReferences(collectorBody, brain);
             lifecycle.ConfigureReferences(memory, brain, heart, state, jointBreaker, binder,
                 collectorBody, magnetController, visuals, bridge);
-
-            _ = health;
+            grabbable.ConfigureExtraBehaviours(collectorBody, binder);
 
             bool success;
             PrefabUtility.SaveAsPrefabAsset(finalRoot, FinalPrefabPath, out success);

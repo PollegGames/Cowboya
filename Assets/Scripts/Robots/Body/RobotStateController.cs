@@ -46,11 +46,30 @@ public class RobotStateController : MonoBehaviour, IPooledObject
     private readonly Dictionary<Rigidbody2D, RigidbodyConstraints2D> defaultConstraints2D = new();
     private SimplePuppetBinder[] puppetBinders;
     private Rigidbody2D[] rigidbodies2D;
+    private ICollectorTaskBody collectorBody;
 
     public WorkerCondition WorkerConditionState => workerCondition;
     [Header("Saving")]
     private static RoomWaypoint cachedStartWaypoint;
     private static bool triedCacheStart;
+
+    /// <summary>
+    /// Wires the core health, breakage, and memory references used by generated robot prefabs.
+    /// </summary>
+    public void ConfigureCoreReferences(HealthBot health, JointBreaker breaker, RobotMemoryNew robotMemory) {
+        healthBot = health;
+        jointBreaker = breaker;
+        memory = robotMemory;
+        collectorBody = GetComponent<ICollectorTaskBody>();
+    }
+
+    /// <summary>
+    /// Restores terminal death effects after a temporary interaction resumes robot behaviours.
+    /// </summary>
+    public void ReapplyDeathState() {
+        if (CurrentState == RobotState.Dead)
+            ApplyEnemyDeathState();
+    }
 
     private void Awake()
     {
@@ -66,6 +85,8 @@ public class RobotStateController : MonoBehaviour, IPooledObject
             bodyController = GetComponent<RobotBodyController>();
         if (attackController == null)
             attackController = GetComponent<RobotAttackController>();
+        if (collectorBody == null)
+            collectorBody = GetComponent<ICollectorTaskBody>();
 
         CacheDeathPhysicsDefaults();
 
@@ -325,6 +346,7 @@ public class RobotStateController : MonoBehaviour, IPooledObject
 
         memory?.SetDead(true);
         bodyController?.StopMovement();
+        collectorBody?.StopAllActuators();
         attackController?.StopAttacking();
         SetPuppetBindersEnabled(false);
         ReleaseRotationConstraints();
