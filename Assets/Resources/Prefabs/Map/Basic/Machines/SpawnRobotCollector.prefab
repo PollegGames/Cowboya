@@ -688,7 +688,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 18078
+  m_VersionIndex: 18111
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -919,13 +919,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::MoveWithPlayerPosition
   player: {fileID: 0}
-  trackingCenter: {fileID: 0}
+  trackingCenter: {fileID: 8436297422213598318}
   roomManager: {fileID: 0}
   activationZone: {fileID: 910000000000000104}
-  horizontalRange: 45
+  horizontalRange: 21.43
   verticalRange: 20
-  maxLeft: 3
-  maxRight: 3
+  maxLeft: 7.5
+  maxRight: 7.5
   maxDown: 3
   maxUp: 3
   invertHorizontal: 0
@@ -1549,7 +1549,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 18144
+  m_VersionIndex: 18177
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -2294,7 +2294,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 18114
+  m_VersionIndex: 18147
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
