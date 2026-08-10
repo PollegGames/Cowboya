@@ -4,7 +4,8 @@ public enum SceneSetupMode
 {
     GeneratedMap,
     StaticLevel,
-    Laboratory
+    Laboratory,
+    Conveyor
 }
 
 [CreateAssetMenu(fileName = "SceneBootstrapConfig", menuName = "Setup/Scene Bootstrap Config")]

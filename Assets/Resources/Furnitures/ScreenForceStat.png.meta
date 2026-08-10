@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: f6930f2368e5e8f41ab811944cac2c16
+guid: f5d6168e90c0883408f276504de9d0e6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3637842853404825971
-    second: GarageLeftPanel_0
+      213: 2779803917890909032
+    second: ScreenForceStat_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: GarageLeftPanel_0
+      name: ScreenForceStat_0
       rect:
         serializedVersion: 2
-        x: 913
-        y: 765
-        width: 98
-        height: 105
+        x: 1125
+        y: 869
+        width: 67
+        height: 49
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 37953e11dc63c7230800000000000000
-      internalID: 3637842853404825971
+      spriteID: 863702f6fe8d39620800000000000000
+      internalID: 2779803917890909032
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      GarageLeftPanel_0: 3637842853404825971
+      ScreenForceStat_0: 2779803917890909032
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

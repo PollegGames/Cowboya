@@ -184,8 +184,12 @@ public class SceneInitiator : GameInitiator
         if (spawnPoint != null)
             return spawnPoint.transform.position;
 
-        string fallbackRoomName = setupMode == SceneSetupMode.Laboratory ? "ROOM_Laboratory" : "ROOM_Deads";
-        GameObject fallbackRoom = GameObject.Find(fallbackRoomName);
+        string fallbackRoomName = setupMode switch
+        {
+            SceneSetupMode.Laboratory => "ROOM_Laboratory_1",
+            SceneSetupMode.Conveyor => "ROOM_Conveyor",
+            _ => "ROOM_Deads"
+        }; GameObject fallbackRoom = GameObject.Find(fallbackRoomName);
         if (fallbackRoom != null)
             return fallbackRoom.transform.position;
 

@@ -27,6 +27,7 @@ public class RunProgressManager : MonoBehaviour
     [SerializeField] private RunMapConfigSO sandboxConfig;
     [SerializeField] private string runNormalSceneName = "MapGeneration";
     [SerializeField] private string firstStaticLevelSceneName = "Level_1";
+    [SerializeField] private string secondStaticLevelSceneName = "Level_2";
     [SerializeField] private string laboratorySceneName = "Level_Laboratory";
     [SerializeField] private string runSandboxSceneName = "SetupSandbox";
     [SerializeField] private SceneController sceneControllerPrefab;
@@ -231,6 +232,7 @@ public class RunProgressManager : MonoBehaviour
             return;
 
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.StaticLevel, SceneName = firstStaticLevelSceneName });
+        runSteps.Add(new RunStepDefinition { Kind = RunStepKind.StaticLevel, SceneName = secondStaticLevelSceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.Laboratory, SceneName = laboratorySceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.GeneratedLevel, SceneName = runNormalSceneName });
     }
@@ -307,10 +309,13 @@ public class RunProgressManager : MonoBehaviour
             return 1;
 
         if (sceneName == runNormalSceneName)
-            return 2;
+            return 3;
 
         if (sceneName == firstStaticLevelSceneName)
             return 0;
+
+        if (sceneName == secondStaticLevelSceneName)
+            return 2;
 
         return -1;
     }

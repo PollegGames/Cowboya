@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 761dbf0d2c7a0f14aa590aa0f2c01dfa
+guid: c1f0a839c35814142a1982ff3e98b897
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7256263647199049854
-    second: GarageLeftBackground_0
+      213: 5938056393417968258
+    second: ScreenDisconnected_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: GarageLeftBackground_0
+      name: ScreenDisconnected_0
       rect:
         serializedVersion: 2
-        x: 907
-        y: 762
-        width: 110
-        height: 121
+        x: 1148
+        y: 792
+        width: 23
+        height: 50
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e7831ef775d63b460800000000000000
-      internalID: 7256263647199049854
+      spriteID: 28a4ae124d6386250800000000000000
+      internalID: 5938056393417968258
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      GarageLeftBackground_0: 7256263647199049854
+      ScreenDisconnected_0: 5938056393417968258
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
