@@ -19,6 +19,11 @@ public class RunStepExitTrigger : MonoBehaviour
             return;
 
         hasRequestedTransition = true;
+        if (!LaboratoryManager.TryFinalizeActiveVisit(collision))
+        {
+            hasRequestedTransition = false;
+            return;
+        }
         CaptureAndSave(collision);
 
         if (RunProgressManager.Instance != null)

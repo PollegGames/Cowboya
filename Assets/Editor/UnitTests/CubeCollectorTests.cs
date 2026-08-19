@@ -1,126 +1,127 @@
 using System.Reflection;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
-public class CubeCollectorTests
-{
+public class CubeCollectorTests {
+    private GameObject collectorObject;
+    private CubeCollector collector;
+
+    [SetUp]
+    public void SetUp() {
+        collectorObject = new GameObject("collector");
+        collectorObject.AddComponent<BoxCollider2D>();
+        collector = collectorObject.AddComponent<CubeCollector>();
+    }
+
+    [TearDown]
+    public void TearDown() {
+        if (collectorObject != null) {
+            Object.DestroyImmediate(collectorObject);
+        }
+
+        CubePickup[] remainingCubes = Object.FindObjectsByType<CubePickup>(FindObjectsSortMode.None);
+        for (int i = 0; i < remainingCubes.Length; i++) {
+            if (remainingCubes[i] != null) {
+                Object.DestroyImmediate(remainingCubes[i].gameObject);
+            }
+        }
+    }
+
     [Test]
-    public void CollectorStoresUpgradeFromCube()
-    {
-        var upgradeSO = ScriptableObject.CreateInstance<CubeUpgradeSO>();
+    public void CollectorStoresColoredCubeForLaboratory() {
+        LaboratoryProgress progress = new LaboratoryProgress();
+        CubePickup pickup = CreateCube(CubeUpgradeType.AttackDamage);
 
-        var collectorGO = new GameObject("collector");
-        collectorGO.AddComponent<BoxCollider2D>();
-        var collector = collectorGO.AddComponent<CubeCollector>();
-        typeof(CubeCollector)
-            .GetField("upgradeStore", BindingFlags.NonPublic | BindingFlags.Instance)
-            .SetValue(collector, upgradeSO);
+        bool collected = collector.TryCollectForLaboratory(pickup, progress);
 
-        var cubeGO = new GameObject("cube");
-        cubeGO.AddComponent<Rigidbody2D>();
-        cubeGO.AddComponent<TargetJoint2D>();
-        var pickup = cubeGO.AddComponent<CubePickup>();
-        var upgrade = cubeGO.AddComponent<CubeUpgrade>();
-        var cubeCollider = cubeGO.AddComponent<BoxCollider2D>();
-
-        typeof(CubeUpgrade)
-            .GetField("upgradeType", BindingFlags.Instance | BindingFlags.NonPublic)
-            .SetValue(upgrade, CubeUpgradeType.AttackDamage);
-
-        var method = typeof(CubeCollector)
-            .GetMethod("OnTriggerEnter2D", BindingFlags.Instance | BindingFlags.NonPublic);
-        method.Invoke(collector, new object[] { cubeCollider });
-
-        Assert.AreEqual(CubeUpgradeType.AttackDamage, upgradeSO.SelectedUpgrade);
+        Assert.IsTrue(collected);
+        Assert.AreEqual(1, progress.GetIncomingCubeCount(LaboratoryCubeType.AttackDamage));
         Assert.IsTrue(pickup == null);
     }
 
     [Test]
-    public void CollectorIncrementsRunStats()
-    {
-        var upgradeSO = ScriptableObject.CreateInstance<CubeUpgradeSO>();
-        var runStats = ScriptableObject.CreateInstance<PlayerRunStats>();
+    public void CollectorStoresNormalCubeAsWhite() {
+        LaboratoryProgress progress = new LaboratoryProgress();
+        CubePickup pickup = CreateCube();
 
-        var sceneControllerGO = new GameObject("sceneController");
-        sceneControllerGO.AddComponent<SceneController>();
+        bool collected = collector.TryCollectForLaboratory(pickup, progress);
 
-        var rpmGO = new GameObject("runManager");
-        var rpm = rpmGO.AddComponent<RunProgressManager>();
-        typeof(RunProgressManager)
-            .GetField("runStats", BindingFlags.Instance | BindingFlags.NonPublic)
-            .SetValue(rpm, runStats);
-
-        var collectorGO = new GameObject("collector");
-        collectorGO.AddComponent<BoxCollider2D>();
-        var collector = collectorGO.AddComponent<CubeCollector>();
-        typeof(CubeCollector)
-            .GetField("upgradeStore", BindingFlags.NonPublic | BindingFlags.Instance)
-            .SetValue(collector, upgradeSO);
-
-        var cubeGO = new GameObject("cube");
-        cubeGO.AddComponent<Rigidbody2D>();
-        cubeGO.AddComponent<TargetJoint2D>();
-        cubeGO.AddComponent<EnergyBot>();
-        cubeGO.AddComponent<HealthBot>();
-        var controller = cubeGO.AddComponent<RobotStateController>();
-        controller.Stats = new RobotStats();
-        var pickup = cubeGO.AddComponent<CubePickup>();
-        var upgrade = cubeGO.AddComponent<CubeUpgrade>();
-        var cubeCollider = cubeGO.AddComponent<BoxCollider2D>();
-
-        typeof(CubeUpgrade)
-            .GetField("upgradeType", BindingFlags.Instance | BindingFlags.NonPublic)
-            .SetValue(upgrade, CubeUpgradeType.MaxHealth);
-
-        var method = typeof(CubeCollector)
-            .GetMethod("OnTriggerEnter2D", BindingFlags.Instance | BindingFlags.NonPublic);
-        method.Invoke(collector, new object[] { cubeCollider });
-
-        Assert.AreEqual(upgradeSO.UpgradeMaxHealthValue, runStats.MaxHealthBonus);
+        Assert.IsTrue(collected);
+        Assert.AreEqual(1, progress.GetIncomingCubeCount(LaboratoryCubeType.White));
+        Assert.IsTrue(pickup == null);
     }
 
     [Test]
-    public void CollectorIncrementsEnergyRechargeRunStats()
-    {
-        var upgradeSO = ScriptableObject.CreateInstance<CubeUpgradeSO>();
-        var runStats = ScriptableObject.CreateInstance<PlayerRunStats>();
+    public void CollectorPreservesRepeatedAndMixedCubeCounts() {
+        LaboratoryProgress progress = new LaboratoryProgress();
 
-        var sceneControllerGO = new GameObject("sceneController");
-        sceneControllerGO.AddComponent<SceneController>();
+        Assert.IsTrue(collector.TryCollectForLaboratory(
+            CreateCube(CubeUpgradeType.MaxHealth),
+            progress));
+        Assert.IsTrue(collector.TryCollectForLaboratory(
+            CreateCube(CubeUpgradeType.MaxHealth),
+            progress));
+        Assert.IsTrue(collector.TryCollectForLaboratory(
+            CreateCube(CubeUpgradeType.MaxEnergy),
+            progress));
 
-        var rpmGO = new GameObject("runManager");
-        var rpm = rpmGO.AddComponent<RunProgressManager>();
-        typeof(RunProgressManager)
-            .GetField("runStats", BindingFlags.Instance | BindingFlags.NonPublic)
-            .SetValue(rpm, runStats);
+        Assert.AreEqual(2, progress.GetIncomingCubeCount(LaboratoryCubeType.MaxHealth));
+        Assert.AreEqual(1, progress.GetIncomingCubeCount(LaboratoryCubeType.MaxEnergy));
+        Assert.AreEqual(0, progress.GetIncomingCubeCount(LaboratoryCubeType.EnergyRecharge));
+    }
 
-        var collectorGO = new GameObject("collector");
-        collectorGO.AddComponent<BoxCollider2D>();
-        var collector = collectorGO.AddComponent<CubeCollector>();
-        typeof(CubeCollector)
-            .GetField("upgradeStore", BindingFlags.NonPublic | BindingFlags.Instance)
-            .SetValue(collector, upgradeSO);
+    [Test]
+    public void CollectorLeavesCubeWhenProgressIsMissing() {
+        CubePickup pickup = CreateCube(CubeUpgradeType.EnergyRecharge);
 
-        var cubeGO = new GameObject("cube");
-        cubeGO.AddComponent<Rigidbody2D>();
-        cubeGO.AddComponent<TargetJoint2D>();
-        cubeGO.AddComponent<EnergyBot>();
-        cubeGO.AddComponent<HealthBot>();
-        var controller = cubeGO.AddComponent<RobotStateController>();
-        controller.Stats = new RobotStats();
-        var pickup = cubeGO.AddComponent<CubePickup>();
-        var upgrade = cubeGO.AddComponent<CubeUpgrade>();
-        var cubeCollider = cubeGO.AddComponent<BoxCollider2D>();
+        bool collected = collector.TryCollectForLaboratory(pickup, null);
 
-        typeof(CubeUpgrade)
-            .GetField("upgradeType", BindingFlags.Instance | BindingFlags.NonPublic)
-            .SetValue(upgrade, CubeUpgradeType.EnergyRecharge);
+        Assert.IsFalse(collected);
+        Assert.IsNotNull(pickup);
+    }
 
-        var method = typeof(CubeCollector)
-            .GetMethod("OnTriggerEnter2D", BindingFlags.Instance | BindingFlags.NonPublic);
-        method.Invoke(collector, new object[] { cubeCollider });
+    [Test]
+    public void CollectorRejectsUnknownUpgradeWithoutDestroyingCube() {
+        LaboratoryProgress progress = new LaboratoryProgress();
+        CubePickup pickup = CreateCube((CubeUpgradeType)999);
 
-        Assert.AreEqual(upgradeSO.UpgradeEnergyRechargeValue, runStats.EnergyRechargeBonus);
+        bool collected = collector.TryCollectForLaboratory(pickup, progress);
+
+        Assert.IsFalse(collected);
+        Assert.IsNotNull(pickup);
+        Assert.AreEqual(0, progress.GetIncomingCubeCount(LaboratoryCubeType.White));
+    }
+
+    [Test]
+    public void CubeCollecteurPrefab_DefaultsToLaboratoryStorageIncludingWhite() {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/Resources/Prefabs/Map/Basic/Machines/CubeCollecteur.prefab");
+
+        Assert.IsNotNull(prefab);
+        CubeCollector prefabCollector = prefab.GetComponentInChildren<CubeCollector>(true);
+        Assert.IsNotNull(prefabCollector);
+
+        SerializedObject serializedCollector = new SerializedObject(prefabCollector);
+        Assert.AreEqual(
+            (int)CubeCollectionMode.LaboratoryStorage,
+            serializedCollector.FindProperty("collectionMode").enumValueIndex);
+        Assert.IsTrue(
+            serializedCollector.FindProperty("collectNormalCubesAsWhite").boolValue);
+    }
+
+    private static CubePickup CreateCube(CubeUpgradeType? upgradeType = null) {
+        GameObject cubeObject = new GameObject("cube");
+        CubePickup pickup = cubeObject.AddComponent<CubePickup>();
+        cubeObject.AddComponent<BoxCollider2D>();
+
+        if (upgradeType.HasValue) {
+            CubeUpgrade upgrade = cubeObject.AddComponent<CubeUpgrade>();
+            typeof(CubeUpgrade)
+                .GetField("upgradeType", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(upgrade, upgradeType.Value);
+        }
+
+        return pickup;
     }
 }
-

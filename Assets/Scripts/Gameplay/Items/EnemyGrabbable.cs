@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
+public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
+    IGrabControllerDetachReceiver
 {
     [Header("Physics")]
     [SerializeField, Range(5f, 15f)] private float frequency = 10f;
@@ -29,6 +31,11 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
     private bool jointWasCreated;
     private bool activeJointWasEnabled;
 
+    public event Action<EnemyGrabbable> OnGrabStarted;
+    public event Action<EnemyGrabbable> OnGrabEnded;
+
+    public bool IsGrabbed => grabbed;
+
     private struct PausedBehaviour
     {
         public Behaviour Behaviour;
@@ -44,7 +51,10 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
     {
         if (grabbed)
         {
-            ReleaseWithoutThrow();
+            EndGrab(
+                applyThrow: false,
+                throwForce: Vector2.zero,
+                restoreRobotIntent: false);
         }
     }
 
@@ -65,6 +75,11 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
 
     public void OnGrab(Transform grabParent)
     {
+        if (grabbed)
+        {
+            return;
+        }
+
         if (grabParent == null)
         {
             Debug.LogWarning($"{nameof(EnemyGrabbable)} received a null grab parent.", this);
@@ -85,6 +100,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
         PauseRobotBehaviours();
         ReleaseFrozenRotations();
         EnableJoint(grabParent.position);
+        OnGrabStarted?.Invoke(this);
     }
 
     public void OnAttract(Vector2 attractPoint)
@@ -99,26 +115,21 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
 
     public void OnRelease(Vector2 throwForce)
     {
-        if (!grabbed)
-        {
-            return;
-        }
+        EndGrab(
+            applyThrow: true,
+            throwForce: throwForce,
+            restoreRobotIntent: true);
+    }
 
-        DisableJoint();
-        ApplyThrow(throwForce);
-        RestoreFrozenRotations();
-        ResumeRobotBehaviours();
-        if (stateController != null && stateController.CurrentState == RobotState.Dead)
-        {
-            stateController.ReapplyDeathState();
-        }
-        else
-        {
-            RestartRobotIntent();
-        }
-        DestroyCreatedJoint();
-        ClearGrabContext();
-        grabbed = false;
+    /// <summary>
+    /// Ends the current grip without applying throw force or invoking OnRelease.
+    /// </summary>
+    public void OnDetachedFromGrabController()
+    {
+        EndGrab(
+            applyThrow: false,
+            throwForce: Vector2.zero,
+            restoreRobotIntent: true);
     }
 
     public void SetGrabContext(Collider2D sourceCollider, Vector2 grabOrigin)
@@ -347,12 +358,34 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
         activeBody.linearVelocity = activeBody.linearVelocity.normalized * releaseVelocityLimit;
     }
 
-    private void ReleaseWithoutThrow()
+    private void EndGrab(bool applyThrow, Vector2 throwForce, bool restoreRobotIntent)
     {
+        if (!grabbed)
+        {
+            return;
+        }
+
+        grabbed = false;
         DisableJoint();
+        if (applyThrow)
+        {
+            ApplyThrow(throwForce);
+        }
+
         RestoreFrozenRotations();
         ResumeRobotBehaviours();
-        grabbed = false;
+
+        if (restoreRobotIntent)
+        {
+            if (stateController != null && stateController.CurrentState == RobotState.Dead)
+            {
+                stateController.ReapplyDeathState();
+            }
+            else
+            {
+                RestartRobotIntent();
+            }
+        }
 
         if (jointWasCreated && activeJoint != null)
         {
@@ -360,6 +393,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver
         }
 
         ClearGrabContext();
+        OnGrabEnded?.Invoke(this);
     }
 
     private void ReleaseFrozenRotations()

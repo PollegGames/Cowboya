@@ -2,8 +2,11 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
-public class JunkPickup : MonoBehaviour, IGrabbable
+public class JunkPickup : MonoBehaviour, IGrabbable, IGrabControllerDetachReceiver
 {
+    [Header("Identity")]
+    [SerializeField] private JunkVariant junkVariant = JunkVariant.Junk1;
+
     [Header("Target Joint Settings")]
     [SerializeField, Range(5f, 15f)] private float frequency = 10f;
     [SerializeField, Range(0f, 1f)] private float dampingRatio = 0.9f;
@@ -20,6 +23,8 @@ public class JunkPickup : MonoBehaviour, IGrabbable
     private bool hasOverrideAttractPoint;
     private bool isHeld;
     private bool isConveyorControlled;
+    private Transform currentHolder;
+    private UnityEngine.Object grabLockOwner;
     private SpriteRenderer[] spriteRenderers;
     private Collider2D[] colliders;
     private bool[] originalTriggerStates;
@@ -29,6 +34,12 @@ public class JunkPickup : MonoBehaviour, IGrabbable
 
     public bool IsHeld => isHeld;
     public bool IsConveyorControlled => isConveyorControlled;
+    public JunkVariant Variant => TryResolveNamedVariant(name, out JunkVariant namedVariant)
+        ? namedVariant
+        : junkVariant;
+    public Transform CurrentHolder => currentHolder;
+    public bool IsGrabLocked => grabLockOwner != null;
+    public UnityEngine.Object GrabLockOwner => grabLockOwner;
 
     private void Awake()
     {
@@ -73,7 +84,8 @@ public class JunkPickup : MonoBehaviour, IGrabbable
 
     public bool CanBeGrabbed(Inventory inventory)
     {
-        return true;
+        _ = inventory;
+        return !IsGrabLocked;
     }
 
     public void OnGrab(Transform grabParent)
@@ -86,6 +98,7 @@ public class JunkPickup : MonoBehaviour, IGrabbable
 
         SetConveyorControlled(false);
         isHeld = true;
+        currentHolder = grabParent;
         rb.simulated = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
         transform.SetParent(grabParent, true);
@@ -110,6 +123,7 @@ public class JunkPickup : MonoBehaviour, IGrabbable
     public void OnRelease(Vector2 throwForce)
     {
         isHeld = false;
+        currentHolder = null;
 
         if (joint != null)
         {
@@ -127,6 +141,63 @@ public class JunkPickup : MonoBehaviour, IGrabbable
 
         ApplySortingOrder(idleSortingOrder);
         OnReleased?.Invoke(this);
+    }
+
+    /// <summary>
+    /// Claims exclusive grab access. Repeating the claim with the same owner is idempotent.
+    /// </summary>
+    public bool TryLockGrab(UnityEngine.Object owner)
+    {
+        if (owner == null)
+        {
+            return false;
+        }
+
+        if (grabLockOwner != null && grabLockOwner != owner)
+        {
+            return false;
+        }
+
+        grabLockOwner = owner;
+        return true;
+    }
+
+    /// <summary>
+    /// Releases exclusive grab access only for the owner that established it.
+    /// </summary>
+    public bool UnlockGrab(UnityEngine.Object owner)
+    {
+        if (owner == null || grabLockOwner == null || grabLockOwner != owner)
+        {
+            return false;
+        }
+
+        grabLockOwner = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Clears the current hand joint without throwing the junk or raising OnReleased.
+    /// </summary>
+    public void OnDetachedFromGrabController()
+    {
+        isHeld = false;
+        currentHolder = null;
+
+        if (joint == null)
+        {
+            joint = GetComponent<TargetJoint2D>();
+        }
+
+        if (joint != null)
+        {
+            joint.enabled = false;
+        }
+
+        followTarget = null;
+        hasOverrideAttractPoint = false;
+        transform.SetParent(null, true);
+        ApplySortingOrder(idleSortingOrder);
     }
 
     /// <summary>
@@ -193,6 +264,50 @@ public class JunkPickup : MonoBehaviour, IGrabbable
             {
                 spriteRenderer.sortingOrder = order;
             }
+        }
+    }
+
+    private static bool TryResolveNamedVariant(string objectName, out JunkVariant variant)
+    {
+        variant = JunkVariant.Junk1;
+        if (string.IsNullOrWhiteSpace(objectName))
+        {
+            return false;
+        }
+
+        int cloneSuffix = objectName.IndexOf("(Clone)", StringComparison.Ordinal);
+        string normalizedName = cloneSuffix >= 0
+            ? objectName.Substring(0, cloneSuffix).Trim()
+            : objectName.Trim();
+
+        switch (normalizedName)
+        {
+            case "Junk_1":
+                variant = JunkVariant.Junk1;
+                return true;
+            case "Junk_2":
+                variant = JunkVariant.Junk2;
+                return true;
+            case "Junk_3":
+                variant = JunkVariant.Junk3;
+                return true;
+            case "Junk_4":
+                variant = JunkVariant.Junk4;
+                return true;
+            case "Junk_5":
+                variant = JunkVariant.Junk5;
+                return true;
+            case "Junk_6":
+                variant = JunkVariant.Junk6;
+                return true;
+            case "Junk_7":
+                variant = JunkVariant.Junk7;
+                return true;
+            case "Junk_8":
+                variant = JunkVariant.Junk8;
+                return true;
+            default:
+                return false;
         }
     }
 }

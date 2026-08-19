@@ -12,3 +12,12 @@ public interface IGrabContextReceiver
 {
     void SetGrabContext(Collider2D sourceCollider, Vector2 grabOrigin);
 }
+
+/// <summary>
+/// Optional transfer hook used when a grab controller gives up ownership without
+/// invoking the normal release behaviour.
+/// </summary>
+public interface IGrabControllerDetachReceiver
+{
+    void OnDetachedFromGrabController();
+}

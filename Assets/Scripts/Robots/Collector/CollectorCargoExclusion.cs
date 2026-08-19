@@ -10,4 +10,12 @@ public sealed class CollectorCargoExclusion : MonoBehaviour
     private bool detachOnCollection;
 
     public bool DetachOnCollection => detachOnCollection;
+
+    /// <summary>
+    /// Configures whether this excluded payload is detached before its corpse root
+    /// is recycled or destroyed.
+    /// </summary>
+    public void Configure(bool shouldDetachOnCollection) {
+        detachOnCollection = shouldDetachOnCollection;
+    }
 }

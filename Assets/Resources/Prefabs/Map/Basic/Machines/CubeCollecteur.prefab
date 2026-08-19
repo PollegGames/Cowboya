@@ -150,6 +150,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6350df1f9d87488384d18ab751b17262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collectionMode: 0
+  collectNormalCubesAsWhite: 1
   upgradeStore: {fileID: 11400000, guid: 1dee94155aed3224a9a4143dc8c26a1c, type: 2}
   upgradeConfig: {fileID: 11400000, guid: 1dee94155aed3224a9a4143dc8c26a1c, type: 2}
 --- !u!1 &542146199199913260

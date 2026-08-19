@@ -52,6 +52,11 @@ public class LevelEndVictoryTrigger : MonoBehaviour
         if (collision.CompareTag("Player") && IsAlwaysAllowedRunStep() && !hasRequestedLevelTransition)
         {
             hasRequestedLevelTransition = true;
+            if (!LaboratoryManager.TryFinalizeActiveVisit(collision))
+            {
+                hasRequestedLevelTransition = false;
+                return;
+            }
             CaptureAndSaveBeforeTransition(collision);
             LoadNextRunStep();
             return;
@@ -68,6 +73,11 @@ public class LevelEndVictoryTrigger : MonoBehaviour
             if (isVictoryDoor && isVictory && collision.CompareTag("Player") && !hasRequestedLevelTransition)
             {
                 hasRequestedLevelTransition = true;
+                if (!LaboratoryManager.TryFinalizeActiveVisit(collision))
+                {
+                    hasRequestedLevelTransition = false;
+                    return;
+                }
                 CaptureAndSaveBeforeTransition(collision);
                 LoadNextRunStep();
             }

@@ -1,8 +1,12 @@
+using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public class CowboyGrabController : MonoBehaviour
 {
+    private static readonly PickupType[] InventoryPickupTypes =
+        (PickupType[])Enum.GetValues(typeof(PickupType));
+
     private sealed class ArmGrabState
     {
         public IGrabbable HeldObject;
@@ -173,6 +177,65 @@ public class CowboyGrabController : MonoBehaviour
         rightGrab.HeldObject = null;
         SetHandAttractorState(CowboyArmSide.Left, false);
         SetHandAttractorState(CowboyArmSide.Right, false);
+    }
+
+    /// <summary>
+    /// Atomically relinquishes this controller's ownership of one precise item without
+    /// invoking the item's normal release behaviour.
+    /// </summary>
+    public bool TryDetachHeldObject(IGrabbable item)
+    {
+        if (item == null)
+        {
+            return false;
+        }
+
+        if (item is UnityEngine.Object unityItem && unityItem == null)
+        {
+            return false;
+        }
+
+        IGrabControllerDetachReceiver detachReceiver =
+            item as IGrabControllerDetachReceiver;
+        if (detachReceiver == null)
+        {
+            return false;
+        }
+
+        bool detachLeft = ReferenceEquals(leftGrab.HeldObject, item);
+        bool detachRight = ReferenceEquals(rightGrab.HeldObject, item);
+        Inventory currentInventory = GetInventory();
+        bool detachInventory = InventoryContainsReference(currentInventory, item);
+        if (!detachLeft && !detachRight && !detachInventory)
+        {
+            return false;
+        }
+
+        if (detachLeft)
+        {
+            leftGrab.HeldObject = null;
+        }
+
+        if (detachRight)
+        {
+            rightGrab.HeldObject = null;
+        }
+
+        RemoveInventoryReferences(currentInventory, item);
+
+        if (detachLeft)
+        {
+            SetHandAttractorState(CowboyArmSide.Left, false);
+        }
+
+        if (detachRight)
+        {
+            SetHandAttractorState(CowboyArmSide.Right, false);
+        }
+
+        detachReceiver.OnDetachedFromGrabController();
+
+        return true;
     }
 
     public bool HasHeldObject()
@@ -597,6 +660,41 @@ public class CowboyGrabController : MonoBehaviour
         if (slot.HasValue)
         {
             currentInventory.RemoveItem(slot.Value);
+        }
+    }
+
+    private static bool InventoryContainsReference(Inventory currentInventory, IGrabbable item)
+    {
+        if (currentInventory == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < InventoryPickupTypes.Length; i++)
+        {
+            if (ReferenceEquals(currentInventory.GetItem(InventoryPickupTypes[i]), item))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void RemoveInventoryReferences(Inventory currentInventory, IGrabbable item)
+    {
+        if (currentInventory == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < InventoryPickupTypes.Length; i++)
+        {
+            PickupType pickupType = InventoryPickupTypes[i];
+            if (ReferenceEquals(currentInventory.GetItem(pickupType), item))
+            {
+                currentInventory.RemoveItem(pickupType);
+            }
         }
     }
 }

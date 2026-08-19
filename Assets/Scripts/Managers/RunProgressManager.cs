@@ -33,6 +33,7 @@ public class RunProgressManager : MonoBehaviour
     [SerializeField] private SceneController sceneControllerPrefab;
     [SerializeField] private PlayerTemplate playerTemplate;
     [SerializeField] private PlayerRunStats runStats;
+    [SerializeField] private LaboratoryProgress laboratoryProgress = new LaboratoryProgress();
 
     // Maximum allowed values for dynamically generated configurations
     private const int MaxGridSize = 10;      // Maximum grid width/height
@@ -48,6 +49,18 @@ public class RunProgressManager : MonoBehaviour
     public int CurrentLevelIndex => currentLevelIndex;
     public int CurrentRunStepIndex => currentRunStepIndex;
     public PlayerRunStats RunStats => runStats;
+    public LaboratoryProgress LaboratoryProgress
+    {
+        get
+        {
+            if (laboratoryProgress == null)
+            {
+                laboratoryProgress = new LaboratoryProgress();
+            }
+
+            return laboratoryProgress;
+        }
+    }
     public bool HasActiveRun => hasActiveRun;
     public RunStepKind CurrentStepKind => GetCurrentStepKind();
 
@@ -114,6 +127,7 @@ public class RunProgressManager : MonoBehaviour
         hasActiveRun = false;
         playerTemplate.ResetStats();
         runStats.Reset();
+        LaboratoryProgress.Reset();
         SceneController.instance.LoadScene(runSandboxSceneName);
     }
     public void LoadStressTestLevel()
@@ -123,6 +137,7 @@ public class RunProgressManager : MonoBehaviour
         hasActiveRun = true;
         playerTemplate.ResetStats();
         runStats.Reset();
+        LaboratoryProgress.Reset();
         SceneController.instance.LoadScene(runNormalSceneName);
     }
     //load first level
@@ -134,6 +149,7 @@ public class RunProgressManager : MonoBehaviour
         hasActiveRun = true;
         playerTemplate.ResetStats();
         runStats.Reset();
+        LaboratoryProgress.Reset();
         LoadStep(0);
     }
 
@@ -182,6 +198,7 @@ public class RunProgressManager : MonoBehaviour
         hasActiveRun = true;
         playerTemplate.ResetStats();
         runStats.Reset();
+        LaboratoryProgress.Reset();
         LoadStep(0);
     }
 
@@ -232,6 +249,7 @@ public class RunProgressManager : MonoBehaviour
             return;
 
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.StaticLevel, SceneName = firstStaticLevelSceneName });
+        runSteps.Add(new RunStepDefinition { Kind = RunStepKind.Laboratory, SceneName = laboratorySceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.StaticLevel, SceneName = secondStaticLevelSceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.Laboratory, SceneName = laboratorySceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.GeneratedLevel, SceneName = runNormalSceneName });
