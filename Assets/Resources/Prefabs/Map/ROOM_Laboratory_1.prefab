@@ -961,6 +961,7 @@ MonoBehaviour:
   docBotPrefab: {fileID: 1866762707138231150, guid: 40ad8cb2c16b919418aeefd8d16051a4, type: 3}
   docBotSpawnPoint: {fileID: 2419558678564645299}
   whiteCubePrefab: {fileID: -3281786584640236443, guid: 965968b2004a3024dbf6cf8534199579, type: 3}
+  collectedCubeSpawner: {fileID: 0}
 --- !u!1 &552395487903275464
 GameObject:
   m_ObjectHideFlags: 0
@@ -3552,6 +3553,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpawnCubesCollected
       objectReference: {fileID: 0}
+    - target: {fileID: 662683361722610522, guid: 569f37b5ed238e14b866010931634d13, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 421b0765d5d491d439c0449a9602a488, type: 2}
     - target: {fileID: 1602069322536624324, guid: 569f37b5ed238e14b866010931634d13, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.16

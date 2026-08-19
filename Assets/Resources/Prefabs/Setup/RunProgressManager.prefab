@@ -60,6 +60,12 @@ MonoBehaviour:
   - Kind: 1
     SceneName: Level_Laboratory
     GeneratedConfig: {fileID: 0}
+  - Kind: 0
+    SceneName: Level_3
+    GeneratedConfig: {fileID: 0}
+  - Kind: 1
+    SceneName: Level_Laboratory
+    GeneratedConfig: {fileID: 0}
   - Kind: 2
     SceneName: MapGeneration
     GeneratedConfig: {fileID: 11400000, guid: 220ec21f1b0240946830eebd3a0ff311, type: 2}
@@ -67,8 +73,27 @@ MonoBehaviour:
   runNormalSceneName: MapGeneration
   firstStaticLevelSceneName: Level_1
   secondStaticLevelSceneName: Level_2
+  thirdStaticLevelSceneName: Level_3
   laboratorySceneName: Level_Laboratory
   runSandboxSceneName: SetupSandbox
   sceneControllerPrefab: {fileID: 3662908670334199631, guid: 3bf2939990ae2ab4f91281497ab365f7, type: 3}
   playerTemplate: {fileID: 11400000, guid: b07a5fd08e0ce9144996ac8b5fd66cc0, type: 2}
   runStats: {fileID: 11400000, guid: 905197fe5314bf546834e0276fed7add, type: 2}
+  laboratoryProgress:
+    schemaVersion: 3
+    hasVisitedLaboratory: 0
+    hasActiveVisit: 0
+    activeVisitId: -1
+    lastFinalizedVisitId: -1
+    lastVisitOutcome: 0
+    currentVisitDisposition: 0
+    nextVisitDisposition: 0
+    acceptedJunkThisVisit: 0
+    acceptedJunkVariant: 0
+    scientistDiedThisVisit: 0
+    availableWhiteCubeCount: 0
+    laboratoryFreeWhiteCubeCount: 0
+    whiteCubeCountPendingForNextVisit: 0
+    storedJunkCounts: 0000000000000000000000000000000000000000000000000000000000000000
+    incomingCubeCounts: 0000000000000000000000000000000000000000
+    laboratoryFreeCubeCounts: 0000000000000000000000000000000000000000
