@@ -1,34 +1,4 @@
-using System.Reflection;
 using NUnit.Framework;
-using UnityEngine;
-
-public class PlayerCrouchInputTests
-{
-    [Test]
-    public void RightStickDown_UsesPressAndReleaseThresholds()
-    {
-        var playerObject = new GameObject("Player input test");
-        PlayerInputReader reader = playerObject.AddComponent<PlayerInputReader>();
-        MethodInfo updateCrouch = typeof(PlayerInputReader).GetMethod(
-            "UpdateGamepadCrouch",
-            BindingFlags.Instance | BindingFlags.NonPublic);
-        Assert.IsNotNull(updateCrouch);
-
-        updateCrouch.Invoke(reader, new object[] { -0.5f });
-        Assert.IsFalse(reader.CrouchHeld);
-
-        updateCrouch.Invoke(reader, new object[] { -0.7f });
-        Assert.IsTrue(reader.CrouchHeld);
-
-        updateCrouch.Invoke(reader, new object[] { -0.5f });
-        Assert.IsTrue(reader.CrouchHeld);
-
-        updateCrouch.Invoke(reader, new object[] { -0.4f });
-        Assert.IsFalse(reader.CrouchHeld);
-
-        Object.DestroyImmediate(playerObject);
-    }
-}
 
 public class PlayerArmModeResolverTests
 {

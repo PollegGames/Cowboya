@@ -3,10 +3,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputReader : MonoBehaviour, IPlayerInput
 {
-    [Header("Right Stick Crouch")]
-    [SerializeField, Range(0f, 1f)] private float crouchPressThreshold = 0.6f;
-    [SerializeField, Range(0f, 1f)] private float crouchReleaseThreshold = 0.45f;
-
     public Vector2 Movement { get; private set; }
     public Vector2 Aim { get; private set; }
     public bool AimIsScreenPosition { get; private set; }
@@ -36,8 +32,6 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
 
     private InputSystem_Actions controls;
     private uint pressSequence;
-    private bool keyboardCrouchHeld;
-    private bool gamepadCrouchHeld;
 
     private void Awake()
     {
@@ -49,14 +43,11 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
         {
             AimIsScreenPosition = false;
             Aim = ctx.ReadValue<Vector2>();
-            UpdateGamepadCrouch(Aim.y);
         };
         controls.Player.Look.canceled += ctx =>
         {
             Aim = Vector2.zero;
             AimIsScreenPosition = false;
-            gamepadCrouchHeld = false;
-            RefreshCrouchHeld();
         };
         controls.Player.MouseAim.performed += ctx =>
         {
@@ -69,16 +60,8 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
             JumpDown = true;
         };
         controls.Player.Jump.canceled += ctx => JumpPressed = false;
-        controls.Player.Crouch.started += ctx =>
-        {
-            keyboardCrouchHeld = true;
-            RefreshCrouchHeld();
-        };
-        controls.Player.Crouch.canceled += ctx =>
-        {
-            keyboardCrouchHeld = false;
-            RefreshCrouchHeld();
-        };
+        controls.Player.Crouch.started += ctx => CrouchHeld = true;
+        controls.Player.Crouch.canceled += ctx => CrouchHeld = false;
 
         BindButton(controls.Player.LeftGrab,
             () => { LeftGrabDown = true; LeftGrabHeld = true; LeftGrabPressSequence = NextSequence(); },
@@ -104,21 +87,6 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
     {
         pressSequence++;
         return pressSequence;
-    }
-
-    private void UpdateGamepadCrouch(float verticalAim)
-    {
-        float pressPoint = Mathf.Clamp01(crouchPressThreshold);
-        float releasePoint = Mathf.Min(Mathf.Clamp01(crouchReleaseThreshold), pressPoint);
-        gamepadCrouchHeld = gamepadCrouchHeld
-            ? verticalAim <= -releasePoint
-            : verticalAim <= -pressPoint;
-        RefreshCrouchHeld();
-    }
-
-    private void RefreshCrouchHeld()
-    {
-        CrouchHeld = keyboardCrouchHeld || gamepadCrouchHeld;
     }
 
     private void OnEnable() => controls.Enable();

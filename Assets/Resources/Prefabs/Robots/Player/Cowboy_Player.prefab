@@ -2388,8 +2388,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d586f98c8b434a0aa73f8a138d3be39a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crouchPressThreshold: 0.6
-  crouchReleaseThreshold: 0.45
 --- !u!114 &1310665631610934291
 MonoBehaviour:
   m_ObjectHideFlags: 0
