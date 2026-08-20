@@ -329,7 +329,7 @@ public class RunProgressManager : MonoBehaviour
             return 1;
 
         if (sceneName == runNormalSceneName)
-            return 4;à-
+            return 4;
 
         if (sceneName == firstStaticLevelSceneName)
             return 0;
