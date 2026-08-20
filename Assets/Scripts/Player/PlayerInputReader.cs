@@ -3,6 +3,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputReader : MonoBehaviour, IPlayerInput
 {
+    [SerializeField, Range(0f, 1f)] private float leftStickCrouchPressThreshold = 0.6f;
+    [SerializeField, Range(0f, 1f)] private float leftStickCrouchReleaseThreshold = 0.45f;
+
     public Vector2 Movement { get; private set; }
     public Vector2 Aim { get; private set; }
     public bool AimIsScreenPosition { get; private set; }
@@ -32,13 +35,28 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
 
     private InputSystem_Actions controls;
     private uint pressSequence;
+    private bool keyboardCrouchHeld;
+    private bool gamepadCrouchHeld;
 
     private void Awake()
     {
         controls = new InputSystem_Actions();
 
-        controls.Player.Move.performed += ctx => Movement = ctx.ReadValue<Vector2>();
-        controls.Player.Move.canceled += ctx => Movement = Vector2.zero;
+        controls.Player.Move.performed += ctx =>
+        {
+            Movement = ctx.ReadValue<Vector2>();
+            if (ctx.control.device is Gamepad)
+                UpdateLeftStickCrouch(Movement.y);
+        };
+        controls.Player.Move.canceled += ctx =>
+        {
+            Movement = Vector2.zero;
+            if (ctx.control.device is Gamepad)
+            {
+                gamepadCrouchHeld = false;
+                RefreshCrouchHeld();
+            }
+        };
         controls.Player.Look.performed += ctx =>
         {
             AimIsScreenPosition = false;
@@ -60,8 +78,16 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
             JumpDown = true;
         };
         controls.Player.Jump.canceled += ctx => JumpPressed = false;
-        controls.Player.Crouch.started += ctx => CrouchHeld = true;
-        controls.Player.Crouch.canceled += ctx => CrouchHeld = false;
+        controls.Player.Crouch.started += ctx =>
+        {
+            keyboardCrouchHeld = true;
+            RefreshCrouchHeld();
+        };
+        controls.Player.Crouch.canceled += ctx =>
+        {
+            keyboardCrouchHeld = false;
+            RefreshCrouchHeld();
+        };
 
         BindButton(controls.Player.LeftGrab,
             () => { LeftGrabDown = true; LeftGrabHeld = true; LeftGrabPressSequence = NextSequence(); },
@@ -89,6 +115,21 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
         return pressSequence;
     }
 
+    private void UpdateLeftStickCrouch(float verticalMovement)
+    {
+        gamepadCrouchHeld = PlayerCrouchInputResolver.Resolve(
+            gamepadCrouchHeld,
+            verticalMovement,
+            leftStickCrouchPressThreshold,
+            leftStickCrouchReleaseThreshold);
+        RefreshCrouchHeld();
+    }
+
+    private void RefreshCrouchHeld()
+    {
+        CrouchHeld = keyboardCrouchHeld || gamepadCrouchHeld;
+    }
+
     private void OnEnable() => controls.Enable();
     private void OnDisable() => controls.Disable();
 
@@ -99,5 +140,25 @@ public class PlayerInputReader : MonoBehaviour, IPlayerInput
         LeftGrabUp = RightGrabUp = false;
         LeftAttackDown = RightAttackDown = false;
         LeftAttackUp = RightAttackUp = false;
+    }
+}
+
+public static class PlayerCrouchInputResolver
+{
+    /// <summary>
+    /// Resolves left-stick crouch state with separate press and release thresholds.
+    /// </summary>
+    public static bool Resolve(
+        bool wasHeld,
+        float verticalMovement,
+        float pressThreshold,
+        float releaseThreshold)
+    {
+        pressThreshold = Mathf.Clamp01(pressThreshold);
+        releaseThreshold = Mathf.Min(Mathf.Clamp01(releaseThreshold), pressThreshold);
+
+        return wasHeld
+            ? verticalMovement <= -releaseThreshold
+            : verticalMovement <= -pressThreshold;
     }
 }
