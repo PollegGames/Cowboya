@@ -1,12 +1,19 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
+/// <summary>
+/// Converts the player's abstract aim into a fixed-radius world target.
+/// </summary>
 public class ArcTargetFollower : MonoBehaviour
 {
-    public Transform circleCenter; // usually the player's torso
+    public Transform circleCenter;
     public float radius = 2f;
+    [SerializeField] private MonoBehaviour inputSource;
+    [SerializeField, Range(0f, 1f)] private float aimDeadzone = 0.2f;
 
     private Camera mainCamera;
+    private IPlayerInput input;
+    private Vector2 lastAimDirection = Vector2.right;
+    private bool hasAimDirection;
     private bool isFacingRight = true;
 
     public bool IsFacingRight => isFacingRight;
@@ -14,27 +21,57 @@ public class ArcTargetFollower : MonoBehaviour
     private void Awake()
     {
         mainCamera = Camera.main;
+        CacheInput();
     }
 
-    void Update()
+    private void Update()
     {
-        if (circleCenter == null || mainCamera == null)
+        if (circleCenter == null)
             return;
 
-        // 1. Get the mouse position
-        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        mouseWorld.z = 0f;
+        CacheInput();
+        if (input == null)
+            return;
 
-        // 2. Calcul direction → position sur le cercle
-        Vector3 direction = (mouseWorld - circleCenter.position).normalized;
-        Vector3 targetPos = circleCenter.position + direction * radius;
-        transform.position = targetPos;
+        Vector2 direction = ResolveAimDirection();
+        if (direction.sqrMagnitude >= aimDeadzone * aimDeadzone)
+        {
+            lastAimDirection = direction.normalized;
+            hasAimDirection = true;
+        }
 
-        // 3. Rotation de la cible vers la souris (optionnel)
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        if (!hasAimDirection)
+            return;
+
+        transform.position = circleCenter.position + (Vector3)(lastAimDirection * radius);
+        float angle = Mathf.Atan2(lastAimDirection.y, lastAimDirection.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        isFacingRight = lastAimDirection.x >= 0f;
+    }
 
-        // 4. Determine if the target is to the left or right of the player
-        isFacingRight = transform.position.x <= circleCenter.position.x;
+    private Vector2 ResolveAimDirection()
+    {
+        Vector2 aim = input.Aim;
+        if (!input.AimIsScreenPosition)
+            return aim;
+
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        if (mainCamera == null)
+            return Vector2.zero;
+
+        Vector3 aimWorld = mainCamera.ScreenToWorldPoint(aim);
+        return (Vector2)(aimWorld - circleCenter.position);
+    }
+
+    private void CacheInput()
+    {
+        if (input != null)
+            return;
+
+        input = inputSource as IPlayerInput;
+        if (input == null)
+            input = GetComponentInParent<IPlayerInput>();
     }
 }

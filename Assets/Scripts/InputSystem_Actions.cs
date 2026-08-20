@@ -181,9 +181,147 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""initialStateCheck"": false,
                     ""priority"": 0
+                },
+                {
+                    ""name"": ""LeftGrab"",
+                    ""type"": ""Button"",
+                    ""id"": ""a0e90195-5506-40f5-b9cc-d1f8175f1fb1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""RightGrab"",
+                    ""type"": ""Button"",
+                    ""id"": ""78bc3844-5c95-424d-b47d-986756bf34fc"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""LeftAttack"",
+                    ""type"": ""Button"",
+                    ""id"": ""a14c2355-6e41-4fcc-a606-d663057246cb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""RightAttack"",
+                    ""type"": ""Button"",
+                    ""id"": ""3dba9e41-5118-4ba6-ad62-ef7c43ebf6f6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""MouseAim"",
+                    ""type"": ""Value"",
+                    ""id"": ""2c75898f-f76a-449d-9b19-7342c9259eaa"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true,
+                    ""priority"": 0
                 }
             ],
             ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""8b61a818-0546-47c4-afc4-807747fa3dd9"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""LeftGrab"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""60af3dfb-447b-4365-a6e7-b3b963e83707"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""LeftGrab"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""55df9aaa-c153-405a-8dcc-eb0fbb3ba017"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RightGrab"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""99357f36-ab97-41e0-a90f-36b988145f56"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""RightGrab"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""47fbc41e-67a3-48d7-865f-5305d204114d"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""LeftAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""166383a1-58bd-4a92-a07b-010998564440"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""LeftAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5b639604-c859-4920-a956-c8fe7c957e88"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RightAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f468d3cb-17a2-49e0-ac1f-96735f0df83e"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""RightAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
                 {
                     ""name"": """",
                     ""id"": ""978bfe49-cc26-4a3d-ab7b-7d7a29327403"",
@@ -330,11 +468,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""8c8e490b-c610-4785-884f-f04217b23ca4"",
-                    ""path"": ""<Pointer>/delta"",
+                    ""path"": ""<Pointer>/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Touch"",
-                    ""action"": ""Look"",
+                    ""action"": ""MouseAim"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1204,6 +1342,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_LeftGrab = m_Player.FindAction("LeftGrab", throwIfNotFound: true);
+        m_Player_RightGrab = m_Player.FindAction("RightGrab", throwIfNotFound: true);
+        m_Player_LeftAttack = m_Player.FindAction("LeftAttack", throwIfNotFound: true);
+        m_Player_RightAttack = m_Player.FindAction("RightAttack", throwIfNotFound: true);
+        m_Player_MouseAim = m_Player.FindAction("MouseAim", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1307,6 +1450,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Previous;
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Sprint;
+    private readonly InputAction m_Player_LeftGrab;
+    private readonly InputAction m_Player_RightGrab;
+    private readonly InputAction m_Player_LeftAttack;
+    private readonly InputAction m_Player_RightAttack;
+    private readonly InputAction m_Player_MouseAim;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1354,6 +1502,26 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Sprint".
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/LeftGrab".
+        /// </summary>
+        public InputAction @LeftGrab => m_Wrapper.m_Player_LeftGrab;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/RightGrab".
+        /// </summary>
+        public InputAction @RightGrab => m_Wrapper.m_Player_RightGrab;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/LeftAttack".
+        /// </summary>
+        public InputAction @LeftAttack => m_Wrapper.m_Player_LeftAttack;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/RightAttack".
+        /// </summary>
+        public InputAction @RightAttack => m_Wrapper.m_Player_RightAttack;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/MouseAim".
+        /// </summary>
+        public InputAction @MouseAim => m_Wrapper.m_Player_MouseAim;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1407,6 +1575,21 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @LeftGrab.started += instance.OnLeftGrab;
+            @LeftGrab.performed += instance.OnLeftGrab;
+            @LeftGrab.canceled += instance.OnLeftGrab;
+            @RightGrab.started += instance.OnRightGrab;
+            @RightGrab.performed += instance.OnRightGrab;
+            @RightGrab.canceled += instance.OnRightGrab;
+            @LeftAttack.started += instance.OnLeftAttack;
+            @LeftAttack.performed += instance.OnLeftAttack;
+            @LeftAttack.canceled += instance.OnLeftAttack;
+            @RightAttack.started += instance.OnRightAttack;
+            @RightAttack.performed += instance.OnRightAttack;
+            @RightAttack.canceled += instance.OnRightAttack;
+            @MouseAim.started += instance.OnMouseAim;
+            @MouseAim.performed += instance.OnMouseAim;
+            @MouseAim.canceled += instance.OnMouseAim;
         }
 
         /// <summary>
@@ -1445,6 +1628,21 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @LeftGrab.started -= instance.OnLeftGrab;
+            @LeftGrab.performed -= instance.OnLeftGrab;
+            @LeftGrab.canceled -= instance.OnLeftGrab;
+            @RightGrab.started -= instance.OnRightGrab;
+            @RightGrab.performed -= instance.OnRightGrab;
+            @RightGrab.canceled -= instance.OnRightGrab;
+            @LeftAttack.started -= instance.OnLeftAttack;
+            @LeftAttack.performed -= instance.OnLeftAttack;
+            @LeftAttack.canceled -= instance.OnLeftAttack;
+            @RightAttack.started -= instance.OnRightAttack;
+            @RightAttack.performed -= instance.OnRightAttack;
+            @RightAttack.canceled -= instance.OnRightAttack;
+            @MouseAim.started -= instance.OnMouseAim;
+            @MouseAim.performed -= instance.OnMouseAim;
+            @MouseAim.canceled -= instance.OnMouseAim;
         }
 
         /// <summary>
@@ -1819,6 +2017,41 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftGrab" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftGrab(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightGrab" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightGrab(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftAttack(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightAttack(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseAim" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseAim(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

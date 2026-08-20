@@ -22,8 +22,8 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     public IPlayerInput Input => input;
     private bool flipped = false;
     private float horizontalInput;
-    private float verticalInput;
     private bool isCrouchingInput;
+    private const float DirectionDeadzone = 0.1f;
 
     [SerializeField] private EnergyBot energyBot;
     [SerializeField] private PlayerBrain playerBrain;
@@ -76,17 +76,15 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
         if (input != null)
         {
             horizontalInput = input.Movement.x;
-            verticalInput = input.Movement.y;
 
-
-            if (Mathf.Abs(horizontalInput) > 0.1f)
+            if (Mathf.Abs(horizontalInput) > DirectionDeadzone)
                 lookDirection = new Vector2(Mathf.Sign(horizontalInput), 0f);
         }
 
         TryFlip();
+        HandleCrouch();
         HandleMovement();
         HandleJump();
-        HandleCrouch();
     }
 
     private void TryFlip()
@@ -109,12 +107,13 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 
     private void HandleMovement()
     {
-        locomotion.HandleMovement(horizontalInput, flipped);
+        locomotion.HandleMovement(isCrouchingInput ? 0f : horizontalInput, flipped);
     }
 
     private void HandleJump()
     {
-        if (verticalInput > 0)
+        if (input != null && input.JumpDown && !isCrouchingInput
+            && Mathf.Abs(horizontalInput) > DirectionDeadzone)
         {
             locomotion.Jump();
         }
@@ -122,20 +121,21 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 
     private void HandleCrouch()
     {
-        if (verticalInput < 0 && !isCrouchingInput)
+        bool crouchHeld = input != null && input.CrouchHeld;
+        if (crouchHeld && !isCrouchingInput)
         {
             locomotion.Crouch();
         }
-        else if (verticalInput >= 0 && isCrouchingInput)
+        else if (!crouchHeld && isCrouchingInput)
         {
             locomotion.Uncrouch();
         }
 
-        isCrouchingInput = verticalInput < 0;
+        isCrouchingInput = crouchHeld;
     }
 
     /// <inheritdoc />
-    public Vector2 Movement => new Vector2(horizontalInput, verticalInput);
+    public Vector2 Movement => new Vector2(isCrouchingInput ? 0f : horizontalInput, 0f);
 
     /// <inheritdoc />
     public Vector2 DesiredFacing
@@ -154,7 +154,7 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
     {
         request = default;
 
-        if (input == null || !input.PrimaryAttack || robotBehaviour == null)
+        if (input == null || (!input.LeftAttackHeld && !input.RightAttackHeld) || robotBehaviour == null)
             return false;
 
         if (robotBehaviour.CurrentState != RobotState.Alive)
@@ -219,8 +219,8 @@ public class PlayerMovementController : MonoBehaviour, ILookDirectionProvider, I
 
         if (input != null)
         {
-            Vector2 lookInput = input.Look;
-            if (lookInput.sqrMagnitude > 0.0001f)
+            Vector2 lookInput = input.Aim;
+            if (!input.AimIsScreenPosition && lookInput.sqrMagnitude > 0.0001f)
                 return lookInput;
         }
 
