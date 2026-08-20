@@ -924,6 +924,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PreviewUpgradeMachine
       objectReference: {fileID: 0}
+    - target: {fileID: 542146199199913260, guid: 2a371aaf8fbda3c48842b9142cfcf691, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3865668901669927916, guid: 2a371aaf8fbda3c48842b9142cfcf691, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -989,6 +993,10 @@ PrefabInstance:
     - target: {fileID: 542146199199913260, guid: a8b8464146149d849926e2118e5bb26a, type: 3}
       propertyPath: m_Name
       value: PreviewCheckGreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 542146199199913260, guid: a8b8464146149d849926e2118e5bb26a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3865668901669927916, guid: a8b8464146149d849926e2118e5bb26a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -1056,6 +1064,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PreviewCubeBlue
       objectReference: {fileID: 0}
+    - target: {fileID: 542146199199913260, guid: e362e0e0514cb074980380e389bd9d61, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226794923736213634, guid: e362e0e0514cb074980380e389bd9d61, type: 3}
+      propertyPath: m_VersionIndex
+      value: 16410
+      objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: e362e0e0514cb074980380e389bd9d61, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.05
@@ -1118,10 +1134,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: PreviewCubeWhite
       objectReference: {fileID: 0}
+    - target: {fileID: 542146199199913260, guid: 5eb61da34e2642149af2be0faa6790e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3865668901669927916, guid: 5eb61da34e2642149af2be0faa6790e7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 54e8d88ad6e1f0c40b4e78d35a343054, type: 2}
+    - target: {fileID: 5226794923736213634, guid: 5eb61da34e2642149af2be0faa6790e7, type: 3}
+      propertyPath: m_VersionIndex
+      value: 16404
+      objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: 5eb61da34e2642149af2be0faa6790e7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.050000906
@@ -1183,6 +1207,10 @@ PrefabInstance:
     - target: {fileID: 542146199199913260, guid: dfab92e7c38825048bd97e46ce3cb942, type: 3}
       propertyPath: m_Name
       value: PreviewCubeGreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 542146199199913260, guid: dfab92e7c38825048bd97e46ce3cb942, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3865668901669927916, guid: dfab92e7c38825048bd97e46ce3cb942, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -1250,6 +1278,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PreviewCrossRed
       objectReference: {fileID: 0}
+    - target: {fileID: 542146199199913260, guid: d34f5f89db8e3cc4f84e9d467250ffc6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3865668901669927916, guid: d34f5f89db8e3cc4f84e9d467250ffc6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -1316,10 +1348,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PreviewCubeViolet
       objectReference: {fileID: 0}
-    - target: {fileID: 3865668901669927916, guid: cce3e243d2ef7b8478a06ef65c99d674, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 4ccf5d1cc4a7c7d4e83d799b649349ed, type: 2}
+    - target: {fileID: 542146199199913260, guid: cce3e243d2ef7b8478a06ef65c99d674, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226794923736213634, guid: cce3e243d2ef7b8478a06ef65c99d674, type: 3}
+      propertyPath: m_VersionIndex
+      value: 16413
+      objectReference: {fileID: 0}
     - target: {fileID: 7047981207480481909, guid: cce3e243d2ef7b8478a06ef65c99d674, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.050000906
@@ -1451,6 +1487,10 @@ PrefabInstance:
     - target: {fileID: 542146199199913260, guid: 7c0b14ca23393064ca194215710310bf, type: 3}
       propertyPath: m_Name
       value: PreviewCubeRed
+      objectReference: {fileID: 0}
+    - target: {fileID: 542146199199913260, guid: 7c0b14ca23393064ca194215710310bf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3865668901669927916, guid: 7c0b14ca23393064ca194215710310bf, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
