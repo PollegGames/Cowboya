@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CowBoya.Robots;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -10,6 +11,8 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
     [SerializeField, Range(5f, 15f)] private float frequency = 10f;
     [SerializeField, Range(0f, 1f)] private float dampingRatio = 0.9f;
     [SerializeField, Min(0f)] private float maxForce = 2500f;
+    [SerializeField, Min(0f), Tooltip("Caps grab force relative to the complete robot mass so light robots do not snap toward the hand.")]
+    private float maximumGrabAcceleration = 70f;
     [SerializeField, Min(0f)] private float releaseVelocityLimit = 12f;
 
     [Header("Robot Systems")]
@@ -17,6 +20,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
     [SerializeField] private bool resetIntentOnRelease = true;
 
     private readonly List<PausedBehaviour> pausedBehaviours = new List<PausedBehaviour>();
+    private readonly List<PausedBehaviour> pendingReleaseRestores = new List<PausedBehaviour>();
     private readonly List<Rigidbody2D> rotationFrozenBodies = new List<Rigidbody2D>();
     private RobotStateController stateController;
     private RobotBodyController bodyController;
@@ -30,6 +34,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
     private bool grabbed;
     private bool jointWasCreated;
     private bool activeJointWasEnabled;
+    private int releaseRestoreFrame = -1;
 
     public event Action<EnemyGrabbable> OnGrabStarted;
     public event Action<EnemyGrabbable> OnGrabEnded;
@@ -49,12 +54,23 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
 
     private void OnDisable()
     {
+        RestorePendingReleaseBehaviours();
+
         if (grabbed)
         {
             EndGrab(
                 applyThrow: false,
                 throwForce: Vector2.zero,
-                restoreRobotIntent: false);
+                restoreRobotIntent: false,
+                delayReleasePhysicsRestore: false);
+        }
+    }
+
+    private void Update()
+    {
+        if (releaseRestoreFrame >= 0 && Time.frameCount >= releaseRestoreFrame)
+        {
+            RestorePendingReleaseBehaviours();
         }
     }
 
@@ -87,6 +103,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         }
 
         CacheReferences();
+        RestorePendingReleaseBehaviours();
         activeBody = ResolveActiveBody();
 
         if (activeBody == null)
@@ -118,7 +135,8 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         EndGrab(
             applyThrow: true,
             throwForce: throwForce,
-            restoreRobotIntent: true);
+            restoreRobotIntent: true,
+            delayReleasePhysicsRestore: true);
     }
 
     /// <summary>
@@ -129,7 +147,8 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         EndGrab(
             applyThrow: false,
             throwForce: Vector2.zero,
-            restoreRobotIntent: true);
+            restoreRobotIntent: true,
+            delayReleasePhysicsRestore: true);
     }
 
     public void SetGrabContext(Collider2D sourceCollider, Vector2 grabOrigin)
@@ -212,6 +231,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         PauseBehaviour(bodyController);
         PauseBehaviour(heart);
         PauseBehaviour(brain);
+        PausePuppetBinders();
 
         if (extraBehavioursToPause == null)
         {
@@ -221,6 +241,15 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         for (int i = 0; i < extraBehavioursToPause.Length; i++)
         {
             PauseBehaviour(extraBehavioursToPause[i]);
+        }
+    }
+
+    private void PausePuppetBinders()
+    {
+        SimplePuppetBinder[] binders = GetComponentsInChildren<SimplePuppetBinder>(true);
+        for (int i = 0; i < binders.Length; i++)
+        {
+            PauseBehaviour(binders[i]);
         }
     }
 
@@ -248,11 +277,17 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         behaviour.enabled = false;
     }
 
-    private void ResumeRobotBehaviours()
+    private void ResumeRobotBehaviours(bool delayReleasePhysicsRestore)
     {
         for (int i = 0; i < pausedBehaviours.Count; i++)
         {
             PausedBehaviour paused = pausedBehaviours[i];
+            if (delayReleasePhysicsRestore && IsReleasePhysicsDriver(paused.Behaviour))
+            {
+                pendingReleaseRestores.Add(paused);
+                continue;
+            }
+
             if (paused.Behaviour != null)
             {
                 paused.Behaviour.enabled = paused.WasEnabled;
@@ -260,6 +295,47 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         }
 
         pausedBehaviours.Clear();
+
+        if (pendingReleaseRestores.Count > 0)
+        {
+            releaseRestoreFrame = Time.frameCount + 1;
+        }
+    }
+
+    private static bool IsReleasePhysicsDriver(Behaviour behaviour)
+    {
+        return behaviour is SimplePuppetBinder
+            || behaviour is RobotBodyController
+            || behaviour is CollectorRobotBodyController;
+    }
+
+    private void RestorePendingReleaseBehaviours()
+    {
+        bool robotIsDead = stateController != null
+            && stateController.CurrentState == RobotState.Dead;
+
+        for (int i = 0; i < pendingReleaseRestores.Count; i++)
+        {
+            PausedBehaviour pending = pendingReleaseRestores[i];
+            if (pending.Behaviour != null
+                && pending.Behaviour is SimplePuppetBinder)
+            {
+                pending.Behaviour.enabled = robotIsDead ? false : pending.WasEnabled;
+            }
+        }
+
+        for (int i = 0; i < pendingReleaseRestores.Count; i++)
+        {
+            PausedBehaviour pending = pendingReleaseRestores[i];
+            if (pending.Behaviour != null
+                && !(pending.Behaviour is SimplePuppetBinder))
+            {
+                pending.Behaviour.enabled = pending.WasEnabled;
+            }
+        }
+
+        pendingReleaseRestores.Clear();
+        releaseRestoreFrame = -1;
     }
 
     private void RestartRobotIntent()
@@ -320,12 +396,38 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         activeJoint.autoConfigureTarget = false;
         activeJoint.frequency = frequency;
         activeJoint.dampingRatio = dampingRatio;
-        activeJoint.maxForce = maxForce;
+        activeJoint.maxForce = CalculateMaximumJointForce();
 
         if (!keepCreatedJoint || !grabbed)
         {
             activeJoint.enabled = false;
         }
+    }
+
+    private float CalculateMaximumJointForce()
+    {
+        if (maxForce <= 0f || maximumGrabAcceleration <= 0f)
+        {
+            return 0f;
+        }
+
+        float totalDynamicMass = 0f;
+        Rigidbody2D[] bodies = GetComponentsInChildren<Rigidbody2D>(true);
+        for (int i = 0; i < bodies.Length; i++)
+        {
+            Rigidbody2D body = bodies[i];
+            if (body != null && body.simulated && body.bodyType == RigidbodyType2D.Dynamic)
+            {
+                totalDynamicMass += body.mass;
+            }
+        }
+
+        if (totalDynamicMass <= 0f && activeBody != null)
+        {
+            totalDynamicMass = activeBody.mass;
+        }
+
+        return Mathf.Min(maxForce, totalDynamicMass * maximumGrabAcceleration);
     }
 
     private void DisableJoint()
@@ -358,7 +460,11 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         activeBody.linearVelocity = activeBody.linearVelocity.normalized * releaseVelocityLimit;
     }
 
-    private void EndGrab(bool applyThrow, Vector2 throwForce, bool restoreRobotIntent)
+    private void EndGrab(
+        bool applyThrow,
+        Vector2 throwForce,
+        bool restoreRobotIntent,
+        bool delayReleasePhysicsRestore)
     {
         if (!grabbed)
         {
@@ -373,18 +479,16 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         }
 
         RestoreFrozenRotations();
-        ResumeRobotBehaviours();
+        ResumeRobotBehaviours(delayReleasePhysicsRestore);
 
-        if (restoreRobotIntent)
+        if (stateController != null && stateController.CurrentState == RobotState.Dead)
         {
-            if (stateController != null && stateController.CurrentState == RobotState.Dead)
-            {
-                stateController.ReapplyDeathState();
-            }
-            else
-            {
-                RestartRobotIntent();
-            }
+            stateController.ReapplyDeathState();
+        }
+        else if (restoreRobotIntent
+            && (stateController == null || stateController.CurrentState == RobotState.Alive))
+        {
+            RestartRobotIntent();
         }
 
         if (jointWasCreated && activeJoint != null)

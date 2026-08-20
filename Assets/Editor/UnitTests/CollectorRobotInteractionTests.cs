@@ -68,9 +68,17 @@ public class CollectorRobotInteractionTests {
         grabController.Release(CowboyArmSide.Left, 0f);
 
         Assert.IsFalse(grabController.HasHeldObject(CowboyArmSide.Left));
+        Assert.IsFalse(body.enabled,
+            "Collector locomotion must remain paused with its binder for the release frame.");
+        Assert.IsFalse(binder.enabled,
+            "The puppet binder must remain disabled for the release frame.");
+        Assert.IsEmpty(collector.GetComponentsInChildren<TargetJoint2D>(true));
+
+        SetPrivateField(grabbable, "releaseRestoreFrame", Time.frameCount);
+        InvokePrivateMethod(grabbable, "Update");
+
         Assert.IsTrue(body.enabled);
         Assert.IsTrue(binder.enabled);
-        Assert.IsEmpty(collector.GetComponentsInChildren<TargetJoint2D>(true));
     }
 
     [Test]
@@ -118,6 +126,30 @@ public class CollectorRobotInteractionTests {
         Assert.IsFalse(motor.IsFlightActive, "A dead Collector must stop applying flight forces.");
         Assert.IsFalse(binder.enabled, "A dead Collector must release puppet rotation control.");
         Assert.IsFalse(grabbable.CanBeGrabbed(null), "Dead enemies follow the existing alive-only grab policy.");
+    }
+
+    [Test]
+    public void CollectorPrefab_DeathDuringReleaseDelayKeepsBinderDisabled() {
+        GameObject collector = InstantiateCollector();
+        EnemyGrabbable grabbable = collector.GetComponent<EnemyGrabbable>();
+        RobotStateController state = collector.GetComponent<RobotStateController>();
+        SimplePuppetBinder binder = collector.GetComponent<SimplePuppetBinder>();
+        Collider2D targetCollider = GetBodyCollider(collector);
+        Transform hand = CreateObject("Collector death delay hand").transform;
+        hand.position = targetCollider.bounds.center;
+
+        grabbable.SetGrabContext(targetCollider, hand.position);
+        grabbable.OnGrab(hand);
+        grabbable.OnRelease(Vector2.zero);
+
+        Assert.IsFalse(binder.enabled);
+        state.SetInitialDeadState();
+        SetPrivateField(grabbable, "releaseRestoreFrame", Time.frameCount);
+        InvokePrivateMethod(grabbable, "Update");
+
+        Assert.AreEqual(RobotState.Dead, state.CurrentState);
+        Assert.IsFalse(binder.enabled,
+            "Delayed release restoration must not reactivate a dead robot's pose driver.");
     }
 
     private GameObject InstantiateCollector() {
