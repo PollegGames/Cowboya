@@ -49,7 +49,6 @@ public class ArmTargetController : MonoBehaviour
     [SerializeField] private PlayerBrain playerBrain;
     [SerializeField] private RobotStateController stateController;
     [SerializeField] private float holdEnergyInterval = 1f;
-    [SerializeField] private float holdEnergyCostPerInterval = 1f;
 
     [Header("Attack")]
     [SerializeField] private float attackSpeedThreshold = 60f;
@@ -307,7 +306,7 @@ public class ArmTargetController : MonoBehaviour
         if (state.HeldInput && !state.WasHeldInput)
         {
             state.NextHoldEnergyTime = Time.time + Mathf.Max(0.01f, holdEnergyInterval);
-            if (!TrySpendHoldEnergy())
+            if (!TrySpendGrabEnergy())
             {
                 state.Mode = PlayerArmMode.Rest;
                 state.DriveInput = false;
@@ -333,7 +332,7 @@ public class ArmTargetController : MonoBehaviour
 
     private void HandleHoldEnergy(CowboyArmSide arm, ArmRuntimeState state)
     {
-        if (!state.HeldInput || holdEnergyCostPerInterval <= 0f)
+        if (!state.HeldInput)
         {
             return;
         }
@@ -344,7 +343,7 @@ public class ArmTargetController : MonoBehaviour
             return;
         }
 
-        if (!TrySpendHoldEnergy())
+        if (!TrySpendGrabEnergy())
         {
             state.HeldInput = false;
             grabController?.SetHandAttractorState(arm, false);
@@ -594,7 +593,7 @@ public class ArmTargetController : MonoBehaviour
         solver.enabled = enabled;
     }
 
-    private bool TrySpendHoldEnergy()
+    private bool TrySpendGrabEnergy()
     {
         if (!IsAlive())
         {
@@ -603,18 +602,12 @@ public class ArmTargetController : MonoBehaviour
 
         if (playerBrain != null)
         {
-            return playerBrain.TrySpendEnergy(EnergyAction.Grab, 0f, holdEnergyCostPerInterval);
+            return playerBrain.TrySpendEnergy(EnergyAction.Grab);
         }
 
         if (stateController != null)
         {
-            if (!stateController.CanPerformEnergy(holdEnergyCostPerInterval))
-            {
-                return false;
-            }
-
-            stateController.ConsumeEnergy(holdEnergyCostPerInterval);
-            return true;
+            return stateController.TryConsumeEnergy(EnergyAction.Grab);
         }
 
         return true;
@@ -627,22 +620,10 @@ public class ArmTargetController : MonoBehaviour
             return false;
         }
 
-        if (stateController.Stats == null)
-        {
-            return false;
-        }
-
-        float energyCost = stateController.Stats.AttackEnergyCost;
-
-        if (energyCost <= 0f)
-        {
-            return false;
-        }
-
         if (playerBrain != null)
-            return playerBrain.TrySpendEnergy(EnergyAction.Attack, 0f, energyCost);
+            return playerBrain.TrySpendEnergy(EnergyAction.Attack);
 
-        return stateController.PerformAttackByEnergy(energyCost);
+        return stateController.TryConsumeEnergy(EnergyAction.Attack);
     }
 
     private bool IsAlive()

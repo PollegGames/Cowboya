@@ -23,8 +23,6 @@ public class RobotLocomotionController : MonoBehaviour
 
     [Header("Movement Settings")]
     [SerializeField, Min(0f)] private float jumpAnimationDuration = 0.4f;
-    [SerializeField] private float energyCostPerJump = 3f;
-    [SerializeField] private float energyCostPerCrouch = 1f;
     [SerializeField] public bool isPlayerControlled = false;
 
     public event Action OnJumpStarted;
@@ -58,8 +56,6 @@ public class RobotLocomotionController : MonoBehaviour
         {
             animator = GetComponentInChildren<Animator>();
         }
-
-        PushCostsToEnergyBot();
     }
 
     /// <summary>
@@ -263,14 +259,4 @@ public class RobotLocomotionController : MonoBehaviour
         return true;
     }
 
-    private void PushCostsToEnergyBot()
-    {
-        if (energyBot == null)
-        {
-            return;
-        }
-
-        energyBot.SetActionCost(EnergyAction.Jump, energyCostPerJump);
-        energyBot.SetActionCost(EnergyAction.Crouch, energyCostPerCrouch);
-    }
 }

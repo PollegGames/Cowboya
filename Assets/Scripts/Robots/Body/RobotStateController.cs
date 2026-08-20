@@ -175,6 +175,23 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         energyBot?.TryConsumeRaw(amount);
     }
 
+    /// <summary>
+    /// Attempts to consume the configured cost for an energy action.
+    /// </summary>
+    public bool TryConsumeEnergy(EnergyAction action, float deltaTime = 0f)
+    {
+        if (CurrentState != RobotState.Alive)
+            return false;
+
+        if (energyBot != null)
+            return energyBot.TryConsume(action, deltaTime);
+
+        if (action == EnergyAction.Attack && Stats != null)
+            return PerformAttackByEnergy(Stats.AttackEnergyCost);
+
+        return true;
+    }
+
     public void PerformAttack(AttackType attackType)
     {
         if (CurrentState != RobotState.Alive || (Stats != null && !Stats.AbleToAttack))
