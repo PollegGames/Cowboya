@@ -49,7 +49,7 @@ public class ArmTargetController : MonoBehaviour
     [SerializeField] private PlayerBrain playerBrain;
     [SerializeField] private RobotStateController stateController;
     [SerializeField] private float holdEnergyInterval = 1f;
-    [SerializeField] private float holdEnergyCostPerInterval = 0.1f;
+    [SerializeField] private float holdEnergyCostPerInterval = 1f;
 
     [Header("Attack")]
     [SerializeField] private float attackSpeedThreshold = 60f;
@@ -307,6 +307,13 @@ public class ArmTargetController : MonoBehaviour
         if (state.HeldInput && !state.WasHeldInput)
         {
             state.NextHoldEnergyTime = Time.time + Mathf.Max(0.01f, holdEnergyInterval);
+            if (!TrySpendHoldEnergy())
+            {
+                state.Mode = PlayerArmMode.Rest;
+                state.DriveInput = false;
+                state.HeldInput = false;
+                grabController?.SetHandAttractorState(arm, false);
+            }
         }
 
         if (!state.HeldInput && state.WasHeldInput && ArmHasHeldObject(arm))

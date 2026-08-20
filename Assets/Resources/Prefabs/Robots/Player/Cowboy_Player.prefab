@@ -2554,7 +2554,7 @@ MonoBehaviour:
   jumpBoolParameter: IsJumping
   crouchBoolParameter: IsCrouching
   jumpAnimationDuration: 0.4
-  energyCostPerJump: 1.5
+  energyCostPerJump: 3
   energyCostPerCrouch: 3
   isPlayerControlled: 1
 --- !u!114 &193686182613551049
@@ -2632,7 +2632,7 @@ MonoBehaviour:
   playerBrain: {fileID: 7969949290834653241}
   stateController: {fileID: 8768979520666320589}
   holdEnergyInterval: 1
-  holdEnergyCostPerInterval: 0.1
+  holdEnergyCostPerInterval: 1
   attackSpeedThreshold: 50
   attackHoldAfterSlowDuration: 0.5
   attackCooldownAfterHoldReleaseDuration: 2
