@@ -5470,6 +5470,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1118626978
 MonoBehaviour:
@@ -6072,6 +6073,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!212 &1126697662
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -6117,6 +6119,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.14150941, g: 0.12749197, b: 0.12749197, a: 1}
   m_FlipX: 0
@@ -6126,7 +6129,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!43 &1133133427
 Mesh:
@@ -6879,6 +6881,10 @@ PrefabInstance:
     - target: {fileID: 814456244760004463, guid: 7937296ba2d4d36468595eae44fbd3e9, type: 3}
       propertyPath: m_VersionIndex
       value: 17958
+      objectReference: {fileID: 0}
+    - target: {fileID: 910000000000000001, guid: 7937296ba2d4d36468595eae44fbd3e9, type: 3}
+      propertyPath: leftDoor
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1096303338772001335, guid: 7937296ba2d4d36468595eae44fbd3e9, type: 3}
       propertyPath: m_Mesh
