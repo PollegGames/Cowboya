@@ -2873,6 +2873,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2014953668}
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2014953669}
   m_SourcePrefab: {fileID: 100100000, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
 --- !u!43 &436570745
 Mesh:
@@ -12577,6 +12580,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1882314702}
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1882314703}
   m_SourcePrefab: {fileID: 100100000, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
 --- !u!43 &1112667867
 Mesh:
@@ -21162,6 +21168,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::StaticRoomDoorConfig
   leftDoor: 1
   rightDoor: 1
+--- !u!114 &1882314703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882314692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a02f219816174e55a97fbbf8d18695df, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::StaticRoomLiftConfig
+  liftUp: 0
+  liftDown: 0
 --- !u!43 &1898419713
 Mesh:
   m_ObjectHideFlags: 0
@@ -23982,6 +24002,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::StaticRoomDoorConfig
   leftDoor: 1
   rightDoor: 1
+--- !u!114 &2014953669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014953658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a02f219816174e55a97fbbf8d18695df, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::StaticRoomLiftConfig
+  liftUp: 0
+  liftDown: 0
 --- !u!43 &2017105048
 Mesh:
   m_ObjectHideFlags: 0

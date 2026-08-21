@@ -120,6 +120,8 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 
                 var doorConfig = room.GetComponent<StaticRoomDoorConfig>();
                 doorConfig?.Apply(room);
+                var liftConfig = room.GetComponent<StaticRoomLiftConfig>();
+                liftConfig?.Apply(room);
                 room.InitializeStatic(this, playerHead);
                 registeredRooms.Add(room);
             }

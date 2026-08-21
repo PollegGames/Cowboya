@@ -141,6 +141,25 @@ public class FactoryManagerTests
         Assert.AreEqual(AlarmState.Wanted, observed.Value);
     }
 
+    [Test]
+    public void RegisterStaticRooms_AppliesLiftConfiguration()
+    {
+        var roomGo = new GameObject("StaticLiftRoom");
+        var room = roomGo.AddComponent<RoomManager>();
+        var properties = roomGo.AddComponent<RoomProperties>();
+        room.roomProperties = properties;
+        var liftConfig = roomGo.AddComponent<StaticRoomLiftConfig>();
+        typeof(StaticRoomLiftConfig).GetField("liftUp", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(liftConfig, true);
+        typeof(StaticRoomLiftConfig).GetField("liftDown", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(liftConfig, false);
+
+        _factoryManager.RegisterStaticRooms(new[] { room }, null);
+
+        Assert.IsTrue(properties.HasLiftUp);
+        Assert.IsFalse(properties.HasLiftDown);
+    }
+
     private class DummyGridBuilder : IGridBuilder
     {
         public System.Collections.Generic.Dictionary<Vector2, Cell> BuildGrid(int width, int height, int wallCount, int poiCount)
