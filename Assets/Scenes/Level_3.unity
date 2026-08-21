@@ -8214,6 +8214,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &826014055
 MonoBehaviour:
@@ -10008,7 +10009,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 588184340}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4732963888443334623, guid: 54e02337c6434194292e57d54ded47ac, type: 3}
+    - {fileID: 7002187767610256299, guid: 54e02337c6434194292e57d54ded47ac, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 54e02337c6434194292e57d54ded47ac, type: 3}
@@ -12852,6 +12855,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1118626978
 MonoBehaviour:
@@ -13454,6 +13458,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!212 &1126697662
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -13499,6 +13504,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.14150941, g: 0.12749197, b: 0.12749197, a: 1}
   m_FlipX: 0
@@ -13508,7 +13514,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!43 &1142076830
 Mesh:
@@ -18815,6 +18820,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1604661826
 MonoBehaviour:
@@ -21178,9 +21184,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a02f219816174e55a97fbbf8d18695df, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Game::StaticRoomLiftConfig
-  liftUp: 0
+  liftUp: 1
   liftDown: 0
 --- !u!43 &1898419713
 Mesh:
@@ -24012,10 +24018,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a02f219816174e55a97fbbf8d18695df, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Game::StaticRoomLiftConfig
   liftUp: 0
-  liftDown: 0
+  liftDown: 1
 --- !u!43 &2017105048
 Mesh:
   m_ObjectHideFlags: 0
