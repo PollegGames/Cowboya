@@ -8,7 +8,7 @@ public class AlarmFlasher : MonoBehaviour
 
     private Color normalColor = Color.white;
     private Color alarmColor = Color.red;
-    private Material sharedMat;
+    private Material runtimeMaterial;
 
     private bool isFlashing = false;
     private float timer = 0f;
@@ -17,8 +17,11 @@ public class AlarmFlasher : MonoBehaviour
     {
         if (targetRenderer != null)
         {
-            sharedMat = targetRenderer.sharedMaterial;
-            sharedMat.color = normalColor;
+            // Renderer.material creates an instance for this alarm. Changing the
+            // shared material would modify the material asset and leave the
+            // prefab tinted after exiting Play Mode.
+            runtimeMaterial = targetRenderer.material;
+            runtimeMaterial.color = normalColor;
         }
 
         if (roomManager != null)
@@ -33,15 +36,25 @@ public class AlarmFlasher : MonoBehaviour
         {
             roomManager.OnRoomAlarmChanged -= OnAlarmChanged;
         }
+
+        if (runtimeMaterial != null)
+        {
+            Destroy(runtimeMaterial);
+        }
+    }
+
+    private void OnDisable()
+    {
+        DeactivateAlarm();
     }
 
     private void Update()
     {
-        if (!isFlashing || sharedMat == null) return;
+        if (!isFlashing || runtimeMaterial == null) return;
 
         timer += Time.deltaTime * flashSpeed;
         float t = Mathf.PingPong(timer, 1f);
-        sharedMat.color = Color.Lerp(normalColor, alarmColor, t);
+        runtimeMaterial.color = Color.Lerp(normalColor, alarmColor, t);
     }
 
     private void OnAlarmChanged(AlarmState state)
@@ -65,7 +78,7 @@ public class AlarmFlasher : MonoBehaviour
     public void DeactivateAlarm()
     {
         isFlashing = false;
-        if (sharedMat != null)
-            sharedMat.color = normalColor;
+        if (runtimeMaterial != null)
+            runtimeMaterial.color = normalColor;
     }
 }
