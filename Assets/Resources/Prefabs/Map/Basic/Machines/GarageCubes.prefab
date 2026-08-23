@@ -51,6 +51,8 @@ MonoBehaviour:
   blockingCollider: {fileID: 604489823012121161}
   scaleAxis: 2
   anchoredEdge: 1
+  useCustomAnchorAxisPosition: 1
+  customAnchorAxisPosition: 0.2683
   openScaleMultiplier: 0.05
   initialState: 0
   closeDuration: 0.6

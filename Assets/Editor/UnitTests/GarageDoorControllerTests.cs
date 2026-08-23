@@ -81,6 +81,22 @@ public class GarageDoorControllerTests {
     }
 
     [Test]
+    public void CustomAnchor_KeepsAuthoredLintelPositionFixed() {
+        GarageDoorController door = CreateDoor(out Transform panel, out _);
+        SetPrivateField(door, "useCustomAnchorAxisPosition", true);
+        SetPrivateField(door, "customAnchorAxisPosition", 0.25f);
+        SetPrivateField(door, "initialized", false);
+        InvokePrivate(door, "Initialize");
+        float closedLintelPosition = panel.localPosition.y + panel.localScale.y * 0.25f;
+
+        door.SetOpenImmediate();
+
+        Assert.That(panel.localPosition.y + panel.localScale.y * 0.25f,
+            Is.EqualTo(closedLintelPosition).Within(0.0001f));
+        Assert.That(panel.localPosition.y, Is.EqualTo(0.2375f).Within(0.0001f));
+    }
+
+    [Test]
     public void CompletionEvents_FireOnlyAtAnimationEndpoints() {
         GarageDoorController door = CreateDoor(out _, out _);
         int openedCount = 0;
@@ -116,6 +132,8 @@ public class GarageDoorControllerTests {
         StringAssert.Contains("blockingCollider: {fileID: 604489823012121161}", prefabYaml);
         StringAssert.Contains("scaleAxis: 2", prefabYaml);
         StringAssert.Contains("anchoredEdge: 1", prefabYaml);
+        StringAssert.Contains("useCustomAnchorAxisPosition: 1", prefabYaml);
+        StringAssert.Contains("customAnchorAxisPosition: 0.2683", prefabYaml);
         StringAssert.Contains("initialState: 0", prefabYaml);
     }
 

@@ -10,6 +10,8 @@ public class GarageDoorController : MonoBehaviour {
     [SerializeField] private Collider blockingCollider;
     [SerializeField] private GarageDoorScaleAxis scaleAxis = GarageDoorScaleAxis.LocalZ;
     [SerializeField] private GarageDoorAnchoredEdge anchoredEdge = GarageDoorAnchoredEdge.Positive;
+    [SerializeField] private bool useCustomAnchorAxisPosition;
+    [SerializeField] private float customAnchorAxisPosition;
     [SerializeField, Range(0.01f, 1f)] private float openScaleMultiplier = 0.05f;
     [SerializeField] private GarageDoorState initialState = GarageDoorState.Open;
 
@@ -158,6 +160,9 @@ public class GarageDoorController : MonoBehaviour {
                 anchor.x = usePositiveEdge ? localBounds.max.x : localBounds.min.x;
                 break;
         }
+
+        if (useCustomAnchorAxisPosition)
+            SetAxisValue(ref anchor, customAnchorAxisPosition);
 
         return anchor;
     }
