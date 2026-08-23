@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1602069322536624324}
+  - component: {fileID: 9192489150372810042}
   m_Layer: 0
   m_Name: GarageCubes
   m_TagString: Untagged
@@ -34,6 +35,26 @@ Transform:
   - {fileID: 1655509297258182914}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9192489150372810042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4367518467533131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6fb7f3232d34b5c9bce4f4db8d98517, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  panelTransform: {fileID: 1655509297258182914}
+  blockingCollider: {fileID: 604489823012121161}
+  scaleAxis: 2
+  anchoredEdge: 1
+  openScaleMultiplier: 0.05
+  initialState: 0
+  closeDuration: 0.6
+  openDuration: 0.6
 --- !u!1 &4051602913359112641
 GameObject:
   m_ObjectHideFlags: 0
