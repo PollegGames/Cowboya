@@ -610,6 +610,16 @@ public class RobotBrainNew : MonoBehaviour
         WorkerCollectorMissionAssignment assignment = facts.Assignment;
         if (assignment == null)
             return new RobotTask(RobotTaskType.WorkerCollectorFindCube);
+        if (facts.DeliveryAccepted)
+        {
+            if (!facts.WaitingForBatch || facts.RestCompleted)
+                return new RobotTask(RobotTaskType.WorkerCollectorFindCube, assignment);
+            if (!facts.BatchCompleted)
+                return new RobotTask(RobotTaskType.WorkerCollectorWaitForBatch, assignment);
+            if (!facts.RestApproachReached)
+                return new RobotTask(RobotTaskType.WorkerCollectorMoveToRest, assignment);
+            return new RobotTask(RobotTaskType.WorkerCollectorRest, assignment, facts.RestUntil);
+        }
         if (facts.TargetUnavailable || facts.CargoLost)
             return new RobotTask(RobotTaskType.WorkerCollectorFindCube, assignment);
         if (!facts.TargetApproachReached)
@@ -618,7 +628,7 @@ public class RobotBrainNew : MonoBehaviour
             return new RobotTask(RobotTaskType.WorkerCollectorGrabCube, assignment);
         if (!facts.DropOffApproachReached)
             return new RobotTask(RobotTaskType.WorkerCollectorMoveToGarage, assignment);
-        return new RobotTask(RobotTaskType.WorkerCollectorWaitForBatch, assignment);
+        return new RobotTask(RobotTaskType.WorkerCollectorDepositCube, assignment);
     }
 
     private bool CanAcceptCollectorIngress()

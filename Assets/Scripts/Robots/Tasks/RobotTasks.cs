@@ -38,7 +38,10 @@ public enum RobotTaskType
     WorkerCollectorMoveToCube,
     WorkerCollectorGrabCube,
     WorkerCollectorMoveToGarage,
-    WorkerCollectorWaitForBatch
+    WorkerCollectorDepositCube,
+    WorkerCollectorWaitForBatch,
+    WorkerCollectorMoveToRest,
+    WorkerCollectorRest
 }
 
 /// <summary>

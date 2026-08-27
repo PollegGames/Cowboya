@@ -27,7 +27,9 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         None,
         MovingToCube,
         MovingToDropOff,
-        WaitingAtDropOff
+        WaitingAtDropOff,
+        MovingToRest,
+        Resting
     }
 
     public Transform CarryAnchor => carryAnchor;
@@ -46,11 +48,13 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
                 && disabledAssignment.Target.transform.parent == carryAnchor)
                 disabledAssignment.Target.Pickup.OnRelease(Vector2.zero);
             disabledAssignment.Target.ReleaseClaim(disabledAssignment.Claim);
+            disabledAssignment.DropOff?.ReleaseReservation(disabledAssignment.Reservation);
         }
         currentAssignment = null;
         RestoreCargoCollisions();
         robotBody?.StopMovement();
         CancelInvoke(nameof(FindCube));
+        CancelInvoke(nameof(CompleteRest));
         command = Command.None;
     }
 
@@ -59,7 +63,8 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         if (currentAssignment == null)
             return;
 
-        if (!IsTargetValid())
+        if ((command == Command.MovingToCube || command == Command.MovingToDropOff)
+            && !IsTargetValid())
         {
             ReportTargetLost();
             return;
@@ -85,6 +90,16 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
                     command = Command.None;
                     brain?.OnWorkerCollectorBodyObservation(
                         WorkerCollectorBodyObservation.DropOffApproach(currentAssignment, commandToken));
+                }
+                break;
+
+            case Command.MovingToRest:
+                if (robotBody != null && robotBody.HasArrivedAtDestination())
+                {
+                    robotBody.StopMovement();
+                    command = Command.None;
+                    brain?.OnWorkerCollectorBodyObservation(
+                        WorkerCollectorBodyObservation.RestApproach(currentAssignment, commandToken));
                 }
                 break;
         }
@@ -146,10 +161,84 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
 
     public void WaitAtDropOff(WorkerCollectorMissionAssignment assignment)
     {
-        if (!PrepareCommand(assignment))
+        if (assignment == null || !ReferenceEquals(currentAssignment, assignment))
             return;
         command = Command.WaitingAtDropOff;
         robotBody?.StopMovement();
+    }
+
+    public void DepositCube(WorkerCollectorMissionAssignment assignment)
+    {
+        if (!PrepareCommand(assignment) || assignment.DropOff == null)
+            return;
+
+        UnsubscribeTarget();
+        if (!assignment.DropOff.TryAccept(this, assignment, out bool waitingForBatch))
+        {
+            subscribedTarget = assignment.Target;
+            if (subscribedTarget != null)
+                subscribedTarget.OnClaimLost += HandleClaimLost;
+            command = Command.WaitingAtDropOff;
+            return;
+        }
+
+        RestoreCargoCollisions();
+        command = waitingForBatch ? Command.WaitingAtDropOff : Command.None;
+        brain?.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.Delivery(assignment, commandToken, waitingForBatch));
+    }
+
+    public void BeginMoveToRest(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null || assignment.Rest == null)
+        {
+            ReportRestCompletedImmediately(assignment);
+            return;
+        }
+        ResolveReferences();
+        currentAssignment = assignment;
+        commandToken++;
+        command = Command.MovingToRest;
+        RoomWaypoint waypoint = assignment.Rest.RestWaypoint;
+        if (robotBody != null && waypoint != null)
+            robotBody.SetDestination(waypoint, assignment.Rest.RestPosition, includeUnavailable: true);
+    }
+
+    public void Rest(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null || !ReferenceEquals(currentAssignment, assignment))
+            return;
+        robotBody?.StopMovement();
+        command = Command.Resting;
+        CancelInvoke(nameof(CompleteRest));
+        float duration = assignment.Rest != null ? assignment.Rest.RestDuration : 0f;
+        if (duration <= 0f)
+            CompleteRest();
+        else
+            Invoke(nameof(CompleteRest), duration);
+    }
+
+    public void ReportBatchCompleted(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null || !ReferenceEquals(currentAssignment, assignment))
+            return;
+        commandToken++;
+        brain?.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.BatchProcessed(assignment, commandToken));
+    }
+
+    public void ReportBatchInterrupted(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null || !ReferenceEquals(currentAssignment, assignment))
+            return;
+        commandToken++;
+        brain?.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.BatchInterrupted(assignment, commandToken));
+    }
+
+    public void ReportDestinationUnavailable()
+    {
+        ReportTargetLost();
     }
 
     public void CancelCurrentCommand(WorkerCollectorMissionAssignment assignment)
@@ -158,6 +247,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             return;
         robotBody?.StopMovement();
         CancelInvoke(nameof(FindCube));
+        CancelInvoke(nameof(CompleteRest));
         command = Command.None;
     }
 
@@ -165,6 +255,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
     {
         robotBody?.StopMovement();
         CancelInvoke(nameof(FindCube));
+        CancelInvoke(nameof(CompleteRest));
         command = Command.None;
     }
 
@@ -220,6 +311,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         UnsubscribeTarget();
         currentAssignment = null;
         commandToken++;
+        lost.DropOff?.ReleaseReservation(lost.Reservation);
         brain?.OnWorkerCollectorBodyObservation(
             WorkerCollectorBodyObservation.TargetLost(lost, commandToken));
     }
@@ -275,4 +367,25 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
     }
 
     private void Reset() => ResolveReferences();
+
+    private void CompleteRest()
+    {
+        WorkerCollectorMissionAssignment assignment = currentAssignment;
+        if (assignment == null)
+            return;
+        command = Command.None;
+        commandToken++;
+        brain?.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.RestFinished(assignment, commandToken));
+    }
+
+    private void ReportRestCompletedImmediately(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null)
+            return;
+        currentAssignment = assignment;
+        commandToken++;
+        brain?.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.RestApproach(assignment, commandToken));
+    }
 }

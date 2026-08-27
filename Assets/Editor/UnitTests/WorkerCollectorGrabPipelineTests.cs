@@ -100,8 +100,8 @@ public class WorkerCollectorGrabPipelineTests
         setup.Body.Commands.Clear();
         Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
             WorkerCollectorBodyObservation.DropOffApproach(assignment, 3)));
-        AssertCurrent(setup, RobotTaskType.WorkerCollectorWaitForBatch, assignment);
-        CollectionAssert.AreEqual(new[] { "Cancel", "Wait" }, setup.Body.Commands);
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorDepositCube, assignment);
+        CollectionAssert.AreEqual(new[] { "Cancel", "Deposit" }, setup.Body.Commands);
     }
 
     [Test]
@@ -118,6 +118,54 @@ public class WorkerCollectorGrabPipelineTests
         Assert.IsNull(setup.Memory.Snapshot.WorkerCollector.Assignment);
         AssertCurrent(setup, RobotTaskType.WorkerCollectorFindCube, null);
         Assert.Contains("Find", setup.Body.Commands);
+    }
+
+    [Test]
+    public void CompletedNinthDelivery_WaitsForBatch_Rests_ThenResumesFinding()
+    {
+        Pipeline setup = CreatePipeline();
+        WorkerCollectorMissionAssignment baseAssignment = CreateAssignment(setup.Body, 3);
+        GameObject restObject = CreateObject("Rest");
+        WorkerCollectorSpawnRestProvider rest = restObject.AddComponent<WorkerCollectorSpawnRestProvider>();
+        rest.Configure(null, restObject.transform, null, restObject.transform, 5f);
+        WorkerCollectorMissionAssignment assignment = new WorkerCollectorMissionAssignment(
+            baseAssignment.MissionId, baseAssignment.Source, baseAssignment.DropOff, rest,
+            baseAssignment.Target, baseAssignment.Claim, default);
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorMissionAssigned(assignment));
+
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.Delivery(assignment, 1, waitingForBatch: true)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorWaitForBatch, assignment);
+
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.BatchProcessed(assignment, 2)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorMoveToRest, assignment);
+
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.RestApproach(assignment, 3)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorRest, assignment);
+        Assert.Greater(setup.Memory.Snapshot.WorkerCollector.RestUntil, Time.time);
+
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.RestFinished(assignment, 4)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorFindCube, null);
+    }
+
+    [Test]
+    public void InterruptedFullBatch_ReturnsToCubeSearchWithoutResting()
+    {
+        Pipeline setup = CreatePipeline();
+        WorkerCollectorMissionAssignment assignment = CreateAssignment(setup.Body, 4);
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorMissionAssigned(assignment));
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.Delivery(assignment, 1, waitingForBatch: true)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorWaitForBatch, assignment);
+
+        Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservation.BatchInterrupted(assignment, 2)));
+
+        Assert.IsFalse(setup.Memory.Snapshot.WorkerCollector.RestApproachReached);
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorFindCube, null);
     }
 
     private Pipeline CreatePipeline()
@@ -207,7 +255,10 @@ public class WorkerCollectorGrabPipelineTests
         public void BeginMoveToCube(WorkerCollectorMissionAssignment assignment) => Commands.Add("MoveToCube");
         public void GrabCube(WorkerCollectorMissionAssignment assignment) => Commands.Add("Grab");
         public void BeginMoveToDropOff(WorkerCollectorMissionAssignment assignment) => Commands.Add("MoveToDropOff");
+        public void DepositCube(WorkerCollectorMissionAssignment assignment) => Commands.Add("Deposit");
         public void WaitAtDropOff(WorkerCollectorMissionAssignment assignment) => Commands.Add("Wait");
+        public void BeginMoveToRest(WorkerCollectorMissionAssignment assignment) => Commands.Add("MoveToRest");
+        public void Rest(WorkerCollectorMissionAssignment assignment) => Commands.Add("Rest");
         public void CancelCurrentCommand(WorkerCollectorMissionAssignment assignment) => Commands.Add("Cancel");
         public void StopAllActuators() => Commands.Add("Stop");
     }

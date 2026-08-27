@@ -56,6 +56,7 @@ public sealed class WhiteCubeCargo : MonoBehaviour
 
     public event Action<WhiteCubeCargoState> OnStateChanged;
     public event Action<WhiteCubeClaim> OnClaimLost;
+    public event Action<WhiteCubeCargo> OnDestroyed;
 
     public CubePickup Pickup
     {
@@ -92,6 +93,11 @@ public sealed class WhiteCubeCargo : MonoBehaviour
         subscribed = false;
 
         LoseClaim();
+    }
+
+    private void OnDestroy()
+    {
+        OnDestroyed?.Invoke(this);
     }
 
     /// <summary>
@@ -153,6 +159,49 @@ public sealed class WhiteCubeCargo : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Transfers a worker-owned cube into an authoritative garage slot.
+    /// </summary>
+    public bool TryStore(WhiteCubeClaim claim, Transform slot)
+    {
+        EnsureSubscribed();
+        if (!IsClaimValid(claim) || slot == null || pickup == null)
+            return false;
+
+        pickup.OnRelease(Vector2.zero);
+        currentClaim = default;
+        expectedCarryAnchor = null;
+        externallyHeld = false;
+        transform.SetParent(slot, false);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        if (body != null)
+        {
+            body.linearVelocity = Vector2.zero;
+            body.angularVelocity = 0f;
+            body.bodyType = RigidbodyType2D.Kinematic;
+            body.simulated = true;
+        }
+
+        SetState(WhiteCubeCargoState.Stored);
+        return true;
+    }
+
+    /// <summary>
+    /// Restores dynamic physics after a stored cube leaves its garage slot.
+    /// </summary>
+    public void RestoreLoosePhysics()
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        if (body != null)
+        {
+            body.bodyType = RigidbodyType2D.Dynamic;
+            body.simulated = true;
+        }
+    }
+
     private void HandleGrabbed(CubePickup grabbed)
     {
         if (grabbed == null)
@@ -168,6 +217,7 @@ public sealed class WhiteCubeCargo : MonoBehaviour
         }
 
         externallyHeld = true;
+        RestoreLoosePhysics();
         LoseClaim();
         SetState(WhiteCubeCargoState.HeldExternally);
     }

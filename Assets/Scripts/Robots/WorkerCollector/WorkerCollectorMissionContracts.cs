@@ -12,19 +12,35 @@ public sealed class WorkerCollectorMissionAssignment
         WorkerCollectorDropOffProvider dropOff,
         WhiteCubeCargo target,
         WhiteCubeClaim claim)
+        : this(missionId, source, dropOff, null, target, claim, default)
+    {
+    }
+
+    public WorkerCollectorMissionAssignment(
+        int missionId,
+        WorkerCollectorWhiteCubeSourceProvider source,
+        WorkerCollectorDropOffProvider dropOff,
+        WorkerCollectorSpawnRestProvider rest,
+        WhiteCubeCargo target,
+        WhiteCubeClaim claim,
+        GarageSlotReservation reservation)
     {
         MissionId = missionId;
         Source = source;
         DropOff = dropOff;
+        Rest = rest;
         Target = target;
         Claim = claim;
+        Reservation = reservation;
     }
 
     public int MissionId { get; }
     public WorkerCollectorWhiteCubeSourceProvider Source { get; }
     public WorkerCollectorDropOffProvider DropOff { get; }
+    public WorkerCollectorSpawnRestProvider Rest { get; }
     public WhiteCubeCargo Target { get; }
     public WhiteCubeClaim Claim { get; }
+    public GarageSlotReservation Reservation { get; }
     public bool HasRequiredReferences => MissionId > 0 && Source != null && DropOff != null
         && Target != null && Claim.IsValid;
 }
@@ -38,6 +54,12 @@ public struct WorkerCollectorMissionFacts
     public bool CargoLost;
     public bool TargetUnavailable;
     public bool DropOffApproachReached;
+    public bool DeliveryAccepted;
+    public bool WaitingForBatch;
+    public bool BatchCompleted;
+    public bool RestApproachReached;
+    public float RestUntil;
+    public bool RestCompleted;
 }
 
 public enum WorkerCollectorBodyObservationType
@@ -45,7 +67,12 @@ public enum WorkerCollectorBodyObservationType
     TargetApproachChanged = 0,
     CargoChanged = 1,
     TargetUnavailable = 2,
-    DropOffApproachChanged = 3
+    DropOffApproachChanged = 3,
+    DeliveryAccepted = 4,
+    BatchCompleted = 5,
+    RestApproachChanged = 6,
+    RestCompleted = 7,
+    BatchInterrupted = 8
 }
 
 public readonly struct WorkerCollectorBodyObservation
@@ -86,6 +113,31 @@ public readonly struct WorkerCollectorBodyObservation
         WorkerCollectorMissionAssignment assignment, int token, bool reached = true) =>
         new WorkerCollectorBodyObservation(
             WorkerCollectorBodyObservationType.DropOffApproachChanged, assignment, token, reached);
+
+    public static WorkerCollectorBodyObservation Delivery(
+        WorkerCollectorMissionAssignment assignment, int token, bool waitingForBatch) =>
+        new WorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservationType.DeliveryAccepted, assignment, token, waitingForBatch);
+
+    public static WorkerCollectorBodyObservation BatchProcessed(
+        WorkerCollectorMissionAssignment assignment, int token) =>
+        new WorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservationType.BatchCompleted, assignment, token, true);
+
+    public static WorkerCollectorBodyObservation BatchInterrupted(
+        WorkerCollectorMissionAssignment assignment, int token) =>
+        new WorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservationType.BatchInterrupted, assignment, token, false);
+
+    public static WorkerCollectorBodyObservation RestApproach(
+        WorkerCollectorMissionAssignment assignment, int token) =>
+        new WorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservationType.RestApproachChanged, assignment, token, true);
+
+    public static WorkerCollectorBodyObservation RestFinished(
+        WorkerCollectorMissionAssignment assignment, int token) =>
+        new WorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservationType.RestCompleted, assignment, token, true);
 }
 
 public interface IWorkerCollectorTaskBody
@@ -94,7 +146,10 @@ public interface IWorkerCollectorTaskBody
     void BeginMoveToCube(WorkerCollectorMissionAssignment assignment);
     void GrabCube(WorkerCollectorMissionAssignment assignment);
     void BeginMoveToDropOff(WorkerCollectorMissionAssignment assignment);
+    void DepositCube(WorkerCollectorMissionAssignment assignment);
     void WaitAtDropOff(WorkerCollectorMissionAssignment assignment);
+    void BeginMoveToRest(WorkerCollectorMissionAssignment assignment);
+    void Rest(WorkerCollectorMissionAssignment assignment);
     void CancelCurrentCommand(WorkerCollectorMissionAssignment assignment);
     void StopAllActuators();
 }

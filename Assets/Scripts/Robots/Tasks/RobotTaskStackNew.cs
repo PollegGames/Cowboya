@@ -108,7 +108,7 @@ public class RobotTaskStackNew
     public static bool IsWorkerCollectorFamily(RobotTaskType type)
     {
         return type >= RobotTaskType.WorkerCollectorStandby
-            && type <= RobotTaskType.WorkerCollectorWaitForBatch;
+            && type <= RobotTaskType.WorkerCollectorRest;
     }
 
     private int FindTaskIndex(RobotTask incoming)

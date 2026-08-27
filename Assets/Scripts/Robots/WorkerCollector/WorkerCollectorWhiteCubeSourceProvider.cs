@@ -9,6 +9,20 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
     [SerializeField] private RoomWaypoint approachWaypoint;
     [SerializeField] private Transform cubeRoot;
 
+    private readonly System.Collections.Generic.List<ClaimedCargo> issuedClaims =
+        new System.Collections.Generic.List<ClaimedCargo>();
+
+    private readonly struct ClaimedCargo
+    {
+        public ClaimedCargo(WhiteCubeCargo cargo, WhiteCubeClaim claim)
+        {
+            Cargo = cargo;
+            Claim = claim;
+        }
+        public WhiteCubeCargo Cargo { get; }
+        public WhiteCubeClaim Claim { get; }
+    }
+
     public RoomWaypoint ApproachWaypoint => approachWaypoint;
 
     private void Awake() => ResolveReferences();
@@ -18,7 +32,16 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
         WorkerCollectorMissionService.RegisterSource(this);
     }
 
-    private void OnDisable() => WorkerCollectorMissionService.UnregisterSource(this);
+    private void OnDisable()
+    {
+        WorkerCollectorMissionService.UnregisterSource(this);
+        for (int i = 0; i < issuedClaims.Count; i++)
+        {
+            ClaimedCargo issued = issuedClaims[i];
+            issued.Cargo?.ReleaseClaim(issued.Claim);
+        }
+        issuedClaims.Clear();
+    }
 
     /// <summary>
     /// Claims the first available white cargo currently owned by this source hierarchy.
@@ -30,6 +53,9 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
         if (claimant == null)
             return false;
 
+        issuedClaims.RemoveAll(issued => issued.Cargo == null
+            || !issued.Cargo.IsClaimValid(issued.Claim));
+
         Transform searchRoot = cubeRoot != null ? cubeRoot : transform;
         WhiteCubeCargo[] candidates = searchRoot.GetComponentsInChildren<WhiteCubeCargo>(true);
         for (int i = 0; i < candidates.Length; i++)
@@ -38,6 +64,7 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
             if (candidate != null && candidate.TryClaim(claimant, out claim))
             {
                 cargo = candidate;
+                issuedClaims.Add(new ClaimedCargo(candidate, claim));
                 return true;
             }
         }

@@ -8,6 +8,9 @@ public class Level2WorkerCollectorPrefabTests
     private const string WorkerCollectorPrefabPath = "Assets/Resources/Prefabs/Robots/WorkerCollector/WorkerCollector.prefab";
     private const string NormalCubePrefabPath = "Assets/Resources/Prefabs/IntereableObjects/CubeNormal.prefab";
     private const string ConveyorRoomPrefabPath = "Assets/Resources/Prefabs/Map/ROOM_Conveyor.prefab";
+    private const string RestRoomPrefabPath = "Assets/Resources/Prefabs/Map/ROOM_resting.prefab";
+    private const string GarageMachinePrefabPath =
+        "Assets/Resources/Prefabs/Map/Basic/Machines/GarageCubes.prefab";
 
     [Test]
     public void RobotRoles_PreserveExistingSerializedValues_AndAppendWorkerCollector()
@@ -88,12 +91,49 @@ public class Level2WorkerCollectorPrefabTests
     }
 
     [Test]
-    public void ConveyorRoom_RegistersSourceAndTemporaryDropOffCapabilities()
+    public void ConveyorRoom_RegistersOnlyWhiteCubeSourceCapability()
     {
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ConveyorRoomPrefabPath);
 
         Assert.IsNotNull(prefab);
         Assert.IsNotNull(prefab.GetComponent<WorkerCollectorWhiteCubeSourceProvider>());
-        Assert.IsNotNull(prefab.GetComponent<WorkerCollectorDropOffProvider>());
+        Assert.IsNull(prefab.GetComponent<WorkerCollectorDropOffProvider>());
+    }
+
+    [Test]
+    public void RestRoom_ProvidesConfiguredSingleCollectorSpawnAndRestCapability()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(RestRoomPrefabPath);
+
+        Assert.IsNotNull(prefab);
+        WorkerCollectorSpawnRestProvider provider = prefab.GetComponent<WorkerCollectorSpawnRestProvider>();
+        Assert.IsNotNull(provider);
+        Assert.AreEqual(1, provider.MaximumLiveCollectors);
+        Assert.AreEqual(5f, provider.RestDuration);
+        Assert.IsNotNull(provider.RestWaypoint);
+        Assert.IsNotNull(prefab.transform.Find("WorkerCollectorSpawnPoint"));
+        Assert.IsNotNull(prefab.transform.Find("WorkerCollectorRestPoint"));
+    }
+
+    [Test]
+    public void GarageMachine_HasNineExplicitSlotsProcessorDoorAndDestination()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GarageMachinePrefabPath);
+
+        Assert.IsNotNull(prefab);
+        GarageCubeStorage storage = prefab.GetComponent<GarageCubeStorage>();
+        GarageCubeProcessor processor = prefab.GetComponent<GarageCubeProcessor>();
+        WorkerCollectorDropOffProvider destination = prefab.GetComponent<WorkerCollectorDropOffProvider>();
+        Assert.IsNotNull(storage);
+        Assert.IsNotNull(processor);
+        Assert.IsNotNull(destination);
+        Assert.IsNotNull(prefab.GetComponent<GarageDoorController>());
+        Assert.AreEqual(GarageCubeStorage.Capacity, storage.Slots.Count);
+        for (int i = 0; i < GarageCubeStorage.Capacity; i++)
+        {
+            Assert.IsNotNull(storage.Slots[i]);
+            Assert.AreEqual($"Slot_{i:00}", storage.Slots[i].name);
+        }
+        Assert.IsNull(prefab.GetComponent<GarageCubeConveyorController>());
     }
 }

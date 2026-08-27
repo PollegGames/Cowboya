@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Matches idle Worker Collectors with registered white-cube sources and a temporary destination.
+/// Spawns and matches Worker Collectors with registered source, garage, and rest capabilities.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class WorkerCollectorMissionService : MonoBehaviour
@@ -11,14 +11,30 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         new List<WorkerCollectorWhiteCubeSourceProvider>();
     private static readonly List<WorkerCollectorDropOffProvider> dropOffs =
         new List<WorkerCollectorDropOffProvider>();
+    private static readonly List<WorkerCollectorSpawnRestProvider> rests =
+        new List<WorkerCollectorSpawnRestProvider>();
     private static WorkerCollectorMissionService instance;
 
     private int nextMissionId;
+    private float nextSpawnCheck;
+
+    private void Update()
+    {
+        if (Time.time < nextSpawnCheck)
+            return;
+        nextSpawnCheck = Time.time + 1f;
+        TryEnsureCollectors();
+    }
 
     public static void RegisterSource(WorkerCollectorWhiteCubeSourceProvider source)
     {
         if (source != null && !sources.Contains(source))
             sources.Add(source);
+        if (Application.isPlaying)
+        {
+            EnsureInstance();
+            instance.TryEnsureCollectors();
+        }
     }
 
     public static void UnregisterSource(WorkerCollectorWhiteCubeSourceProvider source)
@@ -30,11 +46,32 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
     {
         if (dropOff != null && !dropOffs.Contains(dropOff))
             dropOffs.Add(dropOff);
+        if (Application.isPlaying)
+        {
+            EnsureInstance();
+            instance.TryEnsureCollectors();
+        }
     }
 
     public static void UnregisterDropOff(WorkerCollectorDropOffProvider dropOff)
     {
         dropOffs.Remove(dropOff);
+    }
+
+    public static void RegisterRest(WorkerCollectorSpawnRestProvider rest)
+    {
+        if (rest != null && !rests.Contains(rest))
+            rests.Add(rest);
+        if (Application.isPlaying)
+        {
+            EnsureInstance();
+            instance.TryEnsureCollectors();
+        }
+    }
+
+    public static void UnregisterRest(WorkerCollectorSpawnRestProvider rest)
+    {
+        rests.Remove(rest);
     }
 
     /// <summary>
@@ -66,7 +103,8 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         }
 
         RemoveMissingRegistrations();
-        if (dropOffs.Count == 0)
+        WorkerCollectorDropOffProvider dropOff = FindAvailableGarage(collector, out GarageSlotReservation reservation);
+        if (dropOff == null)
             return false;
 
         for (int i = 0; i < sources.Count; i++)
@@ -75,20 +113,57 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
             if (source == null || !source.TryClaimCube(collector, out WhiteCubeCargo target, out WhiteCubeClaim claim))
                 continue;
 
+            WorkerCollectorSpawnRestProvider rest = rests.Count > 0 ? rests[0] : null;
             var assignment = new WorkerCollectorMissionAssignment(
-                ++nextMissionId, source, dropOffs[0], target, claim);
+                ++nextMissionId, source, dropOff, rest, target, claim, reservation);
             if (collector.Brain.OnWorkerCollectorMissionAssigned(assignment))
                 return true;
 
             target.ReleaseClaim(claim);
         }
 
+
+        dropOff.ReleaseReservation(reservation);
+
         return false;
+    }
+
+    private static WorkerCollectorDropOffProvider FindAvailableGarage(
+        WorkerCollectorBodyController collector, out GarageSlotReservation reservation)
+    {
+        reservation = default;
+        for (int i = 0; i < dropOffs.Count; i++)
+        {
+            WorkerCollectorDropOffProvider dropOff = dropOffs[i];
+            if (dropOff != null && dropOff.TryReserve(collector, out reservation))
+                return dropOff;
+        }
+        return null;
+    }
+
+    private void TryEnsureCollectors()
+    {
+        if (!Application.isPlaying)
+            return;
+        RemoveMissingRegistrations();
+        if (sources.Count == 0 || dropOffs.Find(dropOff => dropOff != null && dropOff.IsGarageDestination) == null)
+            return;
+
+        WorkerCollectorBodyController[] live = FindObjectsByType<WorkerCollectorBodyController>(
+            FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        if (live.Length > 0)
+            return;
+        for (int i = 0; i < rests.Count; i++)
+        {
+            if (rests[i] != null && rests[i].TrySpawnCollector() != null)
+                return;
+        }
     }
 
     private static void RemoveMissingRegistrations()
     {
         sources.RemoveAll(source => source == null);
         dropOffs.RemoveAll(dropOff => dropOff == null);
+        rests.RemoveAll(rest => rest == null);
     }
 }

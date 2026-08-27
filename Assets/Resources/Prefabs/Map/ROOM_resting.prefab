@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 187235412449160675}
   - component: {fileID: 5857107069788241263}
   - component: {fileID: 671112882231263764}
+  - component: {fileID: 6473050950692628979}
   m_Layer: 3
   m_Name: ROOM_resting
   m_TagString: Untagged
@@ -48,6 +49,8 @@ Transform:
   - {fileID: 740797385720355902}
   - {fileID: 3130354820747368103}
   - {fileID: 981146430217844132}
+  - {fileID: 4592397540182411598}
+  - {fileID: 6148974819318105817}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: -90, z: 90}
 --- !u!114 &5226794923736213634
@@ -815,6 +818,24 @@ MonoBehaviour:
   - {fileID: 0}
   fleePoints:
   - {fileID: 0}
+--- !u!114 &6473050950692628979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542146199199913260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2aff7a2d8d8c6c4394a10cff7b4721a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::WorkerCollectorSpawnRestProvider
+  workerCollectorPrefab: {fileID: 8873340081358007246, guid: 3e3961c9f3713334d963d58e4a5c4136, type: 3}
+  spawnPoint: {fileID: 4592397540182411598}
+  restWaypoint: {fileID: 1693577635688933943}
+  restPoint: {fileID: 6148974819318105817}
+  restDuration: 5
+  maximumLiveCollectors: 1
 --- !u!1 &552395487903275464
 GameObject:
   m_ObjectHideFlags: 0
@@ -1077,6 +1098,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &1398202103674774586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4592397540182411598}
+  m_Layer: 0
+  m_Name: WorkerCollectorSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4592397540182411598
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398202103674774586}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.65, y: 0.97, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7047981207480481909}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1654726447758918827
 GameObject:
   m_ObjectHideFlags: 0
@@ -1124,6 +1176,37 @@ MonoBehaviour:
   type: 0
   parentRoom: {fileID: 187235412449160675}
   IsAvailable: 1
+--- !u!1 &1834990652388231590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6148974819318105817}
+  m_Layer: 0
+  m_Name: WorkerCollectorRestPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6148974819318105817
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1834990652388231590}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.65, y: 0.97, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7047981207480481909}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3042609896280285433
 GameObject:
   m_ObjectHideFlags: 0

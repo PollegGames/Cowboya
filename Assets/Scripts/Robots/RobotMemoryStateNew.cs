@@ -34,6 +34,9 @@ public enum MemoryChangeType
     WorkerCollectorCargoChanged,
     WorkerCollectorTargetInvalidated,
     WorkerCollectorDropOffChanged,
+    WorkerCollectorDeliveryChanged,
+    WorkerCollectorBatchCompleted,
+    WorkerCollectorRestChanged,
     WorkerCollectorMissionCleared
 }
 
@@ -377,6 +380,50 @@ public class RobotMemoryStateNew
                 facts.DropOffApproachReached = observation.Value;
                 snapshot.WorkerCollector = facts;
                 Raise(MemoryChangeType.WorkerCollectorDropOffChanged);
+                return true;
+
+            case WorkerCollectorBodyObservationType.DeliveryAccepted:
+                if (facts.DeliveryAccepted)
+                    return false;
+                facts.DeliveryAccepted = true;
+                facts.WaitingForBatch = observation.Value;
+                facts.CargoSecured = false;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorDeliveryChanged);
+                return true;
+
+            case WorkerCollectorBodyObservationType.BatchCompleted:
+                if (!facts.WaitingForBatch || facts.BatchCompleted)
+                    return false;
+                facts.BatchCompleted = true;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorBatchCompleted);
+                return true;
+
+            case WorkerCollectorBodyObservationType.BatchInterrupted:
+                if (!facts.WaitingForBatch || facts.BatchCompleted)
+                    return false;
+                facts.WaitingForBatch = false;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorDeliveryChanged);
+                return true;
+
+            case WorkerCollectorBodyObservationType.RestApproachChanged:
+                if (!facts.BatchCompleted || facts.RestApproachReached)
+                    return false;
+                facts.RestApproachReached = true;
+                facts.RestUntil = Time.time + (facts.Assignment.Rest != null
+                    ? facts.Assignment.Rest.RestDuration : 0f);
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorRestChanged);
+                return true;
+
+            case WorkerCollectorBodyObservationType.RestCompleted:
+                if (!facts.RestApproachReached || facts.RestCompleted)
+                    return false;
+                facts.RestCompleted = true;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorRestChanged);
                 return true;
 
             default:

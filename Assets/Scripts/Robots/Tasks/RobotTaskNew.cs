@@ -178,7 +178,10 @@ public class RobotTaskNew : IRobotTaskNew
             case RobotTaskType.WorkerCollectorMoveToCube:
             case RobotTaskType.WorkerCollectorGrabCube:
             case RobotTaskType.WorkerCollectorMoveToGarage:
+            case RobotTaskType.WorkerCollectorDepositCube:
             case RobotTaskType.WorkerCollectorWaitForBatch:
+            case RobotTaskType.WorkerCollectorMoveToRest:
+            case RobotTaskType.WorkerCollectorRest:
                 HandleWorkerCollectorTask(context);
                 break;
 
@@ -278,7 +281,10 @@ public class RobotTaskNew : IRobotTaskNew
             case RobotTaskType.WorkerCollectorMoveToCube:
             case RobotTaskType.WorkerCollectorGrabCube:
             case RobotTaskType.WorkerCollectorMoveToGarage:
+            case RobotTaskType.WorkerCollectorDepositCube:
             case RobotTaskType.WorkerCollectorWaitForBatch:
+            case RobotTaskType.WorkerCollectorMoveToRest:
+            case RobotTaskType.WorkerCollectorRest:
                 ExitWorkerCollectorTask(context, reason);
                 break;
 
@@ -872,8 +878,17 @@ public class RobotTaskNew : IRobotTaskNew
             case RobotTaskType.WorkerCollectorMoveToGarage:
                 workerBody.BeginMoveToDropOff(assignment);
                 break;
+            case RobotTaskType.WorkerCollectorDepositCube:
+                workerBody.DepositCube(assignment);
+                break;
             case RobotTaskType.WorkerCollectorWaitForBatch:
                 workerBody.WaitAtDropOff(assignment);
+                break;
+            case RobotTaskType.WorkerCollectorMoveToRest:
+                workerBody.BeginMoveToRest(assignment);
+                break;
+            case RobotTaskType.WorkerCollectorRest:
+                workerBody.Rest(assignment);
                 break;
         }
     }
