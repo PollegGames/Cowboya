@@ -384,6 +384,9 @@ public class RobotHeartNew : MonoBehaviour
             case RobotRole.Collector:
                 defaultTask = new RobotTask(RobotTaskType.CollectorStandby);
                 break;
+            case RobotRole.WorkerCollector:
+                defaultTask = new RobotTask(RobotTaskType.WorkerCollectorStandby);
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }

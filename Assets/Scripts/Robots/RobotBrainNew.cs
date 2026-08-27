@@ -351,7 +351,8 @@ public class RobotBrainNew : MonoBehaviour
         if (s.PlayerInDetectZone) o |= BrainOption.PlayerDetected;
 
         bool isCollector = heart != null && heart.Role == RobotRole.Collector;
-        if (!isCollector)
+        bool isWorkerCollector = heart != null && heart.Role == RobotRole.WorkerCollector;
+        if (!isCollector && !isWorkerCollector)
         {
             if (ShouldNeedMachine(s)) o |= BrainOption.NeedMachine;
             bool machineUnavailable = heart != null && heart.Role == RobotRole.Worker
@@ -534,6 +535,9 @@ public class RobotBrainNew : MonoBehaviour
 
             case RobotRole.Collector:
                 return BuildCollectorTask(snapshot);
+
+            case RobotRole.WorkerCollector:
+                return new RobotTask(RobotTaskType.WorkerCollectorStandby);
 
             default:
                 throw new ArgumentOutOfRangeException();

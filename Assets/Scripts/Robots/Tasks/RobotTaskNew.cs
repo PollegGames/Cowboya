@@ -172,6 +172,12 @@ public class RobotTaskNew : IRobotTaskNew
                 HandleIdle(context);
                 break;
 
+            case RobotTaskType.WorkerCollectorStandby:
+                // Collection commands are introduced in the next implementation stage.
+                // For now this role must remain safely idle while retaining locomotion.
+                context.Body?.StopMovement();
+                break;
+
             case RobotTaskType.AttackTarget:
                 // Objectif: attaque locale si la cible est deja engageable.
                 // 1) Resoudre la cible depuis payload.

@@ -32,7 +32,8 @@ public enum RobotTaskType
     CollectorGatherCargo,
     CollectorReturnHome,
     CollectorAbortAndReturn,
-    CollectorDock
+    CollectorDock,
+    WorkerCollectorStandby
 }
 
 /// <summary>

@@ -7,5 +7,6 @@ public enum RobotRole
     Spawner = WorkerSpawner,
     Follower = 3,
     Boss = 4,
-    Collector = 5
+    Collector = 5,
+    WorkerCollector = 6
 }
