@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7876967260955353992}
   - component: {fileID: 2933447607757072381}
   - component: {fileID: -3281786584640236443}
+  - component: {fileID: 7346712051943062871}
   m_Layer: 13
   m_Name: CubeNormal
   m_TagString: CubeUpgrade
@@ -206,3 +207,16 @@ MonoBehaviour:
   heldSortingLayer: CubeUpgrade
   idleSortingOrder: 0
   idleSortingLayer: CubeUpgrade
+--- !u!114 &7346712051943062871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934608487537832627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a91d0c34a2f34e5db5d4691539761031, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::WhiteCubeCargo
+  pickup: {fileID: -3281786584640236443}

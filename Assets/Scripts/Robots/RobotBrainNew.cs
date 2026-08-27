@@ -203,6 +203,36 @@ public class RobotBrainNew : MonoBehaviour
     }
 
     /// <summary>
+    /// Assigns one claimed white cube through Worker Collector Memory.
+    /// </summary>
+    public bool OnWorkerCollectorMissionAssigned(WorkerCollectorMissionAssignment assignment)
+    {
+        if (!CanAcceptWorkerCollectorIngress() || assignment == null)
+            return false;
+        return memory.TryAssignWorkerCollectorMission(assignment);
+    }
+
+    /// <summary>
+    /// Records one physical Worker Collector observation in Memory.
+    /// </summary>
+    public bool OnWorkerCollectorBodyObservation(WorkerCollectorBodyObservation observation)
+    {
+        if (!CanAcceptWorkerCollectorIngress())
+            return false;
+        return memory.TryApplyWorkerCollectorObservation(observation);
+    }
+
+    /// <summary>
+    /// Clears only the matching Worker Collector assignment through Memory.
+    /// </summary>
+    public bool OnWorkerCollectorMissionCleared(WorkerCollectorMissionAssignment assignment)
+    {
+        if (!CanAcceptWorkerCollectorIngress() || assignment == null)
+            return false;
+        return memory.TryClearWorkerCollectorMission(assignment);
+    }
+
+    /// <summary>
     /// Records one discrete physical observation from the Collector body.
     /// </summary>
     public bool OnCollectorBodyObservation(CollectorBodyObservation observation)
@@ -537,7 +567,7 @@ public class RobotBrainNew : MonoBehaviour
                 return BuildCollectorTask(snapshot);
 
             case RobotRole.WorkerCollector:
-                return new RobotTask(RobotTaskType.WorkerCollectorStandby);
+                return BuildWorkerCollectorTask(snapshot);
 
             default:
                 throw new ArgumentOutOfRangeException();
@@ -574,6 +604,23 @@ public class RobotBrainNew : MonoBehaviour
         return new RobotTask(RobotTaskType.CollectorDock, assignment);
     }
 
+    private static RobotTask BuildWorkerCollectorTask(RobotMemorySnapshotNew snapshot)
+    {
+        WorkerCollectorMissionFacts facts = snapshot.WorkerCollector;
+        WorkerCollectorMissionAssignment assignment = facts.Assignment;
+        if (assignment == null)
+            return new RobotTask(RobotTaskType.WorkerCollectorFindCube);
+        if (facts.TargetUnavailable || facts.CargoLost)
+            return new RobotTask(RobotTaskType.WorkerCollectorFindCube, assignment);
+        if (!facts.TargetApproachReached)
+            return new RobotTask(RobotTaskType.WorkerCollectorMoveToCube, assignment);
+        if (!facts.CargoSecured)
+            return new RobotTask(RobotTaskType.WorkerCollectorGrabCube, assignment);
+        if (!facts.DropOffApproachReached)
+            return new RobotTask(RobotTaskType.WorkerCollectorMoveToGarage, assignment);
+        return new RobotTask(RobotTaskType.WorkerCollectorWaitForBatch, assignment);
+    }
+
     private bool CanAcceptCollectorIngress()
     {
         ResolveReferences();
@@ -582,6 +629,16 @@ public class RobotBrainNew : MonoBehaviour
             && memory != null
             && heart != null
             && heart.Role == RobotRole.Collector;
+    }
+
+    private bool CanAcceptWorkerCollectorIngress()
+    {
+        ResolveReferences();
+        return RobotNewPipelineRuntime.IsNewPipelineActive
+            && !planPublicationSuspended
+            && memory != null
+            && heart != null
+            && heart.Role == RobotRole.WorkerCollector;
     }
 
     private static RoomWaypoint FindBestWaypointForRole(RobotRole role, RobotMemorySnapshotNew snapshot, int robotId)

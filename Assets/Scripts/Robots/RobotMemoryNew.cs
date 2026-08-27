@@ -184,6 +184,24 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
         memoryState.TryApplyCollectorObservation(observation);
 
     /// <summary>
+    /// Assigns a claimed white cube to this Worker Collector Memory.
+    /// </summary>
+    public bool TryAssignWorkerCollectorMission(WorkerCollectorMissionAssignment assignment) =>
+        memoryState.TryAssignWorkerCollectorMission(assignment);
+
+    /// <summary>
+    /// Applies a physical Worker Collector observation.
+    /// </summary>
+    public bool TryApplyWorkerCollectorObservation(WorkerCollectorBodyObservation observation) =>
+        memoryState.TryApplyWorkerCollectorObservation(observation);
+
+    /// <summary>
+    /// Clears a matching Worker Collector mission.
+    /// </summary>
+    public bool TryClearWorkerCollectorMission(WorkerCollectorMissionAssignment assignment) =>
+        memoryState.TryClearWorkerCollectorMission(assignment);
+
+    /// <summary>
     /// Records whether the owning machine currently grants dock access.
     /// </summary>
     public bool TrySetCollectorDockAccess(CollectorMissionAssignment assignment, bool granted) =>

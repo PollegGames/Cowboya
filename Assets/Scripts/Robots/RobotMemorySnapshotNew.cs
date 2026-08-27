@@ -23,6 +23,7 @@ public struct RobotMemorySnapshotNew
     public bool IsMachineTransitionInProgress;
     public BaseMachine PendingReactivationMachine;
     public CollectorMissionFacts Collector;
+    public WorkerCollectorMissionFacts WorkerCollector;
 
     // Backward-compatible alias for older code that uses lower camel case.
     public Vector3 lastKnownPlayerPosition

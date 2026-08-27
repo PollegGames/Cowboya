@@ -72,6 +72,20 @@ public class RobotTaskStackNew
     }
 
     /// <summary>
+    /// Replaces the sequential Worker Collector phase with one authoritative task.
+    /// </summary>
+    public bool ReplaceWorkerCollectorFamily(RobotTask task)
+    {
+        if (task == null || !IsWorkerCollectorFamily(task.Type))
+            return false;
+        var before = Current;
+        stack.RemoveAll(existing => existing != null && IsWorkerCollectorFamily(existing.Type));
+        stack.Add(task);
+        TrimToDepth();
+        return !IsSameTask(before, Current);
+    }
+
+    /// <summary>
     /// Returns whether a task belongs to the sequential Collector mission family.
     /// </summary>
     public static bool IsCollectorFamily(RobotTaskType type)
@@ -89,6 +103,12 @@ public class RobotTaskStackNew
             default:
                 return false;
         }
+    }
+
+    public static bool IsWorkerCollectorFamily(RobotTaskType type)
+    {
+        return type >= RobotTaskType.WorkerCollectorStandby
+            && type <= RobotTaskType.WorkerCollectorWaitForBatch;
     }
 
     private int FindTaskIndex(RobotTask incoming)

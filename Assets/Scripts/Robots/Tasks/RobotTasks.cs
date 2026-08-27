@@ -33,7 +33,12 @@ public enum RobotTaskType
     CollectorReturnHome,
     CollectorAbortAndReturn,
     CollectorDock,
-    WorkerCollectorStandby
+    WorkerCollectorStandby,
+    WorkerCollectorFindCube,
+    WorkerCollectorMoveToCube,
+    WorkerCollectorGrabCube,
+    WorkerCollectorMoveToGarage,
+    WorkerCollectorWaitForBatch
 }
 
 /// <summary>

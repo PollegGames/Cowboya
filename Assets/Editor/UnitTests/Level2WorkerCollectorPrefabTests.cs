@@ -6,6 +6,8 @@ public class Level2WorkerCollectorPrefabTests
 {
     private const string WorkerPrefabPath = "Assets/Resources/Prefabs/Robots/Worker/Worker3.prefab";
     private const string WorkerCollectorPrefabPath = "Assets/Resources/Prefabs/Robots/WorkerCollector/WorkerCollector.prefab";
+    private const string NormalCubePrefabPath = "Assets/Resources/Prefabs/IntereableObjects/CubeNormal.prefab";
+    private const string ConveyorRoomPrefabPath = "Assets/Resources/Prefabs/Map/ROOM_Conveyor.prefab";
 
     [Test]
     public void RobotRoles_PreserveExistingSerializedValues_AndAppendWorkerCollector()
@@ -72,5 +74,26 @@ public class Level2WorkerCollectorPrefabTests
         Assert.AreEqual(RobotRole.Worker, prefab.GetComponent<RobotHeartNew>().Role);
         Assert.IsNull(prefab.GetComponent<WorkerCollectorBodyController>());
         Assert.IsNull(prefab.transform.Find("CubeCarryAnchor"));
+    }
+
+    [Test]
+    public void NormalCubePrefab_IsMarkedAsWhiteCollectorCargo()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(NormalCubePrefabPath);
+
+        Assert.IsNotNull(prefab);
+        WhiteCubeCargo cargo = prefab.GetComponent<WhiteCubeCargo>();
+        Assert.IsNotNull(cargo);
+        Assert.AreSame(prefab.GetComponent<CubePickup>(), cargo.Pickup);
+    }
+
+    [Test]
+    public void ConveyorRoom_RegistersSourceAndTemporaryDropOffCapabilities()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ConveyorRoomPrefabPath);
+
+        Assert.IsNotNull(prefab);
+        Assert.IsNotNull(prefab.GetComponent<WorkerCollectorWhiteCubeSourceProvider>());
+        Assert.IsNotNull(prefab.GetComponent<WorkerCollectorDropOffProvider>());
     }
 }

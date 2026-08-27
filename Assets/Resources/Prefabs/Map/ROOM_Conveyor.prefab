@@ -680,6 +680,8 @@ GameObject:
   - component: {fileID: 5857107069788241263}
   - component: {fileID: 3994537537568263334}
   - component: {fileID: 2282660691950641533}
+  - component: {fileID: 7326418502034175961}
+  - component: {fileID: 8437529613145286072}
   m_Layer: 3
   m_Name: ROOM_Conveyor
   m_TagString: Untagged
@@ -712,6 +714,34 @@ Transform:
   - {fileID: 5194109493726494484}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: -90, z: 90}
+--- !u!114 &7326418502034175961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542146199199913260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c31f2e56c4b5607fd7f6813751983253, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::WorkerCollectorWhiteCubeSourceProvider
+  approachWaypoint: {fileID: 0}
+  cubeRoot: {fileID: 7047981207480481909}
+--- !u!114 &8437529613145286072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542146199199913260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5314078e6d78291f918a35973ba5475, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::WorkerCollectorDropOffProvider
+  approachWaypoint: {fileID: 0}
+  waitPoint: {fileID: 0}
 --- !u!114 &5226794923736213634
 MonoBehaviour:
   m_ObjectHideFlags: 0

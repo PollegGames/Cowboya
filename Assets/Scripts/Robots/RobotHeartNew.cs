@@ -20,6 +20,7 @@ public class RobotHeartNew : MonoBehaviour
     private RobotTask activeTopTask;
     private IRobotTaskNew taskRuntime;
     private ICollectorTaskBody collectorBody;
+    private IWorkerCollectorTaskBody workerCollectorBody;
     private BrainOption currentOptions;
     private Coroutine scheduledTaskSignal;
 
@@ -124,8 +125,12 @@ public class RobotHeartNew : MonoBehaviour
         RemoveStalePerceptionTasksBeforePlan(planned);
         bool replacedCollectorFamily = role == RobotRole.Collector
             && RobotTaskStackNew.IsCollectorFamily(planned.Type);
+        bool replacedWorkerCollectorFamily = role == RobotRole.WorkerCollector
+            && RobotTaskStackNew.IsWorkerCollectorFamily(planned.Type);
         if (replacedCollectorFamily)
             taskStack.ReplaceCollectorFamily(planned);
+        else if (replacedWorkerCollectorFamily)
+            taskStack.ReplaceWorkerCollectorFamily(planned);
         else
             taskStack.PushOrRefresh(planned);
 
@@ -137,7 +142,9 @@ public class RobotHeartNew : MonoBehaviour
             brainOptions: currentOptions,
             plannedTask: planned,
             heartCurrentTask: taskStack.Current,
-            taskSignal: replacedCollectorFamily ? "replace_collector_family" : "push_refresh");
+            taskSignal: replacedCollectorFamily
+                ? "replace_collector_family"
+                : replacedWorkerCollectorFamily ? "replace_worker_collector_family" : "push_refresh");
 
         if (startImmediately)
             StartTopTaskIfChanged();
@@ -325,6 +332,8 @@ public class RobotHeartNew : MonoBehaviour
             body = GetComponent<RobotBodyController>();
         if (collectorBody == null)
             ResolveCollectorBody();
+        if (workerCollectorBody == null)
+            ResolveWorkerCollectorBody();
         if (memory == null)
             memory = GetComponent<RobotMemoryNew>();
 
@@ -406,6 +415,7 @@ public class RobotHeartNew : MonoBehaviour
             Heart = this,
             Body = body,
             CollectorBody = collectorBody,
+            WorkerCollectorBody = workerCollectorBody,
             Memory = memory
         };
     }
@@ -425,6 +435,19 @@ public class RobotHeartNew : MonoBehaviour
             {
                 collectorBodyBehaviour = behaviours[i];
                 collectorBody = discoveredBody;
+                return;
+            }
+        }
+    }
+
+    private void ResolveWorkerCollectorBody()
+    {
+        MonoBehaviour[] behaviours = GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            if (behaviours[i] is IWorkerCollectorTaskBody discoveredBody)
+            {
+                workerCollectorBody = discoveredBody;
                 return;
             }
         }

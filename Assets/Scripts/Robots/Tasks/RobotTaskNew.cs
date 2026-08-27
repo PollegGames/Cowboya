@@ -18,6 +18,7 @@ public struct RobotTaskContextNew
     public RobotHeartNew Heart;
     public RobotBodyController Body;
     public ICollectorTaskBody CollectorBody;
+    public IWorkerCollectorTaskBody WorkerCollectorBody;
     public RobotMemoryNew Memory;
 }
 
@@ -173,9 +174,12 @@ public class RobotTaskNew : IRobotTaskNew
                 break;
 
             case RobotTaskType.WorkerCollectorStandby:
-                // Collection commands are introduced in the next implementation stage.
-                // For now this role must remain safely idle while retaining locomotion.
-                context.Body?.StopMovement();
+            case RobotTaskType.WorkerCollectorFindCube:
+            case RobotTaskType.WorkerCollectorMoveToCube:
+            case RobotTaskType.WorkerCollectorGrabCube:
+            case RobotTaskType.WorkerCollectorMoveToGarage:
+            case RobotTaskType.WorkerCollectorWaitForBatch:
+                HandleWorkerCollectorTask(context);
                 break;
 
             case RobotTaskType.AttackTarget:
@@ -269,9 +273,20 @@ public class RobotTaskNew : IRobotTaskNew
                 ExitCollectorTask(context, reason);
                 break;
 
+            case RobotTaskType.WorkerCollectorStandby:
+            case RobotTaskType.WorkerCollectorFindCube:
+            case RobotTaskType.WorkerCollectorMoveToCube:
+            case RobotTaskType.WorkerCollectorGrabCube:
+            case RobotTaskType.WorkerCollectorMoveToGarage:
+            case RobotTaskType.WorkerCollectorWaitForBatch:
+                ExitWorkerCollectorTask(context, reason);
+                break;
+
             case RobotTaskType.Dead:
                 if (context.Role == RobotRole.Collector)
                     context.CollectorBody?.StopAllActuators();
+                else if (context.Role == RobotRole.WorkerCollector)
+                    context.WorkerCollectorBody?.StopAllActuators();
                 break;
         }
     }
@@ -725,6 +740,8 @@ public class RobotTaskNew : IRobotTaskNew
         context.Body?.StopMovement();
         if (context.Role == RobotRole.Collector)
             context.CollectorBody?.StopAllActuators();
+        else if (context.Role == RobotRole.WorkerCollector)
+            context.WorkerCollectorBody?.StopAllActuators();
     }
 
     private static void HandleCollectorTask(RobotTaskContextNew context)
@@ -802,6 +819,75 @@ public class RobotTaskNew : IRobotTaskNew
             plannedTask: context.CurrentTask,
             heartCurrentTask: context.Heart != null ? context.Heart.CurrentTask : null,
             taskSignal: "cancel_collector reason=" + reason);
+    }
+
+    private static void HandleWorkerCollectorTask(RobotTaskContextNew context)
+    {
+        IWorkerCollectorTaskBody workerBody = context.WorkerCollectorBody;
+        if (workerBody == null)
+        {
+            Block(context);
+            return;
+        }
+
+        RobotTaskType type = context.CurrentTask.Type;
+        WorkerCollectorMissionAssignment assignment = context.Payload as WorkerCollectorMissionAssignment;
+        if (type == RobotTaskType.WorkerCollectorStandby)
+        {
+            workerBody.StopAllActuators();
+            return;
+        }
+
+        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
+            return;
+
+        if (type == RobotTaskType.WorkerCollectorFindCube)
+        {
+            if (assignment != null && context.Memory != null)
+            {
+                if (assignment.Target != null)
+                    assignment.Target.ReleaseClaim(assignment.Claim);
+                if (context.Memory.TryClearWorkerCollectorMission(assignment))
+                    return;
+            }
+            workerBody.FindCube();
+            return;
+        }
+
+        if (assignment == null)
+        {
+            workerBody.StopAllActuators();
+            Block(context);
+            return;
+        }
+
+        switch (type)
+        {
+            case RobotTaskType.WorkerCollectorMoveToCube:
+                workerBody.BeginMoveToCube(assignment);
+                break;
+            case RobotTaskType.WorkerCollectorGrabCube:
+                workerBody.GrabCube(assignment);
+                break;
+            case RobotTaskType.WorkerCollectorMoveToGarage:
+                workerBody.BeginMoveToDropOff(assignment);
+                break;
+            case RobotTaskType.WorkerCollectorWaitForBatch:
+                workerBody.WaitAtDropOff(assignment);
+                break;
+        }
+    }
+
+    private static void ExitWorkerCollectorTask(RobotTaskContextNew context, TaskExitReason reason)
+    {
+        IWorkerCollectorTaskBody workerBody = context.WorkerCollectorBody;
+        if (workerBody == null)
+            return;
+        WorkerCollectorMissionAssignment assignment = context.Payload as WorkerCollectorMissionAssignment;
+        if (reason == TaskExitReason.Disabled || context.CurrentTask.Type == RobotTaskType.WorkerCollectorStandby)
+            workerBody.StopAllActuators();
+        else
+            workerBody.CancelCurrentCommand(assignment);
     }
 
     private static void ScheduleOrCompleteByTaskExpiry(RobotTaskContextNew context, float fallbackSeconds)

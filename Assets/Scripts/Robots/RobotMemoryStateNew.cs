@@ -28,7 +28,13 @@ public enum MemoryChangeType
     CollectorDockChanged,
     CollectorTargetInvalidated,
     CollectorFlightFaultChanged,
-    CollectorMissionCleared
+    CollectorMissionCleared,
+    WorkerCollectorMissionAssigned,
+    WorkerCollectorTargetChanged,
+    WorkerCollectorCargoChanged,
+    WorkerCollectorTargetInvalidated,
+    WorkerCollectorDropOffChanged,
+    WorkerCollectorMissionCleared
 }
 
 public struct MemoryChangeEvent
@@ -309,6 +315,92 @@ public class RobotMemoryStateNew
         }
 
         Raise(MemoryChangeType.WaypointAvailabilityChanged);
+    }
+
+    /// <summary>
+    /// Atomically installs a claimed Worker Collector mission.
+    /// </summary>
+    public bool TryAssignWorkerCollectorMission(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null || !assignment.HasRequiredReferences
+            || !assignment.Target.IsClaimValid(assignment.Claim)
+            || ReferenceEquals(snapshot.WorkerCollector.Assignment, assignment))
+            return false;
+
+        snapshot.WorkerCollector = new WorkerCollectorMissionFacts { Assignment = assignment };
+        Raise(MemoryChangeType.WorkerCollectorMissionAssigned);
+        return true;
+    }
+
+    /// <summary>
+    /// Applies one assignment-scoped observation from the Worker Collector body.
+    /// </summary>
+    public bool TryApplyWorkerCollectorObservation(WorkerCollectorBodyObservation observation)
+    {
+        WorkerCollectorMissionFacts facts = snapshot.WorkerCollector;
+        if (observation.Assignment == null || observation.CommandToken <= 0
+            || !ReferenceEquals(facts.Assignment, observation.Assignment))
+            return false;
+
+        switch (observation.Type)
+        {
+            case WorkerCollectorBodyObservationType.TargetApproachChanged:
+                if (!HasValidWorkerCollectorClaim() || facts.TargetApproachReached == observation.Value)
+                    return false;
+                facts.TargetApproachReached = observation.Value;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorTargetChanged);
+                return true;
+
+            case WorkerCollectorBodyObservationType.CargoChanged:
+                if (!HasValidWorkerCollectorClaim() || facts.CargoSecured == observation.Value)
+                    return false;
+                facts.CargoSecured = observation.Value;
+                facts.CargoLost = !observation.Value;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorCargoChanged);
+                return true;
+
+            case WorkerCollectorBodyObservationType.TargetUnavailable:
+                if (facts.TargetUnavailable)
+                    return false;
+                facts.TargetUnavailable = true;
+                facts.CargoSecured = false;
+                facts.CargoLost = true;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorTargetInvalidated);
+                return true;
+
+            case WorkerCollectorBodyObservationType.DropOffApproachChanged:
+                if (!facts.CargoSecured || facts.DropOffApproachReached == observation.Value)
+                    return false;
+                facts.DropOffApproachReached = observation.Value;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorDropOffChanged);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Clears only the matching Worker Collector assignment.
+    /// </summary>
+    public bool TryClearWorkerCollectorMission(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null || !ReferenceEquals(snapshot.WorkerCollector.Assignment, assignment))
+            return false;
+        snapshot.WorkerCollector = default;
+        Raise(MemoryChangeType.WorkerCollectorMissionCleared);
+        return true;
+    }
+
+    private bool HasValidWorkerCollectorClaim()
+    {
+        WorkerCollectorMissionAssignment assignment = snapshot.WorkerCollector.Assignment;
+        return assignment != null && assignment.Target != null
+            && assignment.Target.IsClaimValid(assignment.Claim);
     }
 
     /// <summary>
