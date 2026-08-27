@@ -9,6 +9,7 @@ public interface IFactoryManager
 
     void Initialize(MapManager mapManager, IWaypointService waypointService, VictorySetup victorySetup, IEnemiesSpawner enemiesSpawner);
     void InitializeStatic(VictorySetup victorySetup);
+    void InitializeStatic(VictorySetup victorySetup, IWaypointService waypointService);
     void RegisterStaticRooms(IEnumerable<RoomManager> rooms, Transform playerHead);
     IWaypointService GetWayPointService();
     /// <summary>

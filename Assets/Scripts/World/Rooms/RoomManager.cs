@@ -138,6 +138,14 @@ public class RoomManager : MonoBehaviour
                 waypointService = service;
         }
 
+        if (waypointService != null)
+        {
+            InitializeStaticMachineWaypoints(factorymMachinesInRoom);
+            InitializeStaticMachineWaypoints(restingMachinesInRoom);
+            InitializeStaticMachineWaypoints(securityMachinesInRoom);
+            InitializeStaticMachineWaypoints(spawningMachinesInRoom);
+        }
+
         if (factoryManager != null && !alarmSubscribed)
         {
             factoryManager.OnFactoryAlarmChanged += HandleFactoryAlarmChanged;
@@ -145,6 +153,19 @@ public class RoomManager : MonoBehaviour
         }
 
         SubscribeRoomMachineEvents();
+    }
+
+    private void InitializeStaticMachineWaypoints<TMachine>(IEnumerable<TMachine> machines)
+        where TMachine : BaseMachine
+    {
+        if (machines == null)
+            return;
+
+        foreach (TMachine machine in machines)
+        {
+            if (machine != null)
+                machine.InitializeWaypointService(waypointService);
+        }
     }
 
     private void OnDestroy()

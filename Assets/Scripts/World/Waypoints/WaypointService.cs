@@ -28,6 +28,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
 
     private IWaypointRegistry registry;
     private IPathFinder pathFinder;
+    public WaypointGraphMode GraphMode { get; private set; } = WaypointGraphMode.Generated;
 
     // Reservation data
     private readonly HashSet<RoomWaypoint> reservedWaypoints = new();
@@ -148,6 +149,26 @@ public class WaypointService : MonoBehaviour, IWaypointService
         }
 
         pathFinder.BuildAllNeighbors(includeUnavailable);
+    }
+
+    /// <summary>Configures how the shared path finder rebuilds its graph.</summary>
+    public bool ConfigureGraph(WaypointGraphMode mode, StaticLevelPath authoredPath = null)
+    {
+        if (pathFinder is not WaypointPathFinder concretePathFinder)
+        {
+            Debug.LogError($"{nameof(WaypointService)} requires {nameof(WaypointPathFinder)} to configure graph mode.", this);
+            return false;
+        }
+
+        if (mode == WaypointGraphMode.StaticExplicit && authoredPath == null)
+        {
+            Debug.LogError("StaticExplicit waypoint mode requires an authored StaticLevelPath.", this);
+            return false;
+        }
+
+        concretePathFinder.ConfigureGraph(mode, authoredPath);
+        GraphMode = mode;
+        return true;
     }
 
     public RoomWaypoint ClosestWaypointToPlayer { get; private set; }

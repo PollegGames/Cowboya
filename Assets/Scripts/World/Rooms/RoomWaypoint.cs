@@ -21,19 +21,28 @@ public class RoomWaypoint : MonoBehaviour
 
     private void Awake()
     {
-        Id = transform.position.ToString("F2") + "_" + type.ToString();
+        EnsureIdentity();
         Neighbors = new List<RoomWaypoint>();
     }
 
     public override bool Equals(object obj)
     {
+        if (ReferenceEquals(this, obj))
+            return true;
         if (obj is RoomWaypoint wp)
-            return this.Id == wp.Id; // or compare position if Id is not set
+            return EnsureIdentity() == wp.EnsureIdentity();
         return false;
     }
 
     public override int GetHashCode()
     {
-        return Id.GetHashCode();
+        return EnsureIdentity().GetHashCode();
+    }
+
+    private string EnsureIdentity()
+    {
+        if (string.IsNullOrEmpty(Id))
+            Id = transform.position.ToString("F2") + "_" + type;
+        return Id;
     }
 }

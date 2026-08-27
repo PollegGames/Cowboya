@@ -47,6 +47,16 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         IWaypointNotifier waypointNotifier,
         IRobotRespawnService respawnService)
     {
+        bool navigationChanged = this.waypointQueries != waypointQueries
+            || this.waypointNotifier != waypointNotifier;
+        if (navigationChanged && pathFollower != null)
+        {
+            pathFollower.OnStuck -= stuckHandler;
+            this.waypointNotifier?.Unsubscribe(pathFollower);
+            pathFollower = null;
+            stuckHandler = null;
+        }
+
         this.waypointQueries = waypointQueries;
         this.waypointNotifier = waypointNotifier;
         if (bodyMaintenance != null && respawnService != null)

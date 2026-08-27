@@ -61,6 +61,34 @@ public class SceneBootstrapper : MonoBehaviour
             badgeSpawner = Instantiate(config.badgeSpawnerPrefab);
             batterySpawner = Instantiate(config.batterySpawnerPrefab);
         }
+        else
+        {
+            System.Collections.Generic.List<StaticLevelPath> staticPaths = StaticLevelPath.FindEnabledInScene();
+            if (staticPaths.Count > 1)
+            {
+                Debug.LogError($"Static navigation requires exactly one enabled {nameof(StaticLevelPath)}, but found {staticPaths.Count}.");
+            }
+            else if (staticPaths.Count == 1)
+            {
+                WaypointService[] existingServices = FindObjectsByType<WaypointService>(FindObjectsSortMode.None);
+                if (existingServices.Length == 1)
+                {
+                    waypointService = existingServices[0];
+                }
+                else if (existingServices.Length > 1)
+                {
+                    Debug.LogError($"Static navigation requires exactly one waypoint service, but found {existingServices.Length}.");
+                }
+                else if (config.waypointServicePrefab != null)
+                {
+                    waypointService = Instantiate(config.waypointServicePrefab);
+                }
+                else
+                {
+                    Debug.LogError("SceneBootstrapper cannot create static navigation because the waypoint service prefab is missing.");
+                }
+            }
+        }
 
         if (SceneController.instance == null)
         {

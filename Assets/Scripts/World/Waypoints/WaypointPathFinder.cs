@@ -7,6 +7,10 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
     [SerializeField] private MonoBehaviour registryBehaviour;
     private IWaypointRegistry registry;
     private List<INeighborConnector> connectors;
+    private WaypointGraphMode graphMode = WaypointGraphMode.Generated;
+    private StaticLevelPath staticLevelPath;
+
+    public WaypointGraphMode GraphMode => graphMode;
 
     private void Awake()
     {
@@ -65,6 +69,12 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
         foreach (var wp in allWaypoints)
             wp.Neighbors.Clear();
 
+        if (graphMode == WaypointGraphMode.StaticExplicit)
+        {
+            BuildStaticNeighbors();
+            return;
+        }
+
         foreach (var connector in connectors)
             connector.Connect(allWaypoints, includeUnavailable);
 
@@ -81,6 +91,32 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
                     if (!wpA.Neighbors.Contains(wpB)) wpA.Neighbors.Add(wpB);
                     if (!wpB.Neighbors.Contains(wpA)) wpB.Neighbors.Add(wpA);
                 }
+        }
+    }
+
+    /// <summary>Chooses generated or explicitly-authored topology rebuilding.</summary>
+    public void ConfigureGraph(WaypointGraphMode mode, StaticLevelPath authoredPath = null)
+    {
+        graphMode = mode;
+        staticLevelPath = authoredPath;
+    }
+
+    private void BuildStaticNeighbors()
+    {
+        if (staticLevelPath == null)
+        {
+            Debug.LogError("StaticExplicit waypoint mode requires a StaticLevelPath.", this);
+            return;
+        }
+
+        foreach (StaticWaypointConnection connection in staticLevelPath.GetDirectedConnections())
+        {
+            if (connection.From != null
+                && connection.To != null
+                && !connection.From.Neighbors.Contains(connection.To))
+            {
+                connection.From.Neighbors.Add(connection.To);
+            }
         }
     }
 

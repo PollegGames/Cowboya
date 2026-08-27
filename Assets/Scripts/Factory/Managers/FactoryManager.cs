@@ -98,8 +98,13 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 
     public void InitializeStatic(VictorySetup victorySetup)
     {
+        InitializeStatic(victorySetup, null);
+    }
+
+    public void InitializeStatic(VictorySetup victorySetup, IWaypointService waypointService)
+    {
         this.mapManager = null;
-        this.waypointService = null;
+        this.waypointService = waypointService;
         this.victorySetup = victorySetup;
         SetupFactoryState();
         roomManagers.Clear();

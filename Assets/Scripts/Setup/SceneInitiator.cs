@@ -124,7 +124,8 @@ public class SceneInitiator : GameInitiator
         }
 
         RobotDomainEventAdapter.EnsureInScene();
-        factoryManager.InitializeStatic(victorySetup);
+        factoryManager.InitializeStatic(victorySetup, waypointService);
+        InitializeStaticNavigationGraph();
         Debug.Log("Static FactoryManager initialized.");
     }
 
@@ -163,6 +164,7 @@ public class SceneInitiator : GameInitiator
         playerInitiator.InitializePlayer(saveService);
         factoryManager.SetPlayerInstanceHead(playerInitiator.playerInstance, playerInitiator.playerHeadTransform);
         InitializeStaticRooms();
+        InitializeStaticRobotNavigation();
 
         gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
         SetCinemachineTarget(playerInitiator.playerHeadTransform);
@@ -176,6 +178,33 @@ public class SceneInitiator : GameInitiator
     {
         RoomManager[] rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
         factoryManager.RegisterStaticRooms(rooms, playerInitiator.playerHeadTransform);
+    }
+
+    private void InitializeStaticNavigationGraph()
+    {
+        if (waypointService == null)
+            return;
+
+        System.Collections.Generic.List<StaticLevelPath> paths = StaticLevelPath.FindEnabledInScene();
+        if (paths.Count != 1)
+        {
+            Debug.LogError($"Static navigation expected one enabled {nameof(StaticLevelPath)}, but found {paths.Count}.");
+            return;
+        }
+
+        paths[0].TryInitializeNavigation(waypointService);
+    }
+
+    private void InitializeStaticRobotNavigation()
+    {
+        if (waypointService == null)
+            return;
+
+        System.Collections.Generic.List<StaticLevelPath> paths = StaticLevelPath.FindEnabledInScene();
+        if (paths.Count != 1 || !paths[0].IsNavigationReady)
+            return;
+
+        StaticRobotNavigationInitializer.InitializeSceneRobots(waypointService);
     }
 
     private Vector3 ResolveStaticPlayerStartPosition()
