@@ -9,7 +9,9 @@ public enum WorkerCollectorAssignmentFailure
     NavigationUnavailable,
     NoGarageSlot,
     NoWhiteCube,
-    BrainRejectedAssignment
+    BrainRejectedAssignment,
+    NoSource,
+    NoGarage
 }
 
 /// <summary>
@@ -95,7 +97,7 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
     }
 
     /// <summary>
-    /// Finds and assigns one exclusively claimed white cube through Brain ingress.
+    /// Records a stable service route in Memory before the Brain chooses source travel.
     /// </summary>
     public static bool RequestAssignment(WorkerCollectorBodyController collector)
     {
@@ -106,6 +108,39 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         }
         EnsureInstance();
         return instance.TryAssign(collector);
+    }
+
+    /// <summary>
+    /// Claims local cargo and a garage slot only after the worker reaches its source.
+    /// </summary>
+    public static bool RequestTarget(WorkerCollectorBodyController collector,
+        WorkerCollectorMissionAssignment assignment) {
+        if (collector == null || collector.Brain == null || collector.Brain.Memory == null
+            || assignment == null || !assignment.HasRequiredReferences || assignment.HasClaimedTarget)
+            return false;
+
+        RobotMemoryNew memory = collector.Brain.Memory;
+        WorkerCollectorMissionFacts facts = memory.Snapshot.WorkerCollector;
+        if (!ReferenceEquals(facts.Assignment, assignment) || !facts.SourceApproachReached
+            || !assignment.Source.isActiveAndEnabled || !assignment.DropOff.CanAcceptDelivery)
+            return false;
+
+        if (!assignment.Source.TryClaimCube(collector, out WhiteCubeCargo target, out WhiteCubeClaim claim))
+            return false;
+
+        if (!assignment.DropOff.TryReserve(collector, out GarageSlotReservation reservation)) {
+            target.ReleaseClaim(claim);
+            return false;
+        }
+
+        var targetedAssignment = new WorkerCollectorMissionAssignment(assignment.MissionId,
+            assignment.Source, assignment.DropOff, assignment.Rest, target, claim, reservation);
+        if (memory.TryAcquireWorkerCollectorTarget(assignment, targetedAssignment))
+            return true;
+
+        target.ReleaseClaim(claim);
+        assignment.DropOff.ReleaseReservation(reservation);
+        return false;
     }
 
     private static void EnsureInstance()
@@ -138,40 +173,32 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         }
 
         RemoveMissingRegistrations();
-        WorkerCollectorDropOffProvider dropOff = FindAvailableGarage(collector, out GarageSlotReservation reservation);
+        WorkerCollectorDropOffProvider dropOff = FindGarage();
         if (dropOff == null)
         {
-            SetAssignmentFailure(WorkerCollectorAssignmentFailure.NoGarageSlot, collector);
+            SetAssignmentFailure(WorkerCollectorAssignmentFailure.NoGarage, collector);
             return false;
         }
 
-        bool foundWhiteCube = false;
         for (int i = 0; i < sources.Count; i++)
         {
             WorkerCollectorWhiteCubeSourceProvider source = sources[i];
-            if (source == null || !source.TryClaimCube(collector, out WhiteCubeCargo target, out WhiteCubeClaim claim))
+            if (source == null || !source.isActiveAndEnabled || source.ApproachWaypoint == null)
                 continue;
-
-            foundWhiteCube = true;
 
             WorkerCollectorSpawnRestProvider rest = rests.Count > 0 ? rests[0] : null;
             var assignment = new WorkerCollectorMissionAssignment(
-                ++nextMissionId, source, dropOff, rest, target, claim, reservation);
-            if (collector.Brain.OnWorkerCollectorMissionAssigned(assignment))
+                ++nextMissionId, source, dropOff, rest);
+            if (collector.Brain.Memory.TryAssignWorkerCollectorMission(assignment))
             {
                 SetAssignmentFailure(WorkerCollectorAssignmentFailure.None, collector);
                 return true;
             }
-
-            target.ReleaseClaim(claim);
+            SetAssignmentFailure(WorkerCollectorAssignmentFailure.BrainRejectedAssignment, collector);
+            return false;
         }
 
-
-        dropOff.ReleaseReservation(reservation);
-        SetAssignmentFailure(foundWhiteCube
-            ? WorkerCollectorAssignmentFailure.BrainRejectedAssignment
-            : WorkerCollectorAssignmentFailure.NoWhiteCube, collector);
-
+        SetAssignmentFailure(WorkerCollectorAssignmentFailure.NoSource, collector);
         return false;
     }
 
@@ -190,19 +217,15 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         lastReportedFailure = failure;
     }
 
-    private WorkerCollectorDropOffProvider FindAvailableGarage(
-        WorkerCollectorBodyController collector, out GarageSlotReservation reservation)
+    private WorkerCollectorDropOffProvider FindGarage()
     {
-        reservation = default;
-
-        if (preferredDropOff != null && preferredDropOff.TryReserve(collector, out reservation))
+        if (preferredDropOff != null && preferredDropOff.isActiveAndEnabled && preferredDropOff.IsGarageDestination)
             return preferredDropOff;
 
         for (int i = 0; i < dropOffs.Count; i++)
         {
             WorkerCollectorDropOffProvider dropOff = dropOffs[i];
-            if (dropOff != null && dropOff != preferredDropOff
-                && dropOff.TryReserve(collector, out reservation))
+            if (dropOff != null && dropOff.isActiveAndEnabled && dropOff.IsGarageDestination)
                 return dropOff;
         }
         return null;
@@ -217,17 +240,7 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         WorkerCollectorBodyController[] live = FindObjectsByType<WorkerCollectorBodyController>(
             FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         if (live.Length > 0)
-        {
-            // Provider registration can happen after the collector's first FindCube
-            // attempt. Wake every idle collector when the service checks readiness so
-            // a missed startup retry cannot leave it in standby permanently.
-            for (int i = 0; i < live.Length; i++)
-            {
-                if (live[i] != null && live[i].CurrentAssignment == null)
-                    live[i].FindCube();
-            }
             return;
-        }
 
         // Creation belongs to the rest/spawn capability. Source and garage providers
         // may register later in the frame (the garage waits for its coordinator), so

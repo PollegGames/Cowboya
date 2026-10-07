@@ -37,7 +37,9 @@ public enum MemoryChangeType
     WorkerCollectorDeliveryChanged,
     WorkerCollectorBatchCompleted,
     WorkerCollectorRestChanged,
-    WorkerCollectorMissionCleared
+    WorkerCollectorMissionCleared,
+    WorkerCollectorSourceChanged,
+    WorkerCollectorGarageAvailabilityChanged
 }
 
 public struct MemoryChangeEvent
@@ -321,16 +323,65 @@ public class RobotMemoryStateNew
     }
 
     /// <summary>
-    /// Atomically installs a claimed Worker Collector mission.
+    /// Remembers a Worker Collector route, optionally with a cube already claimed.
     /// </summary>
-    public bool TryAssignWorkerCollectorMission(WorkerCollectorMissionAssignment assignment)
-    {
+    public bool TryAssignWorkerCollectorMission(WorkerCollectorMissionAssignment assignment) {
         if (assignment == null || !assignment.HasRequiredReferences
-            || !assignment.Target.IsClaimValid(assignment.Claim)
-            || ReferenceEquals(snapshot.WorkerCollector.Assignment, assignment))
+            || snapshot.WorkerCollector.Assignment != null
+            || (assignment.Target != null && !assignment.Target.IsClaimValid(assignment.Claim))
+            || (assignment.Target == null && assignment.Claim.IsValid))
             return false;
 
-        snapshot.WorkerCollector = new WorkerCollectorMissionFacts { Assignment = assignment };
+        snapshot.WorkerCollector = new WorkerCollectorMissionFacts {
+            Assignment = assignment,
+            GarageAvailable = true
+        };
+        Raise(MemoryChangeType.WorkerCollectorMissionAssigned);
+        return true;
+    }
+
+    /// <summary>
+    /// Records a nearby claimed cube without changing the remembered route or mission identity.
+    /// </summary>
+    public bool TryAcquireWorkerCollectorTarget(
+        WorkerCollectorMissionAssignment sourceAssignment,
+        WorkerCollectorMissionAssignment claimedAssignment) {
+        WorkerCollectorMissionFacts facts = snapshot.WorkerCollector;
+        if (sourceAssignment == null || claimedAssignment == null
+            || !ReferenceEquals(facts.Assignment, sourceAssignment)
+            || sourceAssignment.HasClaimedTarget || !facts.SourceApproachReached
+            || !claimedAssignment.HasRequiredReferences || !claimedAssignment.HasClaimedTarget
+            || !claimedAssignment.Target.IsClaimValid(claimedAssignment.Claim)
+            || claimedAssignment.MissionId != sourceAssignment.MissionId
+            || claimedAssignment.Source != sourceAssignment.Source
+            || claimedAssignment.DropOff != sourceAssignment.DropOff
+            || claimedAssignment.Rest != sourceAssignment.Rest)
+            return false;
+
+        facts.Assignment = claimedAssignment;
+        facts.TargetApproachReached = true;
+        facts.GarageAvailable = true;
+        snapshot.WorkerCollector = facts;
+        Raise(MemoryChangeType.WorkerCollectorTargetChanged);
+        return true;
+    }
+
+    /// <summary>
+    /// Starts the next collection attempt on the same remembered route.
+    /// </summary>
+    public bool TryResetWorkerCollectorMission(
+        WorkerCollectorMissionAssignment assignment, bool sourceApproachReached = false) {
+        if (assignment == null || !assignment.HasRequiredReferences
+            || !ReferenceEquals(snapshot.WorkerCollector.Assignment, assignment)
+            || !assignment.Source.isActiveAndEnabled || !assignment.DropOff.isActiveAndEnabled)
+            return false;
+
+        snapshot.WorkerCollector = new WorkerCollectorMissionFacts {
+            Assignment = new WorkerCollectorMissionAssignment(
+                assignment.MissionId, assignment.Source, assignment.DropOff, assignment.Rest),
+            SourceApproachReached = sourceApproachReached,
+            GarageAvailable = true
+        };
         Raise(MemoryChangeType.WorkerCollectorMissionAssigned);
         return true;
     }
@@ -347,6 +398,22 @@ public class RobotMemoryStateNew
 
         switch (observation.Type)
         {
+            case WorkerCollectorBodyObservationType.SourceApproachChanged:
+                if (facts.Assignment.HasClaimedTarget || facts.SourceApproachReached == observation.Value)
+                    return false;
+                facts.SourceApproachReached = observation.Value;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorSourceChanged);
+                return true;
+
+            case WorkerCollectorBodyObservationType.GarageAvailabilityChanged:
+                if (!facts.CargoSecured || facts.GarageAvailable == observation.Value)
+                    return false;
+                facts.GarageAvailable = observation.Value;
+                snapshot.WorkerCollector = facts;
+                Raise(MemoryChangeType.WorkerCollectorGarageAvailabilityChanged);
+                return true;
+
             case WorkerCollectorBodyObservationType.TargetApproachChanged:
                 if (!HasValidWorkerCollectorClaim() || facts.TargetApproachReached == observation.Value)
                     return false;
@@ -360,6 +427,8 @@ public class RobotMemoryStateNew
                     return false;
                 facts.CargoSecured = observation.Value;
                 facts.CargoLost = !observation.Value;
+                if (observation.Value)
+                    facts.SourceApproachReached = false;
                 snapshot.WorkerCollector = facts;
                 Raise(MemoryChangeType.WorkerCollectorCargoChanged);
                 return true;

@@ -22,6 +22,7 @@ public sealed class GarageCubeProcessor : MonoBehaviour
 
     private float closedHoldRemaining;
     private bool subscribed;
+    private bool removingCompletedBatch;
 
     public event Action<int> OnBatchCompleted;
     public event Action OnBatchInterrupted;
@@ -69,6 +70,7 @@ public sealed class GarageCubeProcessor : MonoBehaviour
             return;
         if (storage == null || !storage.IsFull)
         {
+            OnBatchInterrupted?.Invoke();
             BeginOpening();
             return;
         }
@@ -76,7 +78,15 @@ public sealed class GarageCubeProcessor : MonoBehaviour
         closedHoldRemaining -= deltaTime;
         if (closedHoldRemaining > 0f)
             return;
-        if (!storage.ProcessFullBatch())
+        bool processed;
+        removingCompletedBatch = true;
+        try {
+            processed = storage.ProcessFullBatch();
+        }
+        finally {
+            removingCompletedBatch = false;
+        }
+        if (!processed)
         {
             BeginOpening();
             return;
@@ -89,8 +99,15 @@ public sealed class GarageCubeProcessor : MonoBehaviour
 
     private void HandleOccupancyChanged(int count)
     {
-        if (State == GarageProcessorState.Processing)
+        if (removingCompletedBatch)
             return;
+        if (State == GarageProcessorState.Processing) {
+            if (count < GarageCubeStorage.Capacity) {
+                OnBatchInterrupted?.Invoke();
+                BeginOpening();
+            }
+            return;
+        }
         if (count == GarageCubeStorage.Capacity && State == GarageProcessorState.Open)
         {
             State = GarageProcessorState.Closing;

@@ -184,10 +184,25 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
         memoryState.TryApplyCollectorObservation(observation);
 
     /// <summary>
-    /// Assigns a claimed white cube to this Worker Collector Memory.
+    /// Remembers this Worker's source, garage, and rest route before local cube acquisition.
     /// </summary>
     public bool TryAssignWorkerCollectorMission(WorkerCollectorMissionAssignment assignment) =>
         memoryState.TryAssignWorkerCollectorMission(assignment);
+
+    /// <summary>
+    /// Remembers the cube observed and claimed after reaching the assigned source.
+    /// </summary>
+    public bool TryAcquireWorkerCollectorTarget(
+        WorkerCollectorMissionAssignment sourceAssignment,
+        WorkerCollectorMissionAssignment claimedAssignment) =>
+        memoryState.TryAcquireWorkerCollectorTarget(sourceAssignment, claimedAssignment);
+
+    /// <summary>
+    /// Resets collection progress while keeping the same remembered source and garage.
+    /// </summary>
+    public bool TryResetWorkerCollectorMission(
+        WorkerCollectorMissionAssignment assignment, bool sourceApproachReached = false) =>
+        memoryState.TryResetWorkerCollectorMission(assignment, sourceApproachReached);
 
     /// <summary>
     /// Applies a physical Worker Collector observation.

@@ -94,11 +94,11 @@ public class WorkerCollectorGrabPipelineTests
         cargo.transform.SetParent(conveyorObject.transform);
         GameObject worker = CreateObject("Worker");
 
-        cargo.transform.position = approach.transform.position + Vector3.right * 5f;
+        cargo.GetComponent<Rigidbody2D>().position = (Vector2)approach.transform.position + Vector2.right * 5f;
         Assert.IsFalse(source.TryClaimCube(worker, out _, out _));
         Assert.IsTrue(cargo.IsAvailable);
 
-        cargo.transform.position = approach.transform.position + Vector3.right;
+        cargo.GetComponent<Rigidbody2D>().position = (Vector2)approach.transform.position + Vector2.right;
         Assert.IsTrue(source.TryClaimCube(worker, out WhiteCubeCargo selected, out WhiteCubeClaim claim));
         Assert.AreSame(cargo, selected);
         Assert.IsTrue(cargo.IsClaimValid(claim));
@@ -140,7 +140,8 @@ public class WorkerCollectorGrabPipelineTests
         WorkerCollectorDropOffProvider dropOff =
             dropOffObject.AddComponent<WorkerCollectorDropOffProvider>();
         WhiteCubeCargo cargo = CreateCargo("ApproachCargo");
-        cargo.GetComponent<Rigidbody2D>().position = new Vector2(12f, 4f);
+        cargo.GetComponent<Rigidbody2D>().position =
+            (Vector2)instance.GetComponent<RobotBodyController>().BodyReference.position + Vector2.right * 12f;
         Assert.IsTrue(cargo.TryClaim(controller, out WhiteCubeClaim claim));
         var assignment = new WorkerCollectorMissionAssignment(
             99, source, dropOff, cargo, claim);
@@ -166,6 +167,7 @@ public class WorkerCollectorGrabPipelineTests
         created.Add(instance);
         WorkerCollectorBodyController controller =
             instance.GetComponent<WorkerCollectorBodyController>();
+        InvokePrivate(controller, "ResolveReferences");
         Transform solverTarget = FindDescendant(instance.transform, "RArm_Solver_Target");
         Transform effector = FindDescendant(instance.transform, "RHand_Effector");
         Vector3 solverStart = solverTarget.position;
@@ -230,9 +232,41 @@ public class WorkerCollectorGrabPipelineTests
         Assert.AreNotEqual(WhiteCubeCargoState.Carried, cargo.State);
     }
 
-    [Test]
-    public void GrabCube_ReachesWithObjectController_AndAttachesCargoToHandAnchor()
-    {
+    [TestCase(-1f, CowboyArmSide.Left)]
+    [TestCase(1f, CowboyArmSide.Right)]
+    public void GrabCube_ReachesWithObjectController_AndAttachesCargoToHandAnchor(
+        float side, CowboyArmSide expectedArm) {
+        var setup = CreatePhysicalGrab(side, expectedArm);
+
+        Assert.IsNull(setup.Reach.Target);
+        Assert.AreEqual(WhiteCubeCargoState.Carried, setup.Cargo.State);
+        Assert.AreSame(setup.Controller.CarryAnchor, setup.Cargo.transform.parent);
+        Assert.IsTrue(setup.Cargo.transform.IsChildOf(setup.Reach.ActiveHandEffector),
+            "The selected hand must carry the cube, including a left-hand pickup.");
+
+        setup.Reach.Tick(1f);
+        Assert.AreEqual(expectedArm, setup.Reach.ActiveArm);
+    }
+
+    [TestCase(-1f, CowboyArmSide.Left)]
+    [TestCase(1f, CowboyArmSide.Right)]
+    public void SourceDisabled_WhileCarrying_ReleasesAttachedCargoAndArmPose(
+        float side, CowboyArmSide expectedArm) {
+        var setup = CreatePhysicalGrab(side, expectedArm);
+
+        setup.Source.enabled = false;
+        InvokePrivate(setup.Source, "OnDisable");
+
+        Assert.IsNull(setup.Cargo.transform.parent);
+        Assert.IsFalse(setup.Cargo.GetComponent<TargetJoint2D>().enabled);
+        Assert.IsTrue(setup.Cargo.IsAvailable);
+        Assert.IsNull(setup.Controller.CurrentAssignment);
+        Assert.IsNull(setup.Reach.ActiveArm);
+    }
+
+    private (WorkerCollectorBodyController Controller, RobotObjectArmReachController Reach,
+        WorkerCollectorWhiteCubeSourceProvider Source, WhiteCubeCargo Cargo) CreatePhysicalGrab(
+        float side, CowboyArmSide expectedArm) {
         const string PrefabPath =
             "Assets/Resources/Prefabs/Robots/WorkerCollector/WorkerCollector.prefab";
         GameObject instance = UnityEngine.Object.Instantiate(
@@ -251,9 +285,13 @@ public class WorkerCollectorGrabPipelineTests
         WorkerCollectorDropOffProvider dropOff =
             dropOffObject.AddComponent<WorkerCollectorDropOffProvider>();
         WhiteCubeCargo cargo = CreateCargo("GrabCargo");
-        cargo.GetComponent<Rigidbody2D>().position =
-            (Vector2)instance.transform.position + Vector2.right * reachController.ReachRadius;
-        Assert.IsTrue(cargo.TryClaim(controller, out WhiteCubeClaim claim));
+        cargo.transform.SetParent(sourceObject.transform, true);
+        RobotBodyController body = instance.GetComponent<RobotBodyController>();
+        Vector2 cubePosition = (Vector2)body.BodyReference.position + Vector2.right * side * 1.5f;
+        cargo.transform.position = cubePosition;
+        cargo.GetComponent<Rigidbody2D>().position = cubePosition;
+        Assert.IsTrue(source.TryClaimCube(controller, out WhiteCubeCargo selected, out WhiteCubeClaim claim));
+        Assert.AreSame(cargo, selected);
         var assignment = new WorkerCollectorMissionAssignment(
             102, source, dropOff, cargo, claim);
 
@@ -261,12 +299,37 @@ public class WorkerCollectorGrabPipelineTests
         reachController.Tick(1f);
         Transform hand = reachController.ActiveHandEffector;
         Assert.IsNotNull(hand);
+        Assert.AreEqual(expectedArm, reachController.ActiveArm);
         cargo.GetComponent<Rigidbody2D>().position = hand.position;
         InvokePrivate(controller, "Update");
 
-        Assert.AreSame(cargo.transform, reachController.Target);
         Assert.AreEqual(WhiteCubeCargoState.Carried, cargo.State);
-        Assert.AreSame(controller.CarryAnchor, cargo.transform.parent);
+        return (controller, reachController, source, cargo);
+    }
+
+    [Test]
+    public void NavigationArrival_RemainsObservableUntilTheTaskAcknowledgesIt() {
+        GameObject instance = UnityEngine.Object.Instantiate(
+            AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Resources/Prefabs/Robots/WorkerCollector/WorkerCollector.prefab"));
+        created.Add(instance);
+        RobotBodyController body = instance.GetComponent<RobotBodyController>();
+        RoomWaypoint start = CreateObject("Start").AddComponent<RoomWaypoint>();
+        RoomWaypoint destination = CreateObject("Destination").AddComponent<RoomWaypoint>();
+        start.transform.position = body.BodyReference.position;
+        destination.transform.position = start.transform.position + Vector3.right;
+        body.Initialize(new PathQueriesStub(start, destination), null, null);
+        body.SetDestination(destination, destination.WorldPos, new Vector2(0.15f, 2f),
+            includeUnavailable: true, replaceTargetWaypoint: true);
+        body.BodyReference.position = destination.WorldPos;
+
+        InvokePrivate(body, "Update");
+
+        Assert.IsTrue(body.HasArrivedAtDestination(),
+            "Arrival must remain available to the collector's next observation update.");
+        Assert.IsFalse(body.HasActivePath);
+        body.StopMovement();
+        Assert.IsFalse(body.HasArrivedAtDestination());
     }
 
     [Test]
@@ -338,7 +401,7 @@ public class WorkerCollectorGrabPipelineTests
     }
 
     [Test]
-    public void TargetLoss_ClearsMissionAndReturnsToFindCube()
+    public void TargetLoss_ReleasesCubeAndReturnsToRememberedSource()
     {
         Pipeline setup = CreatePipeline();
         WorkerCollectorMissionAssignment assignment = CreateAssignment(setup.Body, 2);
@@ -348,9 +411,9 @@ public class WorkerCollectorGrabPipelineTests
         Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
             WorkerCollectorBodyObservation.TargetLost(assignment, 1)));
 
-        Assert.IsNull(setup.Memory.Snapshot.WorkerCollector.Assignment);
-        AssertCurrent(setup, RobotTaskType.WorkerCollectorFindCube, null);
-        Assert.Contains("Find", setup.Body.Commands);
+        AssertResetRoute(setup, assignment);
+        Assert.IsFalse(assignment.Target.IsClaimValid(assignment.Claim));
+        Assert.Contains("MoveToSource", setup.Body.Commands);
     }
 
     [Test]
@@ -381,7 +444,7 @@ public class WorkerCollectorGrabPipelineTests
 
         Assert.IsTrue(setup.Brain.OnWorkerCollectorBodyObservation(
             WorkerCollectorBodyObservation.RestFinished(assignment, 4)));
-        AssertCurrent(setup, RobotTaskType.WorkerCollectorFindCube, null);
+        AssertResetRoute(setup, assignment);
     }
 
     [Test]
@@ -398,7 +461,146 @@ public class WorkerCollectorGrabPipelineTests
             WorkerCollectorBodyObservation.BatchInterrupted(assignment, 2)));
 
         Assert.IsFalse(setup.Memory.Snapshot.WorkerCollector.RestApproachReached);
-        AssertCurrent(setup, RobotTaskType.WorkerCollectorFindCube, null);
+        AssertResetRoute(setup, assignment);
+    }
+
+    [Test]
+    public void SourceArrivalThroughMemory_DrivesBrainHeartAndLocalAcquisition() {
+        Pipeline setup = CreatePipeline();
+        WorkerCollectorMissionAssignment claimed = CreateAssignment(setup.Body, 20);
+        var route = new WorkerCollectorMissionAssignment(
+            claimed.MissionId, claimed.Source, claimed.DropOff, null);
+        setup.Body.Commands.Clear();
+
+        Assert.IsTrue(setup.Memory.TryAssignWorkerCollectorMission(route));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorMoveToSource, route);
+        Assert.IsFalse(setup.Memory.TryAcquireWorkerCollectorTarget(route, claimed),
+            "The robot must reach its remembered source before acquiring a cube.");
+
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.SourceApproach(route, 1)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorAcquireCube, route);
+        Assert.Contains("Acquire", setup.Body.Commands);
+
+        Assert.IsTrue(setup.Memory.TryAcquireWorkerCollectorTarget(route, claimed));
+        Assert.IsTrue(setup.Memory.Snapshot.WorkerCollector.SourceApproachReached);
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorGrabCube, claimed);
+        Assert.IsFalse(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.TargetLost(route, 2)),
+            "Late observations from the source phase cannot invalidate the claimed cube.");
+        Assert.IsFalse(setup.Memory.TryAssignWorkerCollectorMission(route),
+            "An unrelated assignment cannot replace the active collection task.");
+    }
+
+    [Test]
+    public void GarageReopens_MemoryResumesRejectedDeliveryWithoutDroppingCargo() {
+        Pipeline setup = CreatePipeline();
+        WorkerCollectorMissionAssignment assignment = CreateAssignment(setup.Body, 21);
+        Assert.IsTrue(setup.Memory.TryAssignWorkerCollectorMission(assignment));
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.TargetApproach(assignment, 1)));
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.Cargo(assignment, 2, secured: true)));
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.DropOffApproach(assignment, 3)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorDepositCube, assignment);
+
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.GarageAvailability(assignment, 4, available: false)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorWaitForGarage, assignment);
+        Assert.IsTrue(setup.Memory.Snapshot.WorkerCollector.CargoSecured);
+        Assert.IsTrue(assignment.Target.IsClaimValid(assignment.Claim));
+
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.GarageAvailability(assignment, 5, available: true)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorDepositCube, assignment);
+        Assert.Contains("WaitForGarage", setup.Body.Commands);
+    }
+
+    [Test]
+    public void LosingCubeAtSource_ReacquiresLocally_WhileLossDuringDeliveryReturnsToSource() {
+        Pipeline setup = CreatePipeline();
+        WorkerCollectorMissionAssignment claimed = CreateAssignment(setup.Body, 23);
+        var route = new WorkerCollectorMissionAssignment(
+            claimed.MissionId, claimed.Source, claimed.DropOff, null);
+        Assert.IsTrue(setup.Memory.TryAssignWorkerCollectorMission(route));
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.SourceApproach(route, 1)));
+        Assert.IsTrue(setup.Memory.TryAcquireWorkerCollectorTarget(route, claimed));
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.TargetLost(claimed, 2)));
+        AssertResetRoute(setup, claimed, stillAtSource: true);
+
+        route = setup.Memory.Snapshot.WorkerCollector.Assignment;
+        Assert.IsTrue(claimed.Target.TryClaim(setup.Body, out WhiteCubeClaim nextClaim));
+        claimed = new WorkerCollectorMissionAssignment(
+            route.MissionId, route.Source, route.DropOff, route.Rest, claimed.Target, nextClaim, default);
+        Assert.IsTrue(setup.Memory.TryAcquireWorkerCollectorTarget(route, claimed));
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.Cargo(claimed, 3, secured: true)));
+        Assert.IsFalse(setup.Memory.Snapshot.WorkerCollector.SourceApproachReached);
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.TargetLost(claimed, 4)));
+        AssertResetRoute(setup, claimed);
+    }
+
+    [Test]
+    public void EachDeliveryBeforeFull_ReturnsToSameRoute_ThenFullBatchRestsAndRestarts() {
+        Pipeline setup = CreatePipeline();
+        WorkerCollectorMissionAssignment firstClaim = CreateAssignment(setup.Body, 22);
+        var route = new WorkerCollectorMissionAssignment(
+            firstClaim.MissionId, firstClaim.Source, firstClaim.DropOff, null);
+        Assert.IsTrue(setup.Memory.TryAssignWorkerCollectorMission(route));
+        WorkerCollectorMissionAssignment delivery = null;
+
+        for (int i = 0; i < 9; i++) {
+            Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+                WorkerCollectorBodyObservation.SourceApproach(route, 1)));
+            WhiteCubeCargo cargo = i == 0 ? firstClaim.Target : CreateCargo("BatchCargo_" + i);
+            WhiteCubeClaim claim = firstClaim.Claim;
+            if (i > 0)
+                Assert.IsTrue(cargo.TryClaim(setup.Body, out claim));
+            delivery = new WorkerCollectorMissionAssignment(
+                route.MissionId, route.Source, route.DropOff, route.Rest, cargo, claim, default);
+            Assert.IsTrue(setup.Memory.TryAcquireWorkerCollectorTarget(route, delivery));
+            Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+                WorkerCollectorBodyObservation.Cargo(delivery, 2, secured: true)));
+            Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+                WorkerCollectorBodyObservation.DropOffApproach(delivery, 3)));
+            Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+                WorkerCollectorBodyObservation.Delivery(delivery, 4, waitingForBatch: i == 8)));
+            if (i < 8) {
+                AssertResetRoute(setup, delivery);
+                route = setup.Memory.Snapshot.WorkerCollector.Assignment;
+            }
+        }
+
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorWaitForBatch, delivery);
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.BatchProcessed(delivery, 5)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorMoveToRest, delivery);
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.RestApproach(delivery, 6)));
+        AssertCurrent(setup, RobotTaskType.WorkerCollectorRest, delivery);
+        Assert.IsTrue(setup.Memory.TryApplyWorkerCollectorObservation(
+            WorkerCollectorBodyObservation.RestFinished(delivery, 7)));
+        AssertResetRoute(setup, delivery);
+    }
+
+    private static void AssertResetRoute(
+        Pipeline setup, WorkerCollectorMissionAssignment previous, bool stillAtSource = false) {
+        WorkerCollectorMissionFacts facts = setup.Memory.Snapshot.WorkerCollector;
+        Assert.IsNotNull(facts.Assignment);
+        Assert.AreNotSame(previous, facts.Assignment);
+        Assert.AreEqual(previous.MissionId, facts.Assignment.MissionId);
+        Assert.AreSame(previous.Source, facts.Assignment.Source);
+        Assert.AreSame(previous.DropOff, facts.Assignment.DropOff);
+        Assert.AreSame(previous.Rest, facts.Assignment.Rest);
+        Assert.IsFalse(facts.Assignment.HasClaimedTarget);
+        Assert.AreEqual(stillAtSource, facts.SourceApproachReached);
+        AssertCurrent(setup, stillAtSource
+            ? RobotTaskType.WorkerCollectorAcquireCube
+            : RobotTaskType.WorkerCollectorMoveToSource, facts.Assignment);
     }
 
     private Pipeline CreatePipeline()
@@ -511,10 +713,13 @@ public class WorkerCollectorGrabPipelineTests
     {
         public List<string> Commands { get; } = new List<string>();
         public void FindCube() => Commands.Add("Find");
+        public void BeginMoveToSource(WorkerCollectorMissionAssignment assignment) => Commands.Add("MoveToSource");
+        public void AcquireCube(WorkerCollectorMissionAssignment assignment) => Commands.Add("Acquire");
         public void BeginMoveToCube(WorkerCollectorMissionAssignment assignment) => Commands.Add("MoveToCube");
         public void GrabCube(WorkerCollectorMissionAssignment assignment) => Commands.Add("Grab");
         public void BeginMoveToDropOff(WorkerCollectorMissionAssignment assignment) => Commands.Add("MoveToDropOff");
         public void DepositCube(WorkerCollectorMissionAssignment assignment) => Commands.Add("Deposit");
+        public void WaitForGarage(WorkerCollectorMissionAssignment assignment) => Commands.Add("WaitForGarage");
         public void WaitAtDropOff(WorkerCollectorMissionAssignment assignment) => Commands.Add("Wait");
         public void BeginMoveToRest(WorkerCollectorMissionAssignment assignment) => Commands.Add("MoveToRest");
         public void Rest(WorkerCollectorMissionAssignment assignment) => Commands.Add("Rest");

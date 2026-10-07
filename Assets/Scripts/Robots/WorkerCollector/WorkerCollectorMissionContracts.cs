@@ -2,10 +2,21 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Stable payload shared by the tasks for one Worker Collector pickup mission.
+/// Immutable service route shared by Worker Collector tasks, with optional per-delivery cargo ownership.
 /// </summary>
 public sealed class WorkerCollectorMissionAssignment
 {
+    /// <summary>
+    /// Remembers the collection route before the worker observes a nearby cube.
+    /// </summary>
+    public WorkerCollectorMissionAssignment(
+        int missionId,
+        WorkerCollectorWhiteCubeSourceProvider source,
+        WorkerCollectorDropOffProvider dropOff,
+        WorkerCollectorSpawnRestProvider rest)
+        : this(missionId, source, dropOff, rest, null, default, default) {
+    }
+
     public WorkerCollectorMissionAssignment(
         int missionId,
         WorkerCollectorWhiteCubeSourceProvider source,
@@ -41,17 +52,19 @@ public sealed class WorkerCollectorMissionAssignment
     public WhiteCubeCargo Target { get; }
     public WhiteCubeClaim Claim { get; }
     public GarageSlotReservation Reservation { get; }
-    public bool HasRequiredReferences => MissionId > 0 && Source != null && DropOff != null
-        && Target != null && Claim.IsValid;
+    public bool HasRequiredReferences => MissionId > 0 && Source != null && DropOff != null;
+    public bool HasClaimedTarget => Target != null && Claim.IsValid;
 }
 
 [Serializable]
 public struct WorkerCollectorMissionFacts
 {
     public WorkerCollectorMissionAssignment Assignment;
+    public bool SourceApproachReached;
     public bool TargetApproachReached;
     public bool CargoSecured;
     public bool CargoLost;
+    public bool GarageAvailable;
     public bool TargetUnavailable;
     public bool DropOffApproachReached;
     public bool DeliveryAccepted;
@@ -72,7 +85,9 @@ public enum WorkerCollectorBodyObservationType
     BatchCompleted = 5,
     RestApproachChanged = 6,
     RestCompleted = 7,
-    BatchInterrupted = 8
+    BatchInterrupted = 8,
+    SourceApproachChanged = 9,
+    GarageAvailabilityChanged = 10
 }
 
 public readonly struct WorkerCollectorBodyObservation
@@ -93,6 +108,16 @@ public readonly struct WorkerCollectorBodyObservation
     public WorkerCollectorMissionAssignment Assignment { get; }
     public int CommandToken { get; }
     public bool Value { get; }
+
+    public static WorkerCollectorBodyObservation SourceApproach(
+        WorkerCollectorMissionAssignment assignment, int token, bool reached = true) =>
+        new WorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservationType.SourceApproachChanged, assignment, token, reached);
+
+    public static WorkerCollectorBodyObservation GarageAvailability(
+        WorkerCollectorMissionAssignment assignment, int token, bool available) =>
+        new WorkerCollectorBodyObservation(
+            WorkerCollectorBodyObservationType.GarageAvailabilityChanged, assignment, token, available);
 
     public static WorkerCollectorBodyObservation TargetApproach(
         WorkerCollectorMissionAssignment assignment, int token, bool reached = true) =>
@@ -143,10 +168,13 @@ public readonly struct WorkerCollectorBodyObservation
 public interface IWorkerCollectorTaskBody
 {
     void FindCube();
+    void BeginMoveToSource(WorkerCollectorMissionAssignment assignment);
+    void AcquireCube(WorkerCollectorMissionAssignment assignment);
     void BeginMoveToCube(WorkerCollectorMissionAssignment assignment);
     void GrabCube(WorkerCollectorMissionAssignment assignment);
     void BeginMoveToDropOff(WorkerCollectorMissionAssignment assignment);
     void DepositCube(WorkerCollectorMissionAssignment assignment);
+    void WaitForGarage(WorkerCollectorMissionAssignment assignment);
     void WaitAtDropOff(WorkerCollectorMissionAssignment assignment);
     void BeginMoveToRest(WorkerCollectorMissionAssignment assignment);
     void Rest(WorkerCollectorMissionAssignment assignment);

@@ -2,7 +2,7 @@ using System.Reflection;
 using UnityEngine;
 
 /// <summary>
-/// Executes Worker Collector navigation and cube carrying while reporting physical facts through Brain.
+/// Executes Worker Collector tasks and records physical observations in Memory for Brain to evaluate.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RobotBodyController))]
@@ -44,14 +44,19 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
     private float nextArmReachDiagnosticAt;
     private bool armRestPoseCached;
     private bool holdArmPose;
+    private Transform securedCarryAnchor;
+    private RobotMemoryNew memory;
 
     private enum Command
     {
         None,
+        MovingToSource,
+        AcquiringCube,
         MovingToCube,
         ReachingForCube,
         MovingToDropOff,
         WaitingAtDropOff,
+        WaitingForGarage,
         MovingToRest,
         Resting
     }
@@ -60,6 +65,9 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
     public RobotBrainNew Brain => brain;
     public WorkerCollectorMissionAssignment CurrentAssignment => currentAssignment;
     public Vector2 PickupArrivalThreshold => pickupArrivalThreshold;
+    public float AcquisitionRadius => armReachController != null
+        ? armReachController.ReachRadius + pickupDistance
+        : maximumArmReachStartDistance + pickupDistance;
 
     private void Awake() => ResolveReferences();
 
@@ -79,9 +87,11 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         RestoreCargoCollisions();
         robotBody?.StopMovement();
         CancelInvoke(nameof(FindCube));
+        CancelInvoke(nameof(ScanForCube));
         CancelInvoke(nameof(CompleteRest));
         command = Command.None;
         holdArmPose = false;
+        securedCarryAnchor = null;
         armReachController?.ClearTarget();
         RestoreArmPoseImmediate();
     }
@@ -91,9 +101,17 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         if (currentAssignment == null)
             return;
 
+        if (currentAssignment.Source == null || !currentAssignment.Source.isActiveAndEnabled
+            || currentAssignment.DropOff == null || !currentAssignment.DropOff.isActiveAndEnabled)
+        {
+            ReportDestinationUnavailable();
+            return;
+        }
+
         if ((command == Command.MovingToCube
                 || command == Command.ReachingForCube
-                || command == Command.MovingToDropOff)
+                || command == Command.MovingToDropOff
+                || command == Command.WaitingForGarage)
             && !IsTargetValid())
         {
             ReportTargetLost();
@@ -102,6 +120,15 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
 
         switch (command)
         {
+            case Command.MovingToSource:
+                if (robotBody != null && robotBody.HasArrivedAtDestination())
+                {
+                    robotBody.StopMovement();
+                    command = Command.None;
+                    Observe(WorkerCollectorBodyObservation.SourceApproach(currentAssignment, commandToken));
+                }
+                break;
+
             case Command.MovingToCube:
                 bool navigationArrived = robotBody != null && robotBody.HasArrivedAtDestination();
                 if (navigationArrived)
@@ -113,12 +140,18 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
                         break;
                     }
                     command = Command.None;
-                    brain?.OnWorkerCollectorBodyObservation(
+                    Observe(
                         WorkerCollectorBodyObservation.TargetApproach(currentAssignment, commandToken));
                 }
                 break;
 
             case Command.ReachingForCube:
+                if (memory != null && memory.Snapshot.WorkerCollector.SourceApproachReached
+                    && !currentAssignment.Source.IsTargetInCollectionArea(this, currentAssignment.Target))
+                {
+                    ReportTargetLost();
+                    break;
+                }
                 Vector2 pickupPoint = GetPickupPoint(currentAssignment);
                 Transform reachReference = GetActiveReachEffector();
                 float reachDistance = CalculateReachDistance(currentAssignment);
@@ -143,9 +176,15 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
                 {
                     robotBody.StopMovement();
                     command = Command.None;
-                    brain?.OnWorkerCollectorBodyObservation(
+                    Observe(
                         WorkerCollectorBodyObservation.DropOffApproach(currentAssignment, commandToken));
                 }
+                break;
+
+            case Command.WaitingForGarage:
+                if (currentAssignment.DropOff.CanAcceptDelivery)
+                    Observe(WorkerCollectorBodyObservation.GarageAvailability(
+                        currentAssignment, commandToken, true));
                 break;
 
             case Command.MovingToRest:
@@ -153,7 +192,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
                 {
                     robotBody.StopMovement();
                     command = Command.None;
-                    brain?.OnWorkerCollectorBodyObservation(
+                    Observe(
                         WorkerCollectorBodyObservation.RestApproach(currentAssignment, commandToken));
                 }
                 break;
@@ -201,6 +240,40 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             Invoke(nameof(FindCube), cubeScanInterval);
     }
 
+    /// <summary>
+    /// Travels to the source's stable work waypoint before observing nearby cargo.
+    /// </summary>
+    public void BeginMoveToSource(WorkerCollectorMissionAssignment assignment) {
+        if (!PrepareCommand(assignment, requireTarget: false))
+            return;
+        armReachController?.ClearTarget();
+        holdArmPose = false;
+        command = Command.MovingToSource;
+        RoomWaypoint waypoint = assignment.Source.ApproachWaypoint;
+        if (robotBody != null && waypoint != null)
+            robotBody.SetDestination(waypoint, waypoint.WorldPos, pickupArrivalThreshold,
+                includeUnavailable: true, replaceTargetWaypoint: true);
+    }
+
+    /// <summary>
+    /// Observes local cargo while stationary; acquisition enters Memory before a grab task is chosen.
+    /// </summary>
+    public void AcquireCube(WorkerCollectorMissionAssignment assignment) {
+        if (!PrepareCommand(assignment, requireTarget: false))
+            return;
+        robotBody?.StopMovement();
+        command = Command.AcquiringCube;
+        ScanForCube();
+    }
+
+    private void ScanForCube() {
+        CancelInvoke(nameof(ScanForCube));
+        if (command != Command.AcquiringCube || currentAssignment == null)
+            return;
+        if (!WorkerCollectorMissionService.RequestTarget(this, currentAssignment) && isActiveAndEnabled)
+            Invoke(nameof(ScanForCube), cubeScanInterval);
+    }
+
     public void BeginMoveToCube(WorkerCollectorMissionAssignment assignment)
     {
         if (!PrepareCommand(assignment))
@@ -228,21 +301,22 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         if (!PrepareCommand(assignment))
             return;
 
-        if (armSolverTarget == null)
+        if (armReachController == null && armSolverTarget == null)
         {
             TrySecureReachedCube(DistanceFromCarryAnchor(GetPickupPoint(assignment)));
             return;
         }
 
         robotBody?.StopMovement();
-        FaceRightForPickup();
-        armReachController?.SetTarget(assignment.Target.transform);
+        if (armReachController == null)
+            FaceRightForPickup();
+        armReachController?.SetPickupTarget(assignment.Target.transform);
         command = Command.ReachingForCube;
         nextArmReachDiagnosticAt = Time.time + armReachDiagnosticInterval;
         holdArmPose = false;
         Debug.Log(
             "[WorkerCollectorDiagnostics] WorkerCollectorGrabCube started; continuously reaching until secured. "
-            + $"solverTarget={armSolverTarget.position:F2}, "
+            + $"solverTarget={(armSolverTarget != null ? armSolverTarget.position.ToString("F2") : "null")}, "
             + $"effector={(armEffector != null ? armEffector.position.ToString("F2") : "null")}, "
             + $"pickupWorkerPlane={GetPickupPoint(assignment):F2}, speed={armReachSpeed:F2}.",
             this);
@@ -270,6 +344,16 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             robotBody?.StopMovement();
     }
 
+    /// <summary>
+    /// Holds carried cargo until garage availability is observed and Memory causes replanning.
+    /// </summary>
+    public void WaitForGarage(WorkerCollectorMissionAssignment assignment) {
+        if (!PrepareCommand(assignment))
+            return;
+        robotBody?.StopMovement();
+        command = Command.WaitingForGarage;
+    }
+
     public void DepositCube(WorkerCollectorMissionAssignment assignment)
     {
         if (!PrepareCommand(assignment) || assignment.DropOff == null)
@@ -281,15 +365,16 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             subscribedTarget = assignment.Target;
             if (subscribedTarget != null)
                 subscribedTarget.OnClaimLost += HandleClaimLost;
-            command = Command.WaitingAtDropOff;
+            Observe(WorkerCollectorBodyObservation.GarageAvailability(assignment, commandToken, false));
             return;
         }
 
         RestoreCargoCollisions();
+        securedCarryAnchor = null;
         holdArmPose = false;
         armReachController?.ClearTarget();
         command = waitingForBatch ? Command.WaitingAtDropOff : Command.None;
-        brain?.OnWorkerCollectorBodyObservation(
+        Observe(
             WorkerCollectorBodyObservation.Delivery(assignment, commandToken, waitingForBatch));
     }
 
@@ -328,7 +413,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         if (assignment == null || !ReferenceEquals(currentAssignment, assignment))
             return;
         commandToken++;
-        brain?.OnWorkerCollectorBodyObservation(
+        Observe(
             WorkerCollectorBodyObservation.BatchProcessed(assignment, commandToken));
     }
 
@@ -337,13 +422,19 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         if (assignment == null || !ReferenceEquals(currentAssignment, assignment))
             return;
         commandToken++;
-        brain?.OnWorkerCollectorBodyObservation(
+        Observe(
             WorkerCollectorBodyObservation.BatchInterrupted(assignment, commandToken));
     }
 
     public void ReportDestinationUnavailable()
     {
-        ReportTargetLost();
+        WorkerCollectorMissionAssignment assignment = currentAssignment;
+        if (assignment == null)
+            return;
+        ReleaseCurrentCargo();
+        StopAllActuators();
+        currentAssignment = null;
+        memory?.TryClearWorkerCollectorMission(assignment);
     }
 
     public void CancelCurrentCommand(WorkerCollectorMissionAssignment assignment)
@@ -352,6 +443,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             return;
         robotBody?.StopMovement();
         CancelInvoke(nameof(FindCube));
+        CancelInvoke(nameof(ScanForCube));
         CancelInvoke(nameof(CompleteRest));
         command = Command.None;
         if (!IsCarryingCurrentTarget())
@@ -365,6 +457,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
     {
         robotBody?.StopMovement();
         CancelInvoke(nameof(FindCube));
+        CancelInvoke(nameof(ScanForCube));
         CancelInvoke(nameof(CompleteRest));
         command = Command.None;
         if (!IsCarryingCurrentTarget())
@@ -374,7 +467,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         }
     }
 
-    private bool PrepareCommand(WorkerCollectorMissionAssignment assignment)
+    private bool PrepareCommand(WorkerCollectorMissionAssignment assignment, bool requireTarget = true)
     {
         ResolveReferences();
         if (assignment == null || !assignment.HasRequiredReferences)
@@ -390,7 +483,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
                 subscribedTarget.OnClaimLost += HandleClaimLost;
         }
 
-        if (!IsTargetValid())
+        if (requireTarget && !IsTargetValid())
         {
             ReportTargetLost();
             return false;
@@ -409,9 +502,16 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         return Vector2.Distance(origin, position);
     }
 
-    private Transform EffectiveCarryAnchor => carryAnchor != null
-        ? carryAnchor
-        : (armEffector != null ? armEffector : armSolverTarget);
+    private Transform EffectiveCarryAnchor {
+        get {
+            if (securedCarryAnchor != null)
+                return securedCarryAnchor;
+            Transform activeHand = armReachController != null ? armReachController.ActiveHandEffector : null;
+            if (activeHand != null && activeHand != armEffector)
+                return activeHand;
+            return carryAnchor != null ? carryAnchor : (armEffector != null ? armEffector : armSolverTarget);
+        }
+    }
 
     private bool IsCarryingCurrentTarget() => currentAssignment != null
         && currentAssignment.Target != null
@@ -453,14 +553,17 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         }
 
         command = Command.None;
+        securedCarryAnchor = anchor;
         holdArmPose = true;
+        armReachController?.HoldCurrentPose();
         IgnoreCargoCollisions(target);
+        Transform grabbedHand = GetActiveReachEffector();
         Debug.Log(
             $"[WorkerCollectorDiagnostics] Arm grab succeeded: distance={reachDistance:F2}, "
-            + $"hand={(armEffector != null ? armEffector.position.ToString("F2") : "null")}, "
+            + $"hand={(grabbedHand != null ? grabbedHand.position.ToString("F2") : "null")}, "
             + $"cube={target.transform.position:F2}.",
             this);
-        brain?.OnWorkerCollectorBodyObservation(
+        Observe(
             WorkerCollectorBodyObservation.Cargo(assignment, commandToken, secured: true));
     }
 
@@ -478,15 +581,12 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
 
         robotBody?.StopMovement();
         command = Command.None;
+        ReleaseCurrentCargo();
         holdArmPose = false;
         armReachController?.ClearTarget();
-        RestoreCargoCollisions();
-        UnsubscribeTarget();
-        lost.Target?.ReleaseClaim(lost.Claim);
         currentAssignment = null;
         commandToken++;
-        lost.DropOff?.ReleaseReservation(lost.Reservation);
-        brain?.OnWorkerCollectorBodyObservation(
+        Observe(
             WorkerCollectorBodyObservation.TargetLost(lost, commandToken));
     }
 
@@ -495,6 +595,22 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         if (subscribedTarget != null)
             subscribedTarget.OnClaimLost -= HandleClaimLost;
         subscribedTarget = null;
+    }
+
+    private void ReleaseCurrentCargo() {
+        UnsubscribeTarget();
+        if (currentAssignment != null && currentAssignment.Target != null
+            && currentAssignment.Target.Pickup != null
+            && currentAssignment.Target.transform.parent == EffectiveCarryAnchor)
+            currentAssignment.Target.Pickup.OnRelease(Vector2.zero);
+        currentAssignment?.Target?.ReleaseClaim(currentAssignment.Claim);
+        currentAssignment?.DropOff?.ReleaseReservation(currentAssignment.Reservation);
+        RestoreCargoCollisions();
+        securedCarryAnchor = null;
+    }
+
+    private void Observe(WorkerCollectorBodyObservation observation) {
+        memory?.TryApplyWorkerCollectorObservation(observation);
     }
 
     private void IgnoreCargoCollisions(WhiteCubeCargo cargo)
@@ -545,6 +661,8 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             robotBody = GetComponent<RobotBodyController>();
         if (brain == null)
             brain = GetComponent<RobotBrainNew>();
+        if (memory == null)
+            memory = GetComponent<RobotMemoryNew>();
     }
 
     private Vector2 GetPickupPoint(WorkerCollectorMissionAssignment assignment)
@@ -655,9 +773,10 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             + $"{(armReachController != null ? armReachController.ReachRadius : 0f):F2}.",
             this);
 
-        if (cubeIsRightOfWorker && validDistance)
+        if ((armReachController != null || cubeIsRightOfWorker) && validDistance)
         {
-            FaceRightForPickup();
+            if (armReachController == null)
+                FaceRightForPickup();
             return true;
         }
 
@@ -739,7 +858,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             return;
         command = Command.None;
         commandToken++;
-        brain?.OnWorkerCollectorBodyObservation(
+        Observe(
             WorkerCollectorBodyObservation.RestFinished(assignment, commandToken));
     }
 
@@ -749,7 +868,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             return;
         currentAssignment = assignment;
         commandToken++;
-        brain?.OnWorkerCollectorBodyObservation(
+        Observe(
             WorkerCollectorBodyObservation.RestApproach(assignment, commandToken));
     }
 }

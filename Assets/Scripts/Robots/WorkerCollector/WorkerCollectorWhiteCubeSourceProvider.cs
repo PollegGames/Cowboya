@@ -8,7 +8,8 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
 {
     [SerializeField] private RoomWaypoint approachWaypoint;
     [SerializeField] private Transform cubeRoot;
-    [SerializeField, Min(0.1f)] private float conveyorClaimRadius = 1.5f;
+    [UnityEngine.Serialization.FormerlySerializedAs("conveyorClaimRadius")]
+    [SerializeField, Min(0.1f)] private float localPickupRadius = 3f;
 
     private readonly System.Collections.Generic.List<ClaimedCargo> issuedClaims =
         new System.Collections.Generic.List<ClaimedCargo>();
@@ -25,6 +26,7 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
     }
 
     public RoomWaypoint ApproachWaypoint => approachWaypoint;
+    public float LocalPickupRadius => Mathf.Max(0.1f, localPickupRadius);
 
     /// <summary>
     /// Returns the cube position in the same world XY plane used by robot navigation and IK.
@@ -57,13 +59,13 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
     }
 
     /// <summary>
-    /// Claims the first available white cargo currently owned by this source hierarchy.
+    /// Claims the nearest eligible white cargo within the worker's local acquisition area.
     /// </summary>
     public bool TryClaimCube(Object claimant, out WhiteCubeCargo cargo, out WhiteCubeClaim claim)
     {
         cargo = null;
         claim = default;
-        if (claimant == null)
+        if (claimant == null || !isActiveAndEnabled)
             return false;
 
         issuedClaims.RemoveAll(issued => issued.Cargo == null
@@ -71,31 +73,55 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
 
         Transform searchRoot = cubeRoot != null ? cubeRoot : transform;
         WhiteCubeCargo[] candidates = searchRoot.GetComponentsInChildren<WhiteCubeCargo>(true);
+        Vector2 origin = GetAcquisitionOrigin(claimant);
+        float maximumDistance = GetAcquisitionRadius(claimant);
+        float nearestDistanceSquared = maximumDistance * maximumDistance;
+        WhiteCubeCargo nearest = null;
         for (int i = 0; i < candidates.Length; i++)
         {
             WhiteCubeCargo candidate = candidates[i];
-            if (!IsAtConveyorPickup(candidate))
+            if (candidate == null || !candidate.IsAvailable)
                 continue;
-            if (candidate != null && candidate.TryClaim(claimant, out claim))
-            {
-                cargo = candidate;
-                issuedClaims.Add(new ClaimedCargo(candidate, claim));
-                return true;
+            float distanceSquared = (GetWorkerPlanePickupPoint(candidate) - origin).sqrMagnitude;
+            if (distanceSquared <= nearestDistanceSquared) {
+                nearest = candidate;
+                nearestDistanceSquared = distanceSquared;
             }
         }
-        return false;
+        if (nearest == null || !nearest.TryClaim(claimant, out claim))
+            return false;
+
+        cargo = nearest;
+        issuedClaims.Add(new ClaimedCargo(nearest, claim));
+        return true;
     }
 
-    private bool IsAtConveyorPickup(WhiteCubeCargo candidate)
-    {
-        if (candidate == null)
+    /// <summary>
+    /// Checks whether a moving target still belongs to this source and remains in local reach.
+    /// </summary>
+    public bool IsTargetInCollectionArea(WorkerCollectorBodyController collector, WhiteCubeCargo target) {
+        if (collector == null || target == null || !isActiveAndEnabled || !target.isActiveAndEnabled)
             return false;
-        if (candidate.GetComponentInParent<GarageCubeConveyorController>() == null
-            || approachWaypoint == null)
-            return true;
 
-        return Vector2.Distance(GetWorkerPlanePickupPoint(candidate), approachWaypoint.WorldPos)
-            <= Mathf.Max(0.1f, conveyorClaimRadius);
+        Transform searchRoot = cubeRoot != null ? cubeRoot : transform;
+        return target.transform.IsChildOf(searchRoot)
+            && Vector2.Distance(GetWorkerPlanePickupPoint(target), GetAcquisitionOrigin(collector))
+                <= GetAcquisitionRadius(collector);
+    }
+
+    private Vector2 GetAcquisitionOrigin(Object claimant) {
+        Transform claimantTransform = claimant is Component component ? component.transform
+            : claimant is GameObject claimantObject ? claimantObject.transform : null;
+        RobotBodyController body = claimantTransform != null
+            ? claimantTransform.GetComponent<RobotBodyController>() : null;
+        return body != null && body.BodyReference != null ? (Vector2)body.BodyReference.position
+            : claimantTransform != null ? (Vector2)claimantTransform.position
+            : approachWaypoint != null ? approachWaypoint.WorldPos : (Vector2)transform.position;
+    }
+
+    private float GetAcquisitionRadius(Object claimant) {
+        WorkerCollectorBodyController collector = claimant as WorkerCollectorBodyController;
+        return collector != null ? Mathf.Min(LocalPickupRadius, collector.AcquisitionRadius) : LocalPickupRadius;
     }
 
     private void ResolveReferences()

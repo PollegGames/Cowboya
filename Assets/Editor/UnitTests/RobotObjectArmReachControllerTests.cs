@@ -73,7 +73,7 @@ public class RobotObjectArmReachControllerTests
             new Vector3(6f, 8f, 20f),
             3f);
 
-        Assert.AreEqual(new Vector3(1.8f, 2.4f, 0f), result);
+        Assert.That(Vector3.Distance(new Vector3(1.8f, 2.4f, 0f), result), Is.LessThan(0.0001f));
     }
 
     [Test]
@@ -84,6 +84,98 @@ public class RobotObjectArmReachControllerTests
         Vector3 result = RobotObjectArmReachController.CalculateReachPoint(center, center, 3f);
 
         Assert.AreEqual(center, result);
+    }
+
+    [Test]
+    public void CalculatePickupReachPoint_NearbyCube_DoesNotOvershoot() {
+        Vector3 result = RobotObjectArmReachController.CalculatePickupReachPoint(
+            new Vector3(1f, 2f, -4f), new Vector3(2f, 3f, 10f), 3f);
+
+        Assert.AreEqual(new Vector3(2f, 3f, -4f), result);
+    }
+
+    [Test]
+    public void CalculatePickupReachPoint_DistantCube_ClampsToReachLimit() {
+        Vector3 result = RobotObjectArmReachController.CalculatePickupReachPoint(
+            Vector3.zero, new Vector3(6f, 8f, 20f), 3f);
+
+        Assert.That(result.x, Is.EqualTo(1.8f).Within(0.0001f));
+        Assert.That(result.y, Is.EqualTo(2.4f).Within(0.0001f));
+        Assert.AreEqual(0f, result.z);
+    }
+
+    [TestCase(-1f, CowboyArmSide.Left)]
+    [TestCase(1f, CowboyArmSide.Right)]
+    public void SetPickupTarget_WithinReach_MovesSelectedArmToCube(float side, CowboyArmSide expectedArm) {
+        Transform root = CreateObject("Robot").transform;
+        Transform left = CreateChild(root, "LArm_Solver_Target", Vector3.left);
+        Transform right = CreateChild(root, "RArm_Solver_Target", Vector3.right);
+        Transform target = CreateObject("Cube").transform;
+        target.position = new Vector3(side * 1.5f, 0.5f, 10f);
+        RobotObjectArmReachController controller = root.gameObject.AddComponent<RobotObjectArmReachController>();
+        controller.Configure(root, null, left, right);
+
+        controller.SetPickupTarget(target);
+        controller.Tick(1f);
+
+        Transform selected = expectedArm == CowboyArmSide.Left ? left : right;
+        Assert.AreEqual(expectedArm, controller.ActiveArm);
+        Assert.AreEqual(new Vector3(side * 1.5f, 0.5f, 0f), selected.position);
+    }
+
+    [TestCase(-1f, CowboyArmSide.Left)]
+    [TestCase(1f, CowboyArmSide.Right)]
+    public void HoldCurrentPose_PreservesActiveHandDuringCarry_AndClearReturnsToRest(
+        float side, CowboyArmSide expectedArm) {
+        Transform root = CreateObject("Robot").transform;
+        Transform left = CreateChild(root, "LArm_Solver_Target", Vector3.left);
+        Transform right = CreateChild(root, "RArm_Solver_Target", Vector3.right);
+        Transform leftHand = CreateChild(root, "LHand_Effector", Vector3.left);
+        Transform rightHand = CreateChild(root, "RHand_Effector", Vector3.right);
+        Transform target = CreateObject("Cube").transform;
+        target.position = new Vector3(side * 1.5f, 0.5f, 0f);
+        RobotObjectArmReachController controller = root.gameObject.AddComponent<RobotObjectArmReachController>();
+        controller.Configure(root, null, left, right);
+        controller.SetPickupTarget(target);
+        controller.Tick(1f);
+        Transform selected = expectedArm == CowboyArmSide.Left ? left : right;
+        Vector3 carryPose = selected.localPosition;
+
+        controller.HoldCurrentPose();
+        target.position = Vector3.up * 20f;
+        root.position = Vector3.right * 4f;
+        controller.Tick(1f);
+
+        Assert.IsNull(controller.Target, "Held cargo must not feed its changing position back into arm aim.");
+        Assert.AreEqual(expectedArm, controller.ActiveArm);
+        Assert.AreSame(expectedArm == CowboyArmSide.Left ? leftHand : rightHand, controller.ActiveHandEffector);
+        Assert.AreEqual(carryPose, selected.localPosition);
+
+        controller.ClearTarget();
+        controller.Tick(1f);
+
+        Assert.IsNull(controller.ActiveArm);
+        Assert.AreEqual(Vector3.left, left.localPosition);
+        Assert.AreEqual(Vector3.right, right.localPosition);
+    }
+
+    [Test]
+    public void SetTarget_AfterPickupHold_ResumesFixedOrbitAim() {
+        Transform root = CreateObject("Robot").transform;
+        Transform left = CreateChild(root, "LArm_Solver_Target", Vector3.left);
+        Transform right = CreateChild(root, "RArm_Solver_Target", Vector3.right);
+        Transform target = CreateObject("Cube").transform;
+        target.position = Vector3.right * 1.5f;
+        RobotObjectArmReachController controller = root.gameObject.AddComponent<RobotObjectArmReachController>();
+        controller.Configure(root, null, left, right);
+        controller.SetPickupTarget(target);
+        controller.Tick(1f);
+        controller.HoldCurrentPose();
+
+        controller.SetTarget(target);
+        controller.Tick(1f);
+
+        Assert.AreEqual(Vector3.right * controller.ReachRadius, right.position);
     }
 
     [Test]

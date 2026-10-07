@@ -27,20 +27,23 @@ public sealed class GarageCubeConveyorController : MonoBehaviour {
     }
 
     private void Update() {
-        if (currentCube == null || exitPoint == null)
+        StepMovement(Time.deltaTime);
+    }
+
+    /// <summary>
+    /// Advances the conveyor without stopping for a worker's temporary ownership claim.
+    /// </summary>
+    public void StepMovement(float deltaTime) {
+        if (currentCube == null || exitPoint == null || deltaTime <= 0f)
             return;
 
-        // A Worker Collector claims the cube only when it reaches the authored pickup
-        // waypoint. Hold it there until the worker grabs it or releases the claim.
-        WhiteCubeCargo cargo = currentCube.GetComponent<WhiteCubeCargo>();
-        if (cargo != null && cargo.State == WhiteCubeCargoState.Claimed)
-            return;
-
+        // A claim reserves ownership but does not stop the conveyor. The worker must
+        // physically reach the cube before it leaves the collection area.
         Vector3 cubePosition = currentCube.transform.position;
         Vector2 nextPosition = Vector2.MoveTowards(
             cubePosition,
             exitPoint.position,
-            speed * Time.deltaTime);
+            speed * deltaTime);
 
         cubePosition.x = nextPosition.x;
         cubePosition.y = nextPosition.y;

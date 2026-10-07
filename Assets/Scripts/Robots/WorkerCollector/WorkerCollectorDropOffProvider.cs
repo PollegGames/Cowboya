@@ -28,7 +28,8 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
     public GarageCubeStorage Storage => storage;
     public GarageCubeProcessor Processor => processor;
     public bool IsGarageDestination => storage != null && processor != null;
-    public bool CanAcceptDelivery => IsGarageDestination && processor.IsAccepting;
+    public bool CanAcceptDelivery => isActiveAndEnabled && IsGarageDestination
+        && storage.isActiveAndEnabled && processor.IsAccepting;
 
     private void Awake() => ResolveReferences();
     private void OnEnable()
@@ -74,7 +75,10 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
         {
             if (coordinator == null)
                 coordinator = GetComponent<GarageCubeCoordinator>();
-            if (coordinator != null && coordinator.IsReady)
+            // Standalone configured garages can expose the same capability without
+            // requiring the optional authored-prefab startup coordinator.
+            if (coordinator != null ? coordinator.IsReady
+                : IsGarageDestination && storage.isActiveAndEnabled && processor.isActiveAndEnabled)
             {
                 WorkerCollectorMissionService.RegisterDropOff(this);
                 registrationRoutine = null;

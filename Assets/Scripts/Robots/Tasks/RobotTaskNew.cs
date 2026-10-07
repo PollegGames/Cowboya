@@ -182,6 +182,9 @@ public class RobotTaskNew : IRobotTaskNew
             case RobotTaskType.WorkerCollectorWaitForBatch:
             case RobotTaskType.WorkerCollectorMoveToRest:
             case RobotTaskType.WorkerCollectorRest:
+            case RobotTaskType.WorkerCollectorMoveToSource:
+            case RobotTaskType.WorkerCollectorAcquireCube:
+            case RobotTaskType.WorkerCollectorWaitForGarage:
                 HandleWorkerCollectorTask(context);
                 break;
 
@@ -285,6 +288,9 @@ public class RobotTaskNew : IRobotTaskNew
             case RobotTaskType.WorkerCollectorWaitForBatch:
             case RobotTaskType.WorkerCollectorMoveToRest:
             case RobotTaskType.WorkerCollectorRest:
+            case RobotTaskType.WorkerCollectorMoveToSource:
+            case RobotTaskType.WorkerCollectorAcquireCube:
+            case RobotTaskType.WorkerCollectorWaitForGarage:
                 ExitWorkerCollectorTask(context, reason);
                 break;
 
@@ -853,6 +859,10 @@ public class RobotTaskNew : IRobotTaskNew
             {
                 if (assignment.Target != null)
                     assignment.Target.ReleaseClaim(assignment.Claim);
+                assignment.DropOff?.ReleaseReservation(assignment.Reservation);
+                bool stillAtSource = context.Memory.Snapshot.WorkerCollector.SourceApproachReached;
+                if (context.Memory.TryResetWorkerCollectorMission(assignment, stillAtSource))
+                    return;
                 if (context.Memory.TryClearWorkerCollectorMission(assignment))
                     return;
             }
@@ -869,6 +879,12 @@ public class RobotTaskNew : IRobotTaskNew
 
         switch (type)
         {
+            case RobotTaskType.WorkerCollectorMoveToSource:
+                workerBody.BeginMoveToSource(assignment);
+                break;
+            case RobotTaskType.WorkerCollectorAcquireCube:
+                workerBody.AcquireCube(assignment);
+                break;
             case RobotTaskType.WorkerCollectorMoveToCube:
                 workerBody.BeginMoveToCube(assignment);
                 break;
@@ -880,6 +896,9 @@ public class RobotTaskNew : IRobotTaskNew
                 break;
             case RobotTaskType.WorkerCollectorDepositCube:
                 workerBody.DepositCube(assignment);
+                break;
+            case RobotTaskType.WorkerCollectorWaitForGarage:
+                workerBody.WaitForGarage(assignment);
                 break;
             case RobotTaskType.WorkerCollectorWaitForBatch:
                 workerBody.WaitAtDropOff(assignment);

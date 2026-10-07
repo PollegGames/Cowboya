@@ -70,6 +70,26 @@ public class GarageCubeStorageAndProcessorTests
     }
 
     [Test]
+    public void Processor_PlayerRemovalDuringClosedHold_ReportsInterruptedAndReopens() {
+        GarageSetup setup = CreateGarage();
+        int interruptedCount = 0;
+        setup.Processor.OnBatchInterrupted += () => interruptedCount++;
+        WhiteCubeCargo[] cubes = Fill(setup.Storage, 9);
+        setup.Door.StepAnimation(2f);
+        Assert.AreEqual(GarageProcessorState.Processing, setup.Processor.State);
+
+        cubes[4].Pickup.OnGrab(Create("PlayerHand").transform);
+        setup.Processor.StepProcessing(2f);
+
+        Assert.AreEqual(1, interruptedCount);
+        Assert.AreEqual(8, setup.Storage.OccupiedCount);
+        Assert.AreEqual(0, setup.Processor.CompletedBatchCount);
+        Assert.AreEqual(GarageProcessorState.Opening, setup.Processor.State);
+        setup.Door.StepAnimation(2f);
+        Assert.IsTrue(setup.Processor.IsAccepting);
+    }
+
+    [Test]
     public void Processor_ValidClosedBatch_RemovesExactlyNine_AndReopens()
     {
         GarageSetup setup = CreateGarage();

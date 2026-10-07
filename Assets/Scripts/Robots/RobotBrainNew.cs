@@ -203,7 +203,7 @@ public class RobotBrainNew : MonoBehaviour
     }
 
     /// <summary>
-    /// Assigns one claimed white cube through Worker Collector Memory.
+    /// Compatibility ingress for recording a Worker Collector route in Memory.
     /// </summary>
     public bool OnWorkerCollectorMissionAssigned(WorkerCollectorMissionAssignment assignment)
     {
@@ -622,10 +622,19 @@ public class RobotBrainNew : MonoBehaviour
         }
         if (facts.TargetUnavailable || facts.CargoLost)
             return new RobotTask(RobotTaskType.WorkerCollectorFindCube, assignment);
+        if (!assignment.HasClaimedTarget) {
+            return new RobotTask(
+                facts.SourceApproachReached
+                    ? RobotTaskType.WorkerCollectorAcquireCube
+                    : RobotTaskType.WorkerCollectorMoveToSource,
+                assignment);
+        }
         if (!facts.TargetApproachReached)
             return new RobotTask(RobotTaskType.WorkerCollectorMoveToCube, assignment);
         if (!facts.CargoSecured)
             return new RobotTask(RobotTaskType.WorkerCollectorGrabCube, assignment);
+        if (!facts.GarageAvailable)
+            return new RobotTask(RobotTaskType.WorkerCollectorWaitForGarage, assignment);
         if (!facts.DropOffApproachReached)
             return new RobotTask(RobotTaskType.WorkerCollectorMoveToGarage, assignment);
         return new RobotTask(RobotTaskType.WorkerCollectorDepositCube, assignment);

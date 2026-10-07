@@ -11,6 +11,7 @@ public class RobotObjectArmReachController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform bodyReference;
+    [Tooltip("Arm aiming preview. During collection, the grab task supplies the claimed cube from Memory automatically.")]
     [SerializeField] private Transform target;
     [SerializeField] private Transform leftArmSolverTarget;
     [SerializeField] private Transform rightArmSolverTarget;
@@ -27,7 +28,7 @@ public class RobotObjectArmReachController : MonoBehaviour
     [Min(0.01f)]
     [SerializeField] private float rotationReturnSpeed = 720f;
     [Min(0.01f)]
-    [Tooltip("Fixed world-space radius of the player-style target orbit around the body.")]
+    [Tooltip("World-space radius of the aim orbit and maximum distance for an object pickup target.")]
     [SerializeField] private float maximumReach = 3f;
     [Min(0f)]
     [Tooltip("Center band in which the previously selected arm remains active.")]
@@ -56,6 +57,8 @@ public class RobotObjectArmReachController : MonoBehaviour
     private CowboyArmSide? activeArm;
     private Vector2 lastTargetDirection = Vector2.right;
     private bool hasTargetDirection;
+    private bool followTargetDistance;
+    private bool holdPose;
     private readonly Dictionary<Behaviour, Action<bool>> solverFlipSetters =
         new Dictionary<Behaviour, Action<bool>>();
 
@@ -84,6 +87,7 @@ public class RobotObjectArmReachController : MonoBehaviour
     private void OnDisable()
     {
         activeArm = null;
+        holdPose = false;
         hasTargetDirection = false;
         RestoreRestPoseImmediate();
         RestoreSolverDefaults();
@@ -112,6 +116,25 @@ public class RobotObjectArmReachController : MonoBehaviour
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
+        followTargetDistance = false;
+        holdPose = false;
+    }
+
+    /// <summary>
+    /// Reaches the object's actual position, limited by the maximum reach radius.
+    /// </summary>
+    public void SetPickupTarget(Transform newTarget) {
+        target = newTarget;
+        followTargetDistance = true;
+        holdPose = false;
+    }
+
+    /// <summary>
+    /// Keeps the selected arm pose relative to the robot after an object is attached.
+    /// </summary>
+    public void HoldCurrentPose() {
+        target = null;
+        holdPose = activeArm.HasValue;
     }
 
     /// <summary>
@@ -121,6 +144,7 @@ public class RobotObjectArmReachController : MonoBehaviour
     {
         target = null;
         activeArm = null;
+        holdPose = false;
     }
 
     /// <summary>
@@ -134,6 +158,8 @@ public class RobotObjectArmReachController : MonoBehaviour
     {
         bodyReference = body;
         target = newTarget;
+        followTargetDistance = false;
+        holdPose = false;
         leftArmSolverTarget = leftSolverTarget;
         rightArmSolverTarget = rightSolverTarget;
         leftArmIkSolver = ResolveIkSolver(leftArmSolverTarget);
@@ -153,6 +179,19 @@ public class RobotObjectArmReachController : MonoBehaviour
         ResolveReferences();
         CaptureRestPose();
         CaptureSolverDefaults();
+
+        if (holdPose && activeArm.HasValue) {
+            if (activeArm.Value == CowboyArmSide.Left) {
+                ReturnToRest(rightArmSolverTarget, rightRestLocalPosition,
+                    rightRestLocalRotation, rightRestCaptured, deltaTime);
+            }
+            else {
+                ReturnToRest(leftArmSolverTarget, leftRestLocalPosition,
+                    leftRestLocalRotation, leftRestCaptured, deltaTime);
+            }
+            RestoreSolverDefaults();
+            return;
+        }
 
         if (target == null || bodyReference == null)
         {
@@ -236,8 +275,24 @@ public class RobotObjectArmReachController : MonoBehaviour
         return new Vector3(targetPoint.x, targetPoint.y, bodyPosition.z);
     }
 
+    /// <summary>
+    /// Keeps a pickup target at its actual distance without extending beyond maximum reach.
+    /// </summary>
+    public static Vector3 CalculatePickupReachPoint(
+        Vector3 bodyPosition,
+        Vector3 targetPosition,
+        float reachRadius) {
+        Vector2 bodyPoint = bodyPosition;
+        Vector2 offset = (Vector2)targetPosition - bodyPoint;
+        Vector2 point = bodyPoint + Vector2.ClampMagnitude(offset, Mathf.Max(0f, reachRadius));
+        return new Vector3(point.x, point.y, bodyPosition.z);
+    }
+
     private Vector3 ResolveRadialTargetPosition()
     {
+        if (followTargetDistance)
+            return CalculatePickupReachPoint(bodyReference.position, target.position, maximumReach);
+
         Vector2 offset = target.position - bodyReference.position;
         if (offset.sqrMagnitude > Mathf.Epsilon)
         {
@@ -445,7 +500,9 @@ public class RobotObjectArmReachController : MonoBehaviour
         if (target == null)
             return;
 
-        Vector3 reachPoint = CalculateReachPoint(center, target.position, radius);
+        Vector3 reachPoint = followTargetDistance
+            ? CalculatePickupReachPoint(center, target.position, radius)
+            : CalculateReachPoint(center, target.position, radius);
         reachPoint.z = center.z;
         Vector3 targetPoint = target.position;
         targetPoint.z = center.z;
