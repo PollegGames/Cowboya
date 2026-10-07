@@ -21,6 +21,12 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
     public float RestDuration => Mathf.Max(0f, restDuration);
     public int MaximumLiveCollectors => Mathf.Max(1, maximumLiveCollectors);
 
+    // Static rooms use an XZ presentation hierarchy that is commonly pitched -90 degrees.
+    // The worker collector is a 2D rig, so only its prefab-authored rotation is valid here.
+    public Quaternion SpawnRotation => workerCollectorPrefab != null
+        ? workerCollectorPrefab.transform.rotation
+        : Quaternion.identity;
+
     private void Awake() => ResolveReferences();
 
     private void OnEnable()
@@ -55,16 +61,27 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
         Transform point = spawnPoint != null ? spawnPoint : transform;
         GameObject staging = new GameObject("WorkerCollectorSpawnStaging");
         staging.SetActive(false);
-        GameObject collector = Instantiate(workerCollectorPrefab, point.position, point.rotation, staging.transform);
+        GameObject collector = Instantiate(workerCollectorPrefab, point.position, SpawnRotation, staging.transform);
         collector.SetActive(false);
         collector.transform.SetParent(null, true);
         collector.name = workerCollectorPrefab.name;
+        AlignNavigationBodyToSpawn(collector, point.position);
         RobotStateController state = collector.GetComponent<RobotStateController>();
         if (state != null)
         {
             state.Stats = new WorkerRobotFactory().CreateRobot();
             state.Stats.RobotName = "Worker Collector";
         }
+
+        // Heart starts the initial WorkerCollectorFindCube task synchronously from
+        // OnEnable. Navigation must therefore be installed while the clone is still
+        // inactive, before that task can request its first mission.
+        bool navigationInitialized = StaticRobotNavigationInitializer.TryInitializeSpawnedRobot(collector);
+        RobotBodyController robotBody = collector.GetComponent<RobotBodyController>();
+        Debug.Log($"[WorkerCollectorDiagnostics] Spawn marker={point.position:F2}, "
+            + $"root={collector.transform.position:F2}, "
+            + $"body={(robotBody != null && robotBody.BodyReference != null ? robotBody.BodyReference.position.ToString("F2") : "null")}, "
+            + $"rotation={collector.transform.eulerAngles:F1}, navigationInitialized={navigationInitialized}.", collector);
         collector.SetActive(true);
         if (Application.isPlaying)
             Destroy(staging);
@@ -72,6 +89,20 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
             DestroyImmediate(staging);
         spawnedCollectors.Add(collector);
         return collector;
+    }
+
+    private static void AlignNavigationBodyToSpawn(GameObject collector, Vector3 spawnPosition)
+    {
+        RobotBodyController body = collector != null ? collector.GetComponent<RobotBodyController>() : null;
+        Transform navigationBody = body != null ? body.BodyReference : null;
+        if (navigationBody == null)
+            return;
+
+        // The inherited Worker rig has its animated body several units above its root.
+        // Paths measure from BodyReference, so align that physical/navigation reference
+        // with the authored marker rather than placing only the invisible prefab root.
+        collector.transform.position += spawnPosition - navigationBody.position;
+        Physics2D.SyncTransforms();
     }
 
     private void ResolveReferences()

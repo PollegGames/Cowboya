@@ -30,6 +30,12 @@ public sealed class GarageCubeConveyorController : MonoBehaviour {
         if (currentCube == null || exitPoint == null)
             return;
 
+        // A Worker Collector claims the cube only when it reaches the authored pickup
+        // waypoint. Hold it there until the worker grabs it or releases the claim.
+        WhiteCubeCargo cargo = currentCube.GetComponent<WhiteCubeCargo>();
+        if (cargo != null && cargo.State == WhiteCubeCargoState.Claimed)
+            return;
+
         Vector3 cubePosition = currentCube.transform.position;
         Vector2 nextPosition = Vector2.MoveTowards(
             cubePosition,

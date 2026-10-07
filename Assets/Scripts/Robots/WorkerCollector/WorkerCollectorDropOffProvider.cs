@@ -8,16 +8,22 @@ using System.Collections.Generic;
 public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
 {
     [SerializeField] private RoomWaypoint approachWaypoint;
+    [SerializeField] private Transform deliveryPoint;
     [SerializeField] private Transform waitPoint;
     [SerializeField] private GarageCubeStorage storage;
     [SerializeField] private GarageCubeProcessor processor;
 
     private WorkerCollectorBodyController batchWaitingCollector;
     private WorkerCollectorMissionAssignment batchWaitingAssignment;
+    private GarageCubeCoordinator coordinator;
+    private Coroutine registrationRoutine;
     private readonly Dictionary<int, WorkerCollectorBodyController> reservingCollectors =
         new Dictionary<int, WorkerCollectorBodyController>();
 
     public RoomWaypoint ApproachWaypoint => approachWaypoint;
+    public Transform DeliveryPoint => deliveryPoint;
+    public Transform WaitPoint => waitPoint;
+    public Vector3 DeliveryPosition => deliveryPoint != null ? deliveryPoint.position : transform.position;
     public Vector3 WaitPosition => waitPoint != null ? waitPoint.position : transform.position;
     public GarageCubeStorage Storage => storage;
     public GarageCubeProcessor Processor => processor;
@@ -35,12 +41,18 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
             processor.OnBatchInterrupted -= HandleBatchInterrupted;
             processor.OnBatchInterrupted += HandleBatchInterrupted;
         }
-        WorkerCollectorMissionService.RegisterDropOff(this);
+        coordinator = GetComponent<GarageCubeCoordinator>();
+        registrationRoutine = StartCoroutine(RegisterWhenGarageReady());
     }
 
     private void OnDisable()
     {
         WorkerCollectorMissionService.UnregisterDropOff(this);
+        if (registrationRoutine != null)
+        {
+            StopCoroutine(registrationRoutine);
+            registrationRoutine = null;
+        }
         if (processor != null)
         {
             processor.OnBatchCompleted -= HandleBatchCompleted;
@@ -56,10 +68,27 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
             affected[i]?.ReportDestinationUnavailable();
     }
 
-    public void Configure(RoomWaypoint waypoint, Transform configuredWaitPoint,
+    private System.Collections.IEnumerator RegisterWhenGarageReady()
+    {
+        while (isActiveAndEnabled)
+        {
+            if (coordinator == null)
+                coordinator = GetComponent<GarageCubeCoordinator>();
+            if (coordinator != null && coordinator.IsReady)
+            {
+                WorkerCollectorMissionService.RegisterDropOff(this);
+                registrationRoutine = null;
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
+    public void Configure(RoomWaypoint waypoint, Transform configuredDeliveryPoint, Transform configuredWaitPoint,
         GarageCubeStorage configuredStorage, GarageCubeProcessor configuredProcessor)
     {
         approachWaypoint = waypoint;
+        deliveryPoint = configuredDeliveryPoint;
         waitPoint = configuredWaitPoint;
         storage = configuredStorage;
         processor = configuredProcessor;
@@ -68,8 +97,33 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
     public bool TryReserve(WorkerCollectorBodyController collector, out GarageSlotReservation reservation)
     {
         reservation = default;
-        if (collector == null || !CanAcceptDelivery || !storage.TryReserve(collector, out reservation))
+        if (collector == null)
+        {
+            Debug.LogWarning("Worker Collector garage reservation failed: collector is null.", this);
             return false;
+        }
+
+        if (!CanAcceptDelivery)
+        {
+            Debug.LogWarning(
+                $"Worker Collector garage reservation failed: providerActive={isActiveAndEnabled}, "
+                + $"providerValid={IsGarageDestination}, processorActive={processor != null && processor.isActiveAndEnabled}, "
+                + $"processorState={(processor != null ? processor.State.ToString() : "null")}, "
+                + $"doorOpen={(processor != null && processor.IsDoorOpen)}, "
+                + $"storageActive={(storage != null && storage.isActiveAndEnabled)}, "
+                + $"occupied={(storage != null ? storage.OccupiedCount.ToString() : "null")}, "
+                + $"full={(storage != null && storage.IsFull)}.", this);
+            return false;
+        }
+
+        if (!storage.TryReserve(collector, out reservation))
+        {
+            Debug.LogWarning(
+                $"Worker Collector garage reservation failed: storage has no usable slot. "
+                + $"occupied={storage.OccupiedCount}, full={storage.IsFull}, slots={storage.Slots.Count}.", this);
+            return false;
+        }
+
         reservingCollectors[collector.GetInstanceID()] = collector;
         return true;
     }
@@ -135,8 +189,14 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
             if (approachWaypoint == null && waypoints.Length > 0)
                 approachWaypoint = waypoints[0];
         }
+        if (deliveryPoint == null)
+            deliveryPoint = transform.Find("DeliveryPoint");
+        if (deliveryPoint == null)
+            deliveryPoint = approachWaypoint != null ? approachWaypoint.transform : transform;
         if (waitPoint == null)
-            waitPoint = approachWaypoint != null ? approachWaypoint.transform : transform;
+            waitPoint = transform.Find("WorkerWaitPoint");
+        if (waitPoint == null)
+            waitPoint = deliveryPoint;
         if (storage == null)
             storage = GetComponent<GarageCubeStorage>() ?? GetComponentInChildren<GarageCubeStorage>(true);
         if (processor == null)

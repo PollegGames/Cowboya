@@ -62,10 +62,15 @@ public sealed class StaticLevelPath : MonoBehaviour
     public static List<StaticLevelPath> FindEnabledInScene()
     {
         var result = new List<StaticLevelPath>();
-        StaticLevelPath[] paths = FindObjectsByType<StaticLevelPath>(FindObjectsSortMode.None);
+        StaticLevelPath[] paths = Resources.FindObjectsOfTypeAll<StaticLevelPath>();
         foreach (StaticLevelPath path in paths)
         {
-            if (path != null && path.isActiveAndEnabled)
+            // isActiveAndEnabled is still false while another component on the same
+            // active object is executing Awake, and Scene.isLoaded is also false during
+            // the initial load pass. A valid scene excludes prefab assets while still
+            // allowing bootstrap to discover authored components during that window.
+            if (path != null && path.enabled && path.gameObject.activeInHierarchy
+                && path.gameObject.scene.IsValid())
                 result.Add(path);
         }
         return result;

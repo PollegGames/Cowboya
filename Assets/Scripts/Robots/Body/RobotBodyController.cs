@@ -133,6 +133,41 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         pathFollower?.SetDestination(target, finalPosition, includeUnavailable);
     }
 
+    /// <summary>
+    /// Navigates through the waypoint graph, then uses a tighter threshold for the exact final position.
+    /// </summary>
+    public void SetDestination(
+        RoomWaypoint target,
+        Vector3 finalPosition,
+        float preciseFinalArrivalThreshold,
+        bool includeUnavailable = false)
+    {
+        pathFollower?.SetDestination(
+            target,
+            finalPosition,
+            includeUnavailable,
+            Mathf.Max(0.01f, preciseFinalArrivalThreshold));
+    }
+
+    /// <summary>
+    /// Navigates to an exact final position with independent horizontal and vertical tolerances.
+    /// </summary>
+    public void SetDestination(
+        RoomWaypoint target,
+        Vector3 finalPosition,
+        Vector2 preciseFinalArrivalThreshold,
+        bool includeUnavailable = false,
+        bool replaceTargetWaypoint = false)
+    {
+        pathFollower?.SetDestination(
+            target,
+            finalPosition,
+            includeUnavailable,
+            Mathf.Max(0.01f, preciseFinalArrivalThreshold.x),
+            Mathf.Max(0.01f, preciseFinalArrivalThreshold.y),
+            replaceTargetWaypoint);
+    }
+
     public void SetDestination(Vector3 worldPosition, bool includeUnavailable = false)
     {
         if (waypointQueries == null)
@@ -152,6 +187,7 @@ public class RobotBodyController : AnimatorBaseAgentController, IPooledObject
         pathFollower != null
         && pathFollower.CurrentPathCount > 0
         && pathFollower.PathIndex < pathFollower.CurrentPathCount;
+    public bool IsNavigationInitialized => waypointQueries != null && pathFollower != null;
 
     public void OnPathObsoleted(RoomWaypoint blockedWaypoint) =>
         pathFollower?.OnPathObsoleted(blockedWaypoint);

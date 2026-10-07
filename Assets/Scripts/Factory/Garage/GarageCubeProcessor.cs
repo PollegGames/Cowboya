@@ -28,6 +28,8 @@ public sealed class GarageCubeProcessor : MonoBehaviour
 
     public GarageProcessorState State { get; private set; } = GarageProcessorState.Open;
     public int CompletedBatchCount { get; private set; }
+    public bool IsDoorOpen => door != null && door.IsOpen;
+    public GarageCubeStorage Storage => storage;
     public bool IsAccepting => isActiveAndEnabled && State == GarageProcessorState.Open
         && door != null && door.IsOpen && storage != null && !storage.IsFull;
 

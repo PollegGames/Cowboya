@@ -113,6 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::WorkerCollectorDropOffProvider
   approachWaypoint: {fileID: 0}
+  deliveryPoint: {fileID: 77602892713636174}
   waitPoint: {fileID: 1942179113231934668}
   storage: {fileID: 570254230316731209}
   processor: {fileID: 5349777296727266864}

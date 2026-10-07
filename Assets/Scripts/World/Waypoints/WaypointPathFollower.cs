@@ -14,6 +14,10 @@ public class WaypointPathFollower : IRobotNavigationListener
     private List<RoomWaypoint> currentWaypoints;
     private int pathIndex;
     private Vector3? finalTarget;
+    private float? finalArrivalThresholdX;
+    private float? finalArrivalThresholdY;
+    private bool hasAppendedFinalPosition;
+    private bool replaceTargetWaypointWithFinalPosition;
     private bool currentIncludeUnavailable;
 
     private readonly float arrivalX;
@@ -69,8 +73,16 @@ public class WaypointPathFollower : IRobotNavigationListener
         float dx = target.x - currentPos.x;
         float dy = target.y - currentPos.y;
 
-        bool nearX = Mathf.Abs(dx) <= arrivalX;
-        bool nearY = Mathf.Abs(dy) <= arrivalY;
+        bool approachingFinalPosition = hasAppendedFinalPosition
+            && pathIndex == currentPath.Count - 1;
+        float activeArrivalX = approachingFinalPosition && finalArrivalThresholdX.HasValue
+            ? finalArrivalThresholdX.Value
+            : arrivalX;
+        float activeArrivalY = approachingFinalPosition && finalArrivalThresholdY.HasValue
+            ? finalArrivalThresholdY.Value
+            : arrivalY;
+        bool nearX = Mathf.Abs(dx) <= activeArrivalX;
+        bool nearY = Mathf.Abs(dy) <= activeArrivalY;
 
         if (nearX && nearY)
         {
@@ -82,8 +94,8 @@ public class WaypointPathFollower : IRobotNavigationListener
             return;
         }
 
-        withinX = UpdateAxis(withinX, dx, arrivalX, deadZoneX);
-        withinY = UpdateAxis(withinY, dy, arrivalY, deadZoneY);
+        withinX = UpdateAxis(withinX, dx, activeArrivalX, deadZoneX);
+        withinY = UpdateAxis(withinY, dy, activeArrivalY, deadZoneY);
 
         mover.SetMovement(withinX ? 0f : Mathf.Sign(dx));
         mover.SetVerticalMovement(withinY ? 0f : Mathf.Sign(dy));
@@ -95,7 +107,13 @@ public class WaypointPathFollower : IRobotNavigationListener
         }
         else if (status == MovementStatus.ShouldAttemptRecovery && currentWaypoints?.Count > 0)
         {
-            SetDestination(currentWaypoints[^1], finalTarget, currentIncludeUnavailable);
+            SetDestination(
+                currentWaypoints[^1],
+                finalTarget,
+                currentIncludeUnavailable,
+                finalArrivalThresholdX,
+                finalArrivalThresholdY,
+                replaceTargetWaypointWithFinalPosition);
         }
     }
 
@@ -111,12 +129,22 @@ public class WaypointPathFollower : IRobotNavigationListener
         SetDestination(target, null, includeUnavailable);
     }
 
-    public void SetDestination(RoomWaypoint target, Vector3? finalPosition, bool includeUnavailable = false)
+    public void SetDestination(
+        RoomWaypoint target,
+        Vector3? finalPosition,
+        bool includeUnavailable = false,
+        float? preciseFinalArrivalThreshold = null,
+        float? preciseFinalArrivalThresholdY = null,
+        bool replaceTargetWaypoint = false)
     {
         if (includeUnavailable && waypointQueries is IWaypointService svc)
             svc.BuildAllNeighbors(true);
 
         finalTarget = finalPosition;
+        finalArrivalThresholdX = preciseFinalArrivalThreshold;
+        finalArrivalThresholdY = preciseFinalArrivalThresholdY ?? preciseFinalArrivalThreshold;
+        hasAppendedFinalPosition = false;
+        replaceTargetWaypointWithFinalPosition = replaceTargetWaypoint;
         currentIncludeUnavailable = includeUnavailable;
 
         RoomWaypoint start = GetClosestWaypoint(target, includeUnavailable);
@@ -127,6 +155,7 @@ public class WaypointPathFollower : IRobotNavigationListener
                 lastAttemptedWaypoint = start;
                 currentWaypoints = new List<RoomWaypoint> { start };
                 currentPath = new List<Vector3> { start.WorldPos, finalPosition.Value };
+                hasAppendedFinalPosition = true;
                 pathIndex = 1;
                 LogPathDecision("WaypointPathFollower.SetDestination", start, target, "alreadyAtWaypoint finalPosition=" + finalPosition.Value.ToString("F2") + " pathCount=" + currentPath.Count);
                 return;
@@ -174,9 +203,20 @@ public class WaypointPathFollower : IRobotNavigationListener
         currentPath = raw.Select(wp => wp.WorldPos).ToList();
         if (finalPosition.HasValue && currentPath.Count > 0)
         {
-            Vector3 last = currentPath[^1];
-            if (ShouldAppendFinalPosition(finalPosition.Value, last))
-                currentPath.Add(finalPosition.Value);
+            if (replaceTargetWaypoint)
+            {
+                currentPath[^1] = finalPosition.Value;
+                hasAppendedFinalPosition = true;
+            }
+            else
+            {
+                Vector3 last = currentPath[^1];
+                if (ShouldAppendFinalPosition(finalPosition.Value, last))
+                {
+                    currentPath.Add(finalPosition.Value);
+                    hasAppendedFinalPosition = true;
+                }
+            }
         }
         pathIndex = 1;
         LogPathDecision(
@@ -186,6 +226,10 @@ public class WaypointPathFollower : IRobotNavigationListener
             "pathCount=" + currentPath.Count
                 + " waypointCount=" + currentWaypoints.Count
                 + " finalPosition=" + (finalPosition.HasValue ? finalPosition.Value.ToString("F2") : "none")
+                + " finalArrival=" + (finalArrivalThresholdX.HasValue
+                    ? $"({finalArrivalThresholdX.Value:F2}, {finalArrivalThresholdY.Value:F2})"
+                    : "default")
+                + " replaceTarget=" + replaceTargetWaypoint
                 + " includeUnavailable=" + includeUnavailable);
     }
 
@@ -249,6 +293,10 @@ public class WaypointPathFollower : IRobotNavigationListener
         currentWaypoints = null;
         pathIndex = 0;
         finalTarget = null;
+        finalArrivalThresholdX = null;
+        finalArrivalThresholdY = null;
+        hasAppendedFinalPosition = false;
+        replaceTargetWaypointWithFinalPosition = false;
         currentIncludeUnavailable = false;
         monitor.Reset(body.position);
         mover.SetMovement(0f);
@@ -257,8 +305,10 @@ public class WaypointPathFollower : IRobotNavigationListener
 
     private bool ShouldAppendFinalPosition(Vector3 finalPosition, Vector3 lastWaypointPosition)
     {
-        return Mathf.Abs(finalPosition.x - lastWaypointPosition.x) > arrivalX
-            || Mathf.Abs(finalPosition.y - lastWaypointPosition.y) > arrivalY;
+        float thresholdX = finalArrivalThresholdX ?? arrivalX;
+        float thresholdY = finalArrivalThresholdY ?? arrivalY;
+        return Mathf.Abs(finalPosition.x - lastWaypointPosition.x) > thresholdX
+            || Mathf.Abs(finalPosition.y - lastWaypointPosition.y) > thresholdY;
     }
 
     private void LogPathDecision(string eventName, RoomWaypoint start, RoomWaypoint target, string detail)

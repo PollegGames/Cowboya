@@ -36,6 +36,8 @@ public class Level2WorkerCollectorPrefabTests
         Assert.AreEqual(1, prefab.GetComponentsInChildren<RobotHeartNew>(true).Length);
         Assert.AreEqual(1, prefab.GetComponentsInChildren<RobotBodyController>(true).Length);
         Assert.AreEqual(1, prefab.GetComponentsInChildren<WorkerCollectorBodyController>(true).Length);
+        Assert.AreEqual(1, prefab.GetComponentsInChildren<RobotObjectArmReachController>(true).Length);
+        Assert.IsNull(prefab.GetComponent<WorkerCollectorArmReachTestIsolation>());
         Assert.AreEqual(RobotRole.WorkerCollector, prefab.GetComponent<RobotHeartNew>().Role);
     }
 
@@ -48,7 +50,41 @@ public class Level2WorkerCollectorPrefabTests
         Assert.IsNotNull(controller);
         Assert.IsNotNull(controller.CarryAnchor);
         Assert.AreEqual("CubeCarryAnchor", controller.CarryAnchor.name);
-        Assert.AreEqual(prefab.transform, controller.CarryAnchor.parent);
+        Assert.IsNotNull(controller.CarryAnchor.parent);
+        Assert.AreEqual("RHand_Effector", controller.CarryAnchor.parent.name);
+    }
+
+    [Test]
+    public void Prefab_PickupArrivalAllowsGroundedBodyVerticalOffset()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(WorkerCollectorPrefabPath);
+        WorkerCollectorBodyController controller = prefab.GetComponent<WorkerCollectorBodyController>();
+
+        Assert.IsNotNull(controller);
+        Assert.AreEqual(0.15f, controller.PickupArrivalThreshold.x, 0.001f);
+        Assert.AreEqual(2f, controller.PickupArrivalThreshold.y, 0.001f);
+    }
+
+    [Test]
+    public void RuntimePrefab_UsesRightHandEffectorAlignedCarryAnchor()
+    {
+        GameObject instance = Object.Instantiate(
+            AssetDatabase.LoadAssetAtPath<GameObject>(WorkerCollectorPrefabPath));
+        try
+        {
+            WorkerCollectorBodyController controller =
+                instance.GetComponent<WorkerCollectorBodyController>();
+
+            Assert.IsNotNull(controller.CarryAnchor);
+            Assert.AreEqual("CubeCarryAnchor", controller.CarryAnchor.name);
+            Assert.IsNotNull(controller.CarryAnchor.parent);
+            Assert.AreEqual("RHand_Effector", controller.CarryAnchor.parent.name);
+            Assert.IsTrue(controller.CarryAnchor.IsChildOf(instance.transform));
+        }
+        finally
+        {
+            Object.DestroyImmediate(instance);
+        }
     }
 
     [Test]
@@ -113,6 +149,8 @@ public class Level2WorkerCollectorPrefabTests
         Assert.IsNotNull(provider.RestWaypoint);
         Assert.IsNotNull(prefab.transform.Find("WorkerCollectorSpawnPoint"));
         Assert.IsNotNull(prefab.transform.Find("WorkerCollectorRestPoint"));
+        Assert.AreEqual(Quaternion.identity, provider.SpawnRotation);
+        Assert.AreNotEqual(prefab.transform.Find("WorkerCollectorSpawnPoint").rotation, provider.SpawnRotation);
     }
 
     [Test]
@@ -128,6 +166,11 @@ public class Level2WorkerCollectorPrefabTests
         Assert.IsNotNull(processor);
         Assert.IsNotNull(destination);
         Assert.IsNotNull(prefab.GetComponent<GarageDoorController>());
+        Assert.IsNotNull(destination.DeliveryPoint);
+        Assert.IsNotNull(destination.WaitPoint);
+        Assert.AreEqual("DeliveryPoint", destination.DeliveryPoint.name);
+        Assert.AreEqual("WorkerWaitPoint", destination.WaitPoint.name);
+        Assert.AreNotSame(destination.DeliveryPoint, destination.WaitPoint);
         Assert.AreEqual(GarageCubeStorage.Capacity, storage.Slots.Count);
         for (int i = 0; i < GarageCubeStorage.Capacity; i++)
         {

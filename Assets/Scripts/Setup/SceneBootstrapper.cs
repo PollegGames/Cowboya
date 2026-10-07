@@ -64,6 +64,8 @@ public class SceneBootstrapper : MonoBehaviour
         else
         {
             System.Collections.Generic.List<StaticLevelPath> staticPaths = StaticLevelPath.FindEnabledInScene();
+            Debug.Log($"[WorkerCollectorDiagnostics] Bootstrap static paths={staticPaths.Count}, "
+                + $"waypointPrefabConfigured={config.waypointServicePrefab != null}.");
             if (staticPaths.Count > 1)
             {
                 Debug.LogError($"Static navigation requires exactly one enabled {nameof(StaticLevelPath)}, but found {staticPaths.Count}.");
@@ -82,6 +84,8 @@ public class SceneBootstrapper : MonoBehaviour
                 else if (config.waypointServicePrefab != null)
                 {
                     waypointService = Instantiate(config.waypointServicePrefab);
+                    Debug.Log($"[WorkerCollectorDiagnostics] Bootstrap created waypoint service={waypointService.name}.",
+                        waypointService);
                 }
                 else
                 {

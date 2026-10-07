@@ -110,6 +110,17 @@ public sealed class GarageCubeStorage : MonoBehaviour
             reservations.Add(ownerId, reservation);
             return true;
         }
+
+        string slotState = string.Empty;
+        for (int i = 0; i < Capacity; i++)
+        {
+            if (i > 0)
+                slotState += ", ";
+            slotState += $"{i}:occupied={contents[i] != null}/reserved={IsSlotReserved(i)}/assigned={slots[i] != null}";
+        }
+        Debug.LogWarning(
+            $"GarageCubeStorage could not reserve a slot. active={isActiveAndEnabled}, "
+            + $"occupied={OccupiedCount}, reservations={reservations.Count}, slots=[{slotState}].", this);
         return false;
     }
 

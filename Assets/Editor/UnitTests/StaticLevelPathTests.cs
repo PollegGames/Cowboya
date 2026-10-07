@@ -147,6 +147,25 @@ public class StaticLevelPathTests
         Assert.IsTrue(errors.Exists(error => error.Contains("share identity")));
     }
 
+    [Test]
+    public void FindEnabledInScene_UsesAuthoredEnabledAndActiveState()
+    {
+        GameObject activeObject = CreateObject("ActiveStaticPath");
+        StaticLevelPath activePath = activeObject.AddComponent<StaticLevelPath>();
+        GameObject disabledObject = CreateObject("DisabledStaticPath");
+        StaticLevelPath disabledPath = disabledObject.AddComponent<StaticLevelPath>();
+        disabledPath.enabled = false;
+        GameObject inactiveObject = CreateObject("InactiveStaticPath");
+        StaticLevelPath inactivePath = inactiveObject.AddComponent<StaticLevelPath>();
+        inactiveObject.SetActive(false);
+
+        List<StaticLevelPath> found = StaticLevelPath.FindEnabledInScene();
+
+        CollectionAssert.Contains(found, activePath);
+        CollectionAssert.DoesNotContain(found, disabledPath);
+        CollectionAssert.DoesNotContain(found, inactivePath);
+    }
+
     private NavigationFixture CreateFixture()
     {
         GameObject serviceObject = CreateObject("WaypointServiceFixture");

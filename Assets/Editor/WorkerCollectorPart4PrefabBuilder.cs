@@ -78,8 +78,9 @@ public static class WorkerCollectorPart4PrefabBuilder
                 throw new InvalidOperationException("The approved garage door controller is missing.");
             GarageCubeProcessor processor = GetOrAdd<GarageCubeProcessor>(root);
             processor.Configure(storage, door, 0.5f);
+            GetOrAdd<GarageCubeCoordinator>(root);
             WorkerCollectorDropOffProvider provider = GetOrAdd<WorkerCollectorDropOffProvider>(root);
-            provider.Configure(null, waitPoint, storage, processor);
+            provider.Configure(null, deliveryPoint, waitPoint, storage, processor);
 
             GarageCubeConveyorController incompatible = root.GetComponent<GarageCubeConveyorController>();
             if (incompatible != null)

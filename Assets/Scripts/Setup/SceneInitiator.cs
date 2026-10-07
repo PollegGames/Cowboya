@@ -183,7 +183,10 @@ public class SceneInitiator : GameInitiator
     private void InitializeStaticNavigationGraph()
     {
         if (waypointService == null)
+        {
+            Debug.LogError("[WorkerCollectorDiagnostics] Static graph initialization skipped: waypointService=null.");
             return;
+        }
 
         System.Collections.Generic.List<StaticLevelPath> paths = StaticLevelPath.FindEnabledInScene();
         if (paths.Count != 1)
@@ -192,7 +195,11 @@ public class SceneInitiator : GameInitiator
             return;
         }
 
-        paths[0].TryInitializeNavigation(waypointService);
+        bool initialized = paths[0].TryInitializeNavigation(waypointService);
+        Debug.Log($"[WorkerCollectorDiagnostics] Static graph initialized={initialized}, paths={paths.Count}, "
+            + $"waypoints={waypointService.GetAllWaypoints().Count}.");
+        if (initialized)
+            StaticRobotNavigationInitializer.SetSharedService(waypointService);
     }
 
     private void InitializeStaticRobotNavigation()

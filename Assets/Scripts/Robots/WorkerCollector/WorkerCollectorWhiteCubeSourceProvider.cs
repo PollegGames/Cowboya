@@ -8,6 +8,7 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
 {
     [SerializeField] private RoomWaypoint approachWaypoint;
     [SerializeField] private Transform cubeRoot;
+    [SerializeField, Min(0.1f)] private float conveyorClaimRadius = 1.5f;
 
     private readonly System.Collections.Generic.List<ClaimedCargo> issuedClaims =
         new System.Collections.Generic.List<ClaimedCargo>();
@@ -24,6 +25,18 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
     }
 
     public RoomWaypoint ApproachWaypoint => approachWaypoint;
+
+    /// <summary>
+    /// Returns the cube position in the same world XY plane used by robot navigation and IK.
+    /// </summary>
+    public Vector2 GetWorkerPlanePickupPoint(WhiteCubeCargo cargo)
+    {
+        if (cargo == null)
+            return Vector2.zero;
+
+        Rigidbody2D body = cargo.GetComponent<Rigidbody2D>();
+        return body != null ? body.position : (Vector2)cargo.transform.position;
+    }
 
     private void Awake() => ResolveReferences();
     private void OnEnable()
@@ -61,6 +74,8 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
         for (int i = 0; i < candidates.Length; i++)
         {
             WhiteCubeCargo candidate = candidates[i];
+            if (!IsAtConveyorPickup(candidate))
+                continue;
             if (candidate != null && candidate.TryClaim(claimant, out claim))
             {
                 cargo = candidate;
@@ -69,6 +84,18 @@ public sealed class WorkerCollectorWhiteCubeSourceProvider : MonoBehaviour
             }
         }
         return false;
+    }
+
+    private bool IsAtConveyorPickup(WhiteCubeCargo candidate)
+    {
+        if (candidate == null)
+            return false;
+        if (candidate.GetComponentInParent<GarageCubeConveyorController>() == null
+            || approachWaypoint == null)
+            return true;
+
+        return Vector2.Distance(GetWorkerPlanePickupPoint(candidate), approachWaypoint.WorldPos)
+            <= Mathf.Max(0.1f, conveyorClaimRadius);
     }
 
     private void ResolveReferences()
