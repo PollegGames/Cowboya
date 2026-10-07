@@ -50,3 +50,29 @@ Local reports are in `Logs/WorkerCollectorFix/` (ignored by Git). Validation use
 an isolated project with its full Windows path; abbreviated 8.3 paths prevented
 Unity from mapping scripts to prefabs. The scene probe used D3D11 because the
 headless graphics device crashed while rendering this scene's sprites.
+
+## Follow-up: stable attachment while walking
+
+Worker cargo previously had two motion drivers: the hand parent and a dynamic
+Rigidbody2D with an active TargetJoint2D spring. Worker pickup now secures the cube
+at the selected hand with a kinematic body and disabled spring/interpolation.
+Its collider stays simulated for player grab queries. Release and player takeover
+restore dynamic physics and the previous interpolation setting. Conveyor grab
+callbacks run before the carry settings are applied; callbacks that release or
+transfer the cube retain ownership. The memory, brain, heart, and task flow is
+unchanged.
+
+- All 103 related Edit Mode cases passed, including ten new attachment cases
+  covering movement through physics steps, player takeover, garage storage,
+  conveyor callbacks, and interrupted grabs.
+- The real Level_2 scene completed nine deliveries and one garage batch. Across
+  27,840 walking samples, the cube retained the same hand, had only one active
+  motion driver, and showed zero measured hand-position error (six decimals).
+- A separate accelerated rest/restart probe timed out while traveling to rest
+  after completing two batches. This follow-up validates carry and delivery;
+  it does not claim a new successful end-to-end rest/restart check.
+
+Follow-up reports are `carry-editmode-results.xml` and
+`carry-attachment-smoke-results.xml` in `Logs/WorkerCollectorFix/`. The extended
+probe's report and log are retained there as `carry-rest-probe-results.xml` and
+`carry-rest-probe.log`.

@@ -123,7 +123,7 @@ public sealed class WhiteCubeCargo : MonoBehaviour
     public bool IsClaimValid(WhiteCubeClaim claim) => claim.IsValid && claim == currentClaim;
 
     /// <summary>
-    /// Marks the expected worker carry anchor before CubePickup performs its normal grab.
+    /// Secures the claimed cube to its worker's single carry anchor.
     /// </summary>
     public bool TryBeginCarry(WhiteCubeClaim claim, Transform carryAnchor)
     {
@@ -134,7 +134,7 @@ public sealed class WhiteCubeCargo : MonoBehaviour
         expectedCarryAnchor = carryAnchor;
         externallyHeld = false;
         SetState(WhiteCubeCargoState.Carried);
-        pickup.OnGrab(carryAnchor);
+        pickup.AttachToCarrier(carryAnchor);
 
         if (pickup == null || pickup.transform.parent != carryAnchor)
         {

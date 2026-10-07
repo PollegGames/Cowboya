@@ -66,6 +66,8 @@ public class CubePickup : MonoBehaviour, IGrabbable
     private bool hasOverrideAttractPoint;
     private bool attached = false;
     private bool wasStolen = false;
+    private bool rigidAttachment;
+    private RigidbodyInterpolation2D interpolationBeforeCarry;
 
     public event Action<CubePickup> OnGrabbed;
     public event Action<CubePickup> OnReleased;
@@ -113,7 +115,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
         {
             if (followTarget != null)
                 joint.target = followTarget.position;
-            joint.enabled = true;
+            joint.enabled = !rigidAttachment;
         }
         else
         {
@@ -146,6 +148,8 @@ public class CubePickup : MonoBehaviour, IGrabbable
             }
         }
 
+        RestoreDynamicAttachment();
+        hasOverrideAttractPoint = false;
         attached = true;
         rb.simulated = true;
 
@@ -154,6 +158,39 @@ public class CubePickup : MonoBehaviour, IGrabbable
         ApplySortingOrder(heldSortingOrder);
 
         OnGrabbed?.Invoke(this);
+    }
+
+    /// <summary>
+    /// Secures cargo to one carrier anchor without a spring pulling against its parent transform.
+    /// The collider stays simulated so another character can still take the cube.
+    /// </summary>
+    public void AttachToCarrier(Transform carryAnchor) {
+        OnGrab(carryAnchor);
+        // Grab listeners may release or transfer the cube. Do not reclaim it afterwards.
+        if (carryAnchor == null || !attached || followTarget != carryAnchor
+            || transform.parent != carryAnchor)
+            return;
+
+        interpolationBeforeCarry = rb.interpolation;
+        rigidAttachment = true;
+        hasOverrideAttractPoint = false;
+        joint.enabled = false;
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        // Conveyor grab listeners restore dynamic physics, so apply carrier settings
+        // after those notifications. Only the selected hand now drives cargo motion.
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.interpolation = RigidbodyInterpolation2D.None;
+        transform.localPosition = Vector3.zero;
+        rb.position = transform.position;
+    }
+
+    private void RestoreDynamicAttachment() {
+        if (!rigidAttachment)
+            return;
+        rigidAttachment = false;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.interpolation = interpolationBeforeCarry;
     }
 
     public void OnAttract(Vector2 attractPoint)
@@ -171,6 +208,7 @@ public class CubePickup : MonoBehaviour, IGrabbable
 
     public void OnRelease(Vector2 throwForce)
     {
+        RestoreDynamicAttachment();
         attached = false;
         if (joint != null)
             joint.enabled = false;
