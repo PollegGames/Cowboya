@@ -59,6 +59,7 @@ public class GridManager
 
                 roomProps.usageType = cell.cellProperties.usageType;
                 roomProps.poiType = cell.cellProperties.poiType;
+                roomProps.POISlot = cell.cellProperties.POISlot;
                 roomProps.HasLeftDoor = cell.cellProperties.HasLeftDoor;
                 roomProps.HasRightDoor = cell.cellProperties.HasRightDoor;
                 roomProps.HasLeftDoorLocked = cell.cellProperties.HasLeftDoorLocked;

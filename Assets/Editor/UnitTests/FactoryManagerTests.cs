@@ -185,6 +185,7 @@ public class FactoryManagerTests
         public void CreateWorkers(int workersToSpawn) { }
         public void CreateSecurityGuards(int enemiesToSpawn) { }
         public void SpawnSecurityReceptionGuards() { }
+        public void SpawnDedicatedRoomRobots() { }
         public void CreateBoss() { }
         public void SpawnBossAtEnd() { }
         public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus) {}

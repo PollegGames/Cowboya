@@ -72,14 +72,12 @@ public class GridFactory
 
         // Pick the first N as POIs. The shuffled list and type pool both have stable order.
         poiPositions = eligibleCells.Take(effectiveCount).ToList();
-        var usedTypes = new HashSet<POIType>();
-
         for (int i = 0; i < poiPositions.Count; i++)
         {
             cellDataGrid[poiPositions[i]].cellProperties.usageType = UsageType.POI;
-            var poiType = POIRoomTypeSelector.Select(i + 1, usedTypes);
+            cellDataGrid[poiPositions[i]].cellProperties.POISlot = i + 1;
+            var poiType = POIRoomTypeSelector.Select(i + 1);
             cellDataGrid[poiPositions[i]].cellProperties.poiType = poiType;
-            usedTypes.Add(poiType);
         }
 
     }
@@ -151,7 +149,8 @@ public class GridFactory
 /// </summary>
 public static class POIRoomTypeSelector
 {
-    private static readonly POIType[] CompactPool = { POIType.Reception, POIType.Security };
+    private static readonly POIType[] CompactPool =
+        { POIType.Resting, POIType.Security, POIType.Reception };
     private static readonly POIType[] CompletePool =
     {
         POIType.Reception,
@@ -167,22 +166,20 @@ public static class POIRoomTypeSelector
     };
 
     /// <summary>Returns the room type for a one-based POI slot.</summary>
-    public static POIType Select(int slot, ISet<POIType> usedTypes)
+    public static POIType Select(int slot)
     {
         if (slot < 1)
             throw new System.ArgumentOutOfRangeException(nameof(slot), "POI slots are one-based.");
-        if (usedTypes == null)
-            throw new System.ArgumentNullException(nameof(usedTypes));
         if (slot == 1)
-            return POIType.Reception;
+            return POIType.Resting;
         if (slot == 2)
             return POIType.Security;
         if (slot <= 5)
             return CompactPool[UnityEngine.Random.Range(0, CompactPool.Length)];
-
-        var candidates = CompletePool.Where(type => !usedTypes.Contains(type)).ToArray();
-        if (candidates.Length == 0)
-            candidates = CompletePool;
-        return candidates[UnityEngine.Random.Range(0, candidates.Length)];
+        if (slot == 6)
+            return POIType.Garage;
+        if (slot == 7)
+            return POIType.Conveyor;
+        return CompletePool[UnityEngine.Random.Range(0, CompletePool.Length)];
     }
 }

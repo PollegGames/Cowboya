@@ -196,6 +196,7 @@ public class SceneInitiator : GameInitiator
             securityBadgeSpawner,
             batterySpawner);
         enemiesSpawner.SpawnSecurityReceptionGuards();
+        WorkerCollectorMissionService.SpawnStaticSceneCollector();
 
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level_3")
             enemiesSpawner.SpawnBossAtEnd();
@@ -314,7 +315,7 @@ public class SceneInitiator : GameInitiator
             enemiesSpawner.CreateBoss();
         }
         enemiesSpawner.SpreadEnemies();
-        enemiesSpawner.SpawnSecurityReceptionGuards();
+        enemiesSpawner.SpawnDedicatedRoomRobots();
         if (RobotNewPipelineRuntime.EnableProbeSummaryOnSceneInit)
             StartCoroutine(DumpProbeSummaryEndOfFrame());
         if (RobotNewPipelineRuntime.IsWorkerCycleValidationEnabled && RobotNewPipelineRuntime.EnableEcosystemProbe)

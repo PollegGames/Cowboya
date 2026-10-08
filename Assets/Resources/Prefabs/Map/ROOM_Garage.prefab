@@ -633,6 +633,7 @@ GameObject:
   - component: {fileID: 5857107069788241263}
   - component: {fileID: 3994537537568263334}
   - component: {fileID: 8756315760676575741}
+  - component: {fileID: 9108374650192837465}
   m_Layer: 3
   m_Name: ROOM_Garage
   m_TagString: Untagged
@@ -1445,6 +1446,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::StaticRoomDoorConfig
   leftDoor: 1
   rightDoor: 1
+--- !u!114 &9108374650192837465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542146199199913260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a873b6d330a74f3a94c195ac680bc911, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::WorkerCollectorGarageSpawnProvider
+  workerCollectorPrefab: {fileID: 8873340081358007246, guid: 3e3961c9f3713334d963d58e4a5c4136, type: 3}
+  dropOff: {fileID: 0}
+  maximumLiveCollectors: 1
 --- !u!1 &552395487903275464
 GameObject:
   m_ObjectHideFlags: 0

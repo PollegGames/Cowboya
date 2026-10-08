@@ -16,5 +16,6 @@ public class CellProperties
     public bool HasLiftDownBlocked { get; set; } = false;
     public UsageType usageType;
     public POIType poiType;
+    public int POISlot { get; set; }
     public Vector2Int GridPosition { get; set; }
 }

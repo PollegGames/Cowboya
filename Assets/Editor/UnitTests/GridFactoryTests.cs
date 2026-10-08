@@ -71,16 +71,16 @@ public class GridFactoryTests
         var types = positions.Select(position => _factory.cellDataGrid[position].cellProperties.poiType).ToList();
 
         Assert.AreEqual(count, types.Count);
-        if (count >= 1) Assert.AreEqual(POIType.Reception, types[0]);
+        if (count >= 1) Assert.AreEqual(POIType.Resting, types[0]);
         if (count >= 2) Assert.AreEqual(POIType.Security, types[1]);
         for (int i = 2; i < Mathf.Min(5, count); i++)
-            Assert.Contains(types[i], new[] { POIType.Reception, POIType.Security });
+            Assert.Contains(types[i], new[] { POIType.Resting, POIType.Security, POIType.Reception });
         if (count >= 6)
-            Assert.IsFalse(new[] { POIType.Reception, POIType.Security }.Contains(types[5]));
-
-        var expandedTypes = types.Skip(5).ToList();
-        Assert.AreEqual(expandedTypes.Count, expandedTypes.Distinct().Count(),
-            "Expanded slots must use every unused type before duplicating one.");
+            Assert.AreEqual(POIType.Garage, types[5]);
+        if (count >= 7)
+            Assert.AreEqual(POIType.Conveyor, types[6]);
+        for (int i = 7; i < count; i++)
+            Assert.AreNotEqual(POIType.None, types[i]);
     }
 
     [Test]

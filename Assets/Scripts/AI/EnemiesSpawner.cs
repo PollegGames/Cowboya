@@ -30,6 +30,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     private readonly List<GameObject> spawnedWorkerSpawners = new();
     private readonly List<GameObject> spawnedSecurityGuards = new();
     private readonly List<GameObject> spawnedSecurityReceptionGuards = new();
+    private readonly Dictionary<RoomWaypoint, GameObject> receptionGuardByPost = new();
     private readonly List<GameObject> spawnedFollowers = new();
     private GameObject bossInstance;
 
@@ -230,9 +231,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         }
         foreach (RoomWaypoint post in receptionPosts)
         {
-            bool alreadySpawned = spawnedSecurityReceptionGuards.Any(guard =>
-                guard != null && Vector3.SqrMagnitude(guard.transform.position - post.WorldPos) < 0.01f);
-            if (alreadySpawned)
+            if (receptionGuardByPost.TryGetValue(post, out GameObject existing) && existing != null)
                 continue;
 
             GameObject guard = PoolGet(securityReceptionPrefab);
@@ -250,10 +249,44 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             }
             Wake(guard);
             spawnedSecurityReceptionGuards.Add(guard);
+            receptionGuardByPost[post] = guard;
             Debug.Log(
                 $"[EnemiesSpawner] Spawned SecurityReception at '{post.name}' in room '{post.parentRoom.name}'.",
                 guard);
         }
+    }
+
+    /// <summary>Populates robots whose existence is derived from generated room identities.</summary>
+    public void SpawnDedicatedRoomRobots()
+    {
+        SpawnSecurityReceptionGuards();
+
+        RoomManager[] rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
+        RoomManager primaryGarage = rooms.FirstOrDefault(room => room != null
+            && room.roomProperties != null
+            && room.roomProperties.usageType == UsageType.POI
+            && room.roomProperties.poiType == POIType.Garage
+            && room.roomProperties.POISlot == 6);
+        bool hasPairedConveyor = rooms.Any(room => room != null
+            && room.roomProperties != null
+            && room.roomProperties.usageType == UsageType.POI
+            && room.roomProperties.poiType == POIType.Conveyor
+            && room.roomProperties.POISlot == 7);
+
+        if (primaryGarage == null || !hasPairedConveyor)
+            return;
+
+        WorkerCollectorGarageSpawnProvider provider =
+            primaryGarage.GetComponentInChildren<WorkerCollectorGarageSpawnProvider>(true);
+        if (provider == null)
+        {
+            Debug.LogError($"DedicatedRoomRobotSkipped room={primaryGarage.name} reason=MissingGarageSpawnProvider",
+                primaryGarage);
+            return;
+        }
+
+        provider.TrySpawnCollector();
+        Debug.Log($"DedicatedRoomPopulation receptions={receptionGuardByPost.Count} garages=1", this);
     }
 
     /// <summary>

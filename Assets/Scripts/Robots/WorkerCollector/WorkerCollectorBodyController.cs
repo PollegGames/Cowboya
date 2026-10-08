@@ -73,6 +73,8 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
 
     private void Awake() => ResolveReferences();
 
+    private void OnDestroy() => WorkerCollectorMissionService.UnbindGarage(this);
+
     private void OnDisable()
     {
         WorkerCollectorMissionAssignment disabledAssignment = currentAssignment;

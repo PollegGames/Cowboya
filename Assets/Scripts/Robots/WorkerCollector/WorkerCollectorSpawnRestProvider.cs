@@ -20,6 +20,7 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
     public Vector3 RestPosition => restPoint != null ? restPoint.position : transform.position;
     public float RestDuration => Mathf.Max(0f, restDuration);
     public int MaximumLiveCollectors => Mathf.Max(1, maximumLiveCollectors);
+    public Vector3 SpawnPosition => spawnPoint != null ? spawnPoint.position : transform.position;
 
     // Static rooms use an XZ presentation hierarchy that is commonly pitched -90 degrees.
     // The worker collector is a 2D rig, so only its prefab-authored rotation is valid here.
@@ -53,6 +54,12 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
     /// </summary>
     public GameObject TrySpawnCollector()
     {
+        return TrySpawnCollector(null);
+    }
+
+    /// <summary>Compatibility spawn path for static scenes with explicit Garage ownership.</summary>
+    public GameObject TrySpawnCollector(WorkerCollectorDropOffProvider garage)
+    {
         spawnedCollectors.RemoveAll(collector => collector == null);
         if (!Application.isPlaying || workerCollectorPrefab == null
             || spawnedCollectors.Count >= MaximumLiveCollectors)
@@ -72,6 +79,9 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
             state.Stats = new WorkerRobotFactory().CreateRobot();
             state.Stats.RobotName = "Worker Collector";
         }
+
+        WorkerCollectorMissionService.BindGarage(
+            collector.GetComponent<WorkerCollectorBodyController>(), garage);
 
         // Heart starts the initial WorkerCollectorFindCube task synchronously from
         // OnEnable. Navigation must therefore be installed while the clone is still

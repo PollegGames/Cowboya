@@ -16,6 +16,8 @@ public class RoomProperties : MonoBehaviour
     public bool IsVictoryDoorRight { get; set; } = false;
     public UsageType usageType;
     public POIType poiType;
+    /// <summary>The one-based generated POI selection slot, or zero otherwise.</summary>
+    public int POISlot { get; set; }
 
 
     /// <summary>

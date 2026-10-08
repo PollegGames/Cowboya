@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum WorkerCollectorAssignmentFailure
@@ -28,32 +29,20 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         new List<WorkerCollectorDropOffProvider>();
     private static readonly List<WorkerCollectorSpawnRestProvider> rests =
         new List<WorkerCollectorSpawnRestProvider>();
+    private static readonly Dictionary<int, WorkerCollectorDropOffProvider> collectorGarages =
+        new Dictionary<int, WorkerCollectorDropOffProvider>();
     private static WorkerCollectorMissionService instance;
 
     private int nextMissionId;
-    private float nextSpawnCheck;
     private WorkerCollectorAssignmentFailure lastReportedFailure;
 
     public static WorkerCollectorAssignmentFailure LastAssignmentFailure { get; private set; }
-
-    private void Update()
-    {
-        if (Time.time < nextSpawnCheck)
-            return;
-        nextSpawnCheck = Time.time + 1f;
-        TryEnsureCollectors();
-    }
 
     public static void RegisterSource(WorkerCollectorWhiteCubeSourceProvider source)
     {
         if (source != null && !sources.Contains(source))
             sources.Add(source);
         Debug.Log($"[WorkerCollectorDiagnostics] Source registered={source != null}, total={sources.Count}.", source);
-        if (Application.isPlaying)
-        {
-            EnsureInstance();
-            instance.TryEnsureCollectors();
-        }
     }
 
     public static void UnregisterSource(WorkerCollectorWhiteCubeSourceProvider source)
@@ -67,11 +56,6 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
             dropOffs.Add(dropOff);
         Debug.Log($"[WorkerCollectorDiagnostics] Garage registered={dropOff != null}, "
             + $"valid={(dropOff != null && dropOff.IsGarageDestination)}, total={dropOffs.Count}.", dropOff);
-        if (Application.isPlaying)
-        {
-            EnsureInstance();
-            instance.TryEnsureCollectors();
-        }
     }
 
     public static void UnregisterDropOff(WorkerCollectorDropOffProvider dropOff)
@@ -84,11 +68,6 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         if (rest != null && !rests.Contains(rest))
             rests.Add(rest);
         Debug.Log($"[WorkerCollectorDiagnostics] Rest registered={rest != null}, total={rests.Count}.", rest);
-        if (Application.isPlaying)
-        {
-            EnsureInstance();
-            instance.TryEnsureCollectors();
-        }
     }
 
     public static void UnregisterRest(WorkerCollectorSpawnRestProvider rest)
@@ -108,6 +87,42 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         }
         EnsureInstance();
         return instance.TryAssign(collector);
+    }
+
+    /// <summary>Binds a collector to the Garage that owns its missions.</summary>
+    public static void BindGarage(WorkerCollectorBodyController collector,
+        WorkerCollectorDropOffProvider garage)
+    {
+        if (collector != null && garage != null)
+            collectorGarages[collector.GetInstanceID()] = garage;
+    }
+
+    /// <summary>Clears the ownership record for a collector leaving the scene.</summary>
+    public static void UnbindGarage(WorkerCollectorBodyController collector)
+    {
+        if (collector != null)
+            collectorGarages.Remove(collector.GetInstanceID());
+    }
+
+    /// <summary>Spawns the legacy static-scene collector with an explicit Garage assignment.</summary>
+    public static GameObject SpawnStaticSceneCollector()
+    {
+        EnsureInstance();
+        RemoveMissingRegistrations();
+        WorkerCollectorDropOffProvider garage = instance.preferredDropOff != null
+                && instance.preferredDropOff.isActiveAndEnabled
+                && instance.preferredDropOff.IsGarageDestination
+            ? instance.preferredDropOff
+            : dropOffs
+            .Where(candidate => candidate != null && candidate.isActiveAndEnabled
+                && candidate.IsGarageDestination)
+            .OrderBy(candidate => GetStableGridOrder(candidate.transform))
+            .FirstOrDefault();
+        WorkerCollectorSpawnRestProvider rest = rests
+            .Where(candidate => candidate != null && candidate.isActiveAndEnabled)
+            .OrderBy(candidate => GetStableGridOrder(candidate.transform))
+            .FirstOrDefault();
+        return garage != null && rest != null ? rest.TrySpawnCollector(garage) : null;
     }
 
     /// <summary>
@@ -173,20 +188,28 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         }
 
         RemoveMissingRegistrations();
-        WorkerCollectorDropOffProvider dropOff = FindGarage();
-        if (dropOff == null)
+        collectorGarages.TryGetValue(collector.GetInstanceID(), out WorkerCollectorDropOffProvider dropOff);
+        if (dropOff == null || !dropOff.isActiveAndEnabled || !dropOff.IsGarageDestination)
+            dropOff = null;
+        if (dropOff == null || dropOff.ApproachWaypoint == null)
         {
             SetAssignmentFailure(WorkerCollectorAssignmentFailure.NoGarage, collector);
             return false;
         }
 
-        for (int i = 0; i < sources.Count; i++)
+        WorkerCollectorWhiteCubeSourceProvider[] orderedSources = sources
+            .Where(source => source != null && source.isActiveAndEnabled && source.ApproachWaypoint != null)
+            .OrderBy(source => Vector3.SqrMagnitude(
+                source.ApproachWaypoint.WorldPos - dropOff.ApproachWaypoint.WorldPos))
+            .ThenBy(source => GetStableGridOrder(source.transform))
+            .ToArray();
+        foreach (WorkerCollectorWhiteCubeSourceProvider source in orderedSources)
         {
-            WorkerCollectorWhiteCubeSourceProvider source = sources[i];
-            if (source == null || !source.isActiveAndEnabled || source.ApproachWaypoint == null)
-                continue;
-
-            WorkerCollectorSpawnRestProvider rest = rests.Count > 0 ? rests[0] : null;
+            WorkerCollectorSpawnRestProvider rest = rests
+                .Where(candidate => candidate != null && candidate.isActiveAndEnabled)
+                .OrderBy(candidate => Vector3.SqrMagnitude(candidate.RestPosition - dropOff.WaitPosition))
+                .ThenBy(candidate => GetStableGridOrder(candidate.transform))
+                .FirstOrDefault();
             var assignment = new WorkerCollectorMissionAssignment(
                 ++nextMissionId, source, dropOff, rest);
             if (collector.Brain.Memory.TryAssignWorkerCollectorMission(assignment))
@@ -217,40 +240,14 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         lastReportedFailure = failure;
     }
 
-    private WorkerCollectorDropOffProvider FindGarage()
+    private static long GetStableGridOrder(Transform candidate)
     {
-        if (preferredDropOff != null && preferredDropOff.isActiveAndEnabled && preferredDropOff.IsGarageDestination)
-            return preferredDropOff;
-
-        for (int i = 0; i < dropOffs.Count; i++)
-        {
-            WorkerCollectorDropOffProvider dropOff = dropOffs[i];
-            if (dropOff != null && dropOff.isActiveAndEnabled && dropOff.IsGarageDestination)
-                return dropOff;
-        }
-        return null;
-    }
-
-    private void TryEnsureCollectors()
-    {
-        if (!Application.isPlaying)
-            return;
-        RemoveMissingRegistrations();
-
-        WorkerCollectorBodyController[] live = FindObjectsByType<WorkerCollectorBodyController>(
-            FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        if (live.Length > 0)
-            return;
-
-        // Creation belongs to the rest/spawn capability. Source and garage providers
-        // may register later in the frame (the garage waits for its coordinator), so
-        // gating creation on them can leave a valid collector permanently unspawned.
-        // The collector's FindCube command already retries until a mission is ready.
-        for (int i = 0; i < rests.Count; i++)
-        {
-            if (rests[i] != null && rests[i].TrySpawnCollector() != null)
-                return;
-        }
+        RoomProperties properties = candidate != null
+            ? candidate.GetComponentInParent<RoomProperties>()
+            : null;
+        if (properties == null)
+            return long.MaxValue;
+        return ((long)properties.GridPosition.x << 32) + (uint)properties.GridPosition.y;
     }
 
     private static void RemoveMissingRegistrations()
@@ -258,5 +255,9 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         sources.RemoveAll(source => source == null);
         dropOffs.RemoveAll(dropOff => dropOff == null);
         rests.RemoveAll(rest => rest == null);
+        int[] stale = collectorGarages.Where(pair => pair.Value == null)
+            .Select(pair => pair.Key).ToArray();
+        for (int i = 0; i < stale.Length; i++)
+            collectorGarages.Remove(stale[i]);
     }
 }
