@@ -1,9 +1,12 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.Reflection;
+using System.Collections.Generic;
 
 public class BatteryPickupTests
 {
+    private readonly List<GameObject> createdObjects = new List<GameObject>();
+
     private class DummyPlayerMovementController : PlayerMovementController
     {
         void Awake() { }
@@ -11,10 +14,28 @@ public class BatteryPickupTests
         void Update() { }
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        foreach (GameObject createdObject in createdObjects)
+        {
+            if (createdObject != null)
+                Object.DestroyImmediate(createdObject);
+        }
+        createdObjects.Clear();
+    }
+
+    private GameObject CreateGameObject(string objectName)
+    {
+        GameObject createdObject = new GameObject(objectName);
+        createdObjects.Add(createdObject);
+        return createdObject;
+    }
+
     [Test]
     public void Battery_AddsHealthAndAttaches()
     {
-        var playerGO = new GameObject("player");
+        var playerGO = CreateGameObject("player");
         playerGO.AddComponent<EnergyBot>();
         playerGO.AddComponent<HealthBot>();
         var playerState = playerGO.AddComponent<RobotStateController>();
@@ -29,10 +50,10 @@ public class BatteryPickupTests
             .GetField("bodyReference", BindingFlags.NonPublic | BindingFlags.Instance)
             .SetValue(player, playerRb);
 
-        var hand = new GameObject("hand").transform;
+        var hand = CreateGameObject("hand").transform;
         hand.SetParent(playerGO.transform);
 
-        var batteryGO = new GameObject("battery");
+        var batteryGO = CreateGameObject("battery");
         batteryGO.AddComponent<Rigidbody2D>();
         batteryGO.AddComponent<TargetJoint2D>();
         var battery = batteryGO.AddComponent<BatteryPickup>();
@@ -43,9 +64,9 @@ public class BatteryPickupTests
         Assert.IsTrue(battery.CanBeGrabbed(inventory));
         Assert.AreEqual(battery, inventory.GetItem(PickupType.Battery));
 
-        var otherInvGO = new GameObject("otherInv");
+        var otherInvGO = CreateGameObject("otherInv");
         var otherInventory = otherInvGO.AddComponent<Inventory>();
-        otherInventory.SetItem(PickupType.Battery, new GameObject("otherBatt").AddComponent<BatteryPickup>());
+        otherInventory.SetItem(PickupType.Battery, CreateGameObject("otherBatt").AddComponent<BatteryPickup>());
         Assert.IsFalse(battery.CanBeGrabbed(otherInventory));
 
         inventory.DropItem(PickupType.Battery);
@@ -55,12 +76,12 @@ public class BatteryPickupTests
     [Test]
     public void Battery_DisablesPhysicsWhileGrabbed()
     {
-        var batteryGO = new GameObject("battery");
+        var batteryGO = CreateGameObject("battery");
         var rb = batteryGO.AddComponent<Rigidbody2D>();
         rb.gravityScale = 2f;
         batteryGO.AddComponent<TargetJoint2D>();
         var battery = batteryGO.AddComponent<BatteryPickup>();
-        var hand = new GameObject("hand").transform;
+        var hand = CreateGameObject("hand").transform;
 
         battery.OnGrab(hand);
 

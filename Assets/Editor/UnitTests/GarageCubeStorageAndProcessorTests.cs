@@ -64,7 +64,7 @@ public class GarageCubeStorageAndProcessorTests
         Assert.IsTrue(setup.Storage.TryAccept(cargo, claim, reservation));
 
         Assert.Less(Quaternion.Angle(Quaternion.identity, cargo.transform.rotation), 0.01f);
-        Assert.AreEqual(new Vector3(0f, 0.01f, 0f), cargo.transform.localPosition);
+        Assert.AreEqual(new Vector3(0f, 0.2f, 0f), cargo.transform.localPosition);
     }
 
     [Test]

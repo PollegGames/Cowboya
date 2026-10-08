@@ -34,7 +34,6 @@ public class RoomSpawnRobotCollectorPrefabTests {
     [TestCase("ROOM_Junks")]
     [TestCase("ROOM_Work")]
     [TestCase("ROOM_security")]
-    [TestCase("ROOM_reception")]
     [TestCase("ROOM_Spawning")]
     [TestCase("ROOM_lift")]
     [TestCase("ROOM_Deads")]

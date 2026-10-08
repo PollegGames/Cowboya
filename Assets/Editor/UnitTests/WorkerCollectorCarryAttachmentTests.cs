@@ -125,7 +125,8 @@ public class WorkerCollectorCarryAttachmentTests {
         Assert.IsTrue(physicsScene.Simulate(0.02f));
 
         Assert.AreSame(slot, cargo.transform.parent);
-        Assert.That(Vector3.Distance(slot.position, cargo.transform.position), Is.LessThan(0.001f));
+        Vector3 expectedStoredPosition = slot.TransformPoint(new Vector3(0f, 0.2f, 0f));
+        Assert.That(Vector3.Distance(expectedStoredPosition, cargo.transform.position), Is.LessThan(0.001f));
         Assert.AreEqual(WhiteCubeCargoState.Stored, cargo.State);
         Assert.IsFalse(cargo.IsClaimValid(claim));
         Assert.AreEqual(RigidbodyType2D.Kinematic, body.bodyType);

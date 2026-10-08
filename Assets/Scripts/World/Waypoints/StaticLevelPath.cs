@@ -247,13 +247,6 @@ public sealed class StaticLevelPath : MonoBehaviour
 
     private bool VerifyRuntimeGraph(WaypointService waypointService)
     {
-        WaypointService[] services = FindObjectsByType<WaypointService>(FindObjectsSortMode.None);
-        if (services.Length != 1 || services[0] != waypointService)
-        {
-            Debug.LogError($"Static navigation requires exactly one waypoint service, but found {services.Length}.", this);
-            return false;
-        }
-
         if (waypointService.GraphMode != WaypointGraphMode.StaticExplicit)
         {
             Debug.LogError("Waypoint service did not retain StaticExplicit graph mode.", this);

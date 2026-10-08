@@ -168,6 +168,7 @@ public class WaypointServiceTests
         var room = roomGo.AddComponent<RoomManager>();
         var props = roomGo.AddComponent<RoomProperties>();
         props.usageType = UsageType.POI;
+        room.roomProperties = props;
 
         var machineGo = new GameObject("RestMachine");
         var machine = machineGo.AddComponent<RestingMachine>();

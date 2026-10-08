@@ -295,9 +295,10 @@ public class WaypointService : MonoBehaviour, IWaypointService
             .Where(wp =>
                 wp != null
                 && wp.parentRoom != null
+                && wp.parentRoom.roomProperties != null
                 && wp.parentRoom.roomProperties.usageType == UsageType.POI
                 && wp.type == WaypointType.Rest
-                && wp.parentRoom.restingMachinesInRoom.Any(m => m.IsOn)
+                && wp.parentRoom.restingMachinesInRoom.Any(m => m != null && m.IsOn)
                 && wp != exclude)
             .FirstOrDefault();
     }
@@ -499,6 +500,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
             .Where(wp =>
                 wp != null
                 && wp.parentRoom != null
+                && wp.parentRoom.roomProperties != null
                 && wp.parentRoom.roomProperties.usageType == UsageType.POI
                 && wp.type == WaypointType.Rest
                 && wp.parentRoom.restingMachinesInRoom.Any(m => m.IsOn)
@@ -528,6 +530,7 @@ public class WaypointService : MonoBehaviour, IWaypointService
             .Where(wp =>
                 wp != null
                 && wp.parentRoom != null
+                && wp.parentRoom.roomProperties != null
                 && wp.parentRoom.roomProperties.usageType == UsageType.POI
                 && wp.type == WaypointType.Rest
             )

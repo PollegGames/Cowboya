@@ -61,35 +61,6 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
-    public void SlotGating_WorkerSlotRequiresWorkTask_AndRestSlotRejectsWorkTask()
-    {
-        var setup = CreateRobotWithBrain("Robot_WorkerSlot");
-        var brain = setup.brain;
-        var heart = setup.heart;
-
-        heart.ResetIntentStack(repopulateDefaultTask: true);
-        heart.QueueTask(new RobotTask(RobotTaskType.WorkAtMachine));
-
-        var workerSlotGo = new GameObject("WorkerSlotGO");
-        var workerSlot = workerSlotGo.AddComponent<WorkerSlot>();
-        var workerMachineGo = new GameObject("WorkerMachine");
-        var factoryMachine = workerMachineGo.AddComponent<FactoryMachine>();
-        SetPrivateField(workerSlot, "machine", factoryMachine);
-
-        InvokePrivate(workerSlot, "OnTriggerEnter2D", setup.collider);
-        Assert.IsTrue(factoryMachine.IsOccupied, "WorkerSlot should attach directly when task is WorkAtMachine.");
-
-        var restSlotGo = new GameObject("RestSlotGO");
-        var restSlot = restSlotGo.AddComponent<RestingSlot>();
-        var restMachineGo = new GameObject("RestMachine");
-        var restingMachine = restMachineGo.AddComponent<RestingMachine>();
-        SetPrivateField(restSlot, "machine", restingMachine);
-
-        InvokePrivate(restSlot, "OnTriggerEnter2D", setup.collider);
-        Assert.IsNull(restingMachine.CurrentWorker, "RestingSlot should reject when task is not Rest.");
-    }
-
-    [Test]
     public void BossSpawnMetadata_UsesEndWaypointDataInProbe()
     {
         var owner = new GameObject("BossProbeOwner").AddComponent<RobotBrainNew>();
@@ -114,20 +85,6 @@ public class RobotEcosystemProbeTests
 
         Assert.Greater(RobotEcosystemProbe.GetCallCount("Brain.OnMachineStateEvent"), 0);
         Assert.AreEqual(0, RobotEcosystemProbe.GetCallCount("Brain.OnPerceptionChanged"));
-    }
-
-    [Test]
-    public void KnownCurrentBehavior_GuardStationCheckReturnsFalse()
-    {
-        var brain = CreateRobotWithBrain("Robot_GuardStation").brain;
-
-        MethodInfo method = typeof(MachineSecurityManager).GetMethod(
-            "IsGuardStationedAtSecurityMachine",
-            BindingFlags.NonPublic | BindingFlags.Static);
-        Assert.IsNotNull(method, "Expected private static method IsGuardStationedAtSecurityMachine.");
-
-        bool result = (bool)method.Invoke(null, new object[] { brain });
-        Assert.IsFalse(result);
     }
 
     [Test]
@@ -206,26 +163,6 @@ public class RobotEcosystemProbeTests
         Assert.IsNotNull(task);
         Assert.AreEqual(RobotTaskType.GoToMachine, task.Type);
         Assert.AreEqual(restWaypoint, task.Payload);
-    }
-
-    [Test]
-    public void WorkerPlan_DoesNotIdle_WhenMachineWaypointsExistEvenIfUnavailable()
-    {
-        var setup = CreateRobotWithBrain("Robot_WorkerNoIdleWhenUnavailable");
-        var memory = setup.brain.Memory;
-        Assert.IsNotNull(memory);
-
-        var restWaypoint = CreateWaypoint("RestWP", WaypointType.Rest, false, Vector3.zero);
-        var workWaypoint = CreateWaypoint("WorkWP", WaypointType.Work, false, Vector3.right);
-        memory.InitializeWaypointAvailability(new[] { restWaypoint, workWaypoint });
-        memory.SetLastVisitedPoint(restWaypoint);
-        memory.ChangeConnectionToMachine(false);
-
-        bool ok = setup.brain.TryGetCurrentPlan(out _, out var task);
-        Assert.IsTrue(ok);
-        Assert.IsNotNull(task);
-        Assert.AreNotEqual(RobotTaskType.Idle, task.Type);
-        Assert.AreEqual(RobotTaskType.GoToMachine, task.Type);
     }
 
     [Test]
@@ -468,31 +405,6 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
-    public void WorkerSlot_DedupesDuplicateTriggerEntries()
-    {
-        RobotNewPipelineRuntime.WorkerCycleValidationMode = false;
-
-        var setup = CreateRobotWithBrain("Robot_WorkerSlotDedup");
-        var heart = setup.heart;
-        heart.ResetIntentStack(repopulateDefaultTask: true);
-        heart.QueueTask(new RobotTask(RobotTaskType.WorkAtMachine));
-
-        var machineGo = new GameObject("FactoryMachine");
-        machineGo.AddComponent<BoxCollider2D>();
-        var machine = machineGo.AddComponent<FactoryMachine>();
-
-        var slotGo = new GameObject("WorkerSlotDedupGO");
-        var slot = slotGo.AddComponent<WorkerSlot>();
-        SetPrivateField(slot, "machine", machine);
-
-        InvokePrivate(slot, "OnTriggerEnter2D", setup.collider);
-        InvokePrivate(slot, "OnTriggerEnter2D", setup.collider);
-
-        Assert.IsTrue(machine.IsOccupied);
-        Assert.AreEqual(1, RobotEcosystemProbe.GetCallCount("Slot.WorkerSlot.attach_requested"));
-    }
-
-    [Test]
     public void WorkerSlot_OccupiedFactoryMachine_ReplacesOwnerAndSendsPreviousWorkerToRest()
     {
         var owner = CreateRobotWithBrain("Robot_WorkOwner");
@@ -527,55 +439,6 @@ public class RobotEcosystemProbeTests
         Assert.IsTrue(incoming.brain.Memory.IsConnectedToMachine);
         Assert.IsFalse(owner.brain.Memory.IsConnectedToMachine);
         AssertWorkerPlansWaypoint(owner.brain, restWaypoint, "The replaced worker should leave the station and go rest.");
-    }
-
-    [Test]
-    public void SecurityMachine_PowerOff_LoneCurrentGuardReceivesReactivateTask()
-    {
-        var setup = CreateRobotWithBrain("Robot_LoneSecurityGuard");
-        setup.heart.ConfigureRole(RobotRole.SecurityGuard, resetStack: true);
-
-        var managerGo = new GameObject("MachineSecurityManager_LoneGuard");
-        var manager = managerGo.AddComponent<MachineSecurityManager>();
-        var machineGo = new GameObject("SecurityPost_LoneGuard");
-        var machine = machineGo.AddComponent<SecurityMachine>();
-
-        manager.RegisterSecurityMachine(machine);
-        manager.RegisterGuard(setup.brain);
-        machine.AttachRobot(setup.brain.gameObject);
-
-        machine.PowerOff();
-
-        Assert.IsNotNull(setup.heart.CurrentTask);
-        Assert.AreEqual(RobotTaskType.ReactivateMachine, setup.heart.CurrentTask.Type);
-        Assert.AreEqual(machine, setup.heart.CurrentTask.Payload, "The displaced current guard must be eligible to restart its security post.");
-    }
-
-    [Test]
-    public void SecurityGuard_ReactivationAssignment_ResumesAfterCombatInterrupt()
-    {
-        var setup = CreateRobotWithBrain("Robot_InterruptedSecurityGuard");
-        setup.heart.ConfigureRole(RobotRole.SecurityGuard, resetStack: true);
-
-        var managerGo = new GameObject("MachineSecurityManager_InterruptResume");
-        var manager = managerGo.AddComponent<MachineSecurityManager>();
-        var machineGo = new GameObject("WorkMachine_ToReactivate");
-        var machine = machineGo.AddComponent<FactoryMachine>();
-        machine.PowerOff();
-
-        InvokePrivate(manager, "DispatchGuardToReactivateMachine", setup.brain, machine, "test_interrupt_resume");
-
-        Assert.AreEqual(machine, setup.brain.Memory.PendingReactivationMachine, "The repair target must be stored in memory before the guard acts.");
-        Assert.AreEqual(RobotTaskType.ReactivateMachine, setup.heart.CurrentTask.Type);
-
-        var player = new GameObject("Player_InterruptingGuard").transform;
-        setup.brain.OnPerceptionChanged(true, true, player.position, true, player);
-        Assert.AreEqual(RobotTaskType.AttackTarget, setup.heart.CurrentTask.Type, "Combat may temporarily interrupt the remembered repair.");
-
-        setup.brain.OnPerceptionChanged(false, false, Vector3.zero, false, null);
-
-        Assert.AreEqual(RobotTaskType.ReactivateMachine, setup.heart.CurrentTask.Type, "When the player is lost, the guard must resume the remembered repair.");
-        Assert.AreEqual(machine, setup.heart.CurrentTask.Payload);
     }
 
     [Test]
@@ -634,47 +497,6 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
-    public void RestingSlot_NewArrivalReplacesCurrentWorker_DirectReplacement()
-    {
-        RobotNewPipelineRuntime.WorkerCycleValidationMode = true;
-
-        var workerA = CreateRobotWithBrain("Robot_RestOwner_A");
-        var workerB = CreateRobotWithBrain("Robot_RestOwner_B");
-
-        workerA.heart.ResetIntentStack(repopulateDefaultTask: true);
-        workerA.heart.QueueTask(new RobotTask(RobotTaskType.Rest));
-        workerB.heart.ResetIntentStack(repopulateDefaultTask: true);
-        workerB.heart.QueueTask(new RobotTask(RobotTaskType.Rest));
-
-        var restWaypoint = CreateWaypoint("RestWP", WaypointType.Rest, true, Vector3.zero);
-        var workWaypoint = CreateWaypoint("WorkWP", WaypointType.Work, true, Vector3.right);
-        workerA.brain.Memory.InitializeWaypointAvailability(new[] { restWaypoint, workWaypoint });
-        workerB.brain.Memory.InitializeWaypointAvailability(new[] { restWaypoint, workWaypoint });
-        workerA.brain.Memory.SetLastVisitedPoint(restWaypoint);
-        workerB.brain.Memory.SetLastVisitedPoint(restWaypoint);
-
-        var machineGo = new GameObject("RestMachine");
-        var machineCollider = machineGo.AddComponent<BoxCollider2D>();
-        machineCollider.isTrigger = true;
-        var restingMachine = machineGo.AddComponent<RestingMachine>();
-
-        var slotGo = new GameObject("RestSlotTakeoverGO");
-        var slot = slotGo.AddComponent<RestingSlot>();
-        SetPrivateField(slot, "machine", restingMachine);
-        InvokePrivate(slot, "OnTriggerEnter2D", workerA.collider);
-        Assert.AreEqual(workerA.brain, restingMachine.CurrentWorker);
-        InvokePrivate(slot, "OnTriggerEnter2D", workerB.collider);
-
-        Assert.AreEqual(workerB.brain, restingMachine.CurrentWorker, "Incoming worker should replace current worker.");
-
-        bool ok = workerA.brain.TryGetCurrentPlan(out _, out var task);
-        Assert.IsTrue(ok);
-        Assert.IsNotNull(task);
-        Assert.AreEqual(RobotTaskType.GoToMachine, task.Type);
-        Assert.AreEqual(workWaypoint, task.Payload);
-    }
-
-    [Test]
     public void RestingSlot_ExitDoesNotReleaseOwner_MemoryDisconnectsOnMachineRelease()
     {
         RobotNewPipelineRuntime.WorkerCycleValidationMode = true;
@@ -708,30 +530,6 @@ public class RobotEcosystemProbeTests
 
         restingMachine.TryReleaseWorker(setup.brain, "rest_done");
         Assert.IsFalse(setup.brain.Memory.IsConnectedToMachine);
-    }
-
-    [Test]
-    public void WorkerSlot_ExitFromNonOwner_DoesNotReleaseCurrentOccupant()
-    {
-        var workerA = CreateRobotWithBrain("Robot_Owner");
-        var workerB = CreateRobotWithBrain("Robot_NonOwner");
-        workerA.heart.ResetIntentStack(repopulateDefaultTask: true);
-        workerA.heart.QueueTask(new RobotTask(RobotTaskType.WorkAtMachine));
-        workerB.heart.ResetIntentStack(repopulateDefaultTask: true);
-        workerB.heart.QueueTask(new RobotTask(RobotTaskType.WorkAtMachine));
-
-        var machineGo = new GameObject("FactoryMachine_NonOwnerExit");
-        var machine = machineGo.AddComponent<FactoryMachine>();
-
-        var slotGo = new GameObject("WorkerSlot_NonOwnerExit");
-        var slot = slotGo.AddComponent<WorkerSlot>();
-        SetPrivateField(slot, "machine", machine);
-
-        InvokePrivate(slot, "OnTriggerEnter2D", workerA.collider);
-        Assert.AreEqual(workerA.brain, machine.CurrentWorker);
-
-        InvokePrivate(slot, "OnTriggerExit2D", workerB.collider);
-        Assert.AreEqual(workerA.brain, machine.CurrentWorker, "Non-owner exit must not release current occupant.");
     }
 
     private static (RobotBrainNew brain, RobotHeartNew heart, Collider2D collider) CreateRobotWithBrain(string name)

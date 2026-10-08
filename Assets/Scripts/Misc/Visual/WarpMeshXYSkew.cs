@@ -42,8 +42,15 @@ public class WarpMeshXYSkew : MonoBehaviour
     }
     private void Start()
     {
-        // Retrieve the mesh from this object's MeshFilter
-        mesh = GetComponent<MeshFilter>().mesh;
+        // Each instance needs a writable mesh. Assign through sharedMesh so Edit Mode
+        // validation does not invoke MeshFilter.mesh and leak an implicit clone.
+        MeshFilter meshFilter = GetComponent<MeshFilter>();
+        if (meshFilter.sharedMesh == null)
+            return;
+
+        mesh = Instantiate(meshFilter.sharedMesh);
+        mesh.name = meshFilter.sharedMesh.name + " (Warp Instance)";
+        meshFilter.sharedMesh = mesh;
 
         // Store the original vertex positions
         originalVerts = mesh.vertices;
@@ -62,6 +69,17 @@ public class WarpMeshXYSkew : MonoBehaviour
             roomManager.triggerZone.onEnter.AddListener(OnEnterRoom);
             roomManager.triggerZone.onExit.AddListener(OnExitRoom);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (mesh == null)
+            return;
+
+        if (Application.isPlaying)
+            Destroy(mesh);
+        else
+            DestroyImmediate(mesh);
     }
 
     private void OnEnterRoom(Collider2D playerCollider)

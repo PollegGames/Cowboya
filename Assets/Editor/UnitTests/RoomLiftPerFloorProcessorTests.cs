@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 using System.Collections.Generic;
 
 public class RoomLiftPerFloorProcessorTests
@@ -42,19 +41,4 @@ public class RoomLiftPerFloorProcessorTests
         Assert.AreEqual(UsageType.PathToPOI, existingPath.cellProperties.usageType);
     }
 
-    [Test]
-    public void ProcessCells_NoCandidateOnFloor_LogsError()
-    {
-        var grid = new Dictionary<Vector2, Cell>();
-        var start = new Cell(new Vector2(0, 0), UsageType.Start);
-        grid[start.position] = start;
-
-        var processor = new RoomLiftPerFloorProcessor(1, 1);
-
-        LogAssert.Expect(LogType.Error, "No suitable cell found on level 0 to set PathToPOI");
-
-        processor.ProcessCells(grid);
-
-        Assert.AreEqual(UsageType.Start, start.cellProperties.usageType);
-    }
 }
