@@ -14,7 +14,9 @@ public interface IEnemiesSpawner
     void SetDropContainer(Transform container);
     void CreateWorkers(int workersToSpawn);
     void CreateSecurityGuards(int enemiesToSpawn);
+    void SpawnSecurityReceptionGuards();
     void CreateBoss();
+    void SpawnBossAtEnd();
     void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus);
     void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine);
     void CreateWorkerSpawners(int workersToSpawn);

@@ -164,6 +164,7 @@ public class SceneInitiator : GameInitiator
         playerInitiator.InitializePlayer(saveService);
         factoryManager.SetPlayerInstanceHead(playerInitiator.playerInstance, playerInitiator.playerHeadTransform);
         InitializeStaticRooms();
+        InitializeStaticReceptionDefenders();
         InitializeStaticRobotNavigation();
 
         gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
@@ -172,6 +173,32 @@ public class SceneInitiator : GameInitiator
         InitializeStaticMiniMap();
 
         Debug.Log("Static player initialized.");
+    }
+
+    private void InitializeStaticReceptionDefenders()
+    {
+        if (enemiesSpawner == null || factoryManager == null)
+        {
+            Debug.LogWarning("SceneInitiator: Reception defender setup dependencies are missing; skipping static spawn.");
+            return;
+        }
+
+        enemiesSpawner.SetDropContainer(factoryManager is MonoBehaviour managerBehaviour
+            ? managerBehaviour.transform
+            : null);
+        enemiesSpawner.Initialize(
+            mapManager,
+            waypointService,
+            gameUIViewModel,
+            respawnService,
+            factoryManager,
+            factoryManager.SecurityManager,
+            securityBadgeSpawner,
+            batterySpawner);
+        enemiesSpawner.SpawnSecurityReceptionGuards();
+
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level_3")
+            enemiesSpawner.SpawnBossAtEnd();
     }
 
     private void InitializeStaticRooms()
@@ -287,6 +314,7 @@ public class SceneInitiator : GameInitiator
             enemiesSpawner.CreateBoss();
         }
         enemiesSpawner.SpreadEnemies();
+        enemiesSpawner.SpawnSecurityReceptionGuards();
         if (RobotNewPipelineRuntime.EnableProbeSummaryOnSceneInit)
             StartCoroutine(DumpProbeSummaryEndOfFrame());
         if (RobotNewPipelineRuntime.IsWorkerCycleValidationEnabled && RobotNewPipelineRuntime.EnableEcosystemProbe)

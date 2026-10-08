@@ -1,3 +1,4 @@
+using System.IO;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -5,6 +6,29 @@ using UnityEngine;
 public class RoomSpawnRobotCollectorPrefabTests {
     private const string MapPrefabFolder = "Assets/Resources/Prefabs/Map/";
     private static readonly Vector3 ExpectedLocalPosition = new Vector3(-4.13f, -0.019f, 0.64f);
+
+    [Test]
+    public void ReceptionRoomHasOneRegisteredWorkWaypoint() {
+        string yaml = File.ReadAllText(MapPrefabFolder + "ROOM_Reception.prefab");
+        StringAssert.Contains("usageType: 4", yaml);
+        StringAssert.Contains("poiType: 1", yaml);
+        StringAssert.Contains("  - {fileID: 8810024028455475932}", yaml);
+    }
+
+    [Test]
+    public void SecurityReceptionPrefabAndSpawnerReferenceAreConfigured() {
+        const string receptionPath =
+            "Assets/Resources/Prefabs/Robots/SecurityReception/SecurityReception.prefab";
+        string receptionYaml = File.ReadAllText(receptionPath);
+        StringAssert.Contains("m_Name: SecurityReception", receptionYaml);
+        StringAssert.Contains("guid: 78fc318645d30794c81b0a3637c2d180", receptionYaml);
+        StringAssert.Contains("guid: b174dc543db813e4ebf8a4dd68405936", receptionYaml);
+
+        string managerYaml = File.ReadAllText("Assets/Resources/Prefabs/Map/EnemyManager.prefab");
+        StringAssert.Contains(
+            "securityReceptionPrefab: {fileID: 7904953425273788862, guid: 6f7d4857918b4df19d58f2374a35e21c, type: 3}",
+            managerYaml);
+    }
 
     [TestCase("ROOM_Furnace")]
     [TestCase("ROOM_Junks")]

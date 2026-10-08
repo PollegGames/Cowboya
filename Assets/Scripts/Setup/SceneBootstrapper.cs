@@ -41,16 +41,21 @@ public class SceneBootstrapper : MonoBehaviour
 
         var factory = Instantiate(config.factoryManagerPrefab);
         var playerSpawner = Instantiate(config.playerSpawnerPrefab);
-        EnemiesSpawner enemiesSpawner = null;
+        EnemiesSpawner enemiesSpawner = config.enemiesSpawnerPrefab != null
+            ? Instantiate(config.enemiesSpawnerPrefab)
+            : null;
         MapManager mapManager = null;
         WaypointService waypointService = null;
         RobotRespawnService respawnService = null;
-        SecurityBadgeSpawner badgeSpawner = null;
-        BatterySpawner batterySpawner = null;
+        SecurityBadgeSpawner badgeSpawner = config.badgeSpawnerPrefab != null
+            ? Instantiate(config.badgeSpawnerPrefab)
+            : null;
+        BatterySpawner batterySpawner = config.batterySpawnerPrefab != null
+            ? Instantiate(config.batterySpawnerPrefab)
+            : null;
 
         if (setupMode == SceneSetupMode.GeneratedMap)
         {
-            enemiesSpawner = Instantiate(config.enemiesSpawnerPrefab);
             mapManager = Instantiate(config.mapManagerPrefab);
             var gridBuilder = mapManager.gameObject.AddComponent<GridBuilder>();
             var roomRenderer = mapManager.gameObject.AddComponent<RoomRenderer>();
@@ -58,8 +63,6 @@ public class SceneBootstrapper : MonoBehaviour
             mapManager.Construct(gridBuilder, roomRenderer, roomProcessor);
             waypointService = Instantiate(config.waypointServicePrefab);
             respawnService = Instantiate(config.respawnServicePrefab);
-            badgeSpawner = Instantiate(config.badgeSpawnerPrefab);
-            batterySpawner = Instantiate(config.batterySpawnerPrefab);
         }
         else
         {
@@ -124,6 +127,6 @@ public class SceneBootstrapper : MonoBehaviour
             );
         }
 
-      
+
     }
 }

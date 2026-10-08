@@ -268,6 +268,7 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         switch (heart.Role)
         {
             case RobotRole.SecurityGuard:
+            case RobotRole.SecurityReception:
             case RobotRole.Follower:
             case RobotRole.Boss:
                 return true;

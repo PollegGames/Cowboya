@@ -184,7 +184,9 @@ public class FactoryManagerTests
         public void SetDropContainer(Transform container) { }
         public void CreateWorkers(int workersToSpawn) { }
         public void CreateSecurityGuards(int enemiesToSpawn) { }
+        public void SpawnSecurityReceptionGuards() { }
         public void CreateBoss() { }
+        public void SpawnBossAtEnd() { }
         public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus) {}
         public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine) {}
         public void CreateWorkerSpawners(int workersToSpawn) { }

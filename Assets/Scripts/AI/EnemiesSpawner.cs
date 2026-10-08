@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,6 +9,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     [SerializeField] private GameObject workerSpawnerPrefab;
     [SerializeField] private GameObject followerGuardPrefab;
     [SerializeField] private GameObject securityGuardPrefab;
+    [SerializeField] private GameObject securityReceptionPrefab;
     [SerializeField] private GameObject bossPrefab;
 
     [Header("Hierarchy")]
@@ -28,6 +29,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     private readonly List<GameObject> spawnedWorkers = new();
     private readonly List<GameObject> spawnedWorkerSpawners = new();
     private readonly List<GameObject> spawnedSecurityGuards = new();
+    private readonly List<GameObject> spawnedSecurityReceptionGuards = new();
     private readonly List<GameObject> spawnedFollowers = new();
     private GameObject bossInstance;
 
@@ -143,6 +145,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         var factory = new EnemyRobotFactory(3);
         bossInstance = PoolGet(bossPrefab);
 
+        if (bossInstance == null)
+        {
+            Debug.LogError("[EnemiesSpawner] No boss prefab assigned.", this);
+            return;
+        }
+
         var locomotion = bossInstance.GetComponent<RobotLocomotionController>();
         if (locomotion != null) locomotion.isPlayerControlled = false;
 
@@ -153,9 +161,135 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             state.Stats.RobotName = "BOSS 1";
         }
 
-        RoomWaypoint end = waypointService.GetEndPoint();
+        RoomWaypoint end = FindEndRoomWaypoint();
         bossInstance.transform.position = (end != null) ? end.WorldPos : Vector3.zero;
         bossInstance.SetActive(false);
+    }
+
+    /// <summary>
+    /// Creates the boss at the authored end-room waypoint and activates it in place.
+    /// </summary>
+    public void SpawnBossAtEnd()
+    {
+        CreateBoss();
+        if (bossInstance == null)
+            return;
+
+        RoomWaypoint end = FindEndRoomWaypoint();
+        if (end == null)
+        {
+            Debug.LogError("[EnemiesSpawner] Cannot spawn boss: no end-room center waypoint was found.", this);
+            return;
+        }
+
+        PositionForSpawn(bossInstance, end.WorldPos);
+        InitializeRobot(bossInstance, RobotRole.Boss, end);
+        Wake(bossInstance);
+        Debug.Log($"[EnemiesSpawner] Spawned boss at '{end.name}' in room '{end.parentRoom.name}'.", bossInstance);
+    }
+
+    private RoomWaypoint FindEndRoomWaypoint()
+    {
+        RoomWaypoint end = waypointService != null ? waypointService.GetEndPoint() : null;
+        if (end != null)
+            return end;
+
+        return FindObjectsByType<RoomManager>(FindObjectsSortMode.None)
+            .Where(room => room != null
+                && room.roomProperties != null
+                && room.roomProperties.usageType == UsageType.End)
+            .SelectMany(room => room.GetWaypoints())
+            .FirstOrDefault(waypoint => waypoint != null && waypoint.type == WaypointType.Center);
+    }
+
+    /// <summary>
+    /// Spawns one stationary defender at the authored Work waypoint in every reception room.
+    /// </summary>
+    public void SpawnSecurityReceptionGuards()
+    {
+        spawnedSecurityReceptionGuards.RemoveAll(guard => guard == null);
+
+        if (securityReceptionPrefab == null)
+        {
+            Debug.LogError("[EnemiesSpawner] No security reception prefab assigned.", this);
+            return;
+        }
+
+        IEnumerable<RoomWaypoint> availableWaypoints = waypointService != null
+            ? waypointService.GetAllWaypoints()
+            : FindObjectsByType<RoomManager>(FindObjectsSortMode.None)
+                .Where(room => room != null)
+                .SelectMany(room => room.GetWaypoints());
+        List<RoomWaypoint> receptionPosts = FindReceptionWorkWaypoints(availableWaypoints);
+        if (receptionPosts.Count == 0)
+        {
+            Debug.LogWarning(
+                "[EnemiesSpawner] No Reception room with exactly one Work waypoint was found.",
+                this);
+            return;
+        }
+        foreach (RoomWaypoint post in receptionPosts)
+        {
+            bool alreadySpawned = spawnedSecurityReceptionGuards.Any(guard =>
+                guard != null && Vector3.SqrMagnitude(guard.transform.position - post.WorldPos) < 0.01f);
+            if (alreadySpawned)
+                continue;
+
+            GameObject guard = PoolGet(securityReceptionPrefab);
+            if (guard == null)
+                continue;
+
+            PositionForSpawn(guard, post.WorldPos);
+            InitializeRobot(guard, RobotRole.SecurityReception, post);
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level_3")
+            {
+                SecurityReceptionFaintLock faintLock = guard.GetComponent<SecurityReceptionFaintLock>();
+                if (faintLock == null)
+                    faintLock = guard.AddComponent<SecurityReceptionFaintLock>();
+                faintLock.Configure();
+            }
+            Wake(guard);
+            spawnedSecurityReceptionGuards.Add(guard);
+            Debug.Log(
+                $"[EnemiesSpawner] Spawned SecurityReception at '{post.name}' in room '{post.parentRoom.name}'.",
+                guard);
+        }
+    }
+
+    /// <summary>
+    /// Returns the unique Work waypoint authored in each reception room.
+    /// </summary>
+    public static List<RoomWaypoint> FindReceptionWorkWaypoints(IEnumerable<RoomWaypoint> waypoints)
+    {
+        if (waypoints == null)
+            return new List<RoomWaypoint>();
+
+        var receptionGroups = waypoints
+            .Where(waypoint => waypoint != null
+                && waypoint.parentRoom != null
+                && waypoint.parentRoom.roomProperties != null
+                && waypoint.parentRoom.roomProperties.usageType == UsageType.POI
+                && waypoint.parentRoom.roomProperties.poiType == POIType.Reception)
+            .GroupBy(waypoint => waypoint.parentRoom);
+
+        var posts = new List<RoomWaypoint>();
+        foreach (var group in receptionGroups)
+        {
+            List<RoomWaypoint> workPoints = group
+                .Where(waypoint => waypoint.type == WaypointType.Work)
+                .ToList();
+            if (workPoints.Count != 1)
+            {
+                Debug.LogError(
+                    $"[EnemiesSpawner] Reception room '{group.Key.name}' requires exactly one Work waypoint, found {workPoints.Count}.",
+                    group.Key);
+                continue;
+            }
+
+            posts.Add(workPoints[0]);
+        }
+
+        return posts;
     }
 
     public void CreateAndSpawnSecurityGuard(RoomWaypoint spawnPos, SecurityMachine machine)
@@ -509,15 +643,21 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             }
         }
 
-        // Attach a security badge to guards and the boss so it can be stolen later.
-        if ((role == RobotRole.SecurityGuard || role == RobotRole.Boss) && securityBadgeSpawner != null)
+        // Attach a security badge to security robots and the boss so it can be stolen later.
+        if ((role == RobotRole.SecurityGuard
+                || role == RobotRole.SecurityReception
+                || role == RobotRole.Boss)
+            && securityBadgeSpawner != null)
         {
             Transform anchor = go.transform;
             var body = go.GetComponent<RobotBodyController>();
             if (body != null && body.BodyReference != null)
                 anchor = body.BodyReference;
 
-            var badge = securityBadgeSpawner.SpawnBadge(anchor);
+            Vector3 badgeOffset = role == RobotRole.SecurityReception
+                ? new Vector3(0.55f, 0.3f, 0f)
+                : Vector3.zero;
+            var badge = securityBadgeSpawner.SpawnBadge(anchor, badgeOffset);
             var inventory = go.GetComponent<Inventory>();
             if (badge != null && inventory != null)
             {
@@ -547,5 +687,147 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             go.AddComponent<RobotBrainNew>();
     }
 
+}
+
+/// <summary>
+/// Keeps the Level 3 reception defender faint without blocking damage or death.
+/// </summary>
+[DisallowMultipleComponent]
+public class SecurityReceptionFaintLock : MonoBehaviour
+{
+    private RobotStateController stateController;
+    private EnergyBot energyBot;
+    private RobotBodyController bodyController;
+    private RobotAttackController attackController;
+    private RobotBrainNew brain;
+    private FollowPlayerTriggerHandler[] perceptionHandlers;
+    private bool configured;
+    private bool triggered;
+    private bool dead;
+
+    public bool IsLocked => configured && triggered && !dead;
+
+    private void Awake()
+    {
+        ResolveReferences();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+        Subscribe();
+        if (configured && triggered && !dead)
+            ApplyFaintLock();
+    }
+
+    private void OnDisable()
+    {
+        Unsubscribe();
+    }
+
+    /// <summary>
+    /// Arms this robot to faint permanently when the player is first detected.
+    /// </summary>
+    public void Configure()
+    {
+        configured = true;
+        triggered = false;
+        dead = false;
+        ResolveReferences();
+        Subscribe();
+        energyBot?.SetStats(stateController != null ? stateController.Stats : null);
+        energyBot?.SetAutoRecharge(false);
+        bodyController?.StopMovement();
+        attackController?.StopAttacking();
+    }
+
+    /// <summary>
+    /// Depletes the robot's energy and locks it in the faint state until death.
+    /// </summary>
+    public void TriggerFaint()
+    {
+        if (!configured || triggered || dead)
+            return;
+
+        triggered = true;
+        ApplyFaintLock();
+    }
+
+    private void HandleStateChanged(RobotState state)
+    {
+        if (state == RobotState.Dead)
+        {
+            dead = true;
+            attackController?.StopAttacking();
+            return;
+        }
+
+        if (configured && triggered && !dead && state != RobotState.Faint)
+            ApplyFaintLock();
+    }
+
+    private void ApplyFaintLock()
+    {
+        if (stateController == null || stateController.CurrentState == RobotState.Dead)
+        {
+            dead = stateController != null && stateController.CurrentState == RobotState.Dead;
+            return;
+        }
+
+        if (energyBot != null)
+        {
+            energyBot.SetStats(stateController.Stats);
+            energyBot.SetAutoRecharge(false);
+            energyBot.SetCurrentEnergy(0f);
+        }
+        else if (stateController.Stats != null)
+        {
+            stateController.Stats.CurrentEnergy = 0f;
+        }
+        bodyController?.StopMovement();
+        attackController?.StopAttacking();
+
+        if (brain != null)
+            brain.enabled = false;
+
+        if (perceptionHandlers != null)
+        {
+            foreach (FollowPlayerTriggerHandler handler in perceptionHandlers)
+            {
+                if (handler != null)
+                    handler.enabled = false;
+            }
+        }
+
+        if (stateController.CurrentState != RobotState.Faint)
+            stateController.UpdateState(RobotState.Faint);
+
+        stateController.ApplyEnemyFaintPose();
+    }
+
+    private void ResolveReferences()
+    {
+        stateController ??= GetComponent<RobotStateController>();
+        energyBot ??= GetComponent<EnergyBot>();
+        bodyController ??= GetComponent<RobotBodyController>();
+        attackController ??= GetComponent<RobotAttackController>();
+        brain ??= GetComponent<RobotBrainNew>();
+        perceptionHandlers ??= GetComponentsInChildren<FollowPlayerTriggerHandler>(true);
+    }
+
+    private void Subscribe()
+    {
+        if (stateController == null)
+            return;
+
+        stateController.OnStateChanged -= HandleStateChanged;
+        stateController.OnStateChanged += HandleStateChanged;
+    }
+
+    private void Unsubscribe()
+    {
+        if (stateController != null)
+            stateController.OnStateChanged -= HandleStateChanged;
+    }
 }
 

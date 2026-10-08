@@ -38,7 +38,6 @@ public class GridManager
 
     public void ProcessRooms(List<ICellProcessor> roomProcessors, Dictionary<Vector2, Cell> cellDataGrid)
     {
-
         foreach (var processor in roomProcessors)
         {
             processor.ProcessCells(cellDataGrid);
@@ -57,8 +56,9 @@ public class GridManager
             if (cellDataGrid.TryGetValue(pos, out var cell))
             {
                 var roomProps = roomGO.GetComponent<RoomProperties>() ?? roomGO.AddComponent<RoomProperties>();
-              
+
                 roomProps.usageType = cell.cellProperties.usageType;
+                roomProps.poiType = cell.cellProperties.poiType;
                 roomProps.HasLeftDoor = cell.cellProperties.HasLeftDoor;
                 roomProps.HasRightDoor = cell.cellProperties.HasRightDoor;
                 roomProps.HasLeftDoorLocked = cell.cellProperties.HasLeftDoorLocked;
@@ -71,5 +71,4 @@ public class GridManager
             }
         }
     }
-
 }

@@ -13,19 +13,28 @@ public class SecurityBadgeSpawner : MonoBehaviour
     /// </summary>
     public SecurityBadgePickup SpawnBadge(Transform parent)
     {
+        return SpawnBadge(parent, Vector3.zero);
+    }
+
+    /// <summary>
+    /// Spawns a security badge and attaches it at a local-space offset from its parent.
+    /// </summary>
+    public SecurityBadgePickup SpawnBadge(Transform parent, Vector3 localOffset)
+    {
         if (badgePrefab == null)
         {
             Debug.LogWarning("SecurityBadgeSpawner: badgePrefab is null!");
             return null;
         }
 
-        // 1) Instantiate badge at the parent's transform and parent it
+        // Instantiate in world space first so the robot body's scale does not
+        // enlarge or shrink the badge when it becomes a child.
         var badge = Instantiate(
             badgePrefab,
             parent.position,
-            parent.rotation,
-            parent
+            parent.rotation
         );
+        badge.transform.SetParent(parent, worldPositionStays: true);
 
         // 2) Ensure the badge has a Rigidbody2D
         var badgeRb = badge.GetComponent<Rigidbody2D>();
@@ -49,7 +58,7 @@ public class SecurityBadgeSpawner : MonoBehaviour
         // joint.maxForce = maxForce;
 
         // Make the badge follow the parent transform
-        badge.SetFollowTarget(parent);
+        badge.SetFollowTarget(parent, localOffset);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         var joint = badge.GetComponent<TargetJoint2D>();

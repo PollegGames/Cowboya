@@ -355,6 +355,72 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
+    public void SecurityReception_DetectsWithoutChasing_AndAttacksInRange()
+    {
+        var setup = CreateRobotWithBrain("Robot_ReceptionGuard");
+        setup.heart.ConfigureRole(RobotRole.SecurityReception, resetStack: true);
+        var player = new GameObject("ReceptionGuardPlayer").transform;
+
+        setup.brain.OnPerceptionChanged(true, false, player.position, true, player);
+        Assert.IsTrue(setup.brain.TryGetCurrentPlan(out _, out var detectedTask));
+        Assert.AreEqual(RobotTaskType.Idle, detectedTask.Type);
+
+        setup.brain.OnPerceptionChanged(true, true, player.position, true, player);
+        Assert.IsTrue(setup.brain.TryGetCurrentPlan(out _, out var attackTask));
+        Assert.AreEqual(RobotTaskType.AttackTarget, attackTask.Type);
+        Assert.AreSame(player, attackTask.Payload);
+    }
+
+    [Test]
+    public void SecurityReceptionFaintLock_TriggersOnPlayerAndStaysFaintUntilDeath()
+    {
+        var robot = new GameObject("Robot_ReceptionFaintLock");
+        robot.SetActive(false);
+        var energy = robot.AddComponent<EnergyBot>();
+        var state = robot.AddComponent<RobotStateController>();
+        state.Stats = new EnemyRobotFactory(2).CreateRobot();
+        robot.AddComponent<RobotMemoryNew>();
+        var heart = robot.AddComponent<RobotHeartNew>();
+        var brain = robot.AddComponent<RobotBrainNew>();
+        var faintLock = robot.AddComponent<SecurityReceptionFaintLock>();
+
+        robot.SetActive(true);
+        heart.ConfigureRole(RobotRole.SecurityReception, resetStack: true);
+        faintLock.Configure();
+        Assert.AreEqual(RobotState.Alive, state.CurrentState);
+        Assert.IsFalse(energy.AutoRechargeEnabled);
+        Assert.IsFalse(faintLock.IsLocked);
+
+        faintLock.TriggerFaint();
+        Assert.AreEqual(RobotState.Faint, state.CurrentState);
+        Assert.AreEqual(0f, state.Stats.CurrentEnergy);
+        Assert.IsTrue(faintLock.IsLocked);
+
+        state.UpdateState(RobotState.Alive);
+        Assert.AreEqual(RobotState.Faint, state.CurrentState, "Non-death wake attempts must be rejected.");
+
+        state.UpdateState(RobotState.Dead);
+        Assert.AreEqual(RobotState.Dead, state.CurrentState);
+        Assert.IsFalse(faintLock.IsLocked, "Death must release the faint-state enforcement.");
+
+        UnityEngine.Object.DestroyImmediate(robot);
+    }
+
+    [Test]
+    public void SecurityReceptionFaintLock_PlayerDetectionTriggersLock()
+    {
+        var setup = CreateRobotWithBrain("Robot_ReceptionDetectionFaint");
+        setup.heart.ConfigureRole(RobotRole.SecurityReception, resetStack: true);
+        var faintLock = setup.brain.gameObject.AddComponent<SecurityReceptionFaintLock>();
+        faintLock.Configure();
+
+        setup.brain.OnPerceptionChanged(true, false, Vector3.zero);
+
+        Assert.IsTrue(faintLock.IsLocked);
+        UnityEngine.Object.DestroyImmediate(setup.brain.gameObject);
+    }
+
+    [Test]
     public void FollowerPerception_UsesPlayerWaypointAndDoesNotAttack()
     {
         var setup = CreateRobotWithBrain("Robot_FollowerWaypointChase");

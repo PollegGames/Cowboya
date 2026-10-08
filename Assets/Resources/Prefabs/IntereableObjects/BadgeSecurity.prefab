@@ -131,6 +131,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   throwStrength: 5
+  followLerpSpeed: 20
+  heldSortingOrder: 50
+  idleSortingOrder: 50
   frequency: 10
   dampingRatio: 0.9
   maxForce: 2000

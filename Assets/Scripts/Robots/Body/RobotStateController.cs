@@ -369,6 +369,21 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         ReleaseRotationConstraints();
     }
 
+    /// <summary>
+    /// Releases the enemy puppet into a limp pose without marking it dead or breaking its joints.
+    /// </summary>
+    public void ApplyEnemyFaintPose()
+    {
+        if (IsPlayerRobot() || CurrentState == RobotState.Dead)
+            return;
+
+        bodyController?.StopMovement();
+        collectorBody?.StopAllActuators();
+        attackController?.StopAttacking();
+        SetPuppetBindersEnabled(false);
+        ReleaseRotationConstraints();
+    }
+
     private void RestoreEnemyAliveState()
     {
         if (IsPlayerRobot())

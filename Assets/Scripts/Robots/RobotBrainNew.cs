@@ -94,6 +94,15 @@ public class RobotBrainNew : MonoBehaviour
         if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
             return;
 
+        if ((playerInDetectZone || playerInAttackZone)
+            && heart != null
+            && heart.Role == RobotRole.SecurityReception
+            && TryGetComponent(out SecurityReceptionFaintLock faintLock))
+        {
+            faintLock.TriggerFaint();
+            return;
+        }
+
         RobotEcosystemProbe.RecordBrainCall(
             this,
             "OnPerceptionChanged",
@@ -522,6 +531,11 @@ public class RobotBrainNew : MonoBehaviour
                 }
                 return new RobotTask(RobotTaskType.GuardPost);
 
+            case RobotRole.SecurityReception:
+                if (o.HasFlag(BrainOption.CanAttack))
+                    return new RobotTask(RobotTaskType.AttackTarget, BuildPlayerPayload(snapshot));
+                return new RobotTask(RobotTaskType.Idle);
+
             case RobotRole.WorkerSpawner:
                 if (o.HasFlag(BrainOption.Dead))
                     return new RobotTask(RobotTaskType.Dead);
@@ -552,16 +566,10 @@ public class RobotBrainNew : MonoBehaviour
                     return new RobotTask(RobotTaskType.AttackTarget, BuildPlayerPayload(snapshot));
                 }
                 if (o.HasFlag(BrainOption.PlayerDetected))
-                {
-                    Debug.Log("[Boss] Player detected outside attack state; staying on end-room patrol instead of chasing.", this);
-                    return new RobotTask(RobotTaskType.Patrol, FindRandomEndRoomWaypoint(snapshot));
-                }
+                    Debug.Log("[Boss] Player detected outside attack range; holding the end-room position.", this);
                 if (o.HasFlag(BrainOption.InDanger))
-                {
-                    Debug.Log("[Boss] Damage/danger detected; staying on end-room patrol instead of fleeing.", this);
-                    return new RobotTask(RobotTaskType.Patrol, FindRandomEndRoomWaypoint(snapshot));
-                }
-                return new RobotTask(RobotTaskType.Patrol, FindRandomEndRoomWaypoint(snapshot));
+                    Debug.Log("[Boss] Damage/danger detected; holding the end-room position.", this);
+                return new RobotTask(RobotTaskType.Idle);
 
             case RobotRole.Collector:
                 return BuildCollectorTask(snapshot);

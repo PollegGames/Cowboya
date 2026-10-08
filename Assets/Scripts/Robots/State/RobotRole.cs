@@ -8,5 +8,6 @@ public enum RobotRole
     Follower = 3,
     Boss = 4,
     Collector = 5,
-    WorkerCollector = 6
+    WorkerCollector = 6,
+    SecurityReception = 7
 }

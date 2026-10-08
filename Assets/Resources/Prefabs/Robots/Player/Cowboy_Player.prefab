@@ -1232,8 +1232,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62a8d4e432c994d4d811b915d252d533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::CowboyGrabController
-  grabRadius: 1
-  livingEnemyBadgeGrabRadius: 0.25
+  grabRadius: 1.25
+  livingEnemyBadgeGrabRadius: 0.5
   grabbableLayers:
     serializedVersion: 2
     m_Bits: 4241536

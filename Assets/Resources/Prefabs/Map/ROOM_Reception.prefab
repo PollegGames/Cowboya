@@ -914,6 +914,7 @@ MonoBehaviour:
   - {fileID: 1335329636127714455}
   - {fileID: 6463375875073196550}
   - {fileID: 2715998052404982039}
+  - {fileID: 8810024028455475932}
   factorymMachinesInRoom: []
   restingMachinesInRoom: []
   securityMachinesInRoom: []
@@ -930,8 +931,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ef0632ae2444f44e9dcc2315d4af2c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usageType: 2
-  poiType: 0
+  usageType: 4
+  poiType: 1
 --- !u!1 &552395487903275464
 GameObject:
   m_ObjectHideFlags: 0

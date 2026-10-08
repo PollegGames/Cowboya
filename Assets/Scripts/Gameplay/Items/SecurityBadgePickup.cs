@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
 public class SecurityBadgePickup : MonoBehaviour, IGrabbable
@@ -12,7 +12,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
 
     [Header("Visuals")]
     [SerializeField, Tooltip("Sorting order applied while the badge is held.")] private int heldSortingOrder = 20;
-    [SerializeField, Tooltip("Sorting order applied when the badge is idle.")] private int idleSortingOrder = 0;
+    [SerializeField, Tooltip("Sorting order applied when the badge is idle or attached to a robot.")] private int idleSortingOrder = 50;
 
     [Header("Target Joint Settings")]
     [Tooltip("How springy the joint movement is. Recommended range: 5â€“15.")]
@@ -67,6 +67,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     Rigidbody2D rb;
     TargetJoint2D joint;
     Transform followTarget;
+    Vector3 followLocalOffset;
     bool attached = false;
     RigidbodyType2D originalBodyType;
     float originalGravityScale;
@@ -115,7 +116,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         if (joint == null || !joint.enabled || followTarget == null)
             return;
 
-        joint.target = followTarget.position;
+        joint.target = GetFollowPosition();
 
         if (attached && rb != null)
         {
@@ -130,7 +131,16 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     /// </summary>
     public void SetFollowTarget(Transform target)
     {
+        SetFollowTarget(target, Vector3.zero);
+    }
+
+    /// <summary>
+    /// Attaches the badge to a transform at a local-space offset.
+    /// </summary>
+    public void SetFollowTarget(Transform target, Vector3 localOffset)
+    {
         followTarget = target;
+        followLocalOffset = localOffset;
         attached = followTarget != null;
 
         if (rb == null)
@@ -144,8 +154,9 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
             rb.gravityScale = 0f;
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
-            rb.position = followTarget.position;
-            transform.position = followTarget.position;
+            Vector3 followPosition = GetFollowPosition();
+            rb.position = followPosition;
+            transform.position = followPosition;
         }
 
         // Ensure we have a joint reference. This can be null if the badge
@@ -157,7 +168,7 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
         if (joint != null)
         {
             if (attached)
-                joint.target = followTarget.position;
+                joint.target = GetFollowPosition();
 
             joint.enabled = attached;
         }
@@ -175,6 +186,19 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
             if (held != null && (object)held != this)
                 return false;
         }
+
+        RobotHeartNew enemyHeart = GetComponentInParent<RobotHeartNew>();
+        if (enemyHeart != null && enemyHeart.Role == RobotRole.SecurityReception)
+        {
+            RobotStateController stateController = enemyHeart.GetComponent<RobotStateController>();
+            if (stateController == null
+                || (stateController.CurrentState != RobotState.Faint
+                    && stateController.CurrentState != RobotState.Dead))
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -186,7 +210,9 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     {
         RobotHeartNew enemyHeart = GetComponentInParent<RobotHeartNew>();
         if (enemyHeart == null
-            || (enemyHeart.Role != RobotRole.SecurityGuard && enemyHeart.Role != RobotRole.Boss))
+            || (enemyHeart.Role != RobotRole.SecurityGuard
+                && enemyHeart.Role != RobotRole.SecurityReception
+                && enemyHeart.Role != RobotRole.Boss))
         {
             return false;
         }
@@ -326,6 +352,17 @@ public class SecurityBadgePickup : MonoBehaviour, IGrabbable
     public void AssignInventory(Inventory inventory)
     {
         ownerInventory = inventory;
+    }
+
+    private Vector3 GetFollowPosition()
+    {
+        if (followTarget == null)
+            return transform.position;
+
+        // Apply the parent's rotation without inheriting its scale. Robot body
+        // transforms are heavily scaled, which would otherwise push the badge
+        // far away from the character.
+        return followTarget.position + followTarget.rotation * followLocalOffset;
     }
 
     private void CacheSpriteRenderers()

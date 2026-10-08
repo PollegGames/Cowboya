@@ -33,6 +33,25 @@ public class SecurityBadgePickupTests
     }
 
     [Test]
+    public void Badge_SetFollowTargetWithOffsetKeepsBadgeVisibleBesideTarget()
+    {
+        var anchorGO = new GameObject("anchor");
+        anchorGO.transform.position = new Vector3(3f, 4f, 0f);
+        anchorGO.transform.localScale = new Vector3(5f, 5f, 5f);
+
+        var obj = new GameObject("badge");
+        obj.AddComponent<Rigidbody2D>();
+        var badge = obj.AddComponent<SecurityBadgePickup>();
+        var localOffset = new Vector3(0.55f, 0.3f, 0f);
+
+        badge.SetFollowTarget(anchorGO.transform, localOffset);
+
+        Vector3 expectedPosition = anchorGO.transform.position + anchorGO.transform.rotation * localOffset;
+        Assert.AreEqual(expectedPosition, obj.transform.position);
+        Assert.AreEqual((Vector2)expectedPosition, obj.GetComponent<TargetJoint2D>().target);
+    }
+
+    [Test]
     public void Badge_AttachAndReleaseChangesPhysics()
     {
         var handGO = new GameObject("hand");
@@ -92,8 +111,42 @@ public class SecurityBadgePickupTests
         Assert.AreEqual(setup.badge, detected, "A dead enemy's badge should remain easy to select within normal grab range.");
     }
 
+    [Test]
+    public void ReceptionBadge_CanOnlyBeGrabbedAfterReceptionRobotFaints()
+    {
+        var setup = CreateEnemyWithBadge(
+            new Vector2(80f, 0f),
+            0.15f,
+            RobotState.Alive,
+            RobotRole.SecurityReception);
+
+        Assert.IsFalse(setup.badge.CanBeGrabbed(setup.inventory));
+
+        setup.enemy.GetComponent<RobotStateController>().UpdateState(RobotState.Faint);
+
+        Assert.IsTrue(setup.badge.CanBeGrabbed(setup.inventory));
+    }
+
+    [Test]
+    public void GrabSelection_FaintReceptionBadge_WinsOverReceptionBody()
+    {
+        var setup = CreateEnemyWithBadge(
+            new Vector2(100f, 0f),
+            0.15f,
+            RobotState.Faint,
+            RobotRole.SecurityReception);
+
+        IGrabbable detected = DetectGrabbable(setup.controller, setup.hand.position, setup.inventory);
+
+        Assert.AreEqual(setup.badge, detected, "A faint reception robot's badge should be stealable by the player.");
+    }
+
     private static (CowboyGrabController controller, Transform hand, Inventory inventory, EnemyGrabbable enemy, SecurityBadgePickup badge)
-        CreateEnemyWithBadge(Vector2 position, float badgeOffset, RobotState state)
+        CreateEnemyWithBadge(
+            Vector2 position,
+            float badgeOffset,
+            RobotState state,
+            RobotRole role = RobotRole.SecurityGuard)
     {
         var player = new GameObject("PlayerGrabber");
         player.transform.position = position;
@@ -113,7 +166,7 @@ public class SecurityBadgePickupTests
         enemyCollider.radius = 0.05f;
         var enemy = enemyObject.AddComponent<EnemyGrabbable>();
         var heart = enemyObject.AddComponent<RobotHeartNew>();
-        heart.ConfigureRole(RobotRole.SecurityGuard, resetStack: true);
+        heart.ConfigureRole(role, resetStack: true);
         var stateController = enemyObject.AddComponent<RobotStateController>();
         if (state != RobotState.Alive)
             stateController.UpdateState(state);

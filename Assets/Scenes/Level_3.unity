@@ -12576,7 +12576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50306220289b44769dc39b6181d4a5de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::StaticRoomDoorConfig
-  leftDoor: 1
+  leftDoor: 2
   rightDoor: 4
 --- !u!43 &1151256054
 Mesh:
@@ -15618,7 +15618,7 @@ PrefabInstance:
       objectReference: {fileID: 1636391000}
     - target: {fileID: 27471713000352206, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17061
+      value: 17064
       objectReference: {fileID: 0}
     - target: {fileID: 187235412449160675, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: waypoints.Array.size
@@ -15642,7 +15642,7 @@ PrefabInstance:
       objectReference: {fileID: 1499392181}
     - target: {fileID: 587035638576472227, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17194
+      value: 17197
       objectReference: {fileID: 0}
     - target: {fileID: 814456244760004463, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15650,7 +15650,7 @@ PrefabInstance:
       objectReference: {fileID: 837114617}
     - target: {fileID: 814456244760004463, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17295
+      value: 17298
       objectReference: {fileID: 0}
     - target: {fileID: 1096303338772001335, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15666,7 +15666,7 @@ PrefabInstance:
       objectReference: {fileID: 436570745}
     - target: {fileID: 2230635188424762924, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17070
+      value: 17073
       objectReference: {fileID: 0}
     - target: {fileID: 2242861849762098043, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15686,7 +15686,7 @@ PrefabInstance:
       objectReference: {fileID: 1407429730}
     - target: {fileID: 3643454115883010778, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17191
+      value: 17194
       objectReference: {fileID: 0}
     - target: {fileID: 3872331124460924978, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15702,7 +15702,7 @@ PrefabInstance:
       objectReference: {fileID: 1396828734}
     - target: {fileID: 4631185467554542170, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 16338
+      value: 16341
       objectReference: {fileID: 0}
     - target: {fileID: 5044588282093235028, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15710,7 +15710,7 @@ PrefabInstance:
       objectReference: {fileID: 696919780}
     - target: {fileID: 5044588282093235028, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17331
+      value: 17334
       objectReference: {fileID: 0}
     - target: {fileID: 5091578789130273770, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15718,7 +15718,7 @@ PrefabInstance:
       objectReference: {fileID: 188230635}
     - target: {fileID: 5091578789130273770, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 22614
+      value: 22617
       objectReference: {fileID: 0}
     - target: {fileID: 5226794923736213634, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15726,7 +15726,7 @@ PrefabInstance:
       objectReference: {fileID: 472102346}
     - target: {fileID: 5226794923736213634, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17181
+      value: 17184
       objectReference: {fileID: 0}
     - target: {fileID: 5618228979114233483, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15754,7 +15754,7 @@ PrefabInstance:
       objectReference: {fileID: 793723738}
     - target: {fileID: 6661535868575916666, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 16338
+      value: 16341
       objectReference: {fileID: 0}
     - target: {fileID: 6865291814243867817, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15838,7 +15838,7 @@ PrefabInstance:
       objectReference: {fileID: 671505402}
     - target: {fileID: 8104909967959787413, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17334
+      value: 17337
       objectReference: {fileID: 0}
     - target: {fileID: 8110285823911401713, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15846,7 +15846,7 @@ PrefabInstance:
       objectReference: {fileID: 1235285799}
     - target: {fileID: 8110285823911401713, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 17307
+      value: 17310
       objectReference: {fileID: 0}
     - target: {fileID: 8167323167050966137, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15854,7 +15854,7 @@ PrefabInstance:
       objectReference: {fileID: 1151256054}
     - target: {fileID: 8167323167050966137, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_VersionIndex
-      value: 16422
+      value: 16425
       objectReference: {fileID: 0}
     - target: {fileID: 8332711025188814430, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       propertyPath: m_Mesh
@@ -15875,6 +15875,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2141402446}
+    - targetCorrespondingSourceObject: {fileID: 2661487937258153035, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2141402448}
   m_SourcePrefab: {fileID: 100100000, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
 --- !u!114 &1446298342 stripped
 MonoBehaviour:
@@ -22054,7 +22057,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::StaticRoomDoorConfig
   leftDoor: 1
-  rightDoor: 1
+  rightDoor: 2
 --- !u!114 &2014953669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23141,6 +23144,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::StaticRoomDoorConfig
   leftDoor: 0
   rightDoor: 1
+--- !u!1 &2141402447 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2661487937258153035, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
+  m_PrefabInstance: {fileID: 1446298341}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2141402448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2141402447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfad992c28814c4ea83e572b9ef0785e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::StaticLevelSpawnPoint
 --- !u!43 &2144252150
 Mesh:
   m_ObjectHideFlags: 0

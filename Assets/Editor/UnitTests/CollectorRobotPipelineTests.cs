@@ -38,6 +38,7 @@ public class CollectorRobotPipelineTests
     {
         Assert.AreEqual(0, (int)RobotRole.Worker);
         Assert.AreEqual(1, (int)RobotRole.SecurityGuard);
+        Assert.AreEqual(7, (int)RobotRole.SecurityReception);
         Assert.AreEqual(2, (int)RobotRole.WorkerSpawner);
         Assert.AreEqual(3, (int)RobotRole.Follower);
         Assert.AreEqual(4, (int)RobotRole.Boss);

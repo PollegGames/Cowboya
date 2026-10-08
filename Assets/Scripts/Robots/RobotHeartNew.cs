@@ -381,6 +381,9 @@ public class RobotHeartNew : MonoBehaviour
             case RobotRole.SecurityGuard:
                 defaultTask = new RobotTask(RobotTaskType.GuardPost);
                 break;
+            case RobotRole.SecurityReception:
+                defaultTask = new RobotTask(RobotTaskType.Idle);
+                break;
             case RobotRole.Follower:
                 defaultTask = new RobotTask(RobotTaskType.ChasePlayer);
                 break;
