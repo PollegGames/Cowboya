@@ -241,8 +241,13 @@ public class WorkerCollectorGrabPipelineTests
         Assert.IsNull(setup.Reach.Target);
         Assert.AreEqual(WhiteCubeCargoState.Carried, setup.Cargo.State);
         Assert.AreSame(setup.Controller.CarryAnchor, setup.Cargo.transform.parent);
-        Assert.IsTrue(setup.Cargo.transform.IsChildOf(setup.Reach.ActiveHandEffector),
-            "The selected hand must carry the cube, including a left-hand pickup.");
+        Assert.AreEqual(
+            expectedArm == CowboyArmSide.Left ? "LHand_Bone" : "RHand_Bone",
+            setup.Cargo.transform.parent.name);
+        Assert.IsNotNull(setup.Cargo.transform.parent.GetComponent<Rigidbody2D>(),
+            "The cube must attach to the physical Puppet hand, not the animated Master hand.");
+        Assert.IsFalse(setup.Cargo.transform.IsChildOf(setup.Reach.ActiveHandEffector),
+            "The Master effector may aim the arm but must never own carried cargo.");
 
         setup.Reach.Tick(1f);
         Assert.AreEqual(expectedArm, setup.Reach.ActiveArm);

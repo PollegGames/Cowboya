@@ -173,8 +173,8 @@ public sealed class WhiteCubeCargo : MonoBehaviour
         expectedCarryAnchor = null;
         externallyHeld = false;
         transform.SetParent(slot, false);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
+        transform.localPosition = new Vector3(0f, 0.2f, 0f);
+        transform.rotation = Quaternion.identity;
 
         Rigidbody2D body = GetComponent<Rigidbody2D>();
         if (body != null)

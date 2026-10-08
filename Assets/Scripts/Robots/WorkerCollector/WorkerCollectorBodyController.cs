@@ -12,6 +12,8 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
     [SerializeField] private Transform carryAnchor;
     [SerializeField] private Transform armSolverTarget;
     [SerializeField] private Transform armEffector;
+    [SerializeField] private Transform leftPuppetHand;
+    [SerializeField] private Transform rightPuppetHand;
     [SerializeField] private RobotObjectArmReachController armReachController;
     [SerializeField] private RobotBodyController robotBody;
     [SerializeField] private RobotBrainNew brain;
@@ -506,10 +508,14 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         get {
             if (securedCarryAnchor != null)
                 return securedCarryAnchor;
-            Transform activeHand = armReachController != null ? armReachController.ActiveHandEffector : null;
-            if (activeHand != null && activeHand != armEffector)
-                return activeHand;
-            return carryAnchor != null ? carryAnchor : (armEffector != null ? armEffector : armSolverTarget);
+            if (armReachController != null && armReachController.ActiveArm.HasValue) {
+                Transform puppetHand = armReachController.ActiveArm.Value == CowboyArmSide.Left
+                    ? leftPuppetHand
+                    : rightPuppetHand;
+                if (puppetHand != null)
+                    return puppetHand;
+            }
+            return carryAnchor != null ? carryAnchor : rightPuppetHand;
         }
     }
 
@@ -654,6 +660,10 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             armSolverTarget = FindDescendant("RArm_Solver_Target");
         if (armEffector == null)
             armEffector = FindDescendant("RHand_Effector");
+        if (leftPuppetHand == null)
+            leftPuppetHand = FindPhysicalPuppetBone("LHand_Bone");
+        if (rightPuppetHand == null)
+            rightPuppetHand = FindPhysicalPuppetBone("RHand_Bone");
         if (armReachController == null)
             armReachController = GetComponent<RobotObjectArmReachController>();
         CacheArmRestPose();
@@ -830,6 +840,18 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         {
             if (descendants[i] != null && descendants[i].name == objectName)
                 return descendants[i];
+        }
+        return null;
+    }
+
+    private Transform FindPhysicalPuppetBone(string objectName) {
+        Transform[] descendants = GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < descendants.Length; i++) {
+            Transform descendant = descendants[i];
+            if (descendant != null
+                && descendant.name == objectName
+                && descendant.GetComponent<Rigidbody2D>() != null)
+                return descendant;
         }
         return null;
     }

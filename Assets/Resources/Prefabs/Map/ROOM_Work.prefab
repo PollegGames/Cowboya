@@ -4565,6 +4565,7 @@ MonoBehaviour:
   trackingCenter: {fileID: 0}
   roomManager: {fileID: 187235412449160675}
   activationZone: {fileID: 730923636781712511}
+  movementPlane: 0
   horizontalRange: 45
   verticalRange: 20
   maxLeft: 1
@@ -4600,6 +4601,7 @@ MonoBehaviour:
   trackingCenter: {fileID: 0}
   roomManager: {fileID: 187235412449160675}
   activationZone: {fileID: 730923636781712511}
+  movementPlane: 0
   horizontalRange: 45
   verticalRange: 20
   maxLeft: 15
@@ -4630,6 +4632,7 @@ MonoBehaviour:
   trackingCenter: {fileID: 0}
   roomManager: {fileID: 187235412449160675}
   activationZone: {fileID: 730923636781712511}
+  movementPlane: 0
   horizontalRange: 45
   verticalRange: 20
   maxLeft: 0

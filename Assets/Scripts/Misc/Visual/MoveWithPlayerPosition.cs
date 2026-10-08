@@ -1,10 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// Moves this transform on the X-Y plane within configurable limits based on the player's position.
+/// Moves this transform on a configurable local plane within limits based on the player's position.
 /// </summary>
 public class MoveWithPlayerPosition : MonoBehaviour
 {
+    public enum MovementPlane {
+        XY = 0,
+        XZ = 1
+    }
+
     [Header("References")]
     [Tooltip("Player transform to track. If empty, the player head is taken from Room Manager.")]
     public Transform player;
@@ -18,13 +23,16 @@ public class MoveWithPlayerPosition : MonoBehaviour
     [Tooltip("Optional zone that activates movement and detects the player. If empty, movement is always active.")]
     public PositionTriggerZone activationZone;
 
+    [Tooltip("Parent-local plane used for both player tracking and movement. Use XZ for rooms rotated onto the screen.")]
+    public MovementPlane movementPlane = MovementPlane.XY;
+
     [Header("Player Range")]
     [Min(0.01f)]
     [Tooltip("Player X distance from the center at which horizontal movement reaches its limit.")]
     public float horizontalRange = 5f;
 
     [Min(0.01f)]
-    [Tooltip("Player Y distance from the center at which vertical movement reaches its limit.")]
+    [Tooltip("Player distance along the plane's second axis (Y or Z) at which vertical movement reaches its limit.")]
     public float verticalRange = 5f;
 
     [Header("Movement Limits")]
@@ -129,7 +137,8 @@ public class MoveWithPlayerPosition : MonoBehaviour
         Vector3 playerOffset = playerPosition - centerPosition;
 
         float horizontalInput = Mathf.Clamp(playerOffset.x / horizontalRange, -1f, 1f);
-        float verticalInput = Mathf.Clamp(playerOffset.y / verticalRange, -1f, 1f);
+        float verticalDistance = movementPlane == MovementPlane.XZ ? playerOffset.z : playerOffset.y;
+        float verticalInput = Mathf.Clamp(verticalDistance / verticalRange, -1f, 1f);
 
         if (invertHorizontal)
             horizontalInput = -horizontalInput;
@@ -144,7 +153,10 @@ public class MoveWithPlayerPosition : MonoBehaviour
             ? verticalInput * maxDown
             : verticalInput * maxUp;
 
-        Vector3 targetPosition = baseLocalPosition + new Vector3(horizontalOffset, verticalOffset, 0f);
+        Vector3 movementOffset = movementPlane == MovementPlane.XZ
+            ? new Vector3(horizontalOffset, 0f, verticalOffset)
+            : new Vector3(horizontalOffset, verticalOffset, 0f);
+        Vector3 targetPosition = baseLocalPosition + movementOffset;
 
         MoveTo(targetPosition);
     }

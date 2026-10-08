@@ -52,6 +52,22 @@ public class GarageCubeStorageAndProcessorTests
     }
 
     [Test]
+    public void Storage_KeepsAcceptedCubeUpright_WhenSlotIsRotated()
+    {
+        GarageSetup setup = CreateGarage();
+        setup.Storage.Slots[0].rotation = Quaternion.Euler(90f, 0f, 0f);
+        WhiteCubeCargo cargo = CreateCargo("UprightCube");
+        GameObject owner = Create("UprightCubeOwner");
+
+        Assert.IsTrue(cargo.TryClaim(owner, out WhiteCubeClaim claim));
+        Assert.IsTrue(setup.Storage.TryReserve(owner, out GarageSlotReservation reservation));
+        Assert.IsTrue(setup.Storage.TryAccept(cargo, claim, reservation));
+
+        Assert.Less(Quaternion.Angle(Quaternion.identity, cargo.transform.rotation), 0.01f);
+        Assert.AreEqual(new Vector3(0f, 0.01f, 0f), cargo.transform.localPosition);
+    }
+
+    [Test]
     public void Processor_InterruptedClosing_ReopensWithoutProcessing()
     {
         GarageSetup setup = CreateGarage();
