@@ -44,8 +44,8 @@ public class BatteryPickupTests
         playerState.Stats.CurrentHealth = 50f;
 
         var playerRb = playerGO.AddComponent<Rigidbody2D>();
-        var player = playerGO.AddComponent<DummyPlayerMovementController>();
         var inventory = playerGO.AddComponent<Inventory>();
+        var player = playerGO.AddComponent<DummyPlayerMovementController>();
         typeof(PlayerMovementController)
             .GetField("bodyReference", BindingFlags.NonPublic | BindingFlags.Instance)
             .SetValue(player, playerRb);
