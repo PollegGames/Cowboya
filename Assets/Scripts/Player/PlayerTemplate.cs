@@ -25,24 +25,24 @@ public class PlayerTemplate : RobotTemplate
     /// </summary>
     public RobotStats InitializePlayerStats(SaveData saveData)
     {
+        saveData ??= new SaveData();
+        saveData.Normalize();
+
         PlayerRobotFactory playerFactory =
             new PlayerRobotFactory(
-                (int)saveData.CurrentHealth,
-                (int)saveData.MaxHealth,
-                (int)saveData.CurrentEnergy,
-                (int)saveData.MaxEnergy,
-                (int)saveData.Morality,
-                (int)saveData.AttackEnergyCost);
+                Mathf.RoundToInt(saveData.CurrentHealth),
+                Mathf.RoundToInt(saveData.MaxHealth),
+                Mathf.RoundToInt(saveData.CurrentEnergy),
+                Mathf.RoundToInt(saveData.MaxEnergy),
+                Mathf.RoundToInt(saveData.Morality),
+                Mathf.RoundToInt(saveData.AttackEnergyCost));
 
         robotBehaviour.Stats = playerFactory.CreateRobot();
-        if (saveData != null)
+        robotBehaviour.Stats.EnergyRechargeRate = Mathf.Max(0f, saveData.EnergyRechargeRate);
+        EnergyBot energyBot = robotBehaviour.GetComponent<EnergyBot>();
+        if (energyBot != null)
         {
-            robotBehaviour.Stats.EnergyRechargeRate = Mathf.Max(0f, saveData.EnergyRechargeRate);
-            EnergyBot energyBot = robotBehaviour.GetComponent<EnergyBot>();
-            if (energyBot != null)
-            {
-                energyBot.RechargeRate = robotBehaviour.Stats.EnergyRechargeRate;
-            }
+            energyBot.RechargeRate = robotBehaviour.Stats.EnergyRechargeRate;
         }
 
         if (robotBehaviour.Stats != null)

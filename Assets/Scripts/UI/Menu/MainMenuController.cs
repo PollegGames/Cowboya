@@ -31,7 +31,7 @@ public class MainMenuController : MonoBehaviour
 
         if (_playButton != null)
             _playButton.RegisterCallback<ClickEvent>(OnPlayClicked);
-        
+
         if (_sandboxButton != null)
             _sandboxButton.RegisterCallback<ClickEvent>(OnSandboxClicked);
 
@@ -43,7 +43,7 @@ public class MainMenuController : MonoBehaviour
     {
         if (_playButton != null)
             _playButton.UnregisterCallback<ClickEvent>(OnPlayClicked);
-        
+
         if (_sandboxButton != null)
             _sandboxButton.UnregisterCallback<ClickEvent>(OnSandboxClicked);
 
@@ -54,8 +54,6 @@ public class MainMenuController : MonoBehaviour
     private void OnPlayClicked(ClickEvent evt)
     {
         AudioManager.Instance?.PlayUIClick();
-        var saveService = FindFirstObjectByType<PlayerSaveService>();
-        saveService?.ResetSaveData();
         runProgressManager.LoadFirstLevel();
     }
 
