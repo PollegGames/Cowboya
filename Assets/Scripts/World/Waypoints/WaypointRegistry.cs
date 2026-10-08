@@ -8,7 +8,15 @@ public class WaypointRegistry : MonoBehaviour, IWaypointRegistry
 
     public void RegisterRoomWaypoints(RoomManager room, IEnumerable<RoomWaypoint> waypoints)
     {
-        roomWaypoints[room] = waypoints.ToList();
+        if (room == null)
+        {
+            Debug.LogWarning("Cannot register waypoints without a room.");
+            return;
+        }
+
+        roomWaypoints[room] = waypoints?
+            .Where(waypoint => waypoint != null)
+            .ToList() ?? new List<RoomWaypoint>();
     }
 
     public void UnregisterRoomWaypoints(RoomManager room)
@@ -17,8 +25,11 @@ public class WaypointRegistry : MonoBehaviour, IWaypointRegistry
     }
 
     public List<RoomWaypoint> GetAllWaypoints() =>
-        roomWaypoints.Values.SelectMany(l => l).ToList();
+        roomWaypoints.Values.SelectMany(list => list).Where(waypoint => waypoint != null).ToList();
 
     public List<RoomWaypoint> GetActiveWaypoints() =>
-        roomWaypoints.Values.SelectMany(l => l).Where(wp => wp.IsAvailable).ToList();
+        roomWaypoints.Values
+            .SelectMany(list => list)
+            .Where(waypoint => waypoint != null && waypoint.IsAvailable)
+            .ToList();
 }

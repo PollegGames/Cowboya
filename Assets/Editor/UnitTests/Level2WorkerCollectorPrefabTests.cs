@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using System.Linq;
 
 public class Level2WorkerCollectorPrefabTests
 {
@@ -134,6 +135,17 @@ public class Level2WorkerCollectorPrefabTests
         Assert.IsNotNull(prefab);
         Assert.IsNotNull(prefab.GetComponent<WorkerCollectorWhiteCubeSourceProvider>());
         Assert.IsNull(prefab.GetComponent<WorkerCollectorDropOffProvider>());
+    }
+
+    [Test]
+    public void ConveyorRoom_HasCompleteNonNullWaypointConfiguration()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ConveyorRoomPrefabPath);
+        RoomManager roomManager = prefab.GetComponent<RoomManager>();
+
+        Assert.IsNotNull(roomManager);
+        Assert.IsFalse(roomManager.GetWaypoints().Any(waypoint => waypoint == null));
+        Assert.IsTrue(roomManager.GetWaypoints().Any(waypoint => waypoint.type == WaypointType.Center));
     }
 
     [Test]
