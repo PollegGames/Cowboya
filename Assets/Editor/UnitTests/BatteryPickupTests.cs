@@ -57,6 +57,7 @@ public class BatteryPickupTests
         batteryGO.AddComponent<Rigidbody2D>();
         batteryGO.AddComponent<TargetJoint2D>();
         var battery = batteryGO.AddComponent<BatteryPickup>();
+        battery.AssignInventory(inventory);
 
         battery.OnGrab(hand);
 

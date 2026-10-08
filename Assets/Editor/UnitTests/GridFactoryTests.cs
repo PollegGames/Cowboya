@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using System.Reflection;
 
 public class GridFactoryTests
 {
@@ -65,9 +66,17 @@ public class GridFactoryTests
     [Test]
     public void SolvePaths_CalculatesPaths()
     {
-        _factory.CreateGrid(2, 2, 0);
-        _factory.AssignStartAndEndCells(new EndpointsFactory(), 2, 2);
-        _factory.SolvePaths(0, 0, new PathSolver(_factory, new PathFinder()), 2, 2);
+        _factory.CreateGrid(3, 2, 0);
+        var start = new Vector2(0f, 0f);
+        var end = new Vector2(2f, 0f);
+        typeof(GridFactory).GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(_factory, start);
+        typeof(GridFactory).GetField("endPosition", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(_factory, end);
+        _factory.cellDataGrid[start].cellProperties.usageType = UsageType.Start;
+        _factory.cellDataGrid[end].cellProperties.usageType = UsageType.End;
+
+        _factory.SolvePaths(0, 0, new PathSolver(_factory, new PathFinder()), 3, 2);
 
         // Expect that some cells are marked as path
         bool anyPath = false;
