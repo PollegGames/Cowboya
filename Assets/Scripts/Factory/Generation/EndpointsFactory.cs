@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,17 +11,20 @@ public class EndpointsFactory
 {
     public void GetCornerEndpoints(int width, int height, out Vector2 start, out Vector2 end)
     {
-        Vector2[] corners =
+        Vector2[] corners = new[]
         {
             new Vector2(0,          0),
             new Vector2(width - 1,  0),
             new Vector2(0,          height - 1),
             new Vector2(width - 1,  height - 1)
-        };
+        }.Distinct().ToArray();
+        if (corners.Length < 2)
+            throw new ArgumentException("A generated map requires dimensions that provide at least two distinct cells.");
+
         int idx1 = Random.Range(0, corners.Length);
-        int idx2;
-        do idx2 = Random.Range(0, corners.Length);
-        while (idx2 == idx1);
+        int idx2 = Random.Range(0, corners.Length - 1);
+        if (idx2 >= idx1)
+            idx2++;
 
         start = corners[idx1];
         end   = corners[idx2];

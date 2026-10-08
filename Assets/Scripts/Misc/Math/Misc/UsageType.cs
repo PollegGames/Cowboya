@@ -9,5 +9,18 @@ public enum UsageType
 }
 
 
-public enum POIType { None, Reception, Security }
+public enum POIType
+{
+    None,
+    Reception,
+    Security,
+    Resting,
+    Spawning,
+    Garage,
+    Conveyor,
+    Furnace,
+    Junks,
+    Deads,
+    CubeCollector
+}
 

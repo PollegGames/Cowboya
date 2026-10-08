@@ -35,6 +35,16 @@ public class MapManagerTests
     [Test]
     public void InitializeGrid_BuildsGrid()
     {
+        foreach (var fieldName in new[]
+        {
+            "receptionPOI_Prefab", "securityPOI_Prefab", "restingPOI_Prefab", "spawningPOI_Prefab",
+            "garagePOI_Prefab", "conveyorPOI_Prefab", "furnacePOI_Prefab", "junksPOI_Prefab",
+            "deadsPOI_Prefab", "cubeCollectorPOI_Prefab"
+        })
+        {
+            typeof(MapManager).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(_manager, new GameObject(fieldName));
+        }
         _manager.Construct(new DummyGridBuilder(), new DummyRoomRenderer(), new DummyRoomProcessor());
         Assert.DoesNotThrow(() => _manager.InitializeGrid());
     }

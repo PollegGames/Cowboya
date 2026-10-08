@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 using System.Collections.Generic;
 
 public class GridRendererTests
@@ -24,5 +25,19 @@ public class GridRendererTests
 
         Assert.AreEqual(1, result.Count);
         Assert.IsTrue(result.ContainsKey(Vector2.zero));
+    }
+
+    [Test]
+    public void Render_MissingSelectedPOIMappingDoesNotSubstituteDefaultPrefab()
+    {
+        var cell = new Cell(Vector2.zero);
+        cell.cellProperties.usageType = UsageType.POI;
+        cell.cellProperties.poiType = POIType.Furnace;
+        var cells = new Dictionary<Vector2, Cell> { { Vector2.zero, cell } };
+
+        LogAssert.Expect(LogType.Error, "No prefab is mapped for selected POI type Furnace at grid position (0.00, 0.00).");
+        var result = _renderer.Render(cells, Vector2.one, Vector3.zero, new GameObject());
+
+        Assert.IsEmpty(result);
     }
 }

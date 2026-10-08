@@ -32,6 +32,9 @@ public class GridFactory
 
     public void AssignStartAndEndCells(EndpointsFactory endpointsFactory, int gridWidth, int gridHeight)
     {
+        if (cellDataGrid == null || cellDataGrid.Count < 2)
+            throw new System.InvalidOperationException("A generated map requires at least two cells for distinct Start and End positions.");
+
         endpointsFactory.GetCornerEndpoints(gridWidth, gridHeight, out startPosition, out endPosition);
         cellDataGrid[startPosition].cellProperties.usageType = UsageType.Start;
         cellDataGrid[endPosition].cellProperties.usageType = UsageType.End;
@@ -60,25 +63,23 @@ public class GridFactory
             eligibleCells[j] = temp;
         }
 
-        // Pick the first N as POIs
-        poiPositions = eligibleCells.Take(pointsOfInterestCount).ToList();
+        int requestedCount = pointsOfInterestCount;
+        int effectiveCount = Mathf.Clamp(requestedCount, 0, eligibleCells.Count);
+        if (requestedCount < 0)
+            Debug.LogWarning($"Invalid POI count {requestedCount}; using 0.");
+        else if (requestedCount > eligibleCells.Count)
+            Debug.LogWarning($"Requested {requestedCount} POIs, but only {effectiveCount} eligible Work cells are available; using {effectiveCount}.");
+
+        // Pick the first N as POIs. The shuffled list and type pool both have stable order.
+        poiPositions = eligibleCells.Take(effectiveCount).ToList();
+        var usedTypes = new HashSet<POIType>();
 
         for (int i = 0; i < poiPositions.Count; i++)
         {
             cellDataGrid[poiPositions[i]].cellProperties.usageType = UsageType.POI;
-
-            if (i == 0)
-            {
-                cellDataGrid[poiPositions[i]].cellProperties.poiType = POIType.Reception;
-            }
-            else if (i > 0 && i < 5)
-            {
-                cellDataGrid[poiPositions[i]].cellProperties.poiType = POIType.Security;
-            }
-            else
-            {
-                cellDataGrid[poiPositions[i]].cellProperties.poiType = POIType.None;
-            }
+            var poiType = POIRoomTypeSelector.Select(i + 1, usedTypes);
+            cellDataGrid[poiPositions[i]].cellProperties.poiType = poiType;
+            usedTypes.Add(poiType);
         }
 
     }
@@ -142,5 +143,46 @@ public class GridFactory
                 }
             }
         }
+    }
+}
+
+/// <summary>
+/// Selects generated POI room types according to their one-based slot.
+/// </summary>
+public static class POIRoomTypeSelector
+{
+    private static readonly POIType[] CompactPool = { POIType.Reception, POIType.Security };
+    private static readonly POIType[] CompletePool =
+    {
+        POIType.Reception,
+        POIType.Security,
+        POIType.Resting,
+        POIType.Spawning,
+        POIType.Garage,
+        POIType.Conveyor,
+        POIType.Furnace,
+        POIType.Junks,
+        POIType.Deads,
+        POIType.CubeCollector
+    };
+
+    /// <summary>Returns the room type for a one-based POI slot.</summary>
+    public static POIType Select(int slot, ISet<POIType> usedTypes)
+    {
+        if (slot < 1)
+            throw new System.ArgumentOutOfRangeException(nameof(slot), "POI slots are one-based.");
+        if (usedTypes == null)
+            throw new System.ArgumentNullException(nameof(usedTypes));
+        if (slot == 1)
+            return POIType.Reception;
+        if (slot == 2)
+            return POIType.Security;
+        if (slot <= 5)
+            return CompactPool[UnityEngine.Random.Range(0, CompactPool.Length)];
+
+        var candidates = CompletePool.Where(type => !usedTypes.Contains(type)).ToArray();
+        if (candidates.Length == 0)
+            candidates = CompletePool;
+        return candidates[UnityEngine.Random.Range(0, candidates.Length)];
     }
 }

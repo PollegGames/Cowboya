@@ -37,8 +37,11 @@ public class GridRenderer
             ) + offset;
             if (kvp.Value.cellProperties.usageType == UsageType.POI)
             {
-                // For POI, use the POIType to determine the prefab
-                var poiPrefab = poiTypeToPrefab.TryGetValue(kvp.Value.cellProperties.poiType, out var poiGo) ? poiGo : defaultPrefab;
+                if (!poiTypeToPrefab.TryGetValue(kvp.Value.cellProperties.poiType, out var poiPrefab) || poiPrefab == null)
+                {
+                    Debug.LogError($"No prefab is mapped for selected POI type {kvp.Value.cellProperties.poiType} at grid position {kvp.Key}.");
+                    continue;
+                }
                 var tile = Object.Instantiate(poiPrefab, spawnPos, poiPrefab.transform.rotation, gridParent);
                 instances[kvp.Key] = tile;
             }

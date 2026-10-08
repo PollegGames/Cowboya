@@ -22,6 +22,14 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject defaultPOI_Prefab;
     [SerializeField] private GameObject receptionPOI_Prefab;
     [SerializeField] private GameObject securityPOI_Prefab;
+    [SerializeField] private GameObject restingPOI_Prefab;
+    [SerializeField] private GameObject spawningPOI_Prefab;
+    [SerializeField] private GameObject garagePOI_Prefab;
+    [SerializeField] private GameObject conveyorPOI_Prefab;
+    [SerializeField] private GameObject furnacePOI_Prefab;
+    [SerializeField] private GameObject junksPOI_Prefab;
+    [SerializeField] private GameObject deadsPOI_Prefab;
+    [SerializeField] private GameObject cubeCollectorPOI_Prefab;
     [SerializeField] private GameObject pathToPOIPrefab;
     [SerializeField] private GameObject workPrefab;
 
@@ -97,6 +105,10 @@ public class MapManager : MonoBehaviour
             return;
         }
 
+        var poiPrefabMapping = CreatePOIPrefabMapping();
+        if (poiPrefabMapping.Any(entry => entry.Value == null))
+            return;
+
         Dictionary<Vector2, Cell> cellDataGrid = null;
         bool validPath = false;
         const int maxAttempts = 20;
@@ -149,7 +161,7 @@ public class MapManager : MonoBehaviour
         roomInstances = roomRenderer.RenderRooms(
             cellDataGrid,
             CreatePrefabMapping(),
-            CreatePOIPrefabMapping(),
+            poiPrefabMapping,
             new Vector2(cellWidth, cellHeight),
             transform.position,
             transform,
@@ -212,12 +224,25 @@ public class MapManager : MonoBehaviour
 
     private Dictionary<POIType, GameObject> CreatePOIPrefabMapping()
     {
-        return new Dictionary<POIType, GameObject>
+        var mapping = new Dictionary<POIType, GameObject>
         {
             { POIType.Reception, receptionPOI_Prefab },
             { POIType.Security, securityPOI_Prefab },
-            { POIType.None, defaultPOI_Prefab }
+            { POIType.Resting, restingPOI_Prefab },
+            { POIType.Spawning, spawningPOI_Prefab },
+            { POIType.Garage, garagePOI_Prefab },
+            { POIType.Conveyor, conveyorPOI_Prefab },
+            { POIType.Furnace, furnacePOI_Prefab },
+            { POIType.Junks, junksPOI_Prefab },
+            { POIType.Deads, deadsPOI_Prefab },
+            { POIType.CubeCollector, cubeCollectorPOI_Prefab }
         };
+
+        var missingTypes = mapping.Where(entry => entry.Value == null).Select(entry => entry.Key).ToArray();
+        if (missingTypes.Length > 0)
+            Debug.LogError($"Missing generated-room prefab mappings on {name}: {string.Join(", ", missingTypes)}.", this);
+
+        return mapping;
     }
 
     public List<RoomManager> RegisterFactoryInEachRoom(
