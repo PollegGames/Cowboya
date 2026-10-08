@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RoomSpawnRobotCollectorPrefabTests {
     private const string MapPrefabFolder = "Assets/Resources/Prefabs/Map/";
-    private static readonly Vector3 ExpectedLocalPosition = new Vector3(-4.13f, 0f, 0.64f);
+    private static readonly Vector3 ExpectedLocalPosition = new Vector3(-4.13f, -0.019f, 0.64f);
 
     [TestCase("ROOM_Furnace")]
     [TestCase("ROOM_Junks")]

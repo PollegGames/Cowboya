@@ -61,8 +61,8 @@ MonoBehaviour:
   customAnchorAxisPosition: 0.2683
   openScaleMultiplier: 0.05
   initialState: 0
-  closeDuration: 0.6
-  openDuration: 0.6
+  closeDuration: 2
+  openDuration: 2
 --- !u!114 &570254230316731209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,7 +99,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::GarageCubeProcessor
   storage: {fileID: 570254230316731209}
   door: {fileID: 9192489150372810042}
-  closedHoldDuration: 0.5
+  closedHoldDuration: 0
 --- !u!114 &3339632104031140917
 MonoBehaviour:
   m_ObjectHideFlags: 0

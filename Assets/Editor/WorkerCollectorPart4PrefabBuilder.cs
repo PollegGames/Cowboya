@@ -104,7 +104,12 @@ public static class WorkerCollectorPart4PrefabBuilder
             RoomWaypoint waypoint = FindWaypoint(root, WaypointType.Rest) ?? FindWaypoint(root, WaypointType.Center);
             Transform spawnPoint = FindOrCreate(root.transform, "WorkerCollectorSpawnPoint");
             Transform restPoint = FindOrCreate(root.transform, "WorkerCollectorRestPoint");
-            Vector3 markerPosition = waypoint != null ? waypoint.transform.localPosition : Vector3.zero;
+            // The waypoint lives under PointOfInterests while these markers live directly
+            // under the room root. Copying localPosition therefore targets a different
+            // world-space point whenever the intermediate parent is translated or rotated.
+            Vector3 markerPosition = waypoint != null
+                ? root.transform.InverseTransformPoint(waypoint.transform.position)
+                : Vector3.zero;
             ConfigureMarker(spawnPoint, markerPosition);
             ConfigureMarker(restPoint, markerPosition);
 

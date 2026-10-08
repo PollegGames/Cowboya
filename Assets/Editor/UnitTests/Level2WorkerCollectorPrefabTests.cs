@@ -149,6 +149,16 @@ public class Level2WorkerCollectorPrefabTests
         Assert.IsNotNull(provider.RestWaypoint);
         Assert.IsNotNull(prefab.transform.Find("WorkerCollectorSpawnPoint"));
         Assert.IsNotNull(prefab.transform.Find("WorkerCollectorRestPoint"));
+        Assert.Less(
+            Vector3.Distance(provider.RestWaypoint.WorldPos, provider.RestPosition),
+            0.001f,
+            "The rest marker must resolve to the rest waypoint in world space.");
+        Assert.Less(
+            Vector3.Distance(
+                provider.RestWaypoint.WorldPos,
+                prefab.transform.Find("WorkerCollectorSpawnPoint").position),
+            0.001f,
+            "The spawn marker must resolve to the rest waypoint in world space.");
         Assert.AreEqual(Quaternion.identity, provider.SpawnRotation);
         Assert.AreNotEqual(prefab.transform.Find("WorkerCollectorSpawnPoint").rotation, provider.SpawnRotation);
     }
