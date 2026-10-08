@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.Reflection;
+using UnityEditor;
 
 public class MapManagerTests
 {
@@ -30,6 +31,37 @@ public class MapManagerTests
 
         Assert.AreEqual(5, widthField.GetValue(_manager));
         Assert.AreEqual(4, heightField.GetValue(_manager));
+    }
+
+    [Test]
+    public void GeneratedRoomPrefabReferences_PointToPrefabRoots()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Prefabs/Map/MapManager.prefab");
+        var manager = prefab.GetComponent<MapManager>();
+        var expectedNames = new System.Collections.Generic.Dictionary<string, string>
+        {
+            { "receptionPOI_Prefab", "ROOM_Reception" },
+            { "securityPOI_Prefab", "ROOM_security" },
+            { "restingPOI_Prefab", "ROOM_resting" },
+            { "spawningPOI_Prefab", "ROOM_Spawning" },
+            { "garagePOI_Prefab", "ROOM_Garage" },
+            { "conveyorPOI_Prefab", "ROOM_Conveyor" },
+            { "furnacePOI_Prefab", "ROOM_Furnace" },
+            { "junksPOI_Prefab", "ROOM_Junks" },
+            { "deadsPOI_Prefab", "ROOM_Deads" },
+            { "cubeCollectorPOI_Prefab", "ROOM_CubeCollector" }
+        };
+
+        foreach (var entry in expectedNames)
+        {
+            var roomPrefab = (GameObject)typeof(MapManager)
+                .GetField(entry.Key, BindingFlags.NonPublic | BindingFlags.Instance)
+                .GetValue(manager);
+            Assert.IsNotNull(roomPrefab, $"{entry.Key} is not assigned.");
+            Assert.AreEqual(entry.Value, roomPrefab.name, $"{entry.Key} must reference the prefab root.");
+            Assert.IsNotNull(roomPrefab.GetComponent<RoomManager>(), $"{entry.Value} needs RoomManager on its root.");
+            Assert.IsNotNull(roomPrefab.GetComponent<RoomProperties>(), $"{entry.Value} needs RoomProperties on its root.");
+        }
     }
 
     [Test]

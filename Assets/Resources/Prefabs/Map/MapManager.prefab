@@ -50,16 +50,16 @@ MonoBehaviour:
   blockedPrefab: {fileID: 542146199199913260, guid: 27a6b4d046762a446821621f345c75d1, type: 3}
   startPrefab: {fileID: 542146199199913260, guid: b6280165da96e5042ac64d6d6fcd9697, type: 3}
   endPrefab: {fileID: 542146199199913260, guid: 54e02337c6434194292e57d54ded47ac, type: 3}
-  defaultPOI_Prefab: {fileID: 69310964051482088, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
-  receptionPOI_Prefab: {fileID: 69310964051482088, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
+  defaultPOI_Prefab: {fileID: 542146199199913260, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
+  receptionPOI_Prefab: {fileID: 542146199199913260, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}
   securityPOI_Prefab: {fileID: 542146199199913260, guid: 61ec338c4d025b14eb781d8691fbccd7, type: 3}
   restingPOI_Prefab: {fileID: 542146199199913260, guid: 3d6b903f23f088d4ab161eccb58e9190, type: 3}
-  spawningPOI_Prefab: {fileID: 60170084204232955, guid: 27a6b4d046762a446821621f345c75d1, type: 3}
-  garagePOI_Prefab: {fileID: 59179985591014420, guid: 759e7cb7ff8d1a74680da94717fd6989, type: 3}
-  conveyorPOI_Prefab: {fileID: 59179985591014420, guid: 819658e48fafc3e498ae21253a71ddee, type: 3}
-  furnacePOI_Prefab: {fileID: 59179985591014420, guid: 7436aa0776a76f447891eceeee8984aa, type: 3}
-  junksPOI_Prefab: {fileID: 59179985591014420, guid: c988c518177c1f44ba9d14c1e256e454, type: 3}
-  deadsPOI_Prefab: {fileID: 59179985591014420, guid: 7937296ba2d4d36468595eae44fbd3e9, type: 3}
-  cubeCollectorPOI_Prefab: {fileID: 69310964051482088, guid: 3f1662d6707795b4a940523d2e30ec02, type: 3}
+  spawningPOI_Prefab: {fileID: 542146199199913260, guid: 27a6b4d046762a446821621f345c75d1, type: 3}
+  garagePOI_Prefab: {fileID: 542146199199913260, guid: 759e7cb7ff8d1a74680da94717fd6989, type: 3}
+  conveyorPOI_Prefab: {fileID: 542146199199913260, guid: 819658e48fafc3e498ae21253a71ddee, type: 3}
+  furnacePOI_Prefab: {fileID: 542146199199913260, guid: 7436aa0776a76f447891eceeee8984aa, type: 3}
+  junksPOI_Prefab: {fileID: 542146199199913260, guid: c988c518177c1f44ba9d14c1e256e454, type: 3}
+  deadsPOI_Prefab: {fileID: 542146199199913260, guid: 7937296ba2d4d36468595eae44fbd3e9, type: 3}
+  cubeCollectorPOI_Prefab: {fileID: 542146199199913260, guid: 3f1662d6707795b4a940523d2e30ec02, type: 3}
   pathToPOIPrefab: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
   workPrefab: {fileID: 542146199199913260, guid: 698d313749aa0524a957563038d9f5cf, type: 3}
