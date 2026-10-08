@@ -1,0 +1,112 @@
+name: Unity CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - tourB
+  workflow_dispatch:
+
+concurrency:
+  group: unity-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+
+env:
+  UNITY_VERSION: 6000.3.22f1
+
+jobs:
+  repository-integrity:
+    name: Repository integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify Unity version and meta files
+        shell: pwsh
+        run: ./Tools/verify-unity-project.ps1 -ExpectedUnityVersion $env:UNITY_VERSION
+
+  edit-mode-tests:
+    name: Edit Mode tests
+    needs: repository-integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-EditMode-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-EditMode-
+
+      - name: Run Edit Mode tests
+        id: tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          testMode: editmode
+
+      - name: Upload test results and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: edit-mode-results-${{ github.sha }}
+          path: ${{ steps.tests.outputs.artifactsPath }}
+          if-no-files-found: warn
+          retention-days: 14
+
+  webgl-build:
+    name: Reproducible WebGL build
+    needs: edit-mode-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-WebGL-
+
+      - name: Build WebGL player
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: WebGL
+          versioning: None
+          buildName: Cowboya
+
+      - name: Write build provenance
+        shell: bash
+        run: |
+          printf 'commit=%s\nunity=%s\npackages-lock-sha256=%s\n' \
+            "$GITHUB_SHA" \
+            "$UNITY_VERSION" \
+            "$(sha256sum Packages/packages-lock.json | cut -d ' ' -f 1)" \
+            > build/BUILD-PROVENANCE.txt
+
+      - name: Upload WebGL player
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cowboya-WebGL-${{ github.sha }}
+          path: build
+          if-no-files-found: error
+          retention-days: 14

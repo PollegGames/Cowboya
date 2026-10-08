@@ -34,7 +34,7 @@ public class GrabHandAttractor : MonoBehaviour
         if (mask == 0)
             mask = ~0;
 
-        Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, detectionRadius);
+        Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, detectionRadius, mask);
         IGrabbable closestBadge = null;
         float closestBadgeDistance = float.MaxValue;
         IGrabbable closestOther = null;

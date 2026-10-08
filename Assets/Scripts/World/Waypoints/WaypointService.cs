@@ -182,7 +182,10 @@ public class WaypointService : MonoBehaviour, IWaypointService
         var works = registry
             .GetActiveWaypoints()
             .Where(wp =>
-                wp.parentRoom.roomProperties.usageType == UsageType.Work
+                wp != null
+                && wp.parentRoom != null
+                && wp.parentRoom.roomProperties != null
+                && wp.parentRoom.roomProperties.usageType == UsageType.Work
                 && wp.type == WaypointType.Work
                 && wp.parentRoom.factorymMachinesInRoom.Any(m =>
                     m.IsOn && m.CurrentWorker == null
@@ -238,12 +241,15 @@ public class WaypointService : MonoBehaviour, IWaypointService
         var works = registry
             .GetActiveWaypoints()
             .Where(wp =>
-                wp.parentRoom.roomProperties.usageType == UsageType.Work
+                wp != null
+                && wp.parentRoom != null
+                && wp.parentRoom.roomProperties != null
+                && wp.parentRoom.roomProperties.usageType == UsageType.Work
                 && wp.type == WaypointType.Work
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp)
                 && wp.parentRoom.factorymMachinesInRoom.Any(m =>
-                    m.IsOn && m.CurrentWorker == null
+                    m != null && m.IsOn && m.CurrentWorker == null
                 )
             )
             .ToList();

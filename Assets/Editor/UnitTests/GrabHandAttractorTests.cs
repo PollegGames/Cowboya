@@ -1,9 +1,11 @@
 using NUnit.Framework;
 using UnityEngine;
-using System.Reflection;
+using System.Collections.Generic;
 
 public class GrabHandAttractorTests
 {
+    private readonly List<GameObject> createdObjects = new List<GameObject>();
+
     private class DummyGrabbable : MonoBehaviour, IGrabbable
     {
         public bool CanBeGrabbed(Inventory inventory) => true;
@@ -12,16 +14,37 @@ public class GrabHandAttractorTests
         public void OnAttract(Vector2 attractPoint) {}
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        foreach (GameObject createdObject in createdObjects)
+        {
+            if (createdObject != null)
+            {
+                Object.DestroyImmediate(createdObject);
+            }
+        }
+
+        createdObjects.Clear();
+    }
+
+    private GameObject CreateGameObject(string objectName)
+    {
+        GameObject createdObject = new GameObject(objectName);
+        createdObjects.Add(createdObject);
+        return createdObject;
+    }
+
     [Test]
     public void DetectGrabbable_DetectsObjectOnLayer()
     {
-        var handObj = new GameObject("hand");
+        var handObj = CreateGameObject("hand");
         var attractor = handObj.AddComponent<GrabHandAttractor>();
         attractor.detectionRadius = 1f;
         int layer = 8;
         attractor.detectionLayer = 1 << layer;
 
-        var obj = new GameObject("grabbable");
+        var obj = CreateGameObject("grabbable");
         obj.layer = layer;
         obj.transform.position = handObj.transform.position;
         obj.AddComponent<CircleCollider2D>();
@@ -39,12 +62,12 @@ public class GrabHandAttractorTests
     [Test]
     public void DetectGrabbable_IgnoresWrongLayer()
     {
-        var handObj = new GameObject("hand");
+        var handObj = CreateGameObject("hand");
         var attractor = handObj.AddComponent<GrabHandAttractor>();
         attractor.detectionRadius = 1f;
         attractor.detectionLayer = 1 << 8;
 
-        var obj = new GameObject("grabbable");
+        var obj = CreateGameObject("grabbable");
         obj.layer = 9;
         obj.transform.position = handObj.transform.position;
         obj.AddComponent<CircleCollider2D>();

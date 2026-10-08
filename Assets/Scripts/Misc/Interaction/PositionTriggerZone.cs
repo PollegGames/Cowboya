@@ -12,8 +12,8 @@ public class PositionTriggerZone : MonoBehaviour
     public LayerMask detectionLayer;              // Layers to detect
 
     [Header("Events")]
-    public ColliderEvent onEnter; // Event to pass the detected collider
-    public UnityEvent onExit;
+    public ColliderEvent onEnter = new ColliderEvent(); // Event to pass the detected collider
+    public UnityEvent onExit = new UnityEvent();
 
     private bool hasEntered = false;
 
