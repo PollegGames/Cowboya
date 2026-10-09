@@ -566,9 +566,6 @@ public class RobotTaskNew : IRobotTaskNew
 
             if (context.Role == RobotRole.Boss)
                 Debug.Log($"[Boss] Patrol target set: {DescribePayload(payload)}.", context.Heart);
-
-            if (context.Role == RobotRole.Boss)
-                ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 3f);
             return;
         }
 

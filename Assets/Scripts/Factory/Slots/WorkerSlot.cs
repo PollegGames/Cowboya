@@ -63,6 +63,28 @@ public class WorkerSlot : MonoBehaviour
             Debug.Log($"[WorkerSlot] Attach rejected {brain.name} machine={machine.name}", this);
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        var brain = collision.GetComponentInParent<RobotBrainNew>();
+        if (brain == null || brain.Heart == null || brain.Heart.Role != RobotRole.Worker)
+            return;
+
+        if (machine == null || !machine.IsOn || machine.IsOccupied)
+            return;
+
+        if (!IsIncomingWorkerTargetingThisSlot(brain))
+            return;
+
+        RobotEcosystemProbe.RecordSlotDecision(
+            this,
+            "WorkerSlot",
+            "attach_retried_while_inside",
+            brain,
+            machine,
+            brain.Heart.CurrentTask);
+        TryAttachOrReplace(brain);
+    }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         var brain = collision.GetComponentInParent<RobotBrainNew>();

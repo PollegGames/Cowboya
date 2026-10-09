@@ -604,6 +604,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
         if (go == null)
             return;
 
+        if (role == RobotRole.Worker
+            && go.GetComponent<WorkerWorkAnimationController>() == null)
+        {
+            go.AddComponent<WorkerWorkAnimationController>();
+        }
+
         MonoBehaviour owner = go.GetComponent<RobotBrainNew>();
         if (owner == null)
             owner = go.GetComponent<RobotHeartNew>();
@@ -720,6 +726,84 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             go.AddComponent<RobotBrainNew>();
     }
 
+}
+
+/// <summary>
+/// Plays the normal worker's arm-only animation while it is attached to a work machine.
+/// </summary>
+[DisallowMultipleComponent]
+public sealed class WorkerWorkAnimationController : MonoBehaviour
+{
+    [SerializeField] private Animator animator;
+    [SerializeField] private RobotHeartNew heart;
+    [SerializeField] private RobotMemoryNew memory;
+    [SerializeField] private RobotStateController stateController;
+    [SerializeField, Min(0f)] private float transitionDuration = 0.15f;
+
+    private static readonly int WorkStateHash = Animator.StringToHash("Base Layer.WorkerArmsWork");
+    private static readonly int IdleStateHash = Animator.StringToHash("Base Layer.Idle_Master");
+
+    private bool isPlayingWorkAnimation;
+    private bool missingStateReported;
+
+    private void Awake()
+    {
+        ResolveReferences();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+        isPlayingWorkAnimation = false;
+    }
+
+    private void Update()
+    {
+        bool shouldPlay = ShouldPlayWorkAnimation();
+        if (shouldPlay == isPlayingWorkAnimation || animator == null)
+            return;
+
+        int targetState = shouldPlay ? WorkStateHash : IdleStateHash;
+        if (!animator.HasState(0, targetState))
+        {
+            if (!missingStateReported)
+            {
+                Debug.LogWarning(
+                    $"[WorkerWorkAnimation] Animator on '{name}' is missing the requested work or idle state.",
+                    this);
+                missingStateReported = true;
+            }
+            return;
+        }
+
+        animator.CrossFade(targetState, transitionDuration, 0);
+        isPlayingWorkAnimation = shouldPlay;
+    }
+
+    private bool ShouldPlayWorkAnimation()
+    {
+        if (heart == null || heart.Role != RobotRole.Worker)
+            return false;
+        if (memory == null || !memory.IsConnectedToMachine)
+            return false;
+        if (stateController == null || stateController.CurrentState != RobotState.Alive)
+            return false;
+
+        RobotTask currentTask = heart.CurrentTask;
+        return currentTask != null && currentTask.Type == RobotTaskType.WorkAtMachine;
+    }
+
+    private void ResolveReferences()
+    {
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+        if (heart == null)
+            heart = GetComponent<RobotHeartNew>();
+        if (memory == null)
+            memory = GetComponent<RobotMemoryNew>();
+        if (stateController == null)
+            stateController = GetComponent<RobotStateController>();
+    }
 }
 
 /// <summary>

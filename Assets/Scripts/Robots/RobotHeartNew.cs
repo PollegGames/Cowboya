@@ -15,6 +15,7 @@ public class RobotHeartNew : MonoBehaviour
     [SerializeField] private MonoBehaviour collectorBodyBehaviour;
     [SerializeField] private RobotMemoryNew memory;
     [SerializeField] private RobotRole role = RobotRole.Worker;
+    [SerializeField, Min(0f)] private float bossPatrolWaitSeconds = 1.5f;
 
     private RobotTaskStackNew taskStack;
     private RobotTask activeTopTask;
@@ -166,7 +167,18 @@ public class RobotHeartNew : MonoBehaviour
         CancelScheduledTaskSignal();
         taskStack.CompleteCurrent();
         if (taskStack.Current == null)
-            taskStack.PushOrRefresh(BuildDefaultTask());
+        {
+            bool shouldPauseBossPatrol = role == RobotRole.Boss
+                && before != null
+                && before.Type == RobotTaskType.Patrol
+                && bossPatrolWaitSeconds > 0f;
+            RobotTask nextTask = shouldPauseBossPatrol
+                ? new RobotTask(
+                    RobotTaskType.Idle,
+                    expireAt: Time.time + bossPatrolWaitSeconds)
+                : BuildDefaultTask();
+            taskStack.PushOrRefresh(nextTask);
+        }
         if (resetAttackMemoryAfterPop)
             memory?.ResetAttackMemory();
 
