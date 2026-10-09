@@ -13,7 +13,7 @@ public class GridFactory
     private List<List<Vector2>> poiPaths = new();
     private List<bool> poiSuccess;
 
-    public void CreateGrid(int width, int height, int wallCount)
+    public void CreateGrid(int width, int height)
     {
         var grid = new Dictionary<Vector2, Cell>();
         for (int x = 0; x < width; x++)
@@ -43,7 +43,8 @@ public class GridFactory
     public void AssignPOICells(
         EndpointsFactory endpointsFactory,
         int pointsOfInterestCount,
-        int gridWidth, int gridHeight)
+        int gridWidth, int gridHeight,
+        float morality = 0f)
     {
         // Exclude start and end positions from POI candidates
         var excluded = new HashSet<Vector2> { startPosition, endPosition };
@@ -76,45 +77,13 @@ public class GridFactory
         {
             cellDataGrid[poiPositions[i]].cellProperties.usageType = UsageType.POI;
             cellDataGrid[poiPositions[i]].cellProperties.POISlot = i + 1;
-            var poiType = POIRoomTypeSelector.Select(i + 1);
+            var poiType = POIRoomTypeSelector.Select(i + 1, morality);
             cellDataGrid[poiPositions[i]].cellProperties.poiType = poiType;
         }
 
     }
 
-    public void AssignBlockedCells(int wallCount)
-    {
-        // 1. Collect all work cells
-        var workCells = cellDataGrid.Values
-            .Where(cell => cell.cellProperties.usageType == UsageType.Work)
-            .ToList();
-
-        // 2. Shuffle the list
-        for (int i = workCells.Count - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            var temp = workCells[i];
-            workCells[i] = workCells[j];
-            workCells[j] = temp;
-        }
-
-        // 3. Assign blocked type to the first wallCount cells
-        int blockedCount = 0;
-        foreach (var cell in workCells)
-        {
-            if (blockedCount >= wallCount)
-                break;
-            cell.cellProperties.usageType = UsageType.Blocked;
-            cell.cellProperties.HasLeftDoor = false;
-            cell.cellProperties.HasRightDoor = false;
-            blockedCount++;
-        }
-
-    }
-
     public void SolvePaths(
-     int pointsOfInterestCount,
-     int wallCount,
      PathSolver pathSolver,
      int gridWidth, int gridHeight)
     {
@@ -149,23 +118,22 @@ public class GridFactory
 /// </summary>
 public static class POIRoomTypeSelector
 {
-    private static readonly POIType[] CompactPool =
-        { POIType.Resting, POIType.Security };
-    private static readonly POIType[] CompletePool =
+    private static readonly POIType[] RandomPool =
     {
-        POIType.Security,
         POIType.Resting,
+        POIType.Security,
         POIType.Spawning,
-        POIType.Garage,
-        POIType.Conveyor,
         POIType.Furnace,
         POIType.Junks,
         POIType.Deads,
         POIType.CubeCollector
     };
 
+    private static readonly float[] GoodWeights = { 0.5f, 4f, 0.25f, 0.5f, 3f, 0.5f, 4f };
+    private static readonly float[] BadWeights = { 0.5f, 0.25f, 3f, 4f, 0.5f, 2f, 0.25f };
+
     /// <summary>Returns the room type for a one-based POI slot.</summary>
-    public static POIType Select(int slot)
+    public static POIType Select(int slot, float morality = 0f)
     {
         if (slot < 1)
             throw new System.ArgumentOutOfRangeException(nameof(slot), "POI slots are one-based.");
@@ -175,12 +143,43 @@ public static class POIRoomTypeSelector
             return POIType.Security;
         if (slot == 3)
             return POIType.Reception;
-        if (slot <= 5)
-            return CompactPool[UnityEngine.Random.Range(0, CompactPool.Length)];
-        if (slot == 6)
+        if (slot == 4)
+            return POIType.Spawning;
+        if (slot == 5)
             return POIType.Garage;
-        if (slot == 7)
+        if (slot == 6)
             return POIType.Conveyor;
-        return CompletePool[UnityEngine.Random.Range(0, CompletePool.Length)];
+        return SelectWeighted(morality);
+    }
+
+    /// <summary>Returns the configured random-selection weight for a room and morality value.</summary>
+    public static float GetWeight(POIType type, float morality)
+    {
+        int index = System.Array.IndexOf(RandomPool, type);
+        if (index < 0)
+            return 0f;
+
+        float influence = morality >= 0f
+            ? Mathf.Clamp01(morality / 5f)
+            : Mathf.Clamp01(-morality / 20f);
+        float targetWeight = morality >= 0f ? GoodWeights[index] : BadWeights[index];
+        return Mathf.Lerp(1f, targetWeight, influence);
+    }
+
+    private static POIType SelectWeighted(float morality)
+    {
+        float totalWeight = 0f;
+        for (int i = 0; i < RandomPool.Length; i++)
+            totalWeight += GetWeight(RandomPool[i], morality);
+
+        float choice = UnityEngine.Random.value * totalWeight;
+        for (int i = 0; i < RandomPool.Length; i++)
+        {
+            choice -= GetWeight(RandomPool[i], morality);
+            if (choice <= 0f)
+                return RandomPool[i];
+        }
+
+        return RandomPool[RandomPool.Length - 1];
     }
 }

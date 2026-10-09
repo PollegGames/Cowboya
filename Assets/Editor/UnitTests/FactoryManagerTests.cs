@@ -162,7 +162,7 @@ public class FactoryManagerTests
 
     private class DummyGridBuilder : IGridBuilder
     {
-        public System.Collections.Generic.Dictionary<Vector2, Cell> BuildGrid(int width, int height, int wallCount, int poiCount)
+        public System.Collections.Generic.Dictionary<Vector2, Cell> BuildGrid(int width, int height, int poiCount, float morality)
         {
             return new System.Collections.Generic.Dictionary<Vector2, Cell>();
         }

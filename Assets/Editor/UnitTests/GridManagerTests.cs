@@ -9,7 +9,7 @@ public class GridManagerTests
     [SetUp]
     public void SetUp()
     {
-        _manager = new GridManager(1,1,1,1,0,0);
+        _manager = new GridManager(1, 1, 1, 1, 0);
     }
 
     private class DummyProcessor : ICellProcessor

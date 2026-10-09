@@ -21,7 +21,6 @@ public class MapManagerTests
         var cfg = ScriptableObject.CreateInstance<RunMapConfigSO>();
         cfg.gridWidth = 5;
         cfg.gridHeight = 4;
-        cfg.blockedCount = 2;
         cfg.poiCount = 1;
 
         _manager.BuildFromConfig(cfg);
@@ -129,6 +128,30 @@ public class MapManagerTests
     }
 
     [Test]
+    public void GetPOIRoomCount_CountsOnlyMatchingPoiRooms()
+    {
+        var spawningRoom = new GameObject("SpawningRoom");
+        var spawningProperties = spawningRoom.AddComponent<RoomProperties>();
+        spawningProperties.usageType = UsageType.POI;
+        spawningProperties.poiType = POIType.Spawning;
+
+        var workRoom = new GameObject("WorkRoom");
+        var workProperties = workRoom.AddComponent<RoomProperties>();
+        workProperties.usageType = UsageType.Work;
+        workProperties.poiType = POIType.Spawning;
+
+        var instances = new System.Collections.Generic.Dictionary<Vector2, GameObject>
+        {
+            { Vector2.zero, spawningRoom },
+            { Vector2.one, workRoom }
+        };
+        typeof(MapManager).GetField("roomInstances", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(_manager, instances);
+
+        Assert.AreEqual(1, _manager.GetPOIRoomCount(POIType.Spawning));
+    }
+
+    [Test]
     public void GetRandomWorkPosition_ReturnsPosition()
     {
         var workGO = new GameObject();
@@ -144,7 +167,7 @@ public class MapManagerTests
 
     private class DummyGridBuilder : IGridBuilder
     {
-        public System.Collections.Generic.Dictionary<Vector2, Cell> BuildGrid(int width, int height, int wallCount, int poiCount)
+        public System.Collections.Generic.Dictionary<Vector2, Cell> BuildGrid(int width, int height, int poiCount, float morality)
             => new System.Collections.Generic.Dictionary<Vector2, Cell>();
     }
     private class DummyRoomRenderer : IRoomRenderer

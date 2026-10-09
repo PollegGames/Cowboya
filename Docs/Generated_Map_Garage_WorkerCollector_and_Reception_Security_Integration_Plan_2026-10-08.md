@@ -8,7 +8,7 @@ Implementation-ready design. This document describes the changes needed to popul
 
 After a generated map has created and initialized all rooms:
 
-- the primary generated Garage at POI slot 6 owns exactly one `WorkerCollector`;
+- the generated Garage at POI slot 5 owns exactly one `WorkerCollector`;
 - every generated `Reception` room owns exactly one `SecurityReception`;
 - both robots run at the same time through their own existing primary-task logic;
 - neither robot is counted as, spawned as, or dispatched like a normal generated Worker or SecurityGuard;
@@ -45,7 +45,7 @@ This plan is based on the current implementations and designs in:
 - slots 3-5: random Resting, Security, or Reception;
 - slot 6: guaranteed Garage;
 - slot 7: guaranteed Conveyor;
-- slots 8+: fully random from every eligible generated-room type except Laboratory.
+- slots 7+: morality-weighted random selection from Resting, Security, Spawning, Furnace, Junks, Deads, and Cube Collector.
 
 Therefore, every map with at least seven effective POIs has the complete Resting + Garage + Conveyor dependency set required by the Worker Collector. `poiCount` is never increased to reach this threshold.
 
@@ -152,7 +152,7 @@ Place it on `ROOM_Garage` or its `GarageCubes` capability root. It owns:
 - the collectors it spawned;
 - an idempotent `TrySpawnCollector()` operation.
 
-Because slots 8+ may randomly create additional Garage rooms, generation must preserve which Garage came from fixed POI slot 6. Store the one-based POI selection slot (or an explicit `IsPrimaryWorkerCollectorGarage` flag derived from it) in generated cell/room metadata. Do not infer the primary Garage from scene enumeration order or position.
+Garage is unique at fixed POI slot 5. Store the one-based POI selection slot in generated cell/room metadata and do not infer the Garage from scene enumeration order or position.
 
 The robot should initially spawn at the guaranteed slot-1 Resting-room spawn marker. Garage ownership must still be bound before activation so the robot's first mission targets the primary slot-6 Garage and paired slot-7 Conveyor.
 
@@ -196,7 +196,7 @@ Do not use `FindObjectsByType` enumeration order as a gameplay decision.
 
 A seven-or-more-POI generated map always has the Resting room at slot 1, the Garage at slot 6, and the Conveyor at slot 7. The Worker Collector must use a Resting-room provider for its rest phase; it must not rest inside the Garage.
 
-If slots 8+ create additional Resting rooms, select the nearest reachable Rest provider to the owning Garage, with stable grid order as the tie-breaker.
+If slots 7+ create additional Resting rooms, select the nearest reachable Rest provider to the owning Garage, with stable grid order as the tie-breaker.
 
 ### 5. Safe behavior for incomplete room combinations
 
@@ -284,7 +284,7 @@ Static registries in `WorkerCollectorMissionService` must remove disabled/destro
 ### `EnemiesSpawner` or a focused `DedicatedRoomRobotSpawner`
 
 - Preserve Reception resolution and spawning.
-- Resolve the initialized Garage whose generated metadata identifies POI slot 6 and invoke only its idempotent spawn method.
+- Resolve the initialized Garage whose generated metadata identifies POI slot 5 and invoke only its idempotent spawn method.
 - Keep dedicated robots separate from normal enemy collections and configured counts.
 - Return a small spawn summary for diagnostics and tests.
 
@@ -420,7 +420,7 @@ The feature is complete when:
 - Reception security and Garage collection execute concurrently through separate Memory -> Brain -> Heart -> Task policies;
 - additional random Garage or Conveyor rooms from slot 8+ do not change the primary pair's collector ownership;
 - slot 1 always supplies the Worker Collector's Resting room;
-- slots 6 and 7 always supply Garage and Conveyor as a pair on maps with at least seven effective POIs;
+- slots 5 and 6 always supply Garage and Conveyor as a pair on maps with at least six effective POIs;
 - repeated initialization and provider registration do not duplicate robots;
 - scene changes do not retain stale provider assignments;
 - generated-room rotations preserve valid spawns and navigation;

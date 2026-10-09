@@ -46,8 +46,7 @@
 //         public RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null) => null;
 //         public RoomWaypoint GetFirstFreeSecurityPoint() => null;
 //         public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null) => null;
-//         public RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null) => null;
-//         public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null) => null;
+//         public RoomWaypoint GetSpawningRoomWaypoint(RoomWaypoint exclude = null) => null;
 //         public void ReleasePOI(RoomWaypoint poi) {}
 //         public FactoryMachine ReserveFreeMachine(RoomManager room, EnemyWorkerController worker) => null;
 //         public void ReleaseMachine(FactoryMachine machine) {}

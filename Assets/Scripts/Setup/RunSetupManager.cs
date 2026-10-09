@@ -40,7 +40,6 @@ public class RunSetupManager : MonoBehaviour
     private IntegerField widthField,
                          heightField,
                          poiField,
-                         blockedField,
                          workersCountField,
                          enemyCountField;
     private TextField seedField;
@@ -73,9 +72,6 @@ public class RunSetupManager : MonoBehaviour
         var poiMinusButton = root.Q<Button>("poi-minus-button");
         var poiPlusButton = root.Q<Button>("poi-plus-button");
 
-        var blockedMinusButton = root.Q<Button>("blocked-minus-button");
-        var blockedPlusButton = root.Q<Button>("blocked-plus-button");
-
         var workerMinusButton = root.Q<Button>("worker-minus-button");
         var workerPlusButton = root.Q<Button>("worker-plus-button");
 
@@ -86,7 +82,6 @@ public class RunSetupManager : MonoBehaviour
         widthField = root.Q<IntegerField>("width-field");
         heightField = root.Q<IntegerField>("height-field");
         poiField = root.Q<IntegerField>("poi-field");
-        blockedField = root.Q<IntegerField>("blocked-field");
         workersCountField = root.Q<IntegerField>("worker-count-field");
         enemyCountField = root.Q<IntegerField>("enemy-count-field");
         seedField = root.Q<TextField>("seed-field");
@@ -100,8 +95,7 @@ public class RunSetupManager : MonoBehaviour
         widthField.RegisterValueChangedCallback(evt => UpdateCellsAndConstraints());
         heightField.RegisterValueChangedCallback(evt => UpdateCellsAndConstraints());
 
-        poiField.RegisterValueChangedCallback(evt => ClampPoiAndBlocked());
-        blockedField.RegisterValueChangedCallback(evt => ClampPoiAndBlocked());
+        poiField.RegisterValueChangedCallback(evt => ClampPoi());
 
         // Callbacks
         widthMinusButton.clicked += () => ChangeFieldValue(widthField, -1, 2);
@@ -110,11 +104,8 @@ public class RunSetupManager : MonoBehaviour
         heightMinusButton.clicked += () => ChangeFieldValue(heightField, -1, 2);
         heightPlusButton.clicked += () => ChangeFieldValue(heightField, +1);
 
-        poiMinusButton.clicked += () => ChangeFieldValue(poiField, -1, 1, ClampPoiAndBlocked);
-        poiPlusButton.clicked += () => ChangeFieldValue(poiField, +1, 1, ClampPoiAndBlocked);
-
-        blockedMinusButton.clicked += () => ChangeFieldValue(blockedField, -1, 0, ClampPoiAndBlocked);
-        blockedPlusButton.clicked += () => ChangeFieldValue(blockedField, +1, 0, ClampPoiAndBlocked);
+        poiMinusButton.clicked += () => ChangeFieldValue(poiField, -1, 1, ClampPoi);
+        poiPlusButton.clicked += () => ChangeFieldValue(poiField, +1, 1, ClampPoi);
 
         workerMinusButton.clicked += () => ChangeFieldValue(workersCountField, -1, 0);
         workerPlusButton.clicked += () => ChangeFieldValue(workersCountField, +1);
@@ -134,7 +125,6 @@ public class RunSetupManager : MonoBehaviour
             widthField.value = config.gridWidth;
             heightField.value = config.gridHeight;
             poiField.value = config.poiCount;
-            blockedField.value = config.blockedCount;
             workersCountField.value = config.workersCount;
             enemyCountField.value = config.enemiesCount;
             seedField.value = config.seed;
@@ -153,65 +143,44 @@ public class RunSetupManager : MonoBehaviour
 
     /// <summary>
     /// Recomputes "Cells Available" whenever width or height changes,
-    /// then automatically clamps poiField and blockedField.
+    /// then automatically clamps poiField.
     /// </summary>
     private void UpdateCellsAndConstraints()
     {
-        // 1) Read width & height and compute cellsAvailable = (w*h)/2 - 2
         int w = Mathf.Max(2, widthField.value);
         int h = Mathf.Max(2, heightField.value);
         int totalCells = w * h;
 
-        int cellsAvailable = totalCells - 4;
+        int cellsAvailable = totalCells - 2;
         if (cellsAvailable < 0) cellsAvailable = 0;
 
         // 2) Update the label
         cellsAvailableLabel.text = $"Cells Available: {cellsAvailable}";
 
-        // 3) Clamp poi & blocked according to the new cellsAvailable
         int poi = Mathf.Max(1, poiField.value);
-        int blocked = Mathf.Max(0, blockedField.value);
-
-        // poi ≤ cellsAvailable - blocked
-        int maxPoi = cellsAvailable - blocked;
-        if (poi > maxPoi) poi = maxPoi;
-
-        // blocked ≤ cellsAvailable - poi (after adjusting poi)
-        int maxBlocked = cellsAvailable - poi;
-        if (blocked > maxBlocked) blocked = maxBlocked;
+        if (poi > cellsAvailable) poi = cellsAvailable;
 
         // 4) Reassign in the UI (forces visual correction)
         poiField.value = poi;
-        blockedField.value = blocked;
     }
 
     /// <summary>
-    /// Called when the user manually edits poiField or blockedField.
-    /// Ensures poi ≤ cellsAvailable - blocked and blocked ≤ cellsAvailable - poi.
+    /// Called when the user manually edits poiField.
     /// </summary>
-    private void ClampPoiAndBlocked()
+    private void ClampPoi()
     {
         // Retrieve current cellsAvailable from the label (or recompute)
         int w = Mathf.Max(2, widthField.value);
         int h = Mathf.Max(2, heightField.value);
         int totalCells = w * h;
-        int cellsAvailable = totalCells - 4;
+        int cellsAvailable = totalCells - 2;
         if (cellsAvailable < 0) cellsAvailable = 0;
 
-        // Current values of poi and blocked
         int poi = Mathf.Max(1, poiField.value);
-        int blocked = Mathf.Max(0, blockedField.value);
-
-        // Apply the same constraints
-        int maxPoi = cellsAvailable - blocked;
-        if (poi > maxPoi) poi = maxPoi;
-
-        int maxBlocked = cellsAvailable - poi;
-        if (blocked > maxBlocked) blocked = maxBlocked;
+        if (poi > cellsAvailable) poi = cellsAvailable;
 
         // Write back
         poiField.value = poi;
-        blockedField.value = blocked;
     }
 
     // =====================================================================
@@ -224,46 +193,28 @@ public class RunSetupManager : MonoBehaviour
         int h = Mathf.Max(2, heightField.value);
         int totalCells = w * h;
 
-        // Compute "cellsAvailable": total cells minus 4 (start + end)
-        int cellsAvailable = totalCells - 4;
+        int cellsAvailable = totalCells - 2;
         if (cellsAvailable < 0) cellsAvailable = 0;
 
         // Update the label
         cellsAvailableLabel.text = $"Cells Available: {cellsAvailable}";
 
-        // Initial read of the POI / Blocked fields
         int poi = Mathf.Max(1, poiField.value);
-        int blocked = Mathf.Max(0, blockedField.value);
-
-        // Apply automatic constraints:
-        //  - poi ≤ cellsAvailable - blocked
-        int maxPoi = cellsAvailable - blocked;
-        if (poi > maxPoi) poi = maxPoi;
-        //  - blocked ≤ cellsAvailable - poi
-        int maxBlocked = cellsAvailable - poi;
-        if (blocked > maxBlocked) blocked = maxBlocked;
+        if (poi > cellsAvailable) poi = cellsAvailable;
 
         // Reassign in the UI (fix possible overflow)
         poiField.value = poi;
-        blockedField.value = blocked;
 
         // Read and clamp the remaining fields
         int workers = Mathf.Max(0, workersCountField.value);
         int enemies = Mathf.Max(0, enemyCountField.value);
 
-        // Additional validation
-        bool isValid = true;
-
-        // 2) Ensure poi + blocked do not exceed cellsAvailable
-        if (poi + blocked > cellsAvailable) isValid = false;
-
-        // 3) Ensure enemy count ≤ (cellsAvailable - poi - blocked)
-        int workCells = cellsAvailable - poi - blocked;
+        bool isValid = poi <= cellsAvailable;
+        int workCells = cellsAvailable - poi;
 
         // Highlight si erreur
         void Mark(VisualElement f, bool ok) => f.style.borderBottomColor = ok ? Color.clear : Color.red;
-        Mark(poiField, poi + blocked <= cellsAvailable);
-        Mark(blockedField, poi + blocked <= cellsAvailable);
+        Mark(poiField, poi <= cellsAvailable);
         Mark(workersCountField, workers <= workCells);
 
         if (!isValid)
@@ -277,7 +228,6 @@ public class RunSetupManager : MonoBehaviour
         config.gridWidth = w;
         config.gridHeight = h;
         config.poiCount = poi;
-        config.blockedCount = blocked;
         config.workersCount = workers;
         config.enemiesCount = enemies;
         config.seed = randomSeedToggle.value
@@ -304,14 +254,14 @@ public class RunSetupManager : MonoBehaviour
 
     /// <summary>
     /// Updates the "Cells Available" label based on the current width,
-    /// height, poi and blocked values.
+    /// height and POI values.
     /// </summary>
     private void UpdateCellsAvailableLabel()
     {
         int w = Mathf.Max(2, widthField.value);
         int h = Mathf.Max(2, heightField.value);
         int totalCells = w * h;
-        int cellsAvailable = totalCells - 4;
+        int cellsAvailable = totalCells - 2;
         if (cellsAvailable < 0) cellsAvailable = 0;
         cellsAvailableLabel.text = $"Cells Available: {cellsAvailable}";
     }

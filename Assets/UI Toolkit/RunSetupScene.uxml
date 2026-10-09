@@ -22,12 +22,6 @@
                 <engine:IntegerField name="poi-field" style="font-size: 24px; width: 100px;" />
                 <engine:Button name="poi-plus-button" text="+" class="int-button" />
             </engine:VisualElement>
-            <engine:VisualElement class="int-field-with-buttons">
-                <engine:Label text="BLOCKED CELLS" class="int-label" style="width: 198px;" />
-                <engine:Button name="blocked-minus-button" text="−" class="int-button" />
-                <engine:IntegerField name="blocked-field" style="font-size: 24px; width: 100px;" />
-                <engine:Button name="blocked-plus-button" text="+" class="int-button" />
-            </engine:VisualElement>
             <engine:TextField name="seed-field" label="SEED" style="font-size: 24px; width: 387px;" />
             <engine:Toggle name="random-seed-toggle" label="RANDOMIZE" style="-unity-font-style: italic; font-size: 16px;" />
             <engine:VisualElement class="int-field-with-buttons">

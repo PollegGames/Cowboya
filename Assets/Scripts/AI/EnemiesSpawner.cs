@@ -411,10 +411,10 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             if (ws == null)
                 continue;
 
-            var p = waypointService.GetBlockedRoomSecuritySpawning();
+            var p = waypointService.GetSpawningRoomWaypoint();
             if (p == null)
             {
-                Debug.LogWarning("[EnemiesSpawner] Cannot spawn worker spawner: no blocked-room spawn waypoint available.", this);
+                Debug.LogWarning("[EnemiesSpawner] Cannot spawn worker spawner: no Spawning POI waypoint available.", this);
                 continue;
             }
 

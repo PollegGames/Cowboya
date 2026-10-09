@@ -191,4 +191,26 @@ public class WaypointServiceTests
         var second = _service.GetWorkOrRestPoint();
         Assert.AreEqual(restWp, second);
     }
+
+    [Test]
+    public void GetSpawningRoomWaypoint_ReturnsSpawnerFromSpawningPoi()
+    {
+        var reg = new GameObject().AddComponent<DummyRegistry>();
+        var finder = new GameObject().AddComponent<DummyPathFinder>();
+        InitService(reg, finder);
+
+        var roomObject = new GameObject("SpawningRoom");
+        var room = roomObject.AddComponent<RoomManager>();
+        var properties = roomObject.AddComponent<RoomProperties>();
+        properties.usageType = UsageType.POI;
+        properties.poiType = POIType.Spawning;
+        room.roomProperties = properties;
+
+        var waypoint = new GameObject("SpawnerWaypoint").AddComponent<RoomWaypoint>();
+        waypoint.type = WaypointType.Spawner;
+        waypoint.parentRoom = room;
+        reg.all.Add(waypoint);
+
+        Assert.AreSame(waypoint, _service.GetSpawningRoomWaypoint());
+    }
 }

@@ -16,7 +16,6 @@ public class MapManager : MonoBehaviour
     [SerializeField] private RunMapConfigSO mapConfig; // can be injected via BuildFromConfig
 
     [Header("Cell Prefabs Mapping")]
-    [SerializeField] private GameObject blockedPrefab;
     [SerializeField] private GameObject startPrefab;
     [SerializeField] private GameObject endPrefab;
     [SerializeField] private GameObject defaultPOI_Prefab;
@@ -43,8 +42,8 @@ public class MapManager : MonoBehaviour
 
     private int gridWidth = 6;
     private int gridHeight = 8;
-    private int wallCount = 5;
     private int pointsOfInterestCount = 3;
+    private float morality;
 
     public void Construct(IGridBuilder builder, IRoomRenderer renderer, IRoomProcessor processor)
     {
@@ -60,8 +59,10 @@ public class MapManager : MonoBehaviour
     {
         gridWidth = cfg.gridWidth;
         gridHeight = cfg.gridHeight;
-        wallCount = cfg.blockedCount;
         pointsOfInterestCount = cfg.poiCount;
+        morality = RunProgressManager.Instance != null && RunProgressManager.Instance.RunStats != null
+            ? RunProgressManager.Instance.RunStats.Morality
+            : 0f;
 
         // Initialize Random so the same seed always yields the same map
         UnityEngine.Random.InitState(cfg.seed.GetHashCode());
@@ -72,7 +73,7 @@ public class MapManager : MonoBehaviour
     /// </summary>
     private void BootSystems()
     {
-        gridManager = new GridManager(gridWidth, gridHeight, cellWidth, cellHeight, wallCount, pointsOfInterestCount);
+        gridManager = new GridManager(gridWidth, gridHeight, cellWidth, cellHeight, pointsOfInterestCount, morality);
     }
 
     /// <summary>
@@ -119,8 +120,8 @@ public class MapManager : MonoBehaviour
             cellDataGrid = gridBuilder.BuildGrid(
                 gridWidth,
                 gridHeight,
-                wallCount,
-                pointsOfInterestCount);
+                pointsOfInterestCount,
+                morality);
 
             var start = Vector2.zero;
             var end = Vector2.zero;
@@ -213,13 +214,27 @@ public class MapManager : MonoBehaviour
     {
         return new Dictionary<UsageType, GameObject>
         {
-            { UsageType.Blocked,   blockedPrefab   },
             { UsageType.Start,     startPrefab     },
             { UsageType.End,       endPrefab       },
             { UsageType.POI,       defaultPOI_Prefab},
             { UsageType.PathToPOI, pathToPOIPrefab },
             { UsageType.Work,      workPrefab      },
         };
+    }
+
+    /// <summary>Returns the number of rendered POI rooms matching the requested type.</summary>
+    public int GetPOIRoomCount(POIType poiType)
+    {
+        if (roomInstances == null)
+            return 0;
+
+        return roomInstances.Values.Count(room =>
+        {
+            RoomProperties properties = room != null ? room.GetComponent<RoomProperties>() : null;
+            return properties != null
+                && properties.usageType == UsageType.POI
+                && properties.poiType == poiType;
+        });
     }
 
     private Dictionary<POIType, GameObject> CreatePOIPrefabMapping()

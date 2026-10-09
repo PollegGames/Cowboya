@@ -17,14 +17,14 @@ public class GridFactoryTests
     [Test]
     public void CreateGrid_CreatesCells()
     {
-        _factory.CreateGrid(2, 2, 0);
+        _factory.CreateGrid(2, 2);
         Assert.AreEqual(4, _factory.cellDataGrid.Count);
     }
 
     [Test]
     public void AssignStartAndEndCells_SetsCells()
     {
-        _factory.CreateGrid(2, 2, 0);
+        _factory.CreateGrid(2, 2);
         _factory.AssignStartAndEndCells(new EndpointsFactory(), 2, 2);
 
         int start = 0, end = 0;
@@ -41,7 +41,7 @@ public class GridFactoryTests
     [Test]
     public void AssignPOICells_AssignsPOIs()
     {
-        _factory.CreateGrid(3, 3, 0);
+        _factory.CreateGrid(3, 3);
         _factory.AssignStartAndEndCells(new EndpointsFactory(), 3, 3);
         _factory.AssignPOICells(new EndpointsFactory(), 1, 3, 3);
 
@@ -61,7 +61,7 @@ public class GridFactoryTests
     public void AssignPOICells_FollowsSlotRules(int count)
     {
         Random.InitState(12345);
-        _factory.CreateGrid(5, 4, 0);
+        _factory.CreateGrid(5, 4);
         _factory.AssignStartAndEndCells(new EndpointsFactory(), 5, 4);
         _factory.AssignPOICells(new EndpointsFactory(), count, 5, 4);
 
@@ -74,15 +74,19 @@ public class GridFactoryTests
         if (count >= 1) Assert.AreEqual(POIType.Resting, types[0]);
         if (count >= 2) Assert.AreEqual(POIType.Security, types[1]);
         if (count >= 3) Assert.AreEqual(POIType.Reception, types[2]);
-        for (int i = 3; i < Mathf.Min(5, count); i++)
-            Assert.Contains(types[i], new[] { POIType.Resting, POIType.Security });
+        if (count >= 4) Assert.AreEqual(POIType.Spawning, types[3]);
+        if (count >= 5) Assert.AreEqual(POIType.Garage, types[4]);
         if (count >= 6)
-            Assert.AreEqual(POIType.Garage, types[5]);
-        if (count >= 7)
-            Assert.AreEqual(POIType.Conveyor, types[6]);
-        for (int i = 7; i < count; i++)
-            Assert.AreNotEqual(POIType.None, types[i]);
+            Assert.AreEqual(POIType.Conveyor, types[5]);
+        for (int i = 6; i < count; i++)
+            Assert.Contains(types[i], new[]
+            {
+                POIType.Resting, POIType.Security, POIType.Spawning, POIType.Furnace,
+                POIType.Junks, POIType.Deads, POIType.CubeCollector
+            });
         Assert.LessOrEqual(types.Count(type => type == POIType.Reception), 1);
+        Assert.LessOrEqual(types.Count(type => type == POIType.Garage), 1);
+        Assert.LessOrEqual(types.Count(type => type == POIType.Conveyor), 1);
     }
 
     [Test]
@@ -102,9 +106,35 @@ public class GridFactoryTests
     }
 
     [Test]
+    public void POIRoomTypeSelector_MoralityUsesAsymmetricThresholds()
+    {
+        foreach (POIType type in new[]
+        {
+            POIType.Resting, POIType.Security, POIType.Spawning, POIType.Furnace,
+            POIType.Junks, POIType.Deads, POIType.CubeCollector
+        })
+        {
+            Assert.AreEqual(1f, POIRoomTypeSelector.GetWeight(type, 0f));
+        }
+
+        Assert.AreEqual(POIRoomTypeSelector.GetWeight(POIType.Security, 5f),
+            POIRoomTypeSelector.GetWeight(POIType.Security, 100f));
+        Assert.AreEqual(POIRoomTypeSelector.GetWeight(POIType.Spawning, -20f),
+            POIRoomTypeSelector.GetWeight(POIType.Spawning, -100f));
+
+        Assert.Greater(POIRoomTypeSelector.GetWeight(POIType.Security, 5f), 1f);
+        Assert.Greater(POIRoomTypeSelector.GetWeight(POIType.CubeCollector, 5f), 1f);
+        Assert.Greater(POIRoomTypeSelector.GetWeight(POIType.Junks, 5f), 1f);
+        Assert.Greater(POIRoomTypeSelector.GetWeight(POIType.Spawning, -20f), 1f);
+        Assert.Greater(POIRoomTypeSelector.GetWeight(POIType.Furnace, -20f), 1f);
+        Assert.Greater(POIRoomTypeSelector.GetWeight(POIType.Deads, -20f), 1f);
+        Assert.Less(POIRoomTypeSelector.GetWeight(POIType.CubeCollector, -20f), 1f);
+    }
+
+    [Test]
     public void AssignPOICells_ClampsToAvailableWorkCellsWithoutReplacingEndpoints()
     {
-        _factory.CreateGrid(2, 2, 0);
+        _factory.CreateGrid(2, 2);
         _factory.AssignStartAndEndCells(new EndpointsFactory(), 2, 2);
         _factory.AssignPOICells(new EndpointsFactory(), 20, 2, 2);
 
@@ -116,7 +146,7 @@ public class GridFactoryTests
     [Test]
     public void AssignPOICells_NegativeCountCreatesNoPOIs()
     {
-        _factory.CreateGrid(2, 2, 0);
+        _factory.CreateGrid(2, 2);
         _factory.AssignStartAndEndCells(new EndpointsFactory(), 2, 2);
         _factory.AssignPOICells(new EndpointsFactory(), -1, 2, 2);
 
@@ -126,7 +156,7 @@ public class GridFactoryTests
     [Test]
     public void AssignStartAndEndCells_RejectsSingleCellGrid()
     {
-        _factory.CreateGrid(1, 1, 0);
+        _factory.CreateGrid(1, 1);
         Assert.Throws<System.InvalidOperationException>(() =>
             _factory.AssignStartAndEndCells(new EndpointsFactory(), 1, 1));
     }
@@ -134,7 +164,7 @@ public class GridFactoryTests
     [Test]
     public void AssignStartAndEndCells_UsesDistinctEndpointsOnOneByTwoGrid()
     {
-        _factory.CreateGrid(1, 2, 0);
+        _factory.CreateGrid(1, 2);
         _factory.AssignStartAndEndCells(new EndpointsFactory(), 1, 2);
 
         Assert.AreEqual(1, _factory.cellDataGrid.Values.Count(cell => cell.cellProperties.usageType == UsageType.Start));
@@ -142,22 +172,18 @@ public class GridFactoryTests
     }
 
     [Test]
-    public void AssignBlockedCells_MarksCells()
+    public void CreateGrid_DoesNotCreateBlockedCells()
     {
-        _factory.CreateGrid(3, 3, 0);
-        _factory.AssignBlockedCells(2);
+        _factory.CreateGrid(3, 3);
 
-        int blocked = 0;
-        foreach (var cell in _factory.cellDataGrid.Values)
-            if (cell.cellProperties.usageType == UsageType.Blocked) blocked++;
-
-        Assert.AreEqual(2, blocked);
+        Assert.IsFalse(_factory.cellDataGrid.Values.Any(cell =>
+            cell.cellProperties.usageType == UsageType.Blocked));
     }
 
     [Test]
     public void SolvePaths_CalculatesPaths()
     {
-        _factory.CreateGrid(3, 2, 0);
+        _factory.CreateGrid(3, 2);
         var start = new Vector2(0f, 0f);
         var end = new Vector2(2f, 0f);
         typeof(GridFactory).GetField("startPosition", BindingFlags.NonPublic | BindingFlags.Instance)
@@ -167,7 +193,7 @@ public class GridFactoryTests
         _factory.cellDataGrid[start].cellProperties.usageType = UsageType.Start;
         _factory.cellDataGrid[end].cellProperties.usageType = UsageType.End;
 
-        _factory.SolvePaths(0, 0, new PathSolver(_factory, new PathFinder()), 3, 2);
+        _factory.SolvePaths(new PathSolver(_factory, new PathFinder()), 3, 2);
 
         // Expect that some cells are marked as path
         bool anyPath = false;

@@ -47,7 +47,6 @@ MonoBehaviour:
   cellWidth: 47
   cellHeight: 11
   mapConfig: {fileID: 11400000, guid: 154e1c44ead135e45a902eca0495e1ec, type: 2}
-  blockedPrefab: {fileID: 542146199199913260, guid: 27a6b4d046762a446821621f345c75d1, type: 3}
   startPrefab: {fileID: 542146199199913260, guid: b6280165da96e5042ac64d6d6fcd9697, type: 3}
   endPrefab: {fileID: 542146199199913260, guid: 54e02337c6434194292e57d54ded47ac, type: 3}
   defaultPOI_Prefab: {fileID: 542146199199913260, guid: aa10a0eddcd108a49ac56f7543d53821, type: 3}

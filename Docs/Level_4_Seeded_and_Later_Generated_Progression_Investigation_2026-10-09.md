@@ -30,7 +30,7 @@ The seed alone does not fully describe a generated map. Reproducing the referenc
 | Grid width | 4 |
 | Grid height | 2 |
 | POI cells | 3 |
-| Blocked cells | 0 |
+| Blocked cells | Removed; Spawning is POI slot 4 |
 | Seed | `282899` |
 | Randomize seed | Off |
 | Workers | 2 |
@@ -38,7 +38,7 @@ The seed alone does not fully describe a generated map. Reproducing the referenc
 
 This should be stored as a dedicated `RunMapConfigSO` asset, tentatively named `Setup Level 4`, rather than changing `Setup Level 1` or `Setup Level 2`.
 
-The requested testing rule overrides the image's displayed POI count of 2. Level 4 must request 3 POIs so its opening room sequence is always POI 1 Resting, POI 2 Security, and POI 3 Reception. POI slots 4 and later retain the existing selection rules. The same slot rule applies to fixed Levels 5-7 and random Level 8 onward.
+The requested testing rule overrides the image's displayed POI count of 2. Level 4 requests 3 POIs, so its opening sequence is POI 1 Resting, POI 2 Security, and POI 3 Reception. Maps with at least four POIs add Spawning at slot 4; Garage and Conveyor occupy slots 5 and 6; morality-weighted selection begins at slot 7. The same rules apply to fixed Levels 5-7 and random Level 8 onward.
 
 ## What Already Exists
 
@@ -97,7 +97,7 @@ Fixed Levels 4-7 should reference their assets directly from their `RunStepDefin
 - it depends on mutable list contents and legacy fallback ordering;
 - it uses the global Unity random stream for growth choices;
 - its seed comes from `DateTime.Now.GetHashCode()`, which is not an inspectable run seed policy;
-- it can increase `blockedCount`, which can make a larger grid feel more obstructed rather than simply broader;
+- it must not create blocked cells; larger maps grow through dimensions and POIs instead;
 - capacity is clamped only by global maxima, not by the number of cells available after Start and End.
 
 The start of procedural growth should be explicit: fixed configs through Level 7, then dynamic generation beginning at Level 8.
@@ -146,7 +146,7 @@ Recommended rules:
 2. Increase width or height by one, alternating or using a deterministic choice, until the current maximum of 10 by 10.
 3. Increase POIs gradually, never beyond `gridWidth * gridHeight - 2`.
 4. Increase workers and enemies gradually within their existing caps.
-5. Increase blocked cells more slowly than total area so navigable space still grows.
+5. Keep all non-POI, non-path cells as Work cells; blocked-cell growth has been removed.
 6. Cache the generated config for the active run so restarting the same current level does not silently produce a different map.
 7. Recreate random configs on a new run unless future save requirements say they must persist across runs.
 
@@ -224,7 +224,7 @@ For Levels 5 and 6, and probably Level 7, capture all fields shown in the genera
 - width;
 - height;
 - POI cells;
-- blocked cells;
+- the fixed Spawning POI and morality-weighted POIs from slot 7 onward;
 - workers;
 - enemies;
 - seed;

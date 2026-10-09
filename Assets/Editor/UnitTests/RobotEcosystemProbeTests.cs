@@ -638,8 +638,7 @@ public class RobotEcosystemProbeTests
         public RoomWaypoint GetFirstRestPoint(RoomWaypoint exclude = null) => null;
         public RoomWaypoint GetFirstFreeSecurityPoint() => null;
         public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null) => null;
-        public RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null) => null;
-        public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null) => null;
+        public RoomWaypoint GetSpawningRoomWaypoint(RoomWaypoint exclude = null) => null;
         public bool IsPOIReserved(RoomWaypoint poi) => false;
         public void ReleaseInvalidReservations() { }
         public void ReleasePOI(RoomWaypoint poi) { }

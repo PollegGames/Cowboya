@@ -39,7 +39,6 @@ public class RunProgressManager : MonoBehaviour
     // Maximum allowed values for dynamically generated configurations
     private const int MaxGridSize = 10;      // Maximum grid width/height
     private const int MaxPoiCount = 20;      // Maximum number of points of interest
-    private const int MaxBlockedCount = 10;  // Maximum number of blocked cells
     private const int MaxEnemiesCount = 20;  // Maximum number of enemies
     private const int MaxWorkersCount = 40;  // Maximum number of workers
 
@@ -408,7 +407,6 @@ public class RunProgressManager : MonoBehaviour
         newConfig.gridWidth = baseConfig.gridWidth;
         newConfig.gridHeight = baseConfig.gridHeight;
         newConfig.poiCount = baseConfig.poiCount;
-        newConfig.blockedCount = baseConfig.blockedCount;
         newConfig.workersCount = baseConfig.workersCount;
         newConfig.enemiesCount = baseConfig.enemiesCount;
 
@@ -428,14 +426,7 @@ public class RunProgressManager : MonoBehaviour
             increment += 2;
         }
 
-        if (Random.value > 0.5f)
-        {
-            newConfig.poiCount += increment;
-        }
-        else
-        {
-            newConfig.blockedCount += increment;
-        }
+        newConfig.poiCount += increment;
 
         newConfig.workersCount += increment;
         newConfig.enemiesCount += increment;
@@ -444,7 +435,6 @@ public class RunProgressManager : MonoBehaviour
         newConfig.gridWidth = Mathf.Min(newConfig.gridWidth, MaxGridSize);
         newConfig.gridHeight = Mathf.Min(newConfig.gridHeight, MaxGridSize);
         newConfig.poiCount = Mathf.Min(newConfig.poiCount, MaxPoiCount);
-        newConfig.blockedCount = Mathf.Min(newConfig.blockedCount, MaxBlockedCount);
         newConfig.enemiesCount = Mathf.Min(newConfig.enemiesCount, MaxEnemiesCount);
         newConfig.workersCount = Mathf.Min(newConfig.workersCount, MaxWorkersCount);
 

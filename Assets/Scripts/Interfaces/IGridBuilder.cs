@@ -3,5 +3,5 @@ using UnityEngine;
 
 public interface IGridBuilder
 {
-    Dictionary<Vector2, Cell> BuildGrid(int width, int height, int wallCount, int poiCount);
+    Dictionary<Vector2, Cell> BuildGrid(int width, int height, int poiCount, float morality);
 }

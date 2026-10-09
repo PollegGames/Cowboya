@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -13,6 +14,15 @@ public class RoomSpawnRobotCollectorPrefabTests {
         StringAssert.Contains("usageType: 4", yaml);
         StringAssert.Contains("poiType: 1", yaml);
         StringAssert.Contains("  - {fileID: 8810024028455475932}", yaml);
+    }
+
+    [Test]
+    public void SpawningRoomHasWorkerSpawnerWaypoint() {
+        GameObject room = LoadRoomPrefab("ROOM_Spawning");
+        RoomWaypoint[] waypoints = room.GetComponentsInChildren<RoomWaypoint>(true);
+
+        Assert.IsTrue(waypoints.Any(waypoint => waypoint.type == WaypointType.Spawner),
+            "ROOM_Spawning must expose a Spawner waypoint for its worker-spawner robot.");
     }
 
     [Test]

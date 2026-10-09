@@ -9,7 +9,6 @@ public class RunMapConfigSO : ScriptableObject
 
     [Header("Rooms")]
     public int poiCount = 1;
-    public int blockedCount = 1;
 
     [Header("Enemies")]
     public int workersCount = 1;

@@ -3,27 +3,27 @@ using UnityEngine;
 
 public class GridManager
 {
-    private int gridWidth, gridHeight, cellWidth, cellHeight, wallCount, pointsOfInterestCount;
+    private int gridWidth, gridHeight, cellWidth, cellHeight, pointsOfInterestCount;
+    private float morality;
     private GridFactory gridFactory;
 
-    public GridManager(int gridWidth, int gridHeight, int cellWidth, int cellHeight, int wallCount, int pointsOfInterestCount)
+    public GridManager(int gridWidth, int gridHeight, int cellWidth, int cellHeight, int pointsOfInterestCount, float morality = 0f)
     {
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
         this.cellWidth = cellWidth;
         this.cellHeight = cellHeight;
-        this.wallCount = wallCount;
         this.pointsOfInterestCount = pointsOfInterestCount;
+        this.morality = morality;
         gridFactory = new GridFactory();
     }
 
     public Dictionary<Vector2, Cell> CreateAndInitializeGrid()
     {
-        gridFactory.CreateGrid(gridWidth, gridHeight, 0);
+        gridFactory.CreateGrid(gridWidth, gridHeight);
         gridFactory.AssignStartAndEndCells(new EndpointsFactory(), gridWidth, gridHeight);
-        gridFactory.AssignPOICells(new EndpointsFactory(), pointsOfInterestCount, gridWidth, gridHeight);
-        gridFactory.SolvePaths(pointsOfInterestCount, wallCount, new PathSolver(gridFactory, new PathFinder()), gridHeight, gridWidth);
-        gridFactory.AssignBlockedCells(wallCount);
+        gridFactory.AssignPOICells(new EndpointsFactory(), pointsOfInterestCount, gridWidth, gridHeight, morality);
+        gridFactory.SolvePaths(new PathSolver(gridFactory, new PathFinder()), gridHeight, gridWidth);
 
         return gridFactory.cellDataGrid;
     }

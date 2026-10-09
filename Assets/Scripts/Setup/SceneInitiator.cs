@@ -310,7 +310,8 @@ public class SceneInitiator : GameInitiator
         {
             int securityGuardsCount = mapConfig.securityGuardsCount;
             enemiesSpawner.CreateWorkers(mapConfig.workersCount);
-            enemiesSpawner.CreateWorkerSpawners(mapConfig.blockedCount);
+            int spawningRoomCount = mapManager != null ? mapManager.GetPOIRoomCount(POIType.Spawning) : 0;
+            enemiesSpawner.CreateWorkerSpawners(spawningRoomCount);
             enemiesSpawner.CreateSecurityGuards(securityGuardsCount);
             enemiesSpawner.CreateBoss();
         }

@@ -357,24 +357,25 @@ public class WaypointService : MonoBehaviour, IWaypointService
         return machines.FirstOrDefault();
     }
 
-    //Get the center point of a blocked room
-    public RoomWaypoint GetBlockedRoomSecuritySpawning(RoomWaypoint exclude = null)
+    /// <summary>Returns an available worker-spawner waypoint in a Spawning POI room.</summary>
+    public RoomWaypoint GetSpawningRoomWaypoint(RoomWaypoint exclude = null)
     {
         PruneReservationData();
 
-        var blockedRooms = registry
+        var spawningRooms = registry
             .GetAllWaypoints()
             .Where(wp =>
-                wp.parentRoom.roomProperties.usageType == UsageType.Blocked
+                wp.parentRoom.roomProperties.usageType == UsageType.POI
+                && wp.parentRoom.roomProperties.poiType == POIType.Spawning
                 && wp.type == WaypointType.Spawner
                 && wp != exclude
                 && !reservedWaypoints.Contains(wp)
             )
             .ToList();
 
-        if (blockedRooms.Any())
+        if (spawningRooms.Any())
         {
-            var best = blockedRooms
+            var best = spawningRooms
                 .OrderBy(wp => workSpawnersUsageCounts.TryGetValue(wp, out var c) ? c : 0)
                 .First();
             workSpawnersUsageCounts[best] = workSpawnersUsageCounts.TryGetValue(best, out var count)
@@ -382,57 +383,12 @@ public class WaypointService : MonoBehaviour, IWaypointService
                 : 1;
             reservedWaypoints.Add(best);
             Debug.Log(
-                $"[WaypointReservation] Assigned BLOCKED ROOM CENTER '{best.WorldPos}' (count={workSpawnersUsageCounts[best]})."
+                $"[WaypointReservation] Assigned SPAWNING POI '{best.WorldPos}' (count={workSpawnersUsageCounts[best]})."
             );
             return best;
         }
 
         return null;
-    }
-
-    public RoomWaypoint GetBlockedRoomCenter(RoomWaypoint exclude = null)
-    {
-        PruneReservationData();
-
-        var blockedRooms = registry
-            .GetAllWaypoints()
-            .Where(wp =>
-                wp.parentRoom.roomProperties.usageType == UsageType.Blocked
-                && wp.type == WaypointType.Center
-                && wp != exclude
-                && !reservedWaypoints.Contains(wp)
-            )
-            .ToList();
-
-        if (blockedRooms.Any())
-        {
-            var best = blockedRooms
-                .OrderBy(wp => workSpawnersUsageCounts.TryGetValue(wp, out var c) ? c : 0)
-                .First();
-            workSpawnersUsageCounts[best] = workSpawnersUsageCounts.TryGetValue(best, out var count)
-                ? count + 1
-                : 1;
-            reservedWaypoints.Add(best);
-            Debug.Log(
-                $"[WaypointReservation] Assigned BLOCKED ROOM CENTER '{best.WorldPos}' (count={workSpawnersUsageCounts[best]})."
-            );
-            return best;
-        }
-        Debug.LogWarning("[WaypointReservation] No blocked room center found.");
-        blockedRooms = registry
-            .GetAllWaypoints()
-            .Where(wp =>
-                wp.parentRoom.roomProperties.usageType == UsageType.Blocked
-                && wp.type == WaypointType.Center
-                && wp != exclude
-            )
-            .ToList();
-        var blocked = blockedRooms.FirstOrDefault();
-        if (blocked == null)
-        {
-            blocked = GetStartPoint();
-        }
-        return blocked;
     }
 
     public RoomWaypoint GetSecurityOrRestPoint(RoomWaypoint exclude = null)
