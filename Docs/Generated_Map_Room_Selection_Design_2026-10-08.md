@@ -43,7 +43,8 @@ Room selection uses the POI's one-based slot:
 |---|---|
 | 1 | Always Resting |
 | 2 | Always Security |
-| 3-5 | Randomly select Resting, Security, or Reception |
+| 3 | Always Reception |
+| 4-5 | Randomly select Resting, Security, or Reception |
 | 6 | Always Garage |
 | 7 | Always Conveyor |
 | 8+ | Randomly select from the complete eligible generated-room pool except Laboratory |
@@ -53,7 +54,8 @@ These rules imply:
 - A map with at least one POI always contains Resting.
 - A map with at least two POIs always contains Security.
 - POI 2 is the Security guarantee; a second special Security insertion is not required.
-- Reception can appear randomly in slots 3-5 and is not guaranteed on maps with fewer than three POIs.
+- Reception is guaranteed in slot 3 when the map has at least three effective POIs.
+- Additional Reception rooms can appear randomly in slots 4-5.
 - A map with at least seven effective POIs always contains both Garage and Conveyor.
 - Garage and Conveyor cannot appear in slots 1-5 and cannot be split across the 6/7 threshold.
 - Slots 8 and later may contain any eligible generated room except Laboratory, including additional Garage or Conveyor rooms.
@@ -108,7 +110,7 @@ For a map with eight POIs:
 ```text
 POI 1: Resting
 POI 2: Security
-POI 3: Resting, Security, or Reception
+POI 3: Reception
 POI 4: Resting, Security, or Reception
 POI 5: Resting, Security, or Reception
 POI 6: Garage
@@ -127,9 +129,9 @@ There is no global minimum that automatically changes `poiCount`. The configured
 | 0 | No POIs |
 | 1 | Resting only |
 | 2 | Resting, then Security |
-| 3 | Resting, Security, then one random Resting/Security/Reception room |
-| 4 | Resting, Security, then two random Resting/Security/Reception rooms |
-| 5 | Resting, Security, then three random Resting/Security/Reception rooms |
+| 3 | Resting, Security, then Reception |
+| 4 | Resting, Security, Reception, then one random Resting/Security/Reception room |
+| 5 | Resting, Security, Reception, then two random Resting/Security/Reception rooms |
 | 6 | The first five rules, then Garage; no Conveyor yet because slot 7 does not exist |
 | 7 | The first five rules, then Garage and Conveyor in slots 6 and 7 |
 | 8+ | The seven fixed/compact rules, followed by unrestricted random non-Laboratory rooms |
@@ -140,7 +142,7 @@ The current configuration intent is therefore preserved:
 
 - `Setup Tutorial`: one POI, Resting only.
 - `Setup Level 1`: two POIs, Resting and Security.
-- `Setup Level 2`: three POIs, Resting, Security, and one random Resting/Security/Reception room.
+- `Setup Level 2`: three POIs, Resting, Security, and Reception.
 - `Setup StressTest`: five POIs, using only Resting, Security, and Reception.
 
 To guarantee the Garage-Conveyor pair, a configuration must request at least seven POIs and have enough eligible cells to create them. The unrestricted pool begins at eight POIs.
@@ -273,7 +275,8 @@ Add focused Edit Mode tests covering:
    - Exactly one Security is guaranteed.
 
 4. **POIs 3-5**
-   - Every type in those slots is Resting, Security, or Reception.
+   - POI 3 is Reception.
+   - POIs 4 and 5 are Resting, Security, or Reception.
    - No expanded-pool type appears in the first five slots.
 
 5. **Fixed functional pair**

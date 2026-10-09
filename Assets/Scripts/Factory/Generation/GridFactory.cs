@@ -174,6 +174,8 @@ public static class POIRoomTypeSelector
             return POIType.Resting;
         if (slot == 2)
             return POIType.Security;
+        if (slot == 3)
+            return POIType.Reception;
         if (slot <= 5)
             return CompactPool[UnityEngine.Random.Range(0, CompactPool.Length)];
         if (slot == 6)

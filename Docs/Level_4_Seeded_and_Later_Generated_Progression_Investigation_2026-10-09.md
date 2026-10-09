@@ -29,7 +29,7 @@ The seed alone does not fully describe a generated map. Reproducing the referenc
 |---|---:|
 | Grid width | 4 |
 | Grid height | 2 |
-| POI cells | 2 |
+| POI cells | 3 |
 | Blocked cells | 0 |
 | Seed | `282899` |
 | Randomize seed | Off |
@@ -38,7 +38,7 @@ The seed alone does not fully describe a generated map. Reproducing the referenc
 
 This should be stored as a dedicated `RunMapConfigSO` asset, tentatively named `Setup Level 4`, rather than changing `Setup Level 1` or `Setup Level 2`.
 
-With the current room-selection rules, two POIs mean POI 1 is Resting and POI 2 is Security. This agrees with the compact map intent documented for small maps.
+The requested testing rule overrides the image's displayed POI count of 2. Level 4 must request 3 POIs so its opening room sequence is always POI 1 Resting, POI 2 Security, and POI 3 Reception. POI slots 4 and later retain the existing selection rules. The same slot rule applies to fixed Levels 5-7 and random Level 8 onward.
 
 ## What Already Exists
 
@@ -184,7 +184,7 @@ Although laboratory gameplay is not required now, keeping the step is important 
 
 ## Implementation Plan After Seed Selection
 
-1. Create `Setup Level 4.asset` using the exact values from the reference image.
+1. Create `Setup Level 4.asset` using the reference image values, except set POIs to 3 to guarantee Reception after Resting and Security.
 2. Add explicit generated steps for Level 4 and its following Laboratory visit to the `RunProgressManager` prefab.
 3. Replace the hardcoded generated-level base of 6 with playable-step counting and add tests covering Levels 1-8.
 4. Create `Setup Level 5.asset` and `Setup Level 6.asset` after their seeds and complete grid/count settings are supplied.
@@ -234,7 +234,8 @@ Until those values are available, the implementation can safely add Level 4, but
 
 ## Acceptance Criteria
 
-- Level 4 uses a dedicated config with seed `282899` and the reference image's full settings.
+- Level 4 uses a dedicated config with seed `282899`, the reference image's settings, and 3 POIs.
+- Every generated map with at least 3 effective POIs starts with Resting, Security, then Reception.
 - The internal playable level number is 4, not 6, when that map is active.
 - The run always enters `Level_Laboratory` between playable levels.
 - Levels 5-7 can receive fixed configs without creating new scenes or changing transition code.

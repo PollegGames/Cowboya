@@ -73,7 +73,8 @@ public class GridFactoryTests
         Assert.AreEqual(count, types.Count);
         if (count >= 1) Assert.AreEqual(POIType.Resting, types[0]);
         if (count >= 2) Assert.AreEqual(POIType.Security, types[1]);
-        for (int i = 2; i < Mathf.Min(5, count); i++)
+        if (count >= 3) Assert.AreEqual(POIType.Reception, types[2]);
+        for (int i = 3; i < Mathf.Min(5, count); i++)
             Assert.Contains(types[i], new[] { POIType.Resting, POIType.Security, POIType.Reception });
         if (count >= 6)
             Assert.AreEqual(POIType.Garage, types[5]);
