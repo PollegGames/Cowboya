@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.TestTools;
 
 public class GridFactoryTests
 {
@@ -132,8 +133,23 @@ public class GridFactoryTests
     }
 
     [Test]
+    public void POIRoomTypeSelector_DescribesEveryRandomRoomWeight()
+    {
+        string description = POIRoomTypeSelector.DescribeWeights(5f);
+
+        foreach (POIType type in new[]
+        {
+            POIType.Resting, POIType.Security, POIType.Spawning, POIType.Furnace,
+            POIType.Junks, POIType.Deads, POIType.CubeCollector
+        })
+            StringAssert.Contains(type.ToString(), description);
+    }
+
+    [Test]
     public void AssignPOICells_ClampsToAvailableWorkCellsWithoutReplacingEndpoints()
     {
+        LogAssert.Expect(LogType.Warning,
+            "Grid capacity provides only 2 POI cells; all 6 fixed POIs cannot be generated.");
         _factory.CreateGrid(2, 2);
         _factory.AssignStartAndEndCells(new EndpointsFactory(), 2, 2);
         _factory.AssignPOICells(new EndpointsFactory(), 20, 2, 2);

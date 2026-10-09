@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class GridFactory
 {
+    private const int FixedPOICount = 6;
     public Dictionary<Vector2, Cell> cellDataGrid;
     private Vector2 startPosition, endPosition;
     private List<Vector2> poiPositions = new();
@@ -66,6 +67,12 @@ public class GridFactory
 
         int requestedCount = pointsOfInterestCount;
         int effectiveCount = Mathf.Clamp(requestedCount, 0, eligibleCells.Count);
+        if (requestedCount >= FixedPOICount && eligibleCells.Count < FixedPOICount)
+        {
+            Debug.LogWarning(
+                $"Grid capacity provides only {eligibleCells.Count} POI cells; " +
+                $"all {FixedPOICount} fixed POIs cannot be generated.");
+        }
         if (requestedCount < 0)
             Debug.LogWarning($"Invalid POI count {requestedCount}; using 0.");
         else if (requestedCount > eligibleCells.Count)
@@ -131,6 +138,12 @@ public static class POIRoomTypeSelector
 
     private static readonly float[] GoodWeights = { 0.5f, 4f, 0.25f, 0.5f, 3f, 0.5f, 4f };
     private static readonly float[] BadWeights = { 0.5f, 0.25f, 3f, 4f, 0.5f, 2f, 0.25f };
+
+    /// <summary>Returns a concise description of the random-room weights at the supplied morality.</summary>
+    public static string DescribeWeights(float morality)
+    {
+        return string.Join(", ", RandomPool.Select(type => $"{type} {GetWeight(type, morality):0.##}"));
+    }
 
     /// <summary>Returns the room type for a one-based POI slot.</summary>
     public static POIType Select(int slot, float morality = 0f)

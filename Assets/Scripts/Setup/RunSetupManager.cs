@@ -21,18 +21,9 @@ public class RunSetupManager : MonoBehaviour
 
     [Header("Config SO (persistent)")]
     [SerializeField] private RunMapConfigSO config;
-    [SerializeField] private VictorySetup victorySetup;
-
-    [Header("Services")]
-    [SerializeField] private FactoryManager factoryManagerPrefab;
-    private FactoryManager factoryManagerInstance;
+    [Header("Preview Map")]
     [SerializeField] private MapManager mapManagerPrefab;
     private MapManager mapManagerInstance;
-    [SerializeField] private WaypointService waypointServicePrefab;
-
-    [SerializeField] private EnemiesSpawner enemiesSpawnerPrefab;
-    private IEnemiesSpawner enemiesSpawnerInstance;
-    private WaypointService waypointServiceInstance;
 
     // =============== Internal UI references
     private VisualElement root;
@@ -45,7 +36,7 @@ public class RunSetupManager : MonoBehaviour
     private TextField seedField;
     private Toggle randomSeedToggle;
     private Button validateButton, runButton;
-    private Label statusLabel, cellsAvailableLabel;
+    private Label statusLabel, cellsAvailableLabel, generationDebugLabel;
 
     // =====================================================================
     // LIFECYCLE
@@ -90,6 +81,7 @@ public class RunSetupManager : MonoBehaviour
         runButton = root.Q<Button>("run-button");
         statusLabel = root.Q<Label>("status-label");
         cellsAvailableLabel = root.Q<Label>("cells-available-label");
+        generationDebugLabel = root.Q<Label>("generation-debug-label");
         previewVE = root.Q<VisualElement>("preview");
 
         widthField.RegisterValueChangedCallback(evt => UpdateCellsAndConstraints());
@@ -272,26 +264,21 @@ public class RunSetupManager : MonoBehaviour
     private void ShowRealPreview()
     {
         DestroyOldInstances();
-        RobotDomainEventAdapter.EnsureInScene();
-        factoryManagerInstance = Instantiate(factoryManagerPrefab);
         mapManagerInstance = Instantiate(mapManagerPrefab);
         var gridBuilder = mapManagerInstance.gameObject.AddComponent<GridBuilder>();
         var roomRenderer = mapManagerInstance.gameObject.AddComponent<RoomRenderer>();
         var roomProcessor = mapManagerInstance.gameObject.AddComponent<RoomProcessor>();
         mapManagerInstance.Construct(gridBuilder, roomRenderer, roomProcessor);
-        waypointServiceInstance = Instantiate(waypointServicePrefab);
-        enemiesSpawnerInstance = Instantiate(enemiesSpawnerPrefab);
-        enemiesSpawnerInstance.SetDropContainer(factoryManagerInstance.transform);
-        enemiesSpawnerInstance.Initialize(mapManagerInstance, waypointServiceInstance, null, null, factoryManagerInstance, factoryManagerInstance.SecurityManager, null, null);
-
         miniMapPreviewInstance = Instantiate(miniMapPreviewPrefab);
 
         // 1) Build the grid
         if (mapManagerInstance != null)
-            mapManagerInstance.BuildFromConfig(config);
-        if (factoryManagerInstance != null)
         {
-            factoryManagerInstance.Initialize(mapManagerInstance, waypointServiceInstance, victorySetup, enemiesSpawnerInstance);
+            mapManagerInstance.BuildFromConfig(config);
+            mapManagerInstance.InitializeGrid();
+            generationDebugLabel.text =
+                $"Effective morality: {mapManagerInstance.EffectiveMorality:0.##}\n" +
+                $"Random POI weights: {POIRoomTypeSelector.DescribeWeights(mapManagerInstance.EffectiveMorality)}";
         }
         Bounds bounds = mapManagerInstance.GetGridWorldBounds();
 
@@ -320,29 +307,17 @@ public class RunSetupManager : MonoBehaviour
 
     private void DestroyOldInstances()
     {
-        if (factoryManagerInstance != null)
-        {
-            Destroy(factoryManagerInstance.gameObject);
-            factoryManagerInstance = null;
-        }
         if (mapManagerInstance != null)
         {
+            mapManagerInstance.gameObject.SetActive(false);
             Destroy(mapManagerInstance.gameObject);
             mapManagerInstance = null;
         }
-        if (waypointServiceInstance != null)
-        {
-            Destroy(waypointServiceInstance.gameObject);
-            waypointServiceInstance = null;
-        }
         if (miniMapPreviewInstance != null)
         {
+            miniMapPreviewInstance.SetActive(false);
             Destroy(miniMapPreviewInstance);
             miniMapPreviewInstance = null;
-        }
-        if (enemiesSpawnerInstance != null)
-        {
-            enemiesSpawnerInstance = null;
         }
     }
 

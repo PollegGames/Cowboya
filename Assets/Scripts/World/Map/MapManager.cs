@@ -44,6 +44,10 @@ public class MapManager : MonoBehaviour
     private int gridHeight = 8;
     private int pointsOfInterestCount = 3;
     private float morality;
+    private string seed;
+
+    /// <summary>Gets the morality value used by the most recent map build.</summary>
+    public float EffectiveMorality => morality;
 
     public void Construct(IGridBuilder builder, IRoomRenderer renderer, IRoomProcessor processor)
     {
@@ -60,6 +64,7 @@ public class MapManager : MonoBehaviour
         gridWidth = cfg.gridWidth;
         gridHeight = cfg.gridHeight;
         pointsOfInterestCount = cfg.poiCount;
+        seed = cfg.seed;
         morality = RunProgressManager.Instance != null && RunProgressManager.Instance.RunStats != null
             ? RunProgressManager.Instance.RunStats.Morality
             : 0f;
@@ -169,6 +174,16 @@ public class MapManager : MonoBehaviour
             workPrefab);
 
         gridManager.AssignRoomProperties(roomInstances, cellDataGrid);
+
+        string orderedPOIs = string.Join(", ", cellDataGrid.Values
+            .Select(cell => cell.cellProperties)
+            .Where(properties => properties.usageType == UsageType.POI)
+            .OrderBy(properties => properties.POISlot)
+            .Select(properties => $"{properties.POISlot}:{properties.poiType}"));
+        Debug.Log(
+            $"Generated map: seed={seed}, morality={morality:0.##}, POIs=[{orderedPOIs}]. " +
+            $"Random weights: {POIRoomTypeSelector.DescribeWeights(morality)}",
+            this);
     }
 
     /// <summary>
@@ -337,7 +352,7 @@ public class MapManager : MonoBehaviour
         unusedPOIPositions.RemoveAt(idx);
         return poiPos;
     }
-    
+
     private List<Vector3> unusedWorkPositions = new List<Vector3>();
     public Vector3 GetRandomWorkPosition()
     {

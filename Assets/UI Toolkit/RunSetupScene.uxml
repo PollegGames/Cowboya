@@ -42,6 +42,7 @@
         </engine:VisualElement>
         <engine:VisualElement class="right-panel vertical-layout" style="height: 946px; padding: 0 20px 0 10px; width: 1567px; margin: 29px; align-items: flex-start; justify-content: flex-start;">
             <engine:Label name="status-label" text="Waiting for validation…" class="section-title" style="-unity-text-align: upper-center; font-size: 30px; width: 1324px;" />
+            <engine:Label name="generation-debug-label" text="Effective morality and random POI weights appear after generation." class="generation-debug-label" />
             <engine:VisualElement name="preview" class="grid-preview" style="height: 710px; width: 1335px; margin-top: 0;" />
         </engine:VisualElement>
     </engine:VisualElement>
