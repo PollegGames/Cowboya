@@ -349,7 +349,7 @@ public class RunProgressManager : MonoBehaviour
             return currentLevelIndex;
 
         if (kind == RunStepKind.GeneratedLevel)
-            return 6 + GetGeneratedStepOrdinal(stepIndex);
+            return CountPlayableLevelsThroughStep(stepIndex);
 
         int staticLevelCount = 0;
         int max = Mathf.Min(stepIndex, runSteps.Count - 1);
@@ -360,6 +360,21 @@ public class RunProgressManager : MonoBehaviour
         }
 
         return Mathf.Max(1, staticLevelCount);
+    }
+
+    private int CountPlayableLevelsThroughStep(int stepIndex)
+    {
+        int playableLevelCount = 0;
+        for (int i = 0; i <= stepIndex; i++)
+        {
+            RunStepKind stepKind = GetStepKindAtIndex(i);
+            if (stepKind == RunStepKind.StaticLevel || stepKind == RunStepKind.GeneratedLevel)
+            {
+                playableLevelCount++;
+            }
+        }
+
+        return Mathf.Max(1, playableLevelCount);
     }
 
     private int GetGeneratedStepOrdinal(int stepIndex)
