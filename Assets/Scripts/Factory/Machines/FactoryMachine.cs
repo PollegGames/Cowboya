@@ -29,6 +29,7 @@ public sealed class FactoryMachine : BaseMachine
         base.Awake();
 
         meshRenderer = GetComponent<MeshRenderer>();
+        ResolveCubeConveyorController();
         ApplyMaterial();
         SubscribeCoreEvents();
         SubscribeConveyorEvents();
@@ -178,7 +179,21 @@ public sealed class FactoryMachine : BaseMachine
     {
         if (meshRenderer == null)
             meshRenderer = GetComponent<MeshRenderer>();
+        ResolveCubeConveyorController();
         ApplyMaterial();
+    }
+
+    private void ResolveCubeConveyorController()
+    {
+        if (cubeConveyorController != null)
+            return;
+
+        RoomManager room = GetComponentInParent<RoomManager>(true);
+        if (room != null)
+            cubeConveyorController = room.GetComponentInChildren<CubeConveyorController>(true);
+
+        if (cubeConveyorController == null)
+            cubeConveyorController = GetComponentInChildren<CubeConveyorController>(true);
     }
 
     private void ApplyMaterial()
