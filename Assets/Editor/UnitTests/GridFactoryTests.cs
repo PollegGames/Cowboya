@@ -75,13 +75,30 @@ public class GridFactoryTests
         if (count >= 2) Assert.AreEqual(POIType.Security, types[1]);
         if (count >= 3) Assert.AreEqual(POIType.Reception, types[2]);
         for (int i = 3; i < Mathf.Min(5, count); i++)
-            Assert.Contains(types[i], new[] { POIType.Resting, POIType.Security, POIType.Reception });
+            Assert.Contains(types[i], new[] { POIType.Resting, POIType.Security });
         if (count >= 6)
             Assert.AreEqual(POIType.Garage, types[5]);
         if (count >= 7)
             Assert.AreEqual(POIType.Conveyor, types[6]);
         for (int i = 7; i < count; i++)
             Assert.AreNotEqual(POIType.None, types[i]);
+        Assert.LessOrEqual(types.Count(type => type == POIType.Reception), 1);
+    }
+
+    [Test]
+    public void POIRoomTypeSelector_ReceptionCanOnlyAppearInThirdSlot()
+    {
+        for (int seed = 0; seed < 100; seed++)
+        {
+            Random.InitState(seed);
+            Assert.AreEqual(POIType.Reception, POIRoomTypeSelector.Select(3));
+
+            for (int slot = 1; slot <= 20; slot++)
+            {
+                if (slot != 3)
+                    Assert.AreNotEqual(POIType.Reception, POIRoomTypeSelector.Select(slot));
+            }
+        }
     }
 
     [Test]

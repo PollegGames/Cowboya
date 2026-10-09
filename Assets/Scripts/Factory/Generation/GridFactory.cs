@@ -150,10 +150,9 @@ public class GridFactory
 public static class POIRoomTypeSelector
 {
     private static readonly POIType[] CompactPool =
-        { POIType.Resting, POIType.Security, POIType.Reception };
+        { POIType.Resting, POIType.Security };
     private static readonly POIType[] CompletePool =
     {
-        POIType.Reception,
         POIType.Security,
         POIType.Resting,
         POIType.Spawning,
