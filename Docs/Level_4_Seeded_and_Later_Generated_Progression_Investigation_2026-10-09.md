@@ -38,7 +38,7 @@ The seed alone does not fully describe a generated map. Reproducing the referenc
 
 This should be stored as a dedicated `RunMapConfigSO` asset, tentatively named `Setup Level 4`, rather than changing `Setup Level 1` or `Setup Level 2`.
 
-The requested testing rule overrides the image's displayed POI count of 2. Level 4 requests 3 POIs, so its opening sequence is POI 1 Resting, POI 2 Security, and POI 3 Reception. Maps with at least four POIs add Spawning at slot 4; Garage and Conveyor occupy slots 5 and 6; morality-weighted selection begins at slot 7. The same rules apply to fixed Levels 5-7 and random Level 8 onward.
+The requested testing rule overrides the image's displayed POI count of 2. Level 4 requests 3 POIs, so its opening sequence is POI 1 Resting, POI 2 Reception, and POI 3 Security. Maps with at least four POIs add Spawning at slot 4; Garage and Conveyor occupy slots 5 and 6; morality-weighted selection begins at slot 7. The same rules apply to fixed Levels 5-7 and random Level 8 onward.
 
 ## What Already Exists
 
@@ -235,7 +235,7 @@ Until those values are available, the implementation can safely add Level 4, but
 ## Acceptance Criteria
 
 - Level 4 uses a dedicated config with seed `282899`, the reference image's settings, and 3 POIs.
-- Every generated map with at least 3 effective POIs starts with Resting, Security, then Reception.
+- Every generated map with at least 3 effective POIs starts with Resting, Reception, then Security.
 - The internal playable level number is 4, not 6, when that map is active.
 - The run always enters `Level_Laboratory` between playable levels.
 - Levels 5-7 can receive fixed configs without creating new scenes or changing transition code.

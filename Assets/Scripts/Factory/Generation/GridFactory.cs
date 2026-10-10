@@ -153,9 +153,9 @@ public static class POIRoomTypeSelector
         if (slot == 1)
             return POIType.Resting;
         if (slot == 2)
-            return POIType.Security;
-        if (slot == 3)
             return POIType.Reception;
+        if (slot == 3)
+            return POIType.Security;
         if (slot == 4)
             return POIType.Spawning;
         if (slot == 5)

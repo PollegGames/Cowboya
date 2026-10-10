@@ -1,6 +1,6 @@
 # Run Progression: Static Level 1, Laboratory, and Generated Levels
 
-This document describes the needed structure for the run flow. Generated levels use fixed POI slots 1-6 (Resting, Security, Reception, Spawning, Garage, Conveyor), then morality-weighted selection from slot 7 onward. Legacy blocked-cell generation and its setup parameter are removed.
+This document describes the needed structure for the run flow. Generated levels use fixed POI slots 1-6 (Resting, Reception, Security, Spawning, Garage, Conveyor), then morality-weighted selection from slot 7 onward. Legacy blocked-cell generation and its setup parameter are removed.
 
 ## Goal
 

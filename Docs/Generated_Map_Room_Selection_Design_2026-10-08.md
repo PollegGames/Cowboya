@@ -15,8 +15,8 @@ The old `blockedCount` configuration parameter and the Blocked Cells setup contr
 | POI slot | Room type |
 |---:|---|
 | 1 | Resting |
-| 2 | Security |
-| 3 | Reception |
+| 2 | Reception |
+| 3 | Security |
 | 4 | Spawning |
 | 5 | Garage |
 | 6 | Conveyor |

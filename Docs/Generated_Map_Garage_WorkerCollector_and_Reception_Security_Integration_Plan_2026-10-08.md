@@ -41,10 +41,11 @@ This plan is based on the current implementations and designs in:
 `GridFactory` and `POIRoomTypeSelector` already support `Reception`, `Garage`, `Conveyor`, and `Resting`, but the selector must be changed to the required fixed-slot contract:
 
 - slot 1: guaranteed Resting;
-- slot 2: guaranteed Security;
-- slots 3-5: random Resting, Security, or Reception;
-- slot 6: guaranteed Garage;
-- slot 7: guaranteed Conveyor;
+- slot 2: guaranteed Reception;
+- slot 3: guaranteed Security;
+- slot 4: guaranteed Spawning;
+- slot 5: guaranteed Garage;
+- slot 6: guaranteed Conveyor;
 - slots 7+: morality-weighted random selection from Resting, Security, Spawning, Furnace, Junks, Deads, and Cube Collector.
 
 Therefore, every map with at least seven effective POIs has the complete Resting + Garage + Conveyor dependency set required by the Worker Collector. `poiCount` is never increased to reach this threshold.
