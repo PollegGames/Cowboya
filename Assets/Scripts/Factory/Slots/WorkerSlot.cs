@@ -114,7 +114,8 @@ public class WorkerSlot : MonoBehaviour
                 return factoryMachine.TryAttachWorker(incoming, "enter_attach");
             if (ReferenceEquals(factoryMachine.CurrentWorker, incoming))
                 return true;
-            return factoryMachine.TryReplaceWorker(incoming, "enter_replace");
+            HandleOccupiedWorkMachineArrival(incoming);
+            return false;
         }
 
         if (machine is RestingMachine restingMachine)
@@ -129,6 +130,28 @@ public class WorkerSlot : MonoBehaviour
         }
 
         return machine.TryAttachWorker(incoming, "enter_attach");
+    }
+
+    private void HandleOccupiedWorkMachineArrival(RobotBrainNew incoming)
+    {
+        if (incoming == null || incoming.Memory == null || machine == null)
+            return;
+
+        RoomWaypoint machinePoint = ResolveMachineWaypoint();
+        if (machinePoint != null)
+            incoming.Memory.SetRoomWaypointAvailability(machinePoint, false);
+        else
+            incoming.Memory.SetMachineWaypointAvailability(machine, false);
+
+        incoming.Memory.ChangeConnectionToMachine(false);
+        incoming.Memory.SetDesiredMachineType(MachineType.WorkStation);
+        RobotEcosystemProbe.RecordSlotDecision(
+            this,
+            "WorkerSlot",
+            "rejected_occupied_replan",
+            incoming,
+            machine,
+            incoming.Heart != null ? incoming.Heart.CurrentTask : null);
     }
 
     private void HandlePoweredOffMachineArrival(RobotBrainNew brain, RobotTask currentTask)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>Supplies shared navigation dependencies to every robot already authored in a static scene.</summary>
@@ -80,6 +81,37 @@ public static class StaticRobotNavigationInitializer
             ? $"success: service={service.name}, waypoints={service.GetAllWaypoints().Count}, mode={service.GraphMode}"
             : $"failed: body initialization returned false, bodyReference="
                 + $"{(body.BodyReference != null ? body.BodyReference.name : "null")}");
+    }
+
+    /// <summary>
+    /// Builds generated navigation from the authored rooms of a static level that has no explicit path asset.
+    /// </summary>
+    public static bool TryInitializeGeneratedSceneGraph(
+        IWaypointService waypointService,
+        IEnumerable<RoomManager> rooms)
+    {
+        if (waypointService is not WaypointService concreteService || rooms == null)
+            return false;
+
+        if (!concreteService.ConfigureGraph(WaypointGraphMode.Generated))
+            return false;
+
+        int waypointCount = 0;
+        foreach (RoomManager room in rooms.Where(candidate => candidate != null))
+        {
+            List<RoomWaypoint> roomWaypoints = room.GetWaypoints()
+                .Where(waypoint => waypoint != null)
+                .ToList();
+            concreteService.RegisterRoomWaypoints(room, roomWaypoints);
+            waypointCount += roomWaypoints.Count;
+        }
+
+        if (waypointCount == 0)
+            return false;
+
+        concreteService.BuildAllNeighbors(includeUnavailable: true);
+        SetSharedService(concreteService);
+        return true;
     }
 
     private static bool Report(GameObject robot, string message)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +13,7 @@ public class MachineSecurityManager : MonoBehaviour
     private readonly List<FactoryMachine> factoryMachines = new();
     private readonly List<RestingMachine> restingMachines = new();
     private readonly List<SecurityMachine> securityMachines = new();
+    private readonly List<SpawningMachine> spawningMachines = new();
     private readonly List<BaseMachine> pendingOffMachines = new();
 
     private readonly List<RobotBrainNew> guards = new();
@@ -73,6 +74,15 @@ public class MachineSecurityManager : MonoBehaviour
         machine.OnMachineTurnedOff += HandleMachineTurnedOff;
     }
 
+    public void RegisterSpawningMachine(SpawningMachine machine)
+    {
+        if (machine == null || spawningMachines.Contains(machine)) return;
+
+        spawningMachines.Add(machine);
+        reservationService?.RegisterMachine(machine, RobotRole.SecurityGuard);
+        machine.OnMachinePowerChanged += HandleMachinePowerChanged;
+    }
+
     private void OnDestroy()
     {
         foreach (var machine in factoryMachines)
@@ -95,6 +105,12 @@ public class MachineSecurityManager : MonoBehaviour
                 continue;
             machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
             machine.OnMachineTurnedOff -= HandleMachineTurnedOff;
+        }
+
+        foreach (var machine in spawningMachines)
+        {
+            if (machine != null)
+                machine.OnMachinePowerChanged -= HandleMachinePowerChanged;
         }
     }
 
@@ -142,6 +158,8 @@ public class MachineSecurityManager : MonoBehaviour
 
         if (evt.Machine is SecurityMachine securityMachine)
             HandleSecurityMachineStateChanged(securityMachine, evt.IsOn);
+        else if (evt.Machine is SpawningMachine spawningMachine)
+            HandleSpawningMachineStateChanged(spawningMachine, evt.IsOn);
     }
 
     private void HandleMachineTurnedOff(MachineTurnedOffEvent evt)
@@ -195,6 +213,19 @@ public class MachineSecurityManager : MonoBehaviour
         }
     }
 
+    private void HandleSpawningMachineStateChanged(SpawningMachine machine, bool isOn)
+    {
+        if (!isOn)
+        {
+            QueuePendingOffMachine(machine, "spawning_power_off");
+            TryDispatchPendingOffMachine("spawning_power_off");
+        }
+        else
+        {
+            HandleReactivationTargetPoweredOn(machine, "spawning_power_on");
+        }
+    }
+
     /// <summary>
     /// Checks queued powered-off machines when a guard reaches and attaches to a security machine.
     /// </summary>
@@ -203,7 +234,22 @@ public class MachineSecurityManager : MonoBehaviour
         if (securityMachine == null || guard == null)
             return;
 
+        bool returningFromReactivation = ReferenceEquals(activeReactivationGuard, guard);
+        if (returningFromReactivation
+            && guardPosts.TryGetValue(guard, out SecurityMachine assignedPost)
+            && assignedPost != null
+            && !ReferenceEquals(assignedPost, securityMachine))
+        {
+            ReturnGuardToAssignedPost(guard, "wrong_security_post");
+            return;
+        }
+
         guardPosts[guard] = securityMachine;
+        if (returningFromReactivation)
+        {
+            activeReactivationGuard = null;
+            activeReactivationMachine = null;
+        }
 
         PruneResolvedPendingOffMachines("security_connect_prune");
         Debug.Log(
@@ -416,11 +462,45 @@ public class MachineSecurityManager : MonoBehaviour
     private void HandleReactivationTargetPoweredOn(BaseMachine machine, string reason)
     {
         RemovePendingOffMachine(machine, reason);
-        if (!ReferenceEquals(activeReactivationMachine, machine))
-            return;
+    }
 
-        activeReactivationMachine = null;
-        activeReactivationGuard = null;
+    /// <summary>
+    /// Returns a repair guard to its assigned Security machine when it is powered on.
+    /// Otherwise, releases the job and sends the guard through the normal Rest/Start fallback.
+    /// </summary>
+    public bool ReturnGuardToAssignedPost(RobotBrainNew guard, string reason = "reactivation_completed")
+    {
+        if (guard == null || !ReferenceEquals(activeReactivationGuard, guard))
+            return false;
+        if (!guardPosts.TryGetValue(guard, out SecurityMachine assignedPost) || assignedPost == null)
+            return false;
+
+        if (!assignedPost.IsOn)
+        {
+            activeReactivationGuard = null;
+            activeReactivationMachine = null;
+            guard.Memory?.SetMachineWaypointAvailability(assignedPost, false);
+            PublishGuardDispatch(guard, null, false);
+            // Dispatch events can synchronously publish a plan. Keep Rest as the
+            // final intent; the Brain falls back to Start when no powered Rest exists.
+            guard.Memory?.SetDesiredMachineType(MachineType.RestStation);
+            RobotEcosystemProbe.RecordBrainCall(
+                guard,
+                "MachineSecurityManager.ReturnGuardToRestOrStart",
+                "reason=" + reason + " securityPost=" + DescribeMachine(assignedPost));
+            TryDispatchPendingOffMachine("assigned_security_post_off");
+            return true;
+        }
+
+        RobotEcosystemProbe.RecordBrainCall(
+            guard,
+            "MachineSecurityManager.ReturnGuardToAssignedPost",
+            "reason=" + reason + " securityPost=" + DescribeMachine(assignedPost));
+        PublishGuardDispatch(guard, assignedPost, assignedPost.IsOn);
+        // Dispatch events can synchronously update Memory and publish a new plan.
+        // Make the return-to-post intent the final fact written by the manager.
+        guard.Memory?.SetDesiredMachineType(MachineType.SecurityMachine);
+        return true;
     }
 
     private bool TryAssignClosestRestingGuard(SecurityMachine machine)
@@ -579,19 +659,12 @@ public class MachineSecurityManager : MonoBehaviour
         if (guard == null)
             return false;
 
-        if (FindSecurityMachineForGuard(guard) != null)
-            return true;
-
-        RobotTask currentTask = guard.Heart != null ? guard.Heart.CurrentTask : null;
-        if (currentTask == null || currentTask.Type != RobotTaskType.GuardPost)
-            return false;
-
-        RoomWaypoint lastVisited = guard.Memory != null ? guard.Memory.LastVisitedPoint : null;
-        if (lastVisited != null && lastVisited.type == WaypointType.Security)
-            return true;
-
-        RoomWaypoint bodyTarget = guard.Body != null ? guard.Body.CurrentTarget : null;
-        return bodyTarget != null && bodyTarget.type == WaypointType.Security;
+        SecurityMachine assignedPost = FindSecurityMachineForGuard(guard);
+        return assignedPost != null
+            && assignedPost.IsOn
+            && ReferenceEquals(assignedPost.CurrentGuard, guard)
+            && guard.Memory != null
+            && guard.Memory.Snapshot.IsConnectedToMachine;
     }
 
     private static void PublishGuardDispatch(RobotBrainNew guard, object payload, bool isOn)

@@ -166,6 +166,37 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
+    public void WorkerPlan_IgnoresReceptionWorkWaypointWithoutFactoryMachine()
+    {
+        var setup = CreateRobotWithBrain("Robot_WorkerReceptionFilter");
+        var memory = setup.brain.Memory;
+        Assert.IsNotNull(memory);
+
+        var receptionRoom = new GameObject("ReceptionRoom").AddComponent<RoomManager>();
+        var receptionWaypoint = CreateWaypoint(
+            "ReceptionFutureDesk", WaypointType.Work, true, Vector3.zero);
+        receptionWaypoint.parentRoom = receptionRoom;
+
+        var workRoom = new GameObject("RealWorkRoom").AddComponent<RoomManager>();
+        var machine = new GameObject("FactoryMachine").AddComponent<FactoryMachine>();
+        workRoom.factorymMachinesInRoom.Add(machine);
+        var realWorkWaypoint = CreateWaypoint(
+            "FactoryMachineWaypoint", WaypointType.Work, true, Vector3.right);
+        realWorkWaypoint.parentRoom = workRoom;
+
+        memory.InitializeWaypointAvailability(new[] { receptionWaypoint, realWorkWaypoint });
+        memory.ChangeConnectionToMachine(false);
+
+        bool ok = setup.brain.TryGetCurrentPlan(out _, out var task);
+
+        Assert.IsTrue(ok);
+        Assert.IsNotNull(task);
+        Assert.AreEqual(RobotTaskType.GoToMachine, task.Type);
+        Assert.AreEqual(realWorkWaypoint, task.Payload,
+            "A Work waypoint without a real powered FactoryMachine must not be selected.");
+    }
+
+    [Test]
     public void WorkerPlan_DesiredMachineType_HardFiltersBeforeCycleFallback()
     {
         var setup = CreateRobotWithBrain("Robot_WorkerDesiredType");
@@ -406,7 +437,7 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
-    public void WorkerSlot_OccupiedFactoryMachine_ReplacesOwnerAndSendsPreviousWorkerToRest()
+    public void WorkerSlot_OccupiedFactoryMachine_KeepsOwnerAndReplansIncomingWorker()
     {
         var owner = CreateRobotWithBrain("Robot_WorkOwner");
         var incoming = CreateRobotWithBrain("Robot_WorkIncoming");
@@ -436,10 +467,15 @@ public class RobotEcosystemProbeTests
         InvokePrivate(slot, "OnTriggerEnter2D", owner.collider);
         InvokePrivate(slot, "OnTriggerEnter2D", incoming.collider);
 
-        Assert.AreEqual(incoming.brain, machine.CurrentWorker, "The arriving worker should take the occupied work station.");
-        Assert.IsTrue(incoming.brain.Memory.IsConnectedToMachine);
-        Assert.IsFalse(owner.brain.Memory.IsConnectedToMachine);
-        AssertWorkerPlansWaypoint(owner.brain, restWaypoint, "The replaced worker should leave the station and go rest.");
+        Assert.AreEqual(owner.brain, machine.CurrentWorker,
+            "An occupied Work machine must keep its current worker.");
+        Assert.IsTrue(owner.brain.Memory.IsConnectedToMachine);
+        Assert.IsFalse(incoming.brain.Memory.IsConnectedToMachine);
+        Assert.IsFalse(incoming.brain.Memory.AllAvailableWaypoints[occupiedWaypoint]);
+        AssertWorkerPlansWaypoint(incoming.brain, restWaypoint,
+            "The arriving worker should try another Work machine, then Rest, then Start.");
+        Assert.AreEqual(1,
+            RobotEcosystemProbe.GetCallCount("Slot.WorkerSlot.rejected_occupied_replan"));
     }
 
     [Test]

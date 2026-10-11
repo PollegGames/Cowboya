@@ -42,6 +42,157 @@ public class FactoryRoleContractTests
     }
 
     [Test]
+    public void ReactivationJob_RemainsActiveUntilGuardReconnectsToAssignedPost()
+    {
+        var managerObject = new GameObject("SecurityManager");
+        var manager = managerObject.AddComponent<MachineSecurityManager>();
+        var postObject = new GameObject("AssignedPost");
+        postObject.AddComponent<MeshRenderer>();
+        var postWaypoint = postObject.AddComponent<RoomWaypoint>();
+        postWaypoint.type = WaypointType.Security;
+        postWaypoint.IsAvailable = true;
+        var post = postObject.AddComponent<SecurityMachine>();
+        var target = new GameObject("RepairTarget").AddComponent<FactoryMachine>();
+        var guardObject = new GameObject("Guard");
+        guardObject.SetActive(false);
+        var memory = guardObject.AddComponent<RobotMemoryNew>();
+        var heart = guardObject.AddComponent<RobotHeartNew>();
+        var guard = guardObject.AddComponent<RobotBrainNew>();
+        SetField(guard, "memory", memory);
+        SetField(guard, "heart", heart);
+        SetField(heart, "memory", memory);
+        SetField(heart, "brain", guard);
+        heart.ConfigureRole(RobotRole.SecurityGuard);
+        memory.InitializeWaypointAvailability(new[] { postWaypoint });
+        guardObject.SetActive(true);
+
+        manager.RegisterSecurityMachine(post);
+        post.AttachRobot(guardObject);
+        SetField(manager, "activeReactivationGuard", guard);
+        SetField(manager, "activeReactivationMachine", target);
+
+        target.PowerOff();
+        target.PowerOn();
+        Assert.IsTrue(manager.HasActiveReactivationJob);
+
+        Assert.IsTrue(manager.ReturnGuardToAssignedPost(guard));
+        Assert.IsTrue(guard.TryGetCurrentPlan(out _, out RobotTask returnTask));
+        Assert.AreEqual(RobotTaskType.GoToMachine, returnTask.Type);
+        Assert.AreEqual(postWaypoint, returnTask.Payload);
+
+        manager.HandleGuardConnectedToSecurityMachine(post, guard);
+        Assert.IsFalse(manager.HasActiveReactivationJob);
+
+        Object.DestroyImmediate(guardObject);
+        Object.DestroyImmediate(target.gameObject);
+        Object.DestroyImmediate(postObject);
+        Object.DestroyImmediate(managerObject);
+    }
+
+    [Test]
+    public void ReactivationCompletion_WithAssignedPostOff_UsesRestFallbackAndReleasesJob()
+    {
+        var managerObject = new GameObject("SecurityManager");
+        var manager = managerObject.AddComponent<MachineSecurityManager>();
+        var postObject = new GameObject("AssignedPost");
+        postObject.AddComponent<MeshRenderer>();
+        var postWaypoint = postObject.AddComponent<RoomWaypoint>();
+        postWaypoint.type = WaypointType.Security;
+        postWaypoint.IsAvailable = true;
+        var post = postObject.AddComponent<SecurityMachine>();
+        var target = new GameObject("RepairTarget").AddComponent<FactoryMachine>();
+        var guardObject = new GameObject("Guard");
+        guardObject.SetActive(false);
+        var memory = guardObject.AddComponent<RobotMemoryNew>();
+        var heart = guardObject.AddComponent<RobotHeartNew>();
+        var guard = guardObject.AddComponent<RobotBrainNew>();
+        SetField(guard, "memory", memory);
+        SetField(guard, "heart", heart);
+        SetField(heart, "memory", memory);
+        SetField(heart, "brain", guard);
+        heart.ConfigureRole(RobotRole.SecurityGuard);
+        memory.InitializeWaypointAvailability(new[] { postWaypoint });
+        guardObject.SetActive(true);
+
+        manager.RegisterSecurityMachine(post);
+        post.AttachRobot(guardObject);
+        SetField(manager, "activeReactivationGuard", guard);
+        SetField(manager, "activeReactivationMachine", target);
+        post.PowerOff();
+
+        Assert.IsTrue(manager.ReturnGuardToAssignedPost(guard));
+        Assert.IsFalse(manager.HasActiveReactivationJob);
+        Assert.AreEqual(MachineType.RestStation, memory.Snapshot.DesiredMachineType);
+        Assert.IsTrue(guard.TryGetCurrentPlan(out _, out RobotTask fallbackTask));
+        Assert.AreEqual(RobotTaskType.ReturnHome, fallbackTask.Type,
+            "Without a powered Rest station, the guard must fall back to Start.");
+
+        Object.DestroyImmediate(guardObject);
+        Object.DestroyImmediate(target.gameObject);
+        Object.DestroyImmediate(postObject);
+        Object.DestroyImmediate(managerObject);
+    }
+
+    [Test]
+    public void ReactivationCompletion_WithAssignedPostOff_GoesToPoweredRest()
+    {
+        var managerObject = new GameObject("SecurityManager");
+        var manager = managerObject.AddComponent<MachineSecurityManager>();
+        var postObject = new GameObject("AssignedPost");
+        postObject.AddComponent<MeshRenderer>();
+        var postWaypoint = postObject.AddComponent<RoomWaypoint>();
+        postWaypoint.type = WaypointType.Security;
+        postWaypoint.IsAvailable = true;
+        var post = postObject.AddComponent<SecurityMachine>();
+        var target = new GameObject("RepairTarget").AddComponent<FactoryMachine>();
+
+        var restRoomObject = new GameObject("RestRoom");
+        var restRoom = restRoomObject.AddComponent<RoomManager>();
+        var restWaypointObject = new GameObject("RestWaypoint");
+        restWaypointObject.transform.SetParent(restRoomObject.transform);
+        var restWaypoint = restWaypointObject.AddComponent<RoomWaypoint>();
+        restWaypoint.type = WaypointType.Rest;
+        restWaypoint.IsAvailable = true;
+        restWaypoint.parentRoom = restRoom;
+        var restMachineObject = new GameObject("RestMachine");
+        restMachineObject.transform.SetParent(restRoomObject.transform);
+        restMachineObject.AddComponent<MeshRenderer>();
+        var restMachine = restMachineObject.AddComponent<RestingMachine>();
+        restRoom.restingMachinesInRoom.Add(restMachine);
+
+        var guardObject = new GameObject("Guard");
+        guardObject.SetActive(false);
+        var memory = guardObject.AddComponent<RobotMemoryNew>();
+        var heart = guardObject.AddComponent<RobotHeartNew>();
+        var guard = guardObject.AddComponent<RobotBrainNew>();
+        SetField(guard, "memory", memory);
+        SetField(guard, "heart", heart);
+        SetField(heart, "memory", memory);
+        SetField(heart, "brain", guard);
+        heart.ConfigureRole(RobotRole.SecurityGuard);
+        memory.InitializeWaypointAvailability(new[] { postWaypoint, restWaypoint });
+        guardObject.SetActive(true);
+
+        manager.RegisterSecurityMachine(post);
+        post.AttachRobot(guardObject);
+        SetField(manager, "activeReactivationGuard", guard);
+        SetField(manager, "activeReactivationMachine", target);
+        post.PowerOff();
+
+        Assert.IsTrue(manager.ReturnGuardToAssignedPost(guard));
+        Assert.IsFalse(manager.HasActiveReactivationJob);
+        Assert.IsTrue(guard.TryGetCurrentPlan(out _, out RobotTask fallbackTask));
+        Assert.AreEqual(RobotTaskType.GoToMachine, fallbackTask.Type);
+        Assert.AreEqual(restWaypoint, fallbackTask.Payload);
+
+        Object.DestroyImmediate(guardObject);
+        Object.DestroyImmediate(target.gameObject);
+        Object.DestroyImmediate(postObject);
+        Object.DestroyImmediate(restRoomObject);
+        Object.DestroyImmediate(managerObject);
+    }
+
+    [Test]
     public void SpawningMachine_PowerOffFaintsAndReleases_ThenPowerOnReconnectsNearbyWorker()
     {
         var alarm = ScriptableObject.CreateInstance<FactoryAlarmStatus>();

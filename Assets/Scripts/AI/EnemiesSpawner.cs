@@ -631,7 +631,10 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             {
                 var state = heart.GetComponent<RobotStateController>();
                 if (state != null)
+                {
                     state.UpdateState(RobotState.Faint);
+                    state.ApplyEnemyFaintPose();
+                }
                 break;
             }
         }

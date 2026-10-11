@@ -12,37 +12,33 @@ public sealed class WorkerCollectorGarageSpawnProvider : MonoBehaviour
 
     private readonly List<GameObject> spawnedCollectors = new List<GameObject>();
 
-    public WorkerCollectorDropOffProvider DropOff => dropOff;
+    public WorkerCollectorDropOffProvider DropOff => ResolveDropOff();
 
     private void Awake()
     {
-        if (dropOff == null)
-            dropOff = GetComponentInChildren<WorkerCollectorDropOffProvider>(true);
+        ResolveDropOff();
     }
 
     /// <summary>Spawns this Garage's collector once, with ownership set before activation.</summary>
     public GameObject TrySpawnCollector(bool restAfterBatch = true)
     {
+        WorkerCollectorDropOffProvider resolvedDropOff = ResolveDropOff();
         spawnedCollectors.RemoveAll(collector => collector == null);
-        if (!Application.isPlaying || workerCollectorPrefab == null || dropOff == null
+        if (!Application.isPlaying || workerCollectorPrefab == null || resolvedDropOff == null
             || spawnedCollectors.Count >= Mathf.Max(1, maximumLiveCollectors))
             return null;
 
         WorkerCollectorSpawnRestProvider rest = FindObjectsByType<WorkerCollectorSpawnRestProvider>(
                 FindObjectsInactive.Exclude, FindObjectsSortMode.None)
             .Where(candidate => candidate != null && candidate.isActiveAndEnabled)
-            .OrderBy(candidate => Vector3.SqrMagnitude(candidate.RestPosition - dropOff.WaitPosition))
+            .OrderBy(candidate => Vector3.SqrMagnitude(candidate.RestPosition - resolvedDropOff.WaitPosition))
             .ThenBy(candidate => StableGridOrder(candidate.transform))
             .FirstOrDefault();
-        if (rest == null)
-        {
-            Debug.LogWarning($"WorkerCollectorStandby garage={name} reason=NoRest", this);
-            return null;
-        }
+        Vector3 spawnPosition = rest != null ? rest.SpawnPosition : resolvedDropOff.WaitPosition;
 
         GameObject staging = new GameObject("WorkerCollectorSpawnStaging");
         staging.SetActive(false);
-        GameObject collector = Instantiate(workerCollectorPrefab, rest.SpawnPosition,
+        GameObject collector = Instantiate(workerCollectorPrefab, spawnPosition,
             workerCollectorPrefab.transform.rotation, staging.transform);
         collector.SetActive(false);
         collector.transform.SetParent(null, true);
@@ -56,14 +52,27 @@ public sealed class WorkerCollectorGarageSpawnProvider : MonoBehaviour
         }
 
         WorkerCollectorBodyController body = collector.GetComponent<WorkerCollectorBodyController>();
-        WorkerCollectorMissionService.BindGarage(body, dropOff, restAfterBatch);
-        AlignNavigationBodyToSpawn(collector, rest.SpawnPosition);
-        StaticRobotNavigationInitializer.TryInitializeSpawnedRobot(collector);
+        WorkerCollectorMissionService.BindGarage(body, resolvedDropOff, restAfterBatch);
+        AlignNavigationBodyToSpawn(collector, spawnPosition);
+        if (!StaticRobotNavigationInitializer.TryInitializeSpawnedRobot(collector))
+        {
+            WorkerCollectorMissionService.UnbindGarage(body);
+            Destroy(collector);
+            Destroy(staging);
+            return null;
+        }
         collector.SetActive(true);
         Destroy(staging);
         spawnedCollectors.Add(collector);
-        Debug.Log($"WorkerCollectorSpawned garage={name} spawn={rest.name}", collector);
+        Debug.Log($"WorkerCollectorSpawned garage={name} spawn={(rest != null ? rest.name : "Garage")}", collector);
         return collector;
+    }
+
+    private WorkerCollectorDropOffProvider ResolveDropOff()
+    {
+        if (dropOff == null)
+            dropOff = GetComponentInChildren<WorkerCollectorDropOffProvider>(true);
+        return dropOff;
     }
 
     /// <summary>Spawns up to the requested number of collectors for this Garage.</summary>

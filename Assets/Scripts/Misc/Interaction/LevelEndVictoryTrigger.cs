@@ -16,6 +16,11 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     {
         ResolveRunStats();
 
+        if (doorNext != null)
+        {
+            doorNext.SetVictoryTrigger(this);
+        }
+
         if (saveService == null)
         {
             saveService = FindFirstObjectByType<PlayerSaveService>();
@@ -68,6 +73,14 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     public bool IsVictoryConditionMet()
     {
         return victorySetup != null && victorySetup.HasMetAnyGoal();
+    }
+
+    /// <summary>
+    /// Returns whether the controlled exit may open for the current run step.
+    /// </summary>
+    public bool IsExitUnlocked()
+    {
+        return IsAlwaysAllowedRunStep() || IsVictoryConditionMet();
     }
 
     private void UpdateVisual()

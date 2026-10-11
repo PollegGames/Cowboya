@@ -12,6 +12,7 @@ public class Level2WorkerCollectorPrefabTests
     private const string RestRoomPrefabPath = "Assets/Resources/Prefabs/Map/ROOM_resting.prefab";
     private const string GarageMachinePrefabPath =
         "Assets/Resources/Prefabs/Map/Basic/Machines/GarageCubes.prefab";
+    private const string GarageRoomPrefabPath = "Assets/Resources/Prefabs/Map/ROOM_Garage.prefab";
 
     [Test]
     public void RobotRoles_PreserveExistingSerializedValues_AndAppendWorkerCollector()
@@ -200,5 +201,33 @@ public class Level2WorkerCollectorPrefabTests
             Assert.AreEqual($"Slot_{i:00}", storage.Slots[i].name);
         }
         Assert.IsNull(prefab.GetComponent<GarageCubeConveyorController>());
+    }
+
+    [Test]
+    public void GarageRoom_CanSpawnConfiguredWorkerCollector()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GarageRoomPrefabPath);
+        Assert.IsNotNull(prefab);
+
+        WorkerCollectorGarageSpawnProvider prefabProvider =
+            prefab.GetComponent<WorkerCollectorGarageSpawnProvider>();
+        Assert.IsNotNull(prefabProvider);
+        var serializedProvider = new SerializedObject(prefabProvider);
+        Assert.IsNotNull(
+            serializedProvider.FindProperty("workerCollectorPrefab").objectReferenceValue,
+            "The Garage room must own the Worker Collector prefab used by static Levels 2 and 3.");
+
+        GameObject instance = Object.Instantiate(prefab);
+        try
+        {
+            WorkerCollectorGarageSpawnProvider runtimeProvider =
+                instance.GetComponent<WorkerCollectorGarageSpawnProvider>();
+            Assert.IsNotNull(runtimeProvider.DropOff,
+                "The Garage spawn provider must resolve its nested delivery destination during Awake.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(instance);
+        }
     }
 }

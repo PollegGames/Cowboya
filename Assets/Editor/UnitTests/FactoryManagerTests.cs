@@ -146,6 +146,50 @@ public class FactoryManagerTests
     }
 
     [Test]
+    public void InitializeStatic_ResetsPersistentAlarmAndLastPlayerPosition()
+    {
+        var alarmStatus = ScriptableObject.CreateInstance<FactoryAlarmStatus>();
+        alarmStatus.CurrentAlarmState = AlarmState.Revolt;
+        alarmStatus.LastPlayerPosition = Vector3.one;
+        typeof(FactoryManager).GetField("factoryAlarmStatus", BindingFlags.Public | BindingFlags.Instance)
+            .SetValue(_factoryManager, alarmStatus);
+        int notifications = 0;
+        alarmStatus.OnAlarmStateChanged += _ => notifications++;
+
+        _factoryManager.InitializeStatic(null, null);
+
+        Assert.AreEqual(AlarmState.Normal, alarmStatus.CurrentAlarmState);
+        Assert.AreEqual(Vector3.zero, alarmStatus.LastPlayerPosition);
+        Assert.AreEqual(1, notifications);
+    }
+
+    [Test]
+    public void StaticRooms_RegisterEveryMachineCategoryForPowerSummary()
+    {
+        var room = new GameObject("StaticMachineRoom").AddComponent<RoomManager>();
+        var work = new GameObject("Work").AddComponent<FactoryMachine>();
+        var rest = new GameObject("Rest").AddComponent<RestingMachine>();
+        var securityObject = new GameObject("Security");
+        securityObject.AddComponent<MeshRenderer>();
+        var security = securityObject.AddComponent<SecurityMachine>();
+        var spawningObject = new GameObject("Spawning");
+        spawningObject.AddComponent<MeshRenderer>();
+        var spawning = spawningObject.AddComponent<SpawningMachine>();
+        room.factorymMachinesInRoom.Add(work);
+        room.restingMachinesInRoom.Add(rest);
+        room.securityMachinesInRoom.Add(security);
+        room.spawningMachinesInRoom.Add(spawning);
+
+        FactoryMachinesSummaryChangedEvent? summary = null;
+        _factoryManager.OnFactoryMachinesSummaryChanged += evt => summary = evt;
+        _factoryManager.RegisterStaticRooms(new[] { room }, null);
+
+        Assert.IsTrue(summary.HasValue);
+        Assert.AreEqual(4, summary.Value.TotalRegistered);
+        Assert.AreEqual(4, summary.Value.TotalOn);
+    }
+
+    [Test]
     public void RegisterStaticRooms_AppliesLiftConfiguration()
     {
         var roomGo = new GameObject("StaticLiftRoom");

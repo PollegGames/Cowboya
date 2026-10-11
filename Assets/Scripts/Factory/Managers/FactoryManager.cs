@@ -34,6 +34,8 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     [SerializeField] private SpawningWorkerManager spawningWorkerManager;
 
     public MachineSecurityManager SecurityManager => machineSecurityManager;
+    public MachineWorkerManager WorkerManager => machineWorkerManager;
+    public SpawningWorkerManager SpawningManager => spawningWorkerManager;
 
     public event Action<AlarmState> OnFactoryAlarmChanged;
     public event Action<FactoryMachinesSummaryChangedEvent> OnFactoryMachinesSummaryChanged;
@@ -145,7 +147,7 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
     {
         if (factoryAlarmStatus != null)
         {
-            factoryAlarmStatus.CurrentAlarmState = AlarmState.Normal;
+            factoryAlarmStatus.ResetForLevel();
             lastAlarmState = factoryAlarmStatus.CurrentAlarmState;
             SubscribeToAlarmStatus();
         }
@@ -374,6 +376,10 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
             if (!allMachinesOffRaised)
             {
                 allMachinesOffRaised = true;
+                Debug.Log(
+                    $"[FactoryPower] All machines off registered={totalRegistered} "
+                    + $"off={totalOff} machines={DescribeRegisteredMachines()}",
+                    this);
                 OnFactoryAllMachinesOff?.Invoke();
             }
         }
@@ -394,6 +400,17 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 
         foreach (var machine in toRemove)
             machinePowerStates.Remove(machine);
+    }
+
+    private string DescribeRegisteredMachines()
+    {
+        var descriptions = new List<string>();
+        foreach (var pair in machinePowerStates)
+        {
+            if (pair.Key != null)
+                descriptions.Add($"{pair.Key.name}:{pair.Key.Type}:{(pair.Value ? "on" : "off")}");
+        }
+        return string.Join(",", descriptions);
     }
 
     private void HandleFactoryAlarmStateChanged(AlarmState newState)

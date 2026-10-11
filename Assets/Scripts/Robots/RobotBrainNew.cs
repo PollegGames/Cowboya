@@ -329,6 +329,13 @@ public class RobotBrainNew : MonoBehaviour
                 this);
             memory.NotifyReactivationCompleted(machine, nextDesiredMachineType);
         }
+
+        if (IsSecurityGuard)
+        {
+            MachineSecurityManager manager = FindFirstObjectByType<MachineSecurityManager>();
+            if (manager == null || !manager.ReturnGuardToAssignedPost(this))
+                memory?.SetDesiredMachineType(MachineType.SecurityMachine);
+        }
     }
 
     public bool TryGetCurrentPlan(out BrainOption currentOptions, out RobotTask plannedTask)
@@ -439,7 +446,8 @@ public class RobotBrainNew : MonoBehaviour
             if (!entry.Value)
                 continue;
 
-            if (entry.Key.type == WaypointType.Work || entry.Key.type == WaypointType.Rest)
+            if ((entry.Key.type == WaypointType.Work || entry.Key.type == WaypointType.Rest)
+                && HasOperationalMachineForWaypoint(entry.Key))
                 return true;
         }
 
@@ -455,7 +463,8 @@ public class RobotBrainNew : MonoBehaviour
         {
             if (entry.Key == null || !entry.Value)
                 continue;
-            if (entry.Key.type == WaypointType.Security || entry.Key.type == WaypointType.Rest)
+            if ((entry.Key.type == WaypointType.Security || entry.Key.type == WaypointType.Rest)
+                && HasOperationalMachineForWaypoint(entry.Key))
                 return true;
         }
 
@@ -782,6 +791,9 @@ public class RobotBrainNew : MonoBehaviour
                     continue;
                 if (pair.Key.type != type)
                     continue;
+                if (IsBalancedMachineWaypointType(type)
+                    && !HasOperationalMachineForWaypoint(pair.Key))
+                    continue;
 
                 candidates.Add(pair.Key);
             }
@@ -822,6 +834,31 @@ public class RobotBrainNew : MonoBehaviour
         return type == WaypointType.Work
             || type == WaypointType.Rest
             || type == WaypointType.Security;
+    }
+
+    private static bool HasOperationalMachineForWaypoint(RoomWaypoint waypoint)
+    {
+        if (waypoint == null)
+            return false;
+
+        RoomManager room = waypoint.parentRoom;
+        if (room == null)
+            return true;
+
+        switch (waypoint.type)
+        {
+            case WaypointType.Work:
+                return room.factorymMachinesInRoom != null
+                    && room.factorymMachinesInRoom.Exists(machine => machine != null && machine.IsOn);
+            case WaypointType.Rest:
+                return room.restingMachinesInRoom != null
+                    && room.restingMachinesInRoom.Exists(machine => machine != null && machine.IsOn);
+            case WaypointType.Security:
+                return room.securityMachinesInRoom != null
+                    && room.securityMachinesInRoom.Exists(machine => machine != null && machine.IsOn);
+            default:
+                return true;
+        }
     }
 
     private static RoomWaypoint FindBestWaypointForSpawner(RobotMemorySnapshotNew snapshot)

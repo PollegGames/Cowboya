@@ -130,6 +130,27 @@ public class StaticLevelPathTests
     }
 
     [Test]
+    public void GeneratedStaticSceneGraph_RegistersAuthoredRoomWaypoints()
+    {
+        NavigationFixture fixture = CreateFixture();
+        RoomWaypoint garage = CreateWaypoint("Garage", fixture.Room, Vector3.zero);
+        RoomWaypoint conveyor = CreateWaypoint("Conveyor", fixture.Room, Vector3.right);
+        garage.IsAvailable = true;
+        conveyor.IsAvailable = true;
+        SetField(fixture.Room, "waypoints", new List<RoomWaypoint> { garage, conveyor });
+
+        bool initialized = StaticRobotNavigationInitializer.TryInitializeGeneratedSceneGraph(
+            fixture.Service,
+            new[] { fixture.Room });
+
+        Assert.IsTrue(initialized);
+        Assert.AreEqual(WaypointGraphMode.Generated, fixture.Service.GraphMode);
+        CollectionAssert.AreEquivalent(new[] { garage, conveyor }, fixture.Service.GetAllWaypoints());
+        CollectionAssert.Contains(garage.Neighbors, conveyor);
+        CollectionAssert.Contains(conveyor.Neighbors, garage);
+    }
+
+    [Test]
     public void Validation_ReportsNullShortRouteAndDuplicateIdentity()
     {
         NavigationFixture fixture = CreateFixture();

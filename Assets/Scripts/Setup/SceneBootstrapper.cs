@@ -73,8 +73,14 @@ public class SceneBootstrapper : MonoBehaviour
             {
                 Debug.LogError($"Static navigation requires exactly one enabled {nameof(StaticLevelPath)}, but found {staticPaths.Count}.");
             }
-            else if (staticPaths.Count == 1)
+            else if (staticPaths.Count == 1 || setupMode == SceneSetupMode.StaticLevel)
             {
+                if (staticPaths.Count == 0)
+                {
+                    Debug.LogWarning(
+                        "Static level has no authored StaticLevelPath; using generated room-waypoint topology.");
+                }
+
                 WaypointService[] existingServices = FindObjectsByType<WaypointService>(FindObjectsSortMode.None);
                 if (existingServices.Length == 1)
                 {

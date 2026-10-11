@@ -534,8 +534,13 @@ public class RunProgressManager : MonoBehaviour
             newConfig.gridHeight += 1;
         }
 
+        // Dynamic generation moved down from Level 7 to Level 6. Use the former
+        // level number for growth cadence so new Level 6 receives the exact
+        // progression step that old Level 7 used, new Level 7 gets old Level 8,
+        // and so on.
+        int formerPlayableLevelIndex = playableLevelIndex + 1;
         int increment = 1;
-        if (playableLevelIndex % 2 == 0)
+        if (formerPlayableLevelIndex % 2 == 0)
         {
             increment += 2;
         }

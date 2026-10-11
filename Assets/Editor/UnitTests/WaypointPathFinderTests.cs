@@ -42,6 +42,59 @@ public class WaypointPathFinderTests
         Object.DestroyImmediate(finderObject);
     }
 
+    [Test]
+    public void FindWorldPath_CanLeaveThroughWaypointsInOriginStartRoom()
+    {
+        var finderObject = new GameObject("PathFinder");
+        var finder = finderObject.AddComponent<WaypointPathFinder>();
+        var startRoomObject = new GameObject("StartRoom");
+        var properties = startRoomObject.AddComponent<RoomProperties>();
+        properties.usageType = UsageType.Start;
+        var startRoom = startRoomObject.AddComponent<RoomManager>();
+        startRoom.roomProperties = properties;
+        RoomWaypoint origin = CreateWaypointInRoom("StartWaypoint", startRoom, Vector3.zero);
+        RoomWaypoint exit = CreateWaypointInRoom("StartExit", startRoom, Vector3.right);
+        RoomWaypoint destination = CreateWaypoint("Destination", Vector3.right * 2f, UsageType.Work);
+
+        origin.Neighbors.Add(exit);
+        exit.Neighbors.Add(destination);
+
+        List<RoomWaypoint> result = finder.FindWorldPath(origin, destination);
+
+        CollectionAssert.AreEqual(new[] { origin, exit, destination }, result);
+
+        Object.DestroyImmediate(startRoomObject);
+        Object.DestroyImmediate(destination.parentRoom.gameObject);
+        Object.DestroyImmediate(finderObject);
+    }
+
+    [Test]
+    public void FindWorldPath_CanEnterThroughWaypointsInDestinationStartRoom()
+    {
+        var finderObject = new GameObject("PathFinder");
+        var finder = finderObject.AddComponent<WaypointPathFinder>();
+        RoomWaypoint origin = CreateWaypoint("Origin", Vector3.zero, UsageType.Work);
+        var startRoomObject = new GameObject("DestinationStartRoom");
+        var properties = startRoomObject.AddComponent<RoomProperties>();
+        properties.usageType = UsageType.Start;
+        var startRoom = startRoomObject.AddComponent<RoomManager>();
+        startRoom.roomProperties = properties;
+        RoomWaypoint entrance = CreateWaypointInRoom("StartEntrance", startRoom, Vector3.right);
+        RoomWaypoint destination = CreateWaypointInRoom(
+            "StartWorkWaypoint", startRoom, Vector3.right * 2f);
+
+        origin.Neighbors.Add(entrance);
+        entrance.Neighbors.Add(destination);
+
+        List<RoomWaypoint> result = finder.FindWorldPath(origin, destination);
+
+        CollectionAssert.AreEqual(new[] { origin, entrance, destination }, result);
+
+        Object.DestroyImmediate(origin.parentRoom.gameObject);
+        Object.DestroyImmediate(startRoomObject);
+        Object.DestroyImmediate(finderObject);
+    }
+
     private static RoomWaypoint CreateWaypoint(string name, Vector3 position, UsageType usageType)
     {
         var roomObject = new GameObject(name + "Room");
@@ -52,6 +105,18 @@ public class WaypointPathFinderTests
 
         var waypointObject = new GameObject(name);
         waypointObject.transform.SetParent(roomObject.transform);
+        waypointObject.transform.position = position;
+        var waypoint = waypointObject.AddComponent<RoomWaypoint>();
+        waypoint.parentRoom = room;
+        waypoint.IsAvailable = true;
+        return waypoint;
+    }
+
+    private static RoomWaypoint CreateWaypointInRoom(
+        string name, RoomManager room, Vector3 position)
+    {
+        var waypointObject = new GameObject(name);
+        waypointObject.transform.SetParent(room.transform);
         waypointObject.transform.position = position;
         var waypoint = waypointObject.AddComponent<RoomWaypoint>();
         waypoint.parentRoom = room;

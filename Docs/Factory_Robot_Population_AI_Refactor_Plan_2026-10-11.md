@@ -27,7 +27,7 @@ Factory services may publish facts and stable assignments. They must not choose 
 | Worker Collector assignment and claims | `WorkerCollectorMissionService` plus providers | The service combines provider registration, static spawning, garage binding, assignment, cube claiming, and slot reservation. It uses static lists and instance-ID dictionaries. |
 | Robot decision flow | `RobotMemoryNew`, `RobotBrainNew`, `RobotHeartNew`, task classes, and body controllers | The intended pipeline exists, but machine code can still mutate Heart state and coordinator code constructs task objects for diagnostics. |
 | Save and kill counting | `RobotStateController` global events and `FactoryManager` | Save handling counts only `Worker` and `WorkerSpawner`; valid saves for Worker Collectors and guards are excluded. There is no explicit idempotency guard at the factory boundary. |
-| Run and level progression | `RunProgressManager`, `RunStepDefinition`, and `RunMapConfigSO` | Playable-level counting has been improved, and Levels 4-6 are explicit generated steps. Dynamic generation follows them, but fallback scene-index constants and dynamic-config assumptions still need tests and cleanup. |
+| Run and level progression | `RunProgressManager`, `RunStepDefinition`, and `RunMapConfigSO` | Playable-level counting has been improved, Levels 4-5 are explicit generated steps, and dynamic generation begins at Level 6. Fallback scene-index constants still need cleanup. |
 
 ## Target architecture map
 
@@ -42,7 +42,7 @@ Factory services may publish facts and stable assignments. They must not choose 
 | `Brain` | Role-aware action choice from Memory | Physical execution |
 | `Heart` | Task stack, interruption, resumption, completion | Factory allocation policy |
 | `Task` and `Body` | Delegation and physical execution | Persistent factory authority |
-| `RunProgressManager` | Run itinerary, playable-level identity, fixed Level 4-6 configs, Level 7+ random config lifecycle | Scene-specific spawning policy |
+| `RunProgressManager` | Run itinerary, playable-level identity, fixed Level 4-5 configs, Level 6+ random config lifecycle | Scene-specific spawning policy |
 
 ## Component disposition
 
@@ -81,7 +81,7 @@ Factory services may publish facts and stable assignments. They must not choose 
 6. Collector search and approach do not require a garage slot reservation. The slot is reserved only when the delivery contract requires it.
 7. A confirmed nine-cube batch completion triggers rest. If no valid rest destination exists, the collector reaches Start and uses the normal save transition.
 8. Save and kill transitions are counted once per robot, regardless of role, while player transitions remain excluded.
-9. Levels 1-3 use static scenes, Levels 4-6 use explicit fixed generated configs, and Level 7 onward uses random generated configs. The playable level number is not the run-step index.
+9. Levels 1-3 use static scenes, Levels 4-5 use explicit fixed generated configs, and Level 6 onward uses random generated configs. The playable level number is not the run-step index.
 10. Serialized `RobotRole` and `RobotTaskType` values remain in their current order.
 
 ## Confirmed gameplay clarifications
@@ -93,7 +93,7 @@ Factory services may publish facts and stable assignments. They must not choose 
 - Exactly one security reactivation job may be active factory-wide. Additional powered-off machines remain pending. The active guard handles one machine, returns to its assigned Security post, and only then becomes eligible for the next pending job. A guard never reactivates its own disabled post.
 - Worker Spawner power-off immediately stops spawning, releases machine occupancy, and faints the worker at its current position. Power-on automatically reconnects and wakes that same worker only while it remains in the machine's connection range. No replacement worker is dispatched and an out-of-range worker does not resume spawning.
 - Only Worker Transformer, Worker Collector, and Security Guard roles are save-eligible.
-- Level 7 and later retain the room-derived population formulas documented in `Generated_Map_Worker_Population.md`.
+- Level 6 and later retain the room-derived population formulas documented in `Generated_Map_Worker_Population.md`.
 - C# EditMode tests may be added or extended in the existing suite. Unity Test Runner execution remains user-run.
 
 ## Implementation stages
@@ -153,8 +153,8 @@ Exit gate: role scenarios pass without any new role controller competing with Br
 ### Stage 5 Progression and bootstrap convergence
 
 - Make the configured run itinerary and direct-scene lookup derive from the same step definitions; remove stale hard-coded step indices.
-- Keep Levels 4-6 bound to `Setup Level 4`, `Setup Level 5`, and `Setup Level 6`.
-- Make Level 7 the first random configuration and cache it for restart consistency.
+- Keep Levels 4-5 bound to `Setup Level 4` and `Setup Level 5`.
+- Make Level 6 the first random configuration and cache it for restart consistency while preserving the former Level 7 growth values.
 - After either static registration or generated-map construction, invoke the same factory registration, work coordination, and population startup sequence.
 - Replace slot-number and scene-name job selection with registered room capabilities.
 
@@ -187,7 +187,7 @@ Exit gate: the first failure is observable; successful pickup retains the valida
 | Worker Spawner | Alarm cadence while active; immediate stop and faint on power-off; no silent resume. |
 | Other roles | Follower cannot attack; Boss remains defend/attack only; flying Collector and SecurityReception do not regress. |
 | Lifecycle | Pool disable/re-enable, scene transition cleanup, no duplicate spawn, one save/kill count per robot. |
-| Progression | Static Levels 1-3, fixed generated Levels 4-6, random Level 7+, laboratory interleaving, restart keeps the active random config. |
+| Progression | Static Levels 1-3, fixed generated Levels 4-5, random Level 6+, laboratory interleaving, restart keeps the active random config. |
 
 ## First implementation slice
 
@@ -212,7 +212,7 @@ The first controlled behavior and ownership slice is implemented in the working 
 - security reactivation permits one active factory-wide job, retains additional pending jobs, remembers each guard's assigned post, and excludes a guard from reactivating that post;
 - Spawning machine power-off stops spawning, releases occupancy, and faints the attached Worker Spawner; power-on reconnects it only while it remains in range;
 - station reservations now record owner and purpose, support a machine shared by multiple eligible roles, and reject release by another robot;
-- Level 7 and later dynamic configurations are cached by playable level and derive from the most recent explicit generated configuration rather than legacy fallback list order;
+- Level 6 and later dynamic configurations are cached by playable level and derive from the most recent explicit generated configuration rather than legacy fallback list order;
 - Worker Collector and robot-domain static registries reset on Unity subsystem registration.
 
 Local C# compilation passes for both runtime and editor assemblies. Unity EditMode and scene/runtime validation remain project-owner actions.

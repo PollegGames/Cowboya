@@ -145,11 +145,36 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
                 && candidate.IsGarageDestination)
             .OrderBy(candidate => GetStableGridOrder(candidate.transform))
             .FirstOrDefault();
+        if (garage == null)
+        {
+            garage = FindObjectsByType<WorkerCollectorDropOffProvider>(
+                    FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                .Where(candidate => candidate != null
+                    && candidate.isActiveAndEnabled
+                    && candidate.IsGarageDestination)
+                .OrderBy(candidate => GetStableGridOrder(candidate.transform))
+                .FirstOrDefault();
+        }
         WorkerCollectorSpawnRestProvider rest = rests
             .Where(candidate => candidate != null && candidate.isActiveAndEnabled)
             .OrderBy(candidate => GetStableGridOrder(candidate.transform))
             .FirstOrDefault();
-        return garage != null && rest != null ? rest.TrySpawnCollector(garage) : null;
+        if (rest == null)
+        {
+            rest = FindObjectsByType<WorkerCollectorSpawnRestProvider>(
+                    FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                .Where(candidate => candidate != null && candidate.isActiveAndEnabled)
+                .OrderBy(candidate => GetStableGridOrder(candidate.transform))
+                .FirstOrDefault();
+        }
+        if (garage == null)
+            return null;
+
+        WorkerCollectorGarageSpawnProvider garageSpawn = garage.GetComponentInParent<WorkerCollectorGarageSpawnProvider>();
+        if (garageSpawn != null)
+            return garageSpawn.TrySpawnCollector(restAfterBatch: rest != null);
+
+        return rest != null ? rest.TrySpawnCollector(garage) : null;
     }
 
     /// <summary>

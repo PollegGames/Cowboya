@@ -86,7 +86,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         CacheReferences();
 
         return ResolveActiveBody() != null
-            && (stateController == null || stateController.CurrentState == RobotState.Alive);
+            && (stateController == null || stateController.CurrentState != RobotState.Dead);
     }
 
     public void OnGrab(Transform grabParent)

@@ -166,6 +166,7 @@ public class SceneInitiator : GameInitiator
         InitializeStaticRooms();
         InitializeStaticReceptionDefenders();
         InitializeStaticRobotNavigation();
+        StartCoroutine(SpawnStaticWorkerCollectorWhenReady());
 
         gameUIViewModel?.SetPlayer(playerInitiator.playerRobotBehaviour);
         SetCinemachineTarget(playerInitiator.playerHeadTransform);
@@ -196,10 +197,36 @@ public class SceneInitiator : GameInitiator
             securityBadgeSpawner,
             batterySpawner);
         enemiesSpawner.SpawnSecurityReceptionGuards();
-        WorkerCollectorMissionService.SpawnStaticSceneCollector();
 
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Level_3")
             enemiesSpawner.SpawnBossAtEnd();
+    }
+
+    private IEnumerator SpawnStaticWorkerCollectorWhenReady()
+    {
+        const int maximumAttempts = 120;
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName != "Level_2" && sceneName != "Level_3")
+            yield break;
+
+        for (int attempt = 1; attempt <= maximumAttempts; attempt++)
+        {
+            GameObject collector = WorkerCollectorMissionService.SpawnStaticSceneCollector();
+            if (collector != null)
+            {
+                Debug.Log(
+                    $"[WorkerCollectorDiagnostics] Static collector spawned scene={sceneName} attempt={attempt}.",
+                    collector);
+                yield break;
+            }
+
+            yield return null;
+        }
+
+        Debug.LogError(
+            $"[WorkerCollectorDiagnostics] Static collector failed to spawn in {sceneName} "
+            + $"after {maximumAttempts} attempts. Verify active Garage, Conveyor, and collector prefab providers.",
+            this);
     }
 
     private void InitializeStaticRooms()
@@ -217,6 +244,15 @@ public class SceneInitiator : GameInitiator
         }
 
         System.Collections.Generic.List<StaticLevelPath> paths = StaticLevelPath.FindEnabledInScene();
+        if (paths.Count == 0 && setupMode == SceneSetupMode.StaticLevel)
+        {
+            bool generatedInitialized = StaticRobotNavigationInitializer.TryInitializeGeneratedSceneGraph(
+                waypointService,
+                FindObjectsByType<RoomManager>(FindObjectsSortMode.None));
+            Debug.Log($"[WorkerCollectorDiagnostics] Static generated graph initialized={generatedInitialized}, "
+                + $"paths=0, waypoints={waypointService.GetAllWaypoints().Count}.");
+            return;
+        }
         if (paths.Count != 1)
         {
             Debug.LogError($"Static navigation expected one enabled {nameof(StaticLevelPath)}, but found {paths.Count}.");
@@ -235,9 +271,17 @@ public class SceneInitiator : GameInitiator
         if (waypointService == null)
             return;
 
-        System.Collections.Generic.List<StaticLevelPath> paths = StaticLevelPath.FindEnabledInScene();
-        if (paths.Count != 1 || !paths[0].IsNavigationReady)
+        if (waypointService is WaypointService concreteService
+            && concreteService.GraphMode == WaypointGraphMode.StaticExplicit)
+        {
+            System.Collections.Generic.List<StaticLevelPath> paths = StaticLevelPath.FindEnabledInScene();
+            if (paths.Count != 1 || !paths[0].IsNavigationReady)
+                return;
+        }
+        else if (waypointService.GetAllWaypoints().Count == 0)
+        {
             return;
+        }
 
         StaticRobotNavigationInitializer.InitializeSceneRobots(waypointService);
     }
@@ -336,7 +380,7 @@ public class SceneInitiator : GameInitiator
     private WorkerPopulation ResolveWorkerPopulation()
     {
         RunProgressManager runProgress = RunProgressManager.Instance;
-        if (runProgress != null && runProgress.CurrentLevelIndex >= 7)
+        if (runProgress != null && runProgress.CurrentLevelIndex >= 6)
         {
             RoomManager[] rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
             return GeneratedWorkerPopulation.Calculate(rooms);

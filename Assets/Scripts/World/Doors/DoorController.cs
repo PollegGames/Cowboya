@@ -82,6 +82,14 @@ public class DoorController : MonoBehaviour
         UpdateStatusPanel();
     }
 
+    /// <summary>
+    /// Associates this victory door with the trigger that controls its exit.
+    /// </summary>
+    public void SetVictoryTrigger(LevelEndVictoryTrigger trigger)
+    {
+        victoryTrigger = trigger;
+    }
+
     private IEnumerator SafetyCheckRoutine()
     {
         while (true)
@@ -278,6 +286,6 @@ public class DoorController : MonoBehaviour
             }
         }
 
-        return victoryTrigger == null || !victoryTrigger.IsVictoryConditionMet();
+        return victoryTrigger == null || !victoryTrigger.IsExitUnlocked();
     }
 }

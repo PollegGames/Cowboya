@@ -14,21 +14,20 @@ For the staged migration and ownership map, see `Factory_Robot_Population_AI_Ref
 
 Levels 1, 2, and 3 are fixed scenes and do not use this generated-map population policy.
 
-Generated Levels 4, 5, and 6 use explicit values from their `Setup Level N` assets:
+Generated Levels 4 and 5 use explicit values from their `Setup Level N` assets:
 
 | Level | Total `workersCount` | Normal Workers | Worker Collectors | Collector resting |
 | --- | ---: | ---: | ---: | --- |
 | 4 | 3 | 3 | 0 | Not applicable |
-| 5 | 3 | 3 | 0 | Not applicable |
-| 6 | 4 | 2 | 2 | Enabled; the collector team rests after each batch |
+| 5 | 4 | 2 | 2 | Enabled; the collector team rests after each batch |
 
-Level 6 uses seed `712226`, a 3x4 grid, and 6 POIs. Its guaranteed Resting, Garage, and Conveyor rooms support the two-collector team.
+Level 4 now uses the former Level 5 configuration: seed `867059`, a 4x2 grid, and 3 POIs. Those fixed slots are Resting, Reception, and Security. Level 5 now uses the former Level 6 configuration: seed `712226`, a 3x4 grid, and 6 POIs. Its guaranteed Resting, Garage, and Conveyor rooms support the two-collector team.
 
-Beginning with playable Level 7, worker counts are derived from the rooms that map generation actually created. The numeric worker fields inherited by later dynamic map configs are not used for worker population.
+Beginning with playable Level 6, maps use cached dynamic configurations derived from Level 5. New Level 6 receives the same growth step that the former Level 7 used, and every later dynamic configuration is shifted down by one playable level. Worker counts are derived from the rooms that map generation actually created; inherited numeric worker fields are not used for dynamic population.
 
 The Setup Sandbox/custom generator treats `workersCount` as a total population. If its generated map contains at least one Resting room and a complete Garage/Conveyor pair, half of that total becomes Worker Collectors and the remainder stays normal Workers. Normal Workers receive the extra unit for odd totals. Without all three required room capabilities, the custom population is entirely normal Workers.
 
-## Level 7+ rules
+## Level 6+ rules
 
 After the map and its `RoomManager` objects exist, `GeneratedWorkerPopulation.Calculate` counts room roles and applies these rules:
 
@@ -47,7 +46,7 @@ normal workers = work rooms + resting rooms
 worker collectors = resting rooms + min(garage rooms, conveyor rooms)
 ```
 
-Level 7+ Worker Collectors use their normal rest-after-batch cycle.
+Level 6+ Worker Collectors use their normal rest-after-batch cycle.
 
 ## Cooperative collector batches
 
@@ -61,8 +60,8 @@ When the Garage processor completes a batch, `WorkerCollectorDropOffProvider` no
 GridFactory generates cells and POIs
     -> RoomRenderer creates RoomManager/RoomProperties objects
     -> SceneInitiator.InitializeEnemies runs
-        -> Levels 4-6: read fixed counts from RunMapConfigSO
-        -> Level 7+: GeneratedWorkerPopulation counts live rooms
+        -> Levels 4-5: read fixed counts from RunMapConfigSO
+        -> Level 6+: GeneratedWorkerPopulation counts live rooms
     -> EnemiesSpawner.CreateWorkers creates normal Workers
     -> EnemiesSpawner.SpreadEnemies assigns Work/Rest waypoints
     -> EnemiesSpawner.SpawnDedicatedRoomRobots creates Worker Collectors
@@ -74,14 +73,14 @@ Spawning-room Worker Spawners are separate from the normal Worker and Worker Col
 
 Reception robots use the `SecurityReception` role and are not enemies. They are spawned independently, one per valid Reception work post.
 
-Regular enemy `SecurityGuard` robots are room-derived: each generated Security room creates exactly one Security Guard. Level 4 has no Security room and therefore has `enemiesCount = 0`; Levels 5 and 6 each have one Security room and one enemy. The fixed setup assets mirror these expected counts, but runtime generation uses the rooms that actually exist.
+Regular enemy `SecurityGuard` robots are room-derived: each generated Security room creates exactly one Security Guard. Fixed Levels 4, 5, and 6 each include a Security room and configure one enemy. The fixed setup assets mirror these expected counts, but runtime generation uses the rooms that actually exist.
 
 ## Configuration ownership
 
-- `RunMapConfigSO.workersCount`: total fixed Worker population for Levels 4-6 and custom configurations.
+- `RunMapConfigSO.workersCount`: total fixed Worker population for Levels 4-5 and custom configurations.
 - `RunMapConfigSO.workerCollectorsCount`: how many members of that total use the Worker Collector role. Normal Workers are `workersCount - workerCollectorsCount`.
 - `RunMapConfigSO.workerCollectorsRestAfterBatch`: fixed-level collector rest policy.
-- `SceneInitiator.ResolveWorkerPopulation`: selects fixed mode below Level 7 or room-derived mode at Level 7+.
+- `SceneInitiator.ResolveWorkerPopulation`: selects fixed mode below Level 6 or room-derived mode at Level 6+.
 - `GeneratedWorkerPopulation`: contains the room-count formula independently of spawning.
 - `EnemiesSpawner`: creates the requested robot quantities after map generation.
 - `WorkerCollectorGarageSpawnProvider`: instantiates multiple collectors and binds their Garage ownership before activation.
@@ -92,7 +91,7 @@ The current generated POI order places Resting at slot 1, Garage at slot 5, and 
 
 All Worker Collectors currently use the primary generated Garage provider. This supports the current generator, which permits at most one Garage and one Conveyor. If future generation allows multiple Garage/Conveyor pairs, collector ownership should be distributed to each pair rather than only increasing the primary Garage's collector count.
 
-Worker Collectors spawned because of Resting rooms still require the generated Garage/Conveyor pipeline to perform useful collection work. Level 7+ maps currently satisfy that dependency because they inherit at least the six-POI Level 6 layout.
+Worker Collectors spawned because of Resting rooms still require the generated Garage/Conveyor pipeline to perform useful collection work. Level 6+ maps satisfy that dependency because they derive from the six-POI Level 5 layout.
 
 ## Tests
 

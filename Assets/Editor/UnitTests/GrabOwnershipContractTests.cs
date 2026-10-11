@@ -113,6 +113,26 @@ public class GrabOwnershipContractTests {
         Assert.IsFalse(disabledBinder.enabled);
     }
 
+    [Test]
+    public void BossPrefab_FaintStateRemainsGrabbable() {
+        const string prefabPath = "Assets/Resources/Prefabs/Robots/Boss/BossMony.prefab";
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        Assert.IsNotNull(prefab, prefabPath);
+
+        GameObject instance = Object.Instantiate(prefab);
+        createdObjects.Add(instance);
+        RobotStateController state = instance.GetComponent<RobotStateController>();
+        EnemyGrabbable grabbable = instance.GetComponent<EnemyGrabbable>();
+        Assert.IsNotNull(state, prefabPath);
+        Assert.IsNotNull(grabbable, prefabPath);
+
+        state.UpdateState(RobotState.Faint);
+        state.ApplyEnemyFaintPose();
+
+        Assert.IsTrue(grabbable.CanBeGrabbed(null),
+            "The Boss must remain grabbable after the all-machines-off faint transition.");
+    }
+
     [TestCase("Assets/Resources/Prefabs/Robots/Worker/WorkerTransform.prefab")]
     [TestCase("Assets/Resources/Prefabs/Robots/SecurityGuard/SecurityGuard.prefab")]
     [TestCase("Assets/Resources/Prefabs/Robots/Follower/Follower.prefab")]

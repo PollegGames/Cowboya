@@ -78,9 +78,6 @@ MonoBehaviour:
   - Kind: 1
     SceneName: Level_Laboratory
     GeneratedConfig: {fileID: 0}
-  - Kind: 2
-    SceneName: MapGeneration
-    GeneratedConfig: {fileID: 11400000, guid: b587bf48e9b94c13aca915086f1ea750, type: 2}
   sandboxConfig: {fileID: 11400000, guid: 7389573697e35074e8cf50f45fae4d43, type: 2}
   runNormalSceneName: MapGeneration
   firstStaticLevelSceneName: Level_1
