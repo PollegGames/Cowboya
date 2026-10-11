@@ -24,6 +24,7 @@ public class RunProgressManager : MonoBehaviour
     [SerializeField] private List<RunMapConfigSO> mapConfigs = new List<RunMapConfigSO>();
     private readonly List<RunMapConfigSO> originalMapConfigs = new List<RunMapConfigSO>();
     [SerializeField] private List<RunStepDefinition> runSteps = new List<RunStepDefinition>();
+    private readonly Dictionary<int, RunMapConfigSO> dynamicConfigsByPlayableLevel = new();
     [SerializeField] private RunMapConfigSO sandboxConfig;
     [SerializeField] private string runNormalSceneName = "MapGeneration";
     [SerializeField] private string firstStaticLevelSceneName = "Level_1";
@@ -84,23 +85,29 @@ public class RunProgressManager : MonoBehaviour
                 return step.GeneratedConfig;
             }
 
-            if (mapConfigs == null || mapConfigs.Count == 0)
-            {
-                return null;
-            }
-
-            int index = GetGeneratedStepOrdinal(currentRunStepIndex);
-            RunMapConfigSO cfg;
-            if (index >= mapConfigs.Count)
-            {
-                cfg = CreateDynamicConfig(index + 1);
-            }
-            else
-            {
-                cfg = mapConfigs[index];
-            }
-            return cfg;
+            return GetOrCreateDynamicConfig(currentLevelIndex);
         }
+    }
+
+    /// <summary>
+    /// Returns the generated-map setup used by a playable level number.
+    /// Static levels do not have a generated-map configuration and return null.
+    /// </summary>
+    public RunMapConfigSO GetConfigForPlayableLevel(int playableLevelIndex)
+    {
+        if (playableLevelIndex < 1)
+            return null;
+
+        EnsureDefaultRunSteps();
+        int stepIndex = FindGeneratedStepForPlayableLevel(playableLevelIndex);
+        if (stepIndex < 0)
+            return null;
+
+        RunStepDefinition step = ResolveStep(stepIndex);
+        if (step != null && step.GeneratedConfig != null)
+            return step.GeneratedConfig;
+
+        return GetOrCreateDynamicConfig(playableLevelIndex);
     }
 
     private void Awake()
@@ -143,6 +150,7 @@ public class RunProgressManager : MonoBehaviour
     //load first level
     public void LoadFirstLevel()
     {
+        DeleteRunAndResetTransientStats();
         ResetMapConfigs();
         currentRunStepIndex = -1;
         currentLevelIndex = 1;
@@ -170,6 +178,11 @@ public class RunProgressManager : MonoBehaviour
 
     public void LoadStep(int stepIndex)
     {
+        LoadStep(stepIndex, true);
+    }
+
+    private void LoadStep(int stepIndex, bool saveCheckpoint)
+    {
         EnsureDefaultRunSteps();
         RunStepDefinition step = ResolveStep(stepIndex);
         if (step == null)
@@ -187,19 +200,47 @@ public class RunProgressManager : MonoBehaviour
         currentRunStepIndex = stepIndex;
         currentLevelIndex = ResolvePlayableLevelIndex(stepIndex, step.Kind);
         hasActiveRun = true;
+        if (saveCheckpoint)
+        {
+            RunSaveStorage.SaveReachedStep(currentRunStepIndex, currentLevelIndex);
+        }
         SceneController.instance.LoadScene(step.SceneName);
     }
 
+    /// <summary>
+    /// Reloads the currently reached level without creating a new run.
+    /// </summary>
+    public void RestartCurrentLevel()
+    {
+        if (!hasActiveRun || currentRunStepIndex < 0)
+        {
+            Debug.LogWarning("RunProgressManager: cannot restart because no run step is active.");
+            return;
+        }
+
+        LoadStep(currentRunStepIndex, false);
+    }
+
+    /// <summary>
+    /// Retained for existing callers; restarting now reloads only the current level.
+    /// </summary>
     public void RestartRun()
     {
-        ResetMapConfigs();
+        RestartCurrentLevel();
+    }
+
+    /// <summary>
+    /// Ends the current run after player death and clears its checkpoint.
+    /// </summary>
+    public void EndRunAfterDeath()
+    {
+        DeleteRunAndResetTransientStats();
         currentRunStepIndex = -1;
         currentLevelIndex = 1;
-        hasActiveRun = true;
+        hasActiveRun = false;
         playerTemplate.ResetStats();
         runStats.Reset();
         LaboratoryProgress.Reset();
-        LoadStep(0);
     }
 
     public void EnsureRunContextForActiveScene(string sceneName)
@@ -234,8 +275,29 @@ public class RunProgressManager : MonoBehaviour
 
     private void ResetMapConfigs()
     {
+        foreach (RunMapConfigSO dynamicConfig in dynamicConfigsByPlayableLevel.Values)
+        {
+            if (dynamicConfig != null)
+                Destroy(dynamicConfig);
+        }
+        dynamicConfigsByPlayableLevel.Clear();
         mapConfigs.Clear();
         mapConfigs.AddRange(originalMapConfigs);
+    }
+
+    private static void DeleteRunAndResetTransientStats()
+    {
+        RunSaveStorage.DeleteRun();
+
+        PlayerSaveService saveService = FindFirstObjectByType<PlayerSaveService>();
+        if (saveService != null)
+        {
+            saveService.ResetRunProgress();
+        }
+        else
+        {
+            PlayerSaveService.ResetPersistedRunProgress();
+        }
     }
 
     private void EnsureDefaultRunSteps()
@@ -376,6 +438,23 @@ public class RunProgressManager : MonoBehaviour
         return Mathf.Max(1, playableLevelCount);
     }
 
+    private int FindGeneratedStepForPlayableLevel(int playableLevelIndex)
+    {
+        // A generated level is always followed by a laboratory in the dynamic
+        // part of the run, so this loop stays small even for stress-test levels.
+        int maximumStepCount = runSteps.Count + playableLevelIndex * 2;
+        for (int stepIndex = 0; stepIndex < maximumStepCount; stepIndex++)
+        {
+            if (GetStepKindAtIndex(stepIndex) == RunStepKind.GeneratedLevel
+                && CountPlayableLevelsThroughStep(stepIndex) == playableLevelIndex)
+            {
+                return stepIndex;
+            }
+        }
+
+        return -1;
+    }
+
     private int GetGeneratedStepOrdinal(int stepIndex)
     {
         int generatedCount = 0;
@@ -400,14 +479,49 @@ public class RunProgressManager : MonoBehaviour
         return SceneUtility.GetBuildIndexByScenePath($"Assets/Scenes/{sceneName}.unity") >= 0;
     }
 
-    private RunMapConfigSO CreateDynamicConfig(int levelIndex)
+    private RunMapConfigSO GetOrCreateDynamicConfig(int playableLevelIndex)
     {
-        RunMapConfigSO baseConfig = mapConfigs[mapConfigs.Count - 1];
+        if (dynamicConfigsByPlayableLevel.TryGetValue(playableLevelIndex, out RunMapConfigSO cached))
+            return cached;
+
+        RunMapConfigSO baseConfig = null;
+        if (dynamicConfigsByPlayableLevel.TryGetValue(playableLevelIndex - 1, out RunMapConfigSO previousDynamic))
+            baseConfig = previousDynamic;
+
+        if (baseConfig == null)
+        {
+            int stepIndex = FindGeneratedStepForPlayableLevel(playableLevelIndex);
+            for (int i = stepIndex - 1; i >= 0; i--)
+            {
+                RunStepDefinition previousStep = ResolveStep(i);
+                if (previousStep != null && previousStep.Kind == RunStepKind.GeneratedLevel
+                    && previousStep.GeneratedConfig != null)
+                {
+                    baseConfig = previousStep.GeneratedConfig;
+                    break;
+                }
+            }
+        }
+
+        if (baseConfig == null && mapConfigs != null && mapConfigs.Count > 0)
+            baseConfig = mapConfigs[mapConfigs.Count - 1];
+        if (baseConfig == null)
+            return null;
+
+        RunMapConfigSO created = CreateDynamicConfig(baseConfig, playableLevelIndex);
+        dynamicConfigsByPlayableLevel[playableLevelIndex] = created;
+        return created;
+    }
+
+    private static RunMapConfigSO CreateDynamicConfig(RunMapConfigSO baseConfig, int playableLevelIndex)
+    {
         RunMapConfigSO newConfig = ScriptableObject.CreateInstance<RunMapConfigSO>();
         newConfig.gridWidth = baseConfig.gridWidth;
         newConfig.gridHeight = baseConfig.gridHeight;
         newConfig.poiCount = baseConfig.poiCount;
         newConfig.workersCount = baseConfig.workersCount;
+        newConfig.workerCollectorsCount = baseConfig.workerCollectorsCount;
+        newConfig.workerCollectorsRestAfterBatch = baseConfig.workerCollectorsRestAfterBatch;
         newConfig.enemiesCount = baseConfig.enemiesCount;
 
         newConfig.GenerateRandomSeed();
@@ -421,7 +535,7 @@ public class RunProgressManager : MonoBehaviour
         }
 
         int increment = 1;
-        if (levelIndex % 2 == 0 && levelIndex >= 4)
+        if (playableLevelIndex % 2 == 0)
         {
             increment += 2;
         }
@@ -438,7 +552,6 @@ public class RunProgressManager : MonoBehaviour
         newConfig.enemiesCount = Mathf.Min(newConfig.enemiesCount, MaxEnemiesCount);
         newConfig.workersCount = Mathf.Min(newConfig.workersCount, MaxWorkersCount);
 
-        mapConfigs.Add(newConfig);
         return newConfig;
     }
 }

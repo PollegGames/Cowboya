@@ -157,7 +157,9 @@ public sealed class RestingMachine : BaseMachine
     {
         if (worker == null || !isOn) return false;
         if (worker.Heart == null) return false;
-        if (worker.Heart.Role != RobotRole.Worker && worker.Heart.Role != RobotRole.SecurityGuard) return false;
+        if (worker.Heart.Role != RobotRole.Worker
+            && worker.Heart.Role != RobotRole.SecurityGuard
+            && worker.Heart.Role != RobotRole.WorkerCollector) return false;
         if (currentWorker != null && !ReferenceEquals(currentWorker, worker)) return false;
         return true;
     }
@@ -205,6 +207,8 @@ public sealed class RestingMachine : BaseMachine
     {
         CancelRestCountdown();
         if (worker == null) return;
+        if (worker.Heart != null && worker.Heart.Role == RobotRole.WorkerCollector)
+            return;
 
         restCountdownCo = StartCoroutine(RestCountdown(worker));
     }

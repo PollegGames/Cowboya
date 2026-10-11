@@ -11,6 +11,7 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private RoomWaypoint restWaypoint;
     [SerializeField] private Transform restPoint;
+    [SerializeField] private RestingMachine restingMachine;
     [SerializeField, Min(0f)] private float restDuration = 5f;
     [SerializeField, Min(1)] private int maximumLiveCollectors = 1;
 
@@ -21,6 +22,7 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
     public float RestDuration => Mathf.Max(0f, restDuration);
     public int MaximumLiveCollectors => Mathf.Max(1, maximumLiveCollectors);
     public Vector3 SpawnPosition => spawnPoint != null ? spawnPoint.position : transform.position;
+    public bool IsPowered => restingMachine == null || restingMachine.IsOn;
 
     // Static rooms use an XZ presentation hierarchy that is commonly pitched -90 degrees.
     // The worker collector is a 2D rig, so only its prefab-authored rotation is valid here.
@@ -47,6 +49,26 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
         restPoint = configuredRestPoint;
         restDuration = Mathf.Max(0f, duration);
         maximumLiveCollectors = Mathf.Max(1, maximumLive);
+    }
+
+    /// <summary>Attempts to claim the physical Rest machine, or succeeds for a point-only provider.</summary>
+    public bool TryEnterRest(RobotBrainNew collector)
+    {
+        if (collector == null || !IsPowered)
+            return false;
+        if (restingMachine == null)
+            return true;
+        if (ReferenceEquals(restingMachine.CurrentWorker, collector))
+            return true;
+        if (restingMachine.CurrentWorker != null)
+            return false;
+        return restingMachine.TryAttachWorker(collector, "worker_collector_rest");
+    }
+
+    /// <summary>Releases the physical Rest machine after the collector's rest completes.</summary>
+    public void ReleaseRest(RobotBrainNew collector)
+    {
+        restingMachine?.TryReleaseWorker(collector, "worker_collector_rest_done");
     }
 
     /// <summary>
@@ -117,6 +139,8 @@ public sealed class WorkerCollectorSpawnRestProvider : MonoBehaviour
 
     private void ResolveReferences()
     {
+        if (restingMachine == null)
+            restingMachine = GetComponentInParent<RestingMachine>() ?? GetComponentInChildren<RestingMachine>(true);
         if (spawnPoint == null)
             spawnPoint = transform.Find("WorkerCollectorSpawnPoint");
         if (restPoint == null)

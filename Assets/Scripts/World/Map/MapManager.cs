@@ -174,6 +174,7 @@ public class MapManager : MonoBehaviour
             workPrefab);
 
         gridManager.AssignRoomProperties(roomInstances, cellDataGrid);
+        RefreshGeneratedDoorProperties();
 
         string orderedPOIs = string.Join(", ", cellDataGrid.Values
             .Select(cell => cell.cellProperties)
@@ -184,6 +185,22 @@ public class MapManager : MonoBehaviour
             $"Generated map: seed={seed}, morality={morality:0.##}, POIs=[{orderedPOIs}]. " +
             $"Random weights: {POIRoomTypeSelector.DescribeWeights(morality)}",
             this);
+    }
+
+    private void RefreshGeneratedDoorProperties()
+    {
+        foreach (GameObject room in roomInstances.Values)
+        {
+            foreach (DoorController door in room.GetComponentsInChildren<DoorController>(true))
+            {
+                door.RefreshFromRoomProperties();
+            }
+
+            foreach (LevelEndVictoryTrigger trigger in room.GetComponentsInChildren<LevelEndVictoryTrigger>(true))
+            {
+                trigger.RefreshFromRoomProperties();
+            }
+        }
     }
 
     /// <summary>
@@ -283,8 +300,13 @@ public class MapManager : MonoBehaviour
         IEnemiesSpawner enemiesSpawner)
     {
         var registeredRooms = new List<RoomManager>();
+        if (roomInstances == null)
+            return registeredRooms;
+
         foreach (var roomGO in roomInstances.Values)
         {
+            if (roomGO == null)
+                continue;
             var rm = roomGO.GetComponent<RoomManager>();
             if (rm != null)
             {

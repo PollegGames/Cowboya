@@ -25,6 +25,7 @@ public class GameUIViewModel : MonoBehaviour
     private Button resumeButton;
     private Button restartButton;
     private Button mainMenuButton;
+    private bool deathHandled;
 
     private void Awake()
     {
@@ -130,6 +131,11 @@ public class GameUIViewModel : MonoBehaviour
     {
         if (newState == RobotState.Dead)
         {
+            if (deathHandled)
+                return;
+
+            deathHandled = true;
+            RunProgressManager.Instance?.EndRunAfterDeath();
             StartCoroutine(LoadSceneAfterDelay());
         }
     }

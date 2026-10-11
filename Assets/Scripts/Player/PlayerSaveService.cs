@@ -115,6 +115,32 @@ public class PlayerSaveService : MonoBehaviour, ISaveService
         Debug.Log("Save data reset.");
     }
 
+    /// <summary>
+    /// Clears temporary run stats without removing profile unlocks or settings.
+    /// </summary>
+    public void ResetRunProgress()
+    {
+        CurrentSaveData ??= new SaveData();
+        CurrentSaveData.ResetRunProgress();
+        WriteSaveToPath(saveFilePath, CurrentSaveData);
+        Debug.Log("Run stats reset while profile data was preserved.");
+    }
+
+    /// <summary>
+    /// Clears temporary run stats in the persisted profile when no save service is active.
+    /// </summary>
+    public static void ResetPersistedRunProgress()
+    {
+        SaveData data;
+        if (!TryLoadFromPath(saveFilePath, out data))
+        {
+            data = new SaveData();
+        }
+
+        data.ResetRunProgress();
+        WriteSaveToPath(saveFilePath, data);
+    }
+
     private void WriteCurrentSaveData(string message)
     {
         WriteSaveToPath(saveFilePath, CurrentSaveData);

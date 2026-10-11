@@ -2,6 +2,85 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>Describes the worker roles that should be created for a generated map.</summary>
+public readonly struct WorkerPopulation
+{
+    public WorkerPopulation(int workers, int workerCollectors, bool workerCollectorsRestAfterBatch)
+    {
+        Workers = workers;
+        WorkerCollectors = workerCollectors;
+        WorkerCollectorsRestAfterBatch = workerCollectorsRestAfterBatch;
+    }
+
+    public int Workers { get; }
+    public int WorkerCollectors { get; }
+    public bool WorkerCollectorsRestAfterBatch { get; }
+}
+
+/// <summary>Calculates level-seven-and-later worker counts from generated room roles.</summary>
+public static class GeneratedWorkerPopulation
+{
+    /// <summary>
+    /// Adds one Worker per Work room, one Worker and one Worker Collector per Resting room,
+    /// and one Worker Collector per complete Garage/Conveyor pair.
+    /// </summary>
+    public static WorkerPopulation Calculate(IEnumerable<RoomManager> rooms)
+    {
+        int workRooms = 0;
+        int restingRooms = 0;
+        int garages = 0;
+        int conveyors = 0;
+
+        if (rooms != null)
+        {
+            foreach (RoomManager room in rooms)
+            {
+                RoomProperties properties = room != null ? room.roomProperties : null;
+                if (properties == null)
+                    continue;
+
+                if (properties.usageType == UsageType.Work)
+                {
+                    workRooms++;
+                    continue;
+                }
+
+                if (properties.usageType != UsageType.POI)
+                    continue;
+
+                switch (properties.poiType)
+                {
+                    case POIType.Resting:
+                        restingRooms++;
+                        break;
+                    case POIType.Garage:
+                        garages++;
+                        break;
+                    case POIType.Conveyor:
+                        conveyors++;
+                        break;
+                }
+            }
+        }
+
+        return Calculate(workRooms, restingRooms, garages, conveyors);
+    }
+
+    /// <summary>Calculates the population from already-counted generated room roles.</summary>
+    public static WorkerPopulation Calculate(
+        int workRooms, int restingRooms, int garages, int conveyors)
+    {
+        int safeWorkRooms = System.Math.Max(0, workRooms);
+        int safeRestingRooms = System.Math.Max(0, restingRooms);
+        int pairedGarages = System.Math.Min(
+            System.Math.Max(0, garages), System.Math.Max(0, conveyors));
+        return new WorkerPopulation(
+            safeWorkRooms + safeRestingRooms,
+            safeRestingRooms + pairedGarages,
+            workerCollectorsRestAfterBatch: true);
+    }
+}
+
 public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 {
     [Header("Prefabs")]
@@ -92,9 +171,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
             state.Stats = factory.CreateRobot();
             state.Stats.RobotName = $"Worker {i + 1}";
+            go.name = $"Worker {i + 1}";
             go.SetActive(false);
             spawnedWorkers.Add(go);
         }
+
+        Debug.Log($"[WorkerPopulation] Created normal workers={spawnedWorkers.Count}/{Mathf.Max(0, count)}.", this);
     }
 
     public void CreateWorkerSpawners(int count)
@@ -257,7 +339,7 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
     }
 
     /// <summary>Populates robots whose existence is derived from generated room identities.</summary>
-    public void SpawnDedicatedRoomRobots()
+    public void SpawnDedicatedRoomRobots(int workerCollectorCount = 1, bool restAfterBatch = true)
     {
         SpawnSecurityReceptionGuards();
 
@@ -266,12 +348,12 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             && room.roomProperties != null
             && room.roomProperties.usageType == UsageType.POI
             && room.roomProperties.poiType == POIType.Garage
-            && room.roomProperties.POISlot == 6);
+            && room.roomProperties.POISlot == 5);
         bool hasPairedConveyor = rooms.Any(room => room != null
             && room.roomProperties != null
             && room.roomProperties.usageType == UsageType.POI
             && room.roomProperties.poiType == POIType.Conveyor
-            && room.roomProperties.POISlot == 7);
+            && room.roomProperties.POISlot == 6);
 
         if (primaryGarage == null || !hasPairedConveyor)
             return;
@@ -285,8 +367,10 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             return;
         }
 
-        provider.TrySpawnCollector();
-        Debug.Log($"DedicatedRoomPopulation receptions={receptionGuardByPost.Count} garages=1", this);
+        int requestedCollectors = Mathf.Max(0, workerCollectorCount);
+        int spawnedCollectors = provider.TrySpawnCollectors(requestedCollectors, restAfterBatch);
+        Debug.Log($"DedicatedRoomPopulation receptions={receptionGuardByPost.Count} garages=1 "
+            + $"collectors={spawnedCollectors}/{requestedCollectors}", this);
     }
 
     /// <summary>
@@ -389,6 +473,8 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
 
     public void SpreadEnemies()
     {
+        var workerSpawnUses = new Dictionary<RoomWaypoint, int>();
+        int activeWorkerCount = 0;
         foreach (var w in spawnedWorkers)
         {
             if (w == null)
@@ -401,10 +487,15 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
                 continue;
             }
 
-            PositionForSpawn(w, p.WorldPos);
+            workerSpawnUses.TryGetValue(p, out int spawnUseIndex);
+            workerSpawnUses[p] = spawnUseIndex + 1;
+            PositionForSpawn(w, GetWorkerSpawnPosition(p, spawnUseIndex));
             InitializeRobot(w, RobotRole.Worker, p);
             Wake(w);
+            activeWorkerCount++;
         }
+
+        Debug.Log($"[WorkerPopulation] Activated normal workers={activeWorkerCount}/{spawnedWorkers.Count}.", this);
 
         foreach (var ws in spawnedWorkerSpawners)
         {
@@ -449,6 +540,17 @@ public class EnemiesSpawner : MonoBehaviour, IEnemiesSpawner, IDropHost
             InitializeRobot(bossInstance, RobotRole.Boss, p);
             Wake(bossInstance);
         }
+    }
+
+    private static Vector3 GetWorkerSpawnPosition(RoomWaypoint waypoint, int useIndex)
+    {
+        if (waypoint == null || useIndex <= 0)
+            return waypoint != null ? waypoint.WorldPos : Vector3.zero;
+
+        const float spacing = 1.25f;
+        int ringIndex = (useIndex + 1) / 2;
+        float direction = useIndex % 2 == 1 ? 1f : -1f;
+        return waypoint.WorldPos + Vector3.right * spacing * ringIndex * direction;
     }
 
     public void SpawnEnemyAtRandom()

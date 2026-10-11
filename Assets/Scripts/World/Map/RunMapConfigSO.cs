@@ -12,6 +12,8 @@ public class RunMapConfigSO : ScriptableObject
 
     [Header("Enemies")]
     public int workersCount = 1;
+    [Min(0)] public int workerCollectorsCount = 1;
+    public bool workerCollectorsRestAfterBatch = true;
     public int enemiesCount = 1;
 
     // Compatibility alias: security guards are currently backed by enemiesCount in assets.

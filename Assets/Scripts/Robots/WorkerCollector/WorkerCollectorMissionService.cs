@@ -31,12 +31,32 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         new List<WorkerCollectorSpawnRestProvider>();
     private static readonly Dictionary<int, WorkerCollectorDropOffProvider> collectorGarages =
         new Dictionary<int, WorkerCollectorDropOffProvider>();
+    private static readonly Dictionary<int, bool> collectorRestPolicies =
+        new Dictionary<int, bool>();
     private static WorkerCollectorMissionService instance;
 
     private int nextMissionId;
     private WorkerCollectorAssignmentFailure lastReportedFailure;
 
     public static WorkerCollectorAssignmentFailure LastAssignmentFailure { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        sources.Clear();
+        dropOffs.Clear();
+        rests.Clear();
+        collectorGarages.Clear();
+        collectorRestPolicies.Clear();
+        instance = null;
+        LastAssignmentFailure = WorkerCollectorAssignmentFailure.None;
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+            instance = null;
+    }
 
     public static void RegisterSource(WorkerCollectorWhiteCubeSourceProvider source)
     {
@@ -91,17 +111,24 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
 
     /// <summary>Binds a collector to the Garage that owns its missions.</summary>
     public static void BindGarage(WorkerCollectorBodyController collector,
-        WorkerCollectorDropOffProvider garage)
+        WorkerCollectorDropOffProvider garage, bool restAfterBatch = true)
     {
-        if (collector != null && garage != null)
+        if (collector != null && garage != null) {
             collectorGarages[collector.GetInstanceID()] = garage;
+            collectorRestPolicies[collector.GetInstanceID()] = restAfterBatch;
+            garage.RegisterCollector(collector);
+        }
     }
 
     /// <summary>Clears the ownership record for a collector leaving the scene.</summary>
     public static void UnbindGarage(WorkerCollectorBodyController collector)
     {
-        if (collector != null)
+        if (collector != null) {
+            if (collectorGarages.TryGetValue(collector.GetInstanceID(), out WorkerCollectorDropOffProvider garage))
+                garage?.UnregisterCollector(collector);
             collectorGarages.Remove(collector.GetInstanceID());
+            collectorRestPolicies.Remove(collector.GetInstanceID());
+        }
     }
 
     /// <summary>Spawns the legacy static-scene collector with an explicit Garage assignment.</summary>
@@ -158,6 +185,38 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         return false;
     }
 
+    /// <summary>Moves a collector to another powered Rest provider, or to Start when none remains.</summary>
+    public static bool RequestRestReassignment(
+        WorkerCollectorBodyController collector,
+        WorkerCollectorMissionAssignment assignment)
+    {
+        if (collector == null || collector.Brain == null || collector.Brain.Memory == null || assignment == null)
+            return false;
+
+        RemoveMissingRegistrations();
+        WorkerCollectorSpawnRestProvider replacementRest = rests
+            .Where(candidate => candidate != null
+                && candidate.isActiveAndEnabled
+                && candidate.IsPowered
+                && !ReferenceEquals(candidate, assignment.Rest))
+            .OrderBy(candidate => Vector3.SqrMagnitude(candidate.RestPosition - collector.transform.position))
+            .ThenBy(candidate => GetStableGridOrder(candidate.transform))
+            .FirstOrDefault();
+
+        var replacement = new WorkerCollectorMissionAssignment(
+            assignment.MissionId,
+            assignment.Source,
+            assignment.DropOff,
+            replacementRest,
+            assignment.Target,
+            assignment.Claim,
+            assignment.Reservation);
+        bool replaced = collector.Brain.Memory.TryReplaceWorkerCollectorRest(assignment, replacement);
+        if (replaced)
+            collector.AcceptRestReassignment(replacement);
+        return replaced;
+    }
+
     private static void EnsureInstance()
     {
         if (instance != null)
@@ -188,7 +247,10 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         }
 
         RemoveMissingRegistrations();
-        collectorGarages.TryGetValue(collector.GetInstanceID(), out WorkerCollectorDropOffProvider dropOff);
+        int collectorId = collector.GetInstanceID();
+        collectorGarages.TryGetValue(collectorId, out WorkerCollectorDropOffProvider dropOff);
+        bool restAfterBatch = !collectorRestPolicies.TryGetValue(collectorId, out bool configuredRest)
+            || configuredRest;
         if (dropOff == null || !dropOff.isActiveAndEnabled || !dropOff.IsGarageDestination)
             dropOff = null;
         if (dropOff == null || dropOff.ApproachWaypoint == null)
@@ -205,11 +267,13 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
             .ToArray();
         foreach (WorkerCollectorWhiteCubeSourceProvider source in orderedSources)
         {
-            WorkerCollectorSpawnRestProvider rest = rests
-                .Where(candidate => candidate != null && candidate.isActiveAndEnabled)
-                .OrderBy(candidate => Vector3.SqrMagnitude(candidate.RestPosition - dropOff.WaitPosition))
-                .ThenBy(candidate => GetStableGridOrder(candidate.transform))
-                .FirstOrDefault();
+            WorkerCollectorSpawnRestProvider rest = restAfterBatch
+                ? rests
+                    .Where(candidate => candidate != null && candidate.isActiveAndEnabled)
+                    .OrderBy(candidate => Vector3.SqrMagnitude(candidate.RestPosition - dropOff.WaitPosition))
+                    .ThenBy(candidate => GetStableGridOrder(candidate.transform))
+                    .FirstOrDefault()
+                : null;
             var assignment = new WorkerCollectorMissionAssignment(
                 ++nextMissionId, source, dropOff, rest);
             if (collector.Brain.Memory.TryAssignWorkerCollectorMission(assignment))
@@ -258,6 +322,9 @@ public sealed class WorkerCollectorMissionService : MonoBehaviour
         int[] stale = collectorGarages.Where(pair => pair.Value == null)
             .Select(pair => pair.Key).ToArray();
         for (int i = 0; i < stale.Length; i++)
+        {
             collectorGarages.Remove(stale[i]);
+            collectorRestPolicies.Remove(stale[i]);
+        }
     }
 }

@@ -28,7 +28,7 @@ public static class DocBotPrefabBuilder {
     public const string WorkerPuppetPrefabPath =
         "Assets/Resources/Prefabs/Robots/RobotPackage/RobotDrawings/Worker/Format PSD/Worker_Puppet.prefab";
     public const string WorkerFinalPrefabPath =
-        "Assets/Resources/Prefabs/Robots/Worker/Worker3.prefab";
+        "Assets/Resources/Prefabs/Robots/Worker/WorkerTransform.prefab";
     public const string FinalPrefabPath =
         "Assets/Resources/Prefabs/Robots/DocBot/DocBot.prefab";
     public const string MasterPrefabPath =

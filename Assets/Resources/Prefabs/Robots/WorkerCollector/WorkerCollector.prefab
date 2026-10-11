@@ -39,6 +39,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 159342441083899244, guid: eb1a9ca185bd3584a84b9fdda083192b, type: 3}
+      propertyPath: m_Controller
+      value:
+      objectReference: {fileID: 22100000, guid: b1e92f46f84942a1af53b54783fb8f6e, type: 2}
     - target: {fileID: 6984445060703993, guid: eb1a9ca185bd3584a84b9fdda083192b, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: 0.87141883

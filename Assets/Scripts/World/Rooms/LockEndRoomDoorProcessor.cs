@@ -27,6 +27,10 @@ public class LockEndRoomDoorProcessor : CellProcessor
             {
                 doorAction(cell, DoorDirection.Left);
                 doorAction(cell, DoorDirection.Right);
+                // The trigger reads this flag from the End room's RoomProperties.
+                // Keep it on the same badge-locked door instead of marking every
+                // room that happens to touch the edge of the generated map.
+                MarkVictoryDoorIfOnEdge(cell);
             }
 
             // Check right neighbor
@@ -48,8 +52,6 @@ public class LockEndRoomDoorProcessor : CellProcessor
                     doorAction(cell, DoorDirection.Left);
                 }
             }
-            // Mark the door as a victory door if this End room is at the map edge
-            MarkVictoryDoorIfOnEdge(cell);
         }
     }
 }

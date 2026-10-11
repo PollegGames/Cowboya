@@ -210,6 +210,16 @@ public class RobotMemoryNew : MonoBehaviour, IRobotMemoryNew
     public bool TryApplyWorkerCollectorObservation(WorkerCollectorBodyObservation observation) =>
         memoryState.TryApplyWorkerCollectorObservation(observation);
 
+    /// <summary>Moves this collector into the synchronized rest phase for its Garage team.</summary>
+    public bool TryStartWorkerCollectorTeamRest(WorkerCollectorMissionAssignment assignment) =>
+        memoryState.TryStartWorkerCollectorTeamRest(assignment);
+
+    /// <summary>Replaces only the Rest destination while preserving the active collector route.</summary>
+    public bool TryReplaceWorkerCollectorRest(
+        WorkerCollectorMissionAssignment current,
+        WorkerCollectorMissionAssignment replacement) =>
+        memoryState.TryReplaceWorkerCollectorRest(current, replacement);
+
     /// <summary>
     /// Clears a matching Worker Collector mission.
     /// </summary>

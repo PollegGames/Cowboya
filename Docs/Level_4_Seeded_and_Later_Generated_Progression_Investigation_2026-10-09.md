@@ -1,5 +1,17 @@
 # Level 4 Seeded Map and Later Generated Progression Investigation
 
+## Current reconciliation 2026 10 11
+
+The current gameplay contract supersedes the earlier Level 7/8 proposal in this document:
+
+- Levels 1, 2, and 3 are static scenes.
+- Levels 4, 5, and 6 use explicit generated-map configuration assets.
+- Level 7 onward uses randomized map generation.
+
+The current `RunProgressManager` prefab contains explicit generated steps for `Setup Level 4`, `Setup Level 5`, and `Setup Level 6`, with Laboratory steps between them. `ResolvePlayableLevelIndex()` now counts playable static and generated steps instead of using the former hard-coded generated-level base of 6.
+
+Remaining work is to make Level 7 the explicit first dynamic level, cache its generated configuration for restart consistency, remove stale fallback scene-to-step indices, and verify the full itinerary in tests. The historical sections below are retained as investigation context; where they propose a fixed Level 7 and random Level 8+, this reconciliation is authoritative.
+
 ## Status
 
 Planning document only. No runtime code, scene, prefab, or map configuration has been changed.

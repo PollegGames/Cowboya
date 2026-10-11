@@ -70,6 +70,19 @@ public class RestingSlot : MonoBehaviour
         RobotEcosystemProbe.RecordSlotDecision(this, "RestingSlot", "exit_tracked", brain, machine, brain.Heart != null ? brain.Heart.CurrentTask : null);
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        var brain = collision.GetComponentInParent<RobotBrainNew>();
+        if (brain == null || brain.Heart == null || !CanUseRestSlot(brain.Heart))
+            return;
+        if (machine == null || !machine.IsOn || machine.IsOccupied)
+            return;
+        if (!IsIncomingRobotTargetingThisSlot(brain))
+            return;
+
+        TryAttachOrReplace(brain);
+    }
+
     private bool TryAttachOrReplace(RobotBrainNew incoming)
     {
         if (machine == null || incoming == null)
@@ -92,15 +105,14 @@ public class RestingSlot : MonoBehaviour
         if (ReferenceEquals(current, incoming))
             return true;
 
-        bool replaced = machine.TryReplaceWorker(incoming, "enter_replace");
         RobotEcosystemProbe.RecordSlotDecision(
             this,
             "RestingSlot",
-            replaced ? "replaced_current" : "replace_rejected",
+            "queued_occupied",
             incoming,
             machine,
             incoming.Heart != null ? incoming.Heart.CurrentTask : null);
-        return replaced;
+        return false;
     }
 
     private void HandlePoweredOffMachineArrival(RobotBrainNew brain, RobotTask currentTask)
@@ -122,11 +134,9 @@ public class RestingSlot : MonoBehaviour
                 "machine=" + machine.name
                 + " localObservation=True"
                 + " memoryUpdated=True"
-                + " taskBlocked=True"
+                + " taskBlocked=False"
                 + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None"));
         }
-
-        brain?.Heart?.BlockCurrentTask();
     }
 
     private bool TryTrackEnter(RobotBrainNew brain, RobotHeartNew heart)

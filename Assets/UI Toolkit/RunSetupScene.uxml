@@ -4,6 +4,12 @@
         <engine:VisualElement name="VisualElement" class="left-panel vertical-layout setup-container" style="height: 956px; margin: 29px 10px 29px 29px; width: 496px; padding-right: -105px;">
             <engine:Label text="GRID SETUP" class="section-title" style="-unity-text-align: upper-center; width: 243px; font-size: 24px;" />
             <engine:VisualElement class="int-field-with-buttons">
+                <engine:Label name="level-selection-label" text="LEVEL" class="int-label" style="width: 203px;" />
+                <engine:Button name="level-minus-button" text="-" class="int-button" />
+                <engine:TextField name="level-field" value="4" style="font-size: 24px; width: 100px;" />
+                <engine:Button name="level-plus-button" text="+" class="int-button" />
+            </engine:VisualElement>
+            <engine:VisualElement class="int-field-with-buttons">
                 <engine:Label text="WIDTH" class="int-label" style="width: 203px;" />
                 <engine:Button name="width-minus-button" text="−" class="int-button" />
                 <engine:IntegerField name="width-field" style="font-size: 24px; width: 100px;" />

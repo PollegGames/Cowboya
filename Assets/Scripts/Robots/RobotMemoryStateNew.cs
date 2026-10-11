@@ -359,6 +359,9 @@ public class RobotMemoryStateNew
             return false;
 
         facts.Assignment = claimedAssignment;
+        // Source acquisition happens only once the collector is already parked at
+        // the conveyor work point. Start the grab system immediately; the arm reach
+        // controller handles the remaining distance without moving the robot body.
         facts.TargetApproachReached = true;
         facts.GarageAvailable = true;
         snapshot.WorkerCollector = facts;
@@ -498,6 +501,42 @@ public class RobotMemoryStateNew
             default:
                 return false;
         }
+    }
+
+    /// <summary>Interrupts any active collection step when the shared Garage batch completes.</summary>
+    public bool TryStartWorkerCollectorTeamRest(WorkerCollectorMissionAssignment assignment)
+    {
+        WorkerCollectorMissionFacts facts = snapshot.WorkerCollector;
+        if (assignment == null || !ReferenceEquals(facts.Assignment, assignment))
+            return false;
+
+        facts.DeliveryAccepted = true;
+        facts.WaitingForBatch = true;
+        facts.BatchCompleted = true;
+        facts.CargoSecured = false;
+        facts.CargoLost = false;
+        facts.TargetUnavailable = false;
+        facts.DropOffApproachReached = false;
+        snapshot.WorkerCollector = facts;
+        Raise(MemoryChangeType.WorkerCollectorBatchCompleted);
+        return true;
+    }
+
+    /// <summary>Changes the Rest destination after it powers off without losing the service route.</summary>
+    public bool TryReplaceWorkerCollectorRest(
+        WorkerCollectorMissionAssignment current,
+        WorkerCollectorMissionAssignment replacement)
+    {
+        WorkerCollectorMissionFacts facts = snapshot.WorkerCollector;
+        if (current == null || replacement == null || !ReferenceEquals(facts.Assignment, current))
+            return false;
+
+        facts.Assignment = replacement;
+        facts.RestApproachReached = false;
+        facts.RestCompleted = false;
+        snapshot.WorkerCollector = facts;
+        Raise(MemoryChangeType.WorkerCollectorRestChanged);
+        return true;
     }
 
     /// <summary>

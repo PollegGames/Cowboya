@@ -64,4 +64,31 @@ public class StationReservationServiceTests
         Assert.AreEqual(1, poweredOff);
         Assert.AreEqual(1, poweredOn);
     }
+
+    [Test]
+    public void Reservation_TracksOwner_AndRejectsReleaseByDifferentRobot()
+    {
+        var machine = new GameObject("Rest").AddComponent<DummyMachine>();
+        var owner = new GameObject("Owner").AddComponent<RobotBrainNew>();
+        var other = new GameObject("Other").AddComponent<RobotBrainNew>();
+        service.RegisterMachine(machine, RobotRole.Worker);
+
+        Assert.IsTrue(service.TryReserveStation(machine, RobotRole.Worker, owner, "rest"));
+        Assert.IsTrue(service.TryGetReservation(machine, out var reservation));
+        Assert.AreSame(owner, reservation.Owner);
+        Assert.AreEqual("rest", reservation.Purpose);
+        Assert.IsFalse(service.ReleaseStation(machine, other));
+        Assert.IsTrue(service.ReleaseStation(machine, owner));
+    }
+
+    [Test]
+    public void Machine_CanBeAvailableToWorkerAndSecurityGuard_ButOnlyOneCanReserveIt()
+    {
+        var machine = new GameObject("SharedRest").AddComponent<DummyMachine>();
+        service.RegisterMachine(machine, RobotRole.Worker);
+        service.RegisterMachine(machine, RobotRole.SecurityGuard);
+
+        Assert.AreSame(machine, service.ReserveStation(RobotRole.Worker));
+        Assert.IsNull(service.ReserveStation(RobotRole.SecurityGuard));
+    }
 }

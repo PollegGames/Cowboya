@@ -192,7 +192,9 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
         Debug.Log("Robot SAVED");
         playerStats?.UpdateMorality(1f);
 
-        if (victorySetup != null && factoryAlarmStatus != null && victorySetup.currentSaved >= victorySetup.robotsSavedTarget)
+        if (victorySetup != null && factoryAlarmStatus != null
+            && victorySetup.robotsSavedTarget > 0
+            && victorySetup.currentSaved >= victorySetup.robotsSavedTarget)
             factoryAlarmStatus.CurrentAlarmState = AlarmState.Revolt;
     }
 
@@ -238,8 +240,16 @@ public class FactoryManager : MonoBehaviour, IFactoryManager
 
         var heart = controller.GetComponent<RobotHeartNew>();
         var role = heart != null ? heart.Role : RobotRole.Worker;
-        if (role == RobotRole.Worker || role == RobotRole.WorkerSpawner)
+        if (IsSaveEligibleRole(role))
             OnRobotSaved();
+    }
+
+    /// <summary>Returns whether the role can complete the Start-room rescue flow.</summary>
+    public static bool IsSaveEligibleRole(RobotRole role)
+    {
+        return role == RobotRole.Worker
+            || role == RobotRole.WorkerCollector
+            || role == RobotRole.SecurityGuard;
     }
 
     private void HandlePlayerStateChange(RobotState newState)

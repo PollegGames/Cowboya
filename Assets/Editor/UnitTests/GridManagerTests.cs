@@ -24,7 +24,8 @@ public class GridManagerTests
     [Test]
     public void CreateAndInitializeGrid_ReturnsGrid()
     {
-        var grid = _manager.CreateAndInitializeGrid();
+        var manager = new GridManager(1, 2, 1, 1, 0);
+        var grid = manager.CreateAndInitializeGrid();
 
         Assert.IsNotNull(grid);
         Assert.Greater(grid.Count, 0);

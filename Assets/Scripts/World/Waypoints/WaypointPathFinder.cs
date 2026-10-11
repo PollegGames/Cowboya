@@ -47,6 +47,7 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
             foreach (var neighbor in current.Neighbors)
             {
                 if (visited.Contains(neighbor)) continue;
+                if (neighbor != end && IsStartRoomWaypoint(neighbor)) continue;
                 queue.Enqueue(neighbor);
                 visited.Add(neighbor);
                 cameFrom[neighbor] = current;
@@ -61,6 +62,14 @@ public class WaypointPathFinder : MonoBehaviour, IPathFinder
             }
         }
         return new List<RoomWaypoint>();
+    }
+
+    private static bool IsStartRoomWaypoint(RoomWaypoint waypoint)
+    {
+        return waypoint != null
+            && waypoint.parentRoom != null
+            && waypoint.parentRoom.roomProperties != null
+            && waypoint.parentRoom.roomProperties.usageType == UsageType.Start;
     }
 
     public void BuildAllNeighbors(bool includeUnavailable = false)

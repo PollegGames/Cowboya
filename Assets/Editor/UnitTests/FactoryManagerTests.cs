@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Reflection;
 using System.Collections.Generic;
 using System;
+using UnityEngine.TestTools;
 
 public class FactoryManagerTests
 {
@@ -26,6 +27,9 @@ public class FactoryManagerTests
         var vs = ScriptableObject.CreateInstance<VictorySetup>();
         var spawner = new DummyEnemiesSpawner();
 
+        LogAssert.Expect(
+            LogType.Error,
+            "Missing generated-room prefab mappings on New Game Object: Reception, Security, Resting, Spawning, Garage, Conveyor, Furnace, Junks, Deads, CubeCollector.");
         Assert.DoesNotThrow(() => _factoryManager.Initialize(mapManager, waypointService, vs, spawner));
         Assert.AreEqual(waypointService, _factoryManager.GetWayPointService());
     }
@@ -185,7 +189,7 @@ public class FactoryManagerTests
         public void CreateWorkers(int workersToSpawn) { }
         public void CreateSecurityGuards(int enemiesToSpawn) { }
         public void SpawnSecurityReceptionGuards() { }
-        public void SpawnDedicatedRoomRobots() { }
+        public void SpawnDedicatedRoomRobots(int workerCollectorCount = 1, bool restAfterBatch = true) { }
         public void CreateBoss() { }
         public void SpawnBossAtEnd() { }
         public void CreateAndSpawnFollowerGuard(RoomWaypoint spawnPos, FactoryAlarmStatus factoryAlarmStatus) {}

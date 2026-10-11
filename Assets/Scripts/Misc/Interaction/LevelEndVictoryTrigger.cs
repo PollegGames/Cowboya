@@ -30,11 +30,44 @@ public class LevelEndVictoryTrigger : MonoBehaviour
             Debug.LogError("LevelEndVictoryTrigger: PlayerSaveService reference is missing.");
         }
 
+        RefreshFromRoomProperties();
+    }
+
+    private void Start()
+    {
+        // Generated RoomProperties are assigned after prefab Awake calls. Start
+        // runs after map construction, so the correct left/right exit is now known.
+        RefreshFromRoomProperties();
+    }
+
+    /// <summary>
+    /// Refreshes this trigger from the left/right victory flag on its room.
+    /// </summary>
+    public void RefreshFromRoomProperties()
+    {
         if (doorNext != null)
         {
+            doorNext.RefreshFromRoomProperties();
             isVictoryDoor = doorNext.isVictoryDoor;
         }
+
         UpdateVisual();
+    }
+
+    /// <summary>
+    /// Returns whether this trigger controls the supplied door.
+    /// </summary>
+    public bool ControlsDoor(DoorController door)
+    {
+        return doorNext == door;
+    }
+
+    /// <summary>
+    /// Returns whether at least one enabled save or kill goal has been reached.
+    /// </summary>
+    public bool IsVictoryConditionMet()
+    {
+        return victorySetup != null && victorySetup.HasMetAnyGoal();
     }
 
     private void UpdateVisual()
@@ -48,6 +81,7 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         ResolveRunStats();
+        RefreshFromRoomProperties();
 
         if (collision.CompareTag("Player") && IsAlwaysAllowedRunStep() && !hasRequestedLevelTransition)
         {
@@ -62,14 +96,9 @@ public class LevelEndVictoryTrigger : MonoBehaviour
             return;
         }
 
-        if (doorNext != null)
-        {
-            isVictoryDoor = doorNext.isVictoryDoor;
-        }
         if (victorySetup != null)
         {
-            bool isVictory = victorySetup.currentKilled >= victorySetup.robotsKilledTarget
-                || victorySetup.currentSaved >= victorySetup.robotsSavedTarget;
+            bool isVictory = IsVictoryConditionMet();
             if (isVictoryDoor && isVictory && collision.CompareTag("Player") && !hasRequestedLevelTransition)
             {
                 hasRequestedLevelTransition = true;

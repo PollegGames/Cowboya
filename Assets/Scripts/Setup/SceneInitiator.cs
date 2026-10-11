@@ -308,19 +308,59 @@ public class SceneInitiator : GameInitiator
             batterySpawner);
         if (mapConfig != null)
         {
-            int securityGuardsCount = mapConfig.securityGuardsCount;
-            enemiesSpawner.CreateWorkers(mapConfig.workersCount);
+            int securityGuardsCount = mapManager != null
+                ? mapManager.GetPOIRoomCount(POIType.Security)
+                : 0;
+            WorkerPopulation workerPopulation = ResolveWorkerPopulation();
+            Debug.Log($"[WorkerPopulation] Level="
+                + $"{(RunProgressManager.Instance != null ? RunProgressManager.Instance.CurrentLevelIndex : 0)} "
+                + $"total={workerPopulation.Workers + workerPopulation.WorkerCollectors} "
+                + $"normal={workerPopulation.Workers} collectors={workerPopulation.WorkerCollectors}.", this);
+            enemiesSpawner.CreateWorkers(workerPopulation.Workers);
             int spawningRoomCount = mapManager != null ? mapManager.GetPOIRoomCount(POIType.Spawning) : 0;
             enemiesSpawner.CreateWorkerSpawners(spawningRoomCount);
             enemiesSpawner.CreateSecurityGuards(securityGuardsCount);
             enemiesSpawner.CreateBoss();
         }
         enemiesSpawner.SpreadEnemies();
-        enemiesSpawner.SpawnDedicatedRoomRobots();
+        WorkerPopulation dedicatedPopulation = ResolveWorkerPopulation();
+        enemiesSpawner.SpawnDedicatedRoomRobots(
+            dedicatedPopulation.WorkerCollectors,
+            dedicatedPopulation.WorkerCollectorsRestAfterBatch);
         if (RobotNewPipelineRuntime.EnableProbeSummaryOnSceneInit)
             StartCoroutine(DumpProbeSummaryEndOfFrame());
         if (RobotNewPipelineRuntime.IsWorkerCycleValidationEnabled && RobotNewPipelineRuntime.EnableEcosystemProbe)
             StartCoroutine(DumpWorkerProbeSummaryIntervals());
+    }
+
+    private WorkerPopulation ResolveWorkerPopulation()
+    {
+        RunProgressManager runProgress = RunProgressManager.Instance;
+        if (runProgress != null && runProgress.CurrentLevelIndex >= 7)
+        {
+            RoomManager[] rooms = FindObjectsByType<RoomManager>(FindObjectsSortMode.None);
+            return GeneratedWorkerPopulation.Calculate(rooms);
+        }
+
+        int totalWorkers = mapConfig != null ? Mathf.Max(0, mapConfig.workersCount) : 0;
+        bool supportsCollectors = mapManager != null
+            && mapManager.GetPOIRoomCount(POIType.Resting) > 0
+            && mapManager.GetPOIRoomCount(POIType.Garage) > 0
+            && mapManager.GetPOIRoomCount(POIType.Conveyor) > 0;
+        bool isCustomSetup = runProgress != null && runProgress.CurrentLevelIndex == 0;
+        int collectors = 0;
+        if (supportsCollectors)
+        {
+            collectors = isCustomSetup
+                ? totalWorkers / 2
+                : mapConfig != null
+                    ? Mathf.Clamp(mapConfig.workerCollectorsCount, 0, totalWorkers)
+                    : 0;
+        }
+        return new WorkerPopulation(
+            totalWorkers - collectors,
+            collectors,
+            mapConfig == null || mapConfig.workerCollectorsRestAfterBatch);
     }
 
     private IEnumerator DumpProbeSummaryEndOfFrame()
@@ -351,11 +391,17 @@ public class SceneInitiator : GameInitiator
     {
         if (victorySetup != null)
         {
-            if (mapConfig != null)
+            RunProgressManager runProgress = RunProgressManager.Instance;
+            if (runProgress != null && runProgress.CurrentLevelIndex > 0)
             {
-                int securityGuardsCount = mapConfig.securityGuardsCount;
-                victorySetup.robotsSavedTarget = mapConfig.workersCount;
-                victorySetup.robotsKilledTarget = securityGuardsCount;
+                float morality = runProgress.RunStats != null ? runProgress.RunStats.Morality : 0f;
+                victorySetup.ConfigureForLevel(runProgress.CurrentLevelIndex, morality);
+            }
+            else
+            {
+                // Directly opening a gameplay scene in the Editor has no active run.
+                // Treat it as an early level instead of leaking population counts into victory goals.
+                victorySetup.ConfigureForLevel(1, 0f);
             }
             victorySetup.currentSaved = 0;
             victorySetup.currentKilled = 0;

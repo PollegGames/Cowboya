@@ -33,10 +33,16 @@ public class RunSetupManager : MonoBehaviour
                          poiField,
                          workersCountField,
                          enemyCountField;
-    private TextField seedField;
+    private TextField seedField, levelField;
     private Toggle randomSeedToggle;
     private Button validateButton, runButton;
     private Label statusLabel, cellsAvailableLabel, generationDebugLabel;
+    private bool isLoadingLevelConfig;
+    private int selectedLevel = FirstGeneratedLevel;
+    private const int FirstGeneratedLevel = 4;
+    private bool hasLoadedLevelValues;
+    private int loadedWidth, loadedHeight, loadedPoi, loadedWorkers, loadedEnemies;
+    private string loadedSeed;
 
     // =====================================================================
     // LIFECYCLE
@@ -68,6 +74,8 @@ public class RunSetupManager : MonoBehaviour
 
         var enemyMinusButton = root.Q<Button>("enemy-minus-button");
         var enemyPlusButton = root.Q<Button>("enemy-plus-button");
+        var levelMinusButton = root.Q<Button>("level-minus-button");
+        var levelPlusButton = root.Q<Button>("level-plus-button");
 
         // Grab all UI references
         widthField = root.Q<IntegerField>("width-field");
@@ -75,6 +83,8 @@ public class RunSetupManager : MonoBehaviour
         poiField = root.Q<IntegerField>("poi-field");
         workersCountField = root.Q<IntegerField>("worker-count-field");
         enemyCountField = root.Q<IntegerField>("enemy-count-field");
+        levelField = root.Q<TextField>("level-field");
+        levelField.isDelayed = true;
         seedField = root.Q<TextField>("seed-field");
         randomSeedToggle = root.Q<Toggle>("random-seed-toggle");
         validateButton = root.Q<Button>("validate-button");
@@ -84,10 +94,21 @@ public class RunSetupManager : MonoBehaviour
         generationDebugLabel = root.Q<Label>("generation-debug-label");
         previewVE = root.Q<VisualElement>("preview");
 
-        widthField.RegisterValueChangedCallback(evt => UpdateCellsAndConstraints());
-        heightField.RegisterValueChangedCallback(evt => UpdateCellsAndConstraints());
+        widthField.RegisterValueChangedCallback(evt => { UpdateCellsAndConstraints(); MarkCustom(); });
+        heightField.RegisterValueChangedCallback(evt => { UpdateCellsAndConstraints(); MarkCustom(); });
 
-        poiField.RegisterValueChangedCallback(evt => ClampPoi());
+        poiField.RegisterValueChangedCallback(evt => { ClampPoi(); MarkCustom(); });
+        workersCountField.RegisterValueChangedCallback(evt => MarkCustom());
+        enemyCountField.RegisterValueChangedCallback(evt => MarkCustom());
+        seedField.RegisterValueChangedCallback(evt => MarkCustom());
+        randomSeedToggle.RegisterValueChangedCallback(evt => MarkCustom());
+        levelField.RegisterValueChangedCallback(evt =>
+        {
+            if (int.TryParse(evt.newValue, out int levelNumber))
+            {
+                LoadSelectedLevel(levelNumber);
+            }
+        });
 
         // Callbacks
         widthMinusButton.clicked += () => ChangeFieldValue(widthField, -1, 2);
@@ -104,6 +125,8 @@ public class RunSetupManager : MonoBehaviour
 
         enemyMinusButton.clicked += () => ChangeFieldValue(enemyCountField, -1, 0);
         enemyPlusButton.clicked += () => ChangeFieldValue(enemyCountField, +1);
+        levelMinusButton.clicked += () => LoadSelectedLevel(Mathf.Max(FirstGeneratedLevel, selectedLevel - 1));
+        levelPlusButton.clicked += () => LoadSelectedLevel(Mathf.Max(FirstGeneratedLevel, selectedLevel + 1));
         validateButton.clicked += Validate;
         runButton.clicked += StartRun;
         randomSeedToggle.RegisterValueChangedCallback(e => seedField.SetEnabled(!e.newValue));
@@ -124,6 +147,71 @@ public class RunSetupManager : MonoBehaviour
             // Initialize "Cells Available" with the correct value
             UpdateCellsAndConstraints();
         }
+
+        LoadSelectedLevel(FirstGeneratedLevel);
+    }
+
+    private void LoadSelectedLevel(int levelNumber)
+    {
+        levelNumber = Mathf.Max(FirstGeneratedLevel, levelNumber);
+        selectedLevel = levelNumber;
+        levelField.SetValueWithoutNotify(levelNumber.ToString());
+
+        RunProgressManager source = RunProgressManager.Instance != null
+            ? RunProgressManager.Instance
+            : runProgressManagerPrefab;
+        RunMapConfigSO levelConfig = source != null
+            ? source.GetConfigForPlayableLevel(levelNumber)
+            : null;
+        if (levelConfig == null)
+        {
+            statusLabel.text = $"Level {levelNumber} has no generated-map setup";
+            return;
+        }
+
+        isLoadingLevelConfig = true;
+        loadedWidth = levelConfig.gridWidth;
+        loadedHeight = levelConfig.gridHeight;
+        loadedPoi = levelConfig.poiCount;
+        loadedWorkers = levelConfig.workersCount;
+        loadedEnemies = levelConfig.enemiesCount;
+        loadedSeed = levelConfig.seed;
+        hasLoadedLevelValues = true;
+        widthField.value = levelConfig.gridWidth;
+        heightField.value = levelConfig.gridHeight;
+        poiField.value = levelConfig.poiCount;
+        workersCountField.value = levelConfig.workersCount;
+        enemyCountField.value = levelConfig.enemiesCount;
+        seedField.value = levelConfig.seed;
+        randomSeedToggle.value = false;
+
+        UpdateCellsAndConstraints();
+        isLoadingLevelConfig = false;
+        runButton.SetEnabled(false);
+        statusLabel.text = $"Level {levelNumber} loaded - generate preview to validate";
+    }
+
+    private void MarkCustom()
+    {
+        if (isLoadingLevelConfig || levelField == null)
+            return;
+
+        if (hasLoadedLevelValues
+            && widthField.value == loadedWidth
+            && heightField.value == loadedHeight
+            && poiField.value == loadedPoi
+            && workersCountField.value == loadedWorkers
+            && enemyCountField.value == loadedEnemies
+            && seedField.value == loadedSeed
+            && !randomSeedToggle.value)
+        {
+            return;
+        }
+
+        hasLoadedLevelValues = false;
+        selectedLevel = FirstGeneratedLevel - 1;
+        levelField.SetValueWithoutNotify(string.Empty);
+        runButton.SetEnabled(false);
     }
 
     private void ChangeFieldValue(IntegerField field, int delta, int min = int.MinValue, System.Action onChanged = null)

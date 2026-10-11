@@ -1,5 +1,24 @@
 # Factory / Room / Machine Logic Investigation and Fix Plan (2026-04-15)
 
+## Reopened architecture gaps 2026 10 11
+
+The event and reservation consolidation recorded below remains useful, but the broader factory and robot population audit found unresolved ownership violations:
+
+- `MachineWorkerManager` still stores manager-side waiting state and calls `RobotHeartNew.BlockCurrentTask()` directly.
+- `MachineSecurityManager.DispatchGuardForSecurityMachine()` can still fall back to the disabled security machine's own displaced guard.
+- `SpawningMachine` still sends its attached Worker Spawner away when disabled instead of applying the required faint behavior.
+- `FactoryManager.HandleRobotSaved()` counts only Worker and WorkerSpawner roles.
+- `StationReservationService` is the single station service, but it does not yet record the robot and purpose that own a reservation.
+- Static and generated robot population still use different creation paths.
+
+Confirmed follow-up policy:
+
+- the existing global all-machines-off event remains for Boss fainting;
+- Worker rescue is based on each Worker's locally accumulated Work/Rest availability facts, not a global rescue notification;
+- test code may be added or updated, while Unity Test Runner execution is performed by the project owner.
+
+Therefore, the previous phase-complete labels apply only to the narrower machine-event migration. They do not mean the full factory, population, job-coordination, and AI ownership refactor is complete. The current implementation plan is `Factory_Robot_Population_AI_Refactor_Plan_2026-10-11.md`.
+
 ## Goal
 
 Provide a practical, low-risk plan to refactor machine-system logic around your model:

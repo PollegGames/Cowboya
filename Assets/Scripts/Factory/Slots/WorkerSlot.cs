@@ -123,7 +123,9 @@ public class WorkerSlot : MonoBehaviour
                 return restingMachine.TryAttachWorker(incoming, "enter_attach");
             if (ReferenceEquals(restingMachine.CurrentWorker, incoming))
                 return true;
-            return restingMachine.TryReplaceWorker(incoming, "enter_replace");
+            // Rest is short-lived and exclusive. The trigger keeps this robot
+            // queued and OnTriggerStay2D retries after the current rest ends.
+            return false;
         }
 
         return machine.TryAttachWorker(incoming, "enter_attach");
@@ -148,11 +150,9 @@ public class WorkerSlot : MonoBehaviour
                 "machine=" + machine.name
                 + " localObservation=True"
                 + " memoryUpdated=True"
-                + " taskBlocked=True"
+                + " taskBlocked=False"
                 + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None"));
         }
-
-        brain?.Heart?.BlockCurrentTask();
     }
 
     private bool TryTrackEnter(RobotBrainNew brain, RobotHeartNew heart)

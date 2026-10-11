@@ -10,12 +10,14 @@ public class SpawningMachine : BaseMachine
 
     [Header("Spawning Settings")]
     [SerializeField] private float spawnInterval = 30f;
+    [SerializeField, Min(0f)] private float reconnectDistance = 3f;
     [SerializeField] private FactoryAlarmStatus factoryAlarmStatus;
 
     private Coroutine spawnCoroutine;
 
     private RobotBrainNew currentWorker;
     private RobotStateController currentWorkerState;
+    private RobotBrainNew reconnectCandidate;
 
     public bool HasWorker => currentWorker != null;
     public RobotBrainNew CurrentWorker => currentWorker;
@@ -48,7 +50,7 @@ public class SpawningMachine : BaseMachine
 
     private void Update()
     {
-        if (factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted)
+        if (factoryAlarmStatus != null && factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted)
             TryStartSpawning();
     }
     public void InitializeSpawner(IEnemiesSpawner enemiesSpawner)
@@ -70,6 +72,7 @@ public class SpawningMachine : BaseMachine
     public override void PowerOn()
     {
         base.PowerOn();
+        TryReconnectFaintedWorker();
         TryStartSpawning();
         ApplyMaterial();
     }
@@ -79,11 +82,17 @@ public class SpawningMachine : BaseMachine
         if (!isOn) return;
 
         StopSpawning();
-        UnsubscribeFromWorkerState();
-        SendWorkerToStart(currentWorker);
+        RobotBrainNew worker = currentWorker;
         base.PowerOff();
+        if (worker != null)
+        {
+            reconnectCandidate = worker;
+            base.ReleaseRobot();
+            currentWorker = null;
+            ApplyFaintState(worker);
+        }
+        UnsubscribeFromWorkerState();
         ApplyMaterial();
-        currentWorker = null;
     }
 
 
@@ -113,13 +122,16 @@ public class SpawningMachine : BaseMachine
 
         if (!isOn)
         {
-            SendWorkerToStart(newWorker);
+            reconnectCandidate = newWorker;
+            ApplyFaintState(newWorker);
             return;
         }
 
         if (currentWorker == null)
         {
+            WakeWorker(newWorker);
             currentWorker = newWorker;
+            reconnectCandidate = null;
             SubscribeToWorkerState(currentWorker);
             SetWorkerToSpawn(currentWorker);
             base.AttachRobot(robot);
@@ -153,7 +165,8 @@ public class SpawningMachine : BaseMachine
 
     private void TryStartSpawning()
     {
-        if (spawnCoroutine == null && isOn && factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted
+        if (spawnCoroutine == null && isOn && factoryAlarmStatus != null
+        && factoryAlarmStatus.CurrentAlarmState == AlarmState.Wanted
         && HasAliveWorker())
         {
             spawnCoroutine = StartCoroutine(SpawnLoop());
@@ -180,7 +193,8 @@ public class SpawningMachine : BaseMachine
 
     private void SpawnFollower()
     {
-        if (!isOn || factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted || !HasAliveWorker())
+        if (!isOn || factoryAlarmStatus == null || enemiesSpawner == null || waypointService == null
+            || factoryAlarmStatus.CurrentAlarmState != AlarmState.Wanted || !HasAliveWorker())
             return;
         var spawnPos = trigger.transform.position;
         var lastVisitedPoint = waypointService.GetClosestWaypoint(spawnPos, includeUnavailable: true);
@@ -219,6 +233,47 @@ public class SpawningMachine : BaseMachine
     private bool HasAliveWorker()
     {
         return currentWorker != null && currentWorkerState != null && currentWorkerState.CurrentState == RobotState.Alive;
+    }
+
+    private void TryReconnectFaintedWorker()
+    {
+        if (reconnectCandidate == null || !IsWithinReconnectRange(reconnectCandidate.transform.position))
+            return;
+
+        RobotBrainNew worker = reconnectCandidate;
+        reconnectCandidate = null;
+        AttachRobot(worker.gameObject);
+    }
+
+    private bool IsWithinReconnectRange(Vector3 workerPosition)
+    {
+        if (trigger != null && trigger.bounds.Contains(workerPosition))
+            return true;
+        return Vector2.Distance(transform.position, workerPosition) <= reconnectDistance;
+    }
+
+    private static void ApplyFaintState(RobotBrainNew worker)
+    {
+        if (worker == null)
+            return;
+
+        RobotStateController state = worker.GetComponent<RobotStateController>();
+        if (state != null && state.CurrentState != RobotState.Dead)
+        {
+            state.UpdateState(RobotState.Faint);
+            state.ApplyEnemyFaintPose();
+        }
+        worker.Body?.StopMovement();
+    }
+
+    private static void WakeWorker(RobotBrainNew worker)
+    {
+        if (worker == null)
+            return;
+
+        RobotStateController state = worker.GetComponent<RobotStateController>();
+        if (state != null && state.CurrentState == RobotState.Faint)
+            state.UpdateState(RobotState.Alive);
     }
 }
 

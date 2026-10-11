@@ -5,7 +5,7 @@ using System.Linq;
 
 public class Level2WorkerCollectorPrefabTests
 {
-    private const string WorkerPrefabPath = "Assets/Resources/Prefabs/Robots/Worker/Worker3.prefab";
+    private const string WorkerPrefabPath = "Assets/Resources/Prefabs/Robots/Worker/WorkerTransform.prefab";
     private const string WorkerCollectorPrefabPath = "Assets/Resources/Prefabs/Robots/WorkerCollector/WorkerCollector.prefab";
     private const string NormalCubePrefabPath = "Assets/Resources/Prefabs/IntereableObjects/CubeNormal.prefab";
     private const string ConveyorRoomPrefabPath = "Assets/Resources/Prefabs/Map/ROOM_Conveyor.prefab";

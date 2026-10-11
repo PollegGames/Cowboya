@@ -43,6 +43,7 @@ public class DoorController : MonoBehaviour
 
     [Header("Victory")]
     public bool isVictoryDoor = false;
+    private LevelEndVictoryTrigger victoryTrigger;
 
     private void Start()
     {
@@ -144,6 +145,13 @@ public class DoorController : MonoBehaviour
     }
     public void EvaluateDoorState()
     {
+        if (IsVictoryExitLocked())
+        {
+            CloseDoor(forceClose: true);
+            UpdateStatusPanel();
+            return;
+        }
+
         if (isRevolt)
         {
             OpenDoor();
@@ -241,7 +249,9 @@ public class DoorController : MonoBehaviour
         {
             statusPanelRenderer.material = blockedMaterial;
         }
-        else if ((isAlarmActive && alarmLocksDoor) || (!isAlarmActive && normalRequiresBadge))
+        else if (IsVictoryExitLocked()
+            || (isAlarmActive && alarmLocksDoor)
+            || (!isAlarmActive && normalRequiresBadge))
         {
             statusPanelRenderer.material = lockedMaterial;
         }
@@ -249,5 +259,25 @@ public class DoorController : MonoBehaviour
         {
             statusPanelRenderer.material = normalMaterial;
         }
+    }
+
+    private bool IsVictoryExitLocked()
+    {
+        if (!isVictoryDoor)
+            return false;
+
+        if (victoryTrigger == null && roomManager != null)
+        {
+            foreach (LevelEndVictoryTrigger trigger in roomManager.GetComponentsInChildren<LevelEndVictoryTrigger>(true))
+            {
+                if (trigger.ControlsDoor(this))
+                {
+                    victoryTrigger = trigger;
+                    break;
+                }
+            }
+        }
+
+        return victoryTrigger == null || !victoryTrigger.IsVictoryConditionMet();
     }
 }

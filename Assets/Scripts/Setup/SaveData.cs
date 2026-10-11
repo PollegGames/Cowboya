@@ -37,6 +37,21 @@ public class SaveData : ISerializationCallbackReceiver
         SaveName = Guid.NewGuid().ToString();
     }
 
+    /// <summary>
+    /// Restores values that belong to a single run while preserving profile data and settings.
+    /// </summary>
+    public void ResetRunProgress()
+    {
+        var defaults = new SaveData();
+        MaxHealth = defaults.MaxHealth;
+        CurrentHealth = defaults.CurrentHealth;
+        MaxEnergy = defaults.MaxEnergy;
+        CurrentEnergy = defaults.CurrentEnergy;
+        EnergyRechargeRate = defaults.EnergyRechargeRate;
+        AttackEnergyCost = defaults.AttackEnergyCost;
+        Morality = defaults.Morality;
+    }
+
     public void OnBeforeSerialize()
     {
         specialResourceEntries.Clear();

@@ -30,26 +30,29 @@ public class FollowEnemyTriggerHandler : MonoBehaviour
 
     private void OnEnemyEnterRoomZone(Collider2D collider)
     {
-        if (stateController == null)
-        {
+        if (stateController == null || collider == null)
             return;
-        }
 
         Debug.Log($"Enemy entered room zone via {collider.name}", this);
 
         var room = collider.GetComponentInParent<RoomManager>();
-        Debug.Log($"Room detected: {room.roomProperties.usageType}", this);
-        if (room != null && room.roomProperties != null && room.roomProperties.usageType == UsageType.Start)
-        {
-            stateController.MarkAsSaved();
-            return;
-        }
-
         var roomProps = collider.GetComponentInParent<RoomProperties>();
-        if (roomProps != null && roomProps.usageType == UsageType.Start)
-        {
+        bool enteredStart = room != null && room.roomProperties != null
+            ? room.roomProperties.usageType == UsageType.Start
+            : roomProps != null && roomProps.usageType == UsageType.Start;
+        if (enteredStart && IsReturningHomeForRescue())
             stateController.MarkAsSaved();
-        }
+    }
+
+    private bool IsReturningHomeForRescue()
+    {
+        RobotHeartNew heart = stateController != null
+            ? stateController.GetComponent<RobotHeartNew>()
+            : null;
+        return heart != null
+            && FactoryManager.IsSaveEligibleRole(heart.Role)
+            && heart.CurrentTask != null
+            && heart.CurrentTask.Type == RobotTaskType.ReturnHome;
     }
 
 }

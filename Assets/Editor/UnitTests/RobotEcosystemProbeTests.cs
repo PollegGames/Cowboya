@@ -221,7 +221,7 @@ public class RobotEcosystemProbeTests
     }
 
     [Test]
-    public void MachineWorkerManager_PowerOff_RetargetsWorkerTravelingToRestMachine()
+    public void MachineWorkerManager_PowerOff_DoesNotBroadcastToTravelingWorker()
     {
         var setup = CreateRobotWithBrain("Robot_TargetedRestPowerOff");
 
@@ -243,9 +243,10 @@ public class RobotEcosystemProbeTests
 
         machine.PowerOff();
 
-        Assert.IsFalse(setup.brain.Memory.AllAvailableWaypoints[restWaypoint], "A worker targeting the machine should learn immediately that it powered off.");
-        AssertWorkerPlansWaypoint(setup.brain, workWaypoint, "A worker targeting an off rest machine should reroute without waiting for another slot entry.");
-        Assert.GreaterOrEqual(RobotEcosystemProbe.GetCallCount("Brain.MachineWorkerManager.NotifyWorkersMachinePoweredOff"), 1);
+        Assert.IsTrue(setup.brain.Memory.AllAvailableWaypoints[restWaypoint],
+            "A traveling worker learns that a machine is off only after reaching its slot.");
+        Assert.AreEqual(0,
+            RobotEcosystemProbe.GetCallCount("Brain.MachineWorkerManager.NotifyWorkersMachinePoweredOff"));
     }
 
     [Test]

@@ -8,11 +8,26 @@ using UnityEngine;
 /// </summary>
 public class StationReservationService : MonoBehaviour
 {
+    public readonly struct StationReservation
+    {
+        public StationReservation(BaseMachine machine, RobotBrainNew owner, string purpose)
+        {
+            Machine = machine;
+            Owner = owner;
+            Purpose = purpose;
+        }
+
+        public BaseMachine Machine { get; }
+        public RobotBrainNew Owner { get; }
+        public string Purpose { get; }
+    }
+
     public static StationReservationService Instance { get; private set; }
 
     private readonly List<BaseMachine> machines = new();
-    private readonly Dictionary<BaseMachine, RobotRole> machineRoles = new();
+    private readonly Dictionary<BaseMachine, HashSet<RobotRole>> machineRoles = new();
     private readonly Dictionary<RobotRole, List<BaseMachine>> available = new();
+    private readonly Dictionary<BaseMachine, StationReservation> reservations = new();
 
     public event Action<BaseMachine> OnMachineFreed;
     public event Action<BaseMachine> OnMachinePoweredOff;
@@ -38,31 +53,43 @@ public class StationReservationService : MonoBehaviour
     /// <param name="role">The role allowed to use the machine.</param>
     public void RegisterMachine(BaseMachine machine, RobotRole role)
     {
-        if (machine == null || machines.Contains(machine)) return;
-        machines.Add(machine);
-        machineRoles[machine] = role;
-        machine.OnRobotFreed += HandleMachineFreed;
-        machine.OnRobotAssigned += HandleMachineOccupied;
-        machine.OnPoweredOff += HandleMachinePoweredOff;
-        machine.OnPoweredOn += HandleMachinePoweredOn;
+        if (machine == null) return;
+        if (!machineRoles.TryGetValue(machine, out HashSet<RobotRole> roles))
+        {
+            roles = new HashSet<RobotRole>();
+            machineRoles[machine] = roles;
+        }
+        if (!roles.Add(role)) return;
+
+        if (!machines.Contains(machine))
+        {
+            machines.Add(machine);
+            machine.OnRobotFreed += HandleMachineFreed;
+            machine.OnRobotAssigned += HandleMachineOccupied;
+            machine.OnPoweredOff += HandleMachinePoweredOff;
+            machine.OnPoweredOn += HandleMachinePoweredOn;
+        }
         if (!available.ContainsKey(role))
             available[role] = new List<BaseMachine>();
-        if (machine.IsOn && !machine.IsOccupied)
+        if (machine.IsOn && !machine.IsOccupied && !reservations.ContainsKey(machine))
             available[role].Add(machine);
     }
 
     private void HandleMachineFreed(BaseMachine machine)
     {
-        var role = machineRoles[machine];
-        if (!available[role].Contains(machine) && machine.IsOn)
-            available[role].Add(machine);
+        foreach (RobotRole role in machineRoles[machine])
+        {
+            if (!available[role].Contains(machine) && machine.IsOn && !reservations.ContainsKey(machine))
+                available[role].Add(machine);
+        }
         OnMachineFreed?.Invoke(machine);
     }
 
     private void HandleMachineOccupied(BaseMachine machine)
     {
-        var role = machineRoles[machine];
-        available[role].Remove(machine);
+        foreach (RobotRole role in machineRoles[machine])
+            available[role].Remove(machine);
+        reservations.Remove(machine);
     }
 
     private void HandleMachinePoweredOff(BaseMachine machine)
@@ -82,16 +109,20 @@ public class StationReservationService : MonoBehaviour
     /// <param name="isOn">True if the machine is now powered on.</param>
     public void NotifyPowerChanged(BaseMachine machine, bool isOn)
     {
-        var role = machineRoles[machine];
         if (isOn)
         {
-            if (!machine.IsOccupied && !available[role].Contains(machine))
-                available[role].Add(machine);
+            foreach (RobotRole role in machineRoles[machine])
+            {
+                if (!machine.IsOccupied && !reservations.ContainsKey(machine) && !available[role].Contains(machine))
+                    available[role].Add(machine);
+            }
             OnMachinePoweredOn?.Invoke(machine);
         }
         else
         {
-            available[role].Remove(machine);
+            foreach (RobotRole role in machineRoles[machine])
+                available[role].Remove(machine);
+            reservations.Remove(machine);
             OnMachinePoweredOff?.Invoke(machine);
         }
     }
@@ -103,10 +134,17 @@ public class StationReservationService : MonoBehaviour
     /// <returns>The reserved machine or <c>null</c> if none are available.</returns>
     public BaseMachine ReserveStation(RobotRole role)
     {
+        return ReserveStation(role, null, "legacy");
+    }
+
+    /// <summary>Reserves an available station for a specific robot and purpose.</summary>
+    public BaseMachine ReserveStation(RobotRole role, RobotBrainNew owner, string purpose)
+    {
         var list = available[role];
         if (list.Count == 0) return null;
         var machine = list[0];
-        list.RemoveAt(0);
+        RemoveFromAllAvailability(machine);
+        reservations[machine] = new StationReservation(machine, owner, purpose);
         return machine;
     }
 
@@ -118,6 +156,17 @@ public class StationReservationService : MonoBehaviour
     /// <param name="typeFilter">Optional machine type filter.</param>
     /// <returns>The reserved machine or <c>null</c> if none are available.</returns>
     public BaseMachine ReserveClosestStation(RobotRole role, Vector3 position, MachineType? typeFilter = null)
+    {
+        return ReserveClosestStation(role, position, typeFilter, null, "legacy");
+    }
+
+    /// <summary>Reserves the closest station for a specific robot and purpose.</summary>
+    public BaseMachine ReserveClosestStation(
+        RobotRole role,
+        Vector3 position,
+        MachineType? typeFilter,
+        RobotBrainNew owner,
+        string purpose)
     {
         var list = available[role];
         if (list.Count == 0) return null;
@@ -141,7 +190,8 @@ public class StationReservationService : MonoBehaviour
         if (best == null)
             return null;
 
-        list.Remove(best);
+        RemoveFromAllAvailability(best);
+        reservations[best] = new StationReservation(best, owner, purpose);
         return best;
     }
 
@@ -153,6 +203,12 @@ public class StationReservationService : MonoBehaviour
     /// <returns><c>true</c> if the machine was reserved.</returns>
     public bool TryReserveStation(BaseMachine machine, RobotRole role)
     {
+        return TryReserveStation(machine, role, null, "legacy");
+    }
+
+    /// <summary>Attempts to reserve a specific station for a robot and purpose.</summary>
+    public bool TryReserveStation(BaseMachine machine, RobotRole role, RobotBrainNew owner, string purpose)
+    {
         if (machine == null)
             return false;
 
@@ -162,7 +218,8 @@ public class StationReservationService : MonoBehaviour
         if (!list.Contains(machine))
             return false;
 
-        list.Remove(machine);
+        RemoveFromAllAvailability(machine);
+        reservations[machine] = new StationReservation(machine, owner, purpose);
         return true;
     }
 
@@ -172,9 +229,58 @@ public class StationReservationService : MonoBehaviour
     /// <param name="machine">The machine to release.</param>
     public void ReleaseStation(BaseMachine machine)
     {
-        if (machine == null || !machineRoles.ContainsKey(machine)) return;
-        var role = machineRoles[machine];
-        if (machine.IsOn && !available[role].Contains(machine))
-            available[role].Add(machine);
+        ReleaseStation(machine, null);
+    }
+
+    /// <summary>Releases a reservation when the caller owns it or uses the legacy ownerless API.</summary>
+    public bool ReleaseStation(BaseMachine machine, RobotBrainNew owner)
+    {
+        if (machine == null || !machineRoles.ContainsKey(machine)) return false;
+        if (owner != null
+            && reservations.TryGetValue(machine, out StationReservation reservation)
+            && reservation.Owner != null
+            && !ReferenceEquals(reservation.Owner, owner))
+        {
+            return false;
+        }
+
+        reservations.Remove(machine);
+        foreach (RobotRole role in machineRoles[machine])
+        {
+            if (machine.IsOn && !machine.IsOccupied && !available[role].Contains(machine))
+                available[role].Add(machine);
+        }
+        return true;
+    }
+
+    /// <summary>Returns the current reservation record for a machine.</summary>
+    public bool TryGetReservation(BaseMachine machine, out StationReservation reservation)
+    {
+        return reservations.TryGetValue(machine, out reservation);
+    }
+
+    private void RemoveFromAllAvailability(BaseMachine machine)
+    {
+        if (machine == null || !machineRoles.TryGetValue(machine, out HashSet<RobotRole> roles))
+            return;
+
+        foreach (RobotRole role in roles)
+            available[role].Remove(machine);
+    }
+
+    private void OnDestroy()
+    {
+        foreach (BaseMachine machine in machines)
+        {
+            if (machine == null)
+                continue;
+            machine.OnRobotFreed -= HandleMachineFreed;
+            machine.OnRobotAssigned -= HandleMachineOccupied;
+            machine.OnPoweredOff -= HandleMachinePoweredOff;
+            machine.OnPoweredOn -= HandleMachinePoweredOn;
+        }
+
+        if (Instance == this)
+            Instance = null;
     }
 }

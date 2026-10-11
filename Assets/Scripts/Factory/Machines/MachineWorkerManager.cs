@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -11,9 +10,6 @@ public class MachineWorkerManager : MonoBehaviour
     [SerializeField] private FactoryManager factoryManager;
     [SerializeField] private StationReservationService reservationService;
     private readonly List<BaseMachine> machines = new List<BaseMachine>();
-
-    // Track workers waiting on a specific machine
-    private readonly Dictionary<RobotBrainNew, BaseMachine> waitingWorkers = new();
 
     public void RegisterMachine(FactoryMachine machine)
     {
@@ -81,14 +77,7 @@ public class MachineWorkerManager : MonoBehaviour
         NotifyWorkersMachinePoweredOff(machine, worker);
 
         if (worker == null)
-        {
             Debug.Log($"[MachineWorkerManager] Machine turned off without resolved worker machine={(machine != null ? machine.name : "null")}", machine);
-            return;
-        }
-
-        // Store that this worker was attached to this machine
-        waitingWorkers[worker] = machine;
-        Debug.Log($"[MachineWorkerManager] Stored waiting worker={worker.name} machine={machine.name}", machine);
     }
 
     private void NotifyWorkersMachinePoweredOff(BaseMachine machine, RobotBrainNew releasedWorker)
@@ -100,11 +89,8 @@ public class MachineWorkerManager : MonoBehaviour
         if (releasedWorker == null)
         {
             Debug.Log($"[MachineWorkerManager] Powered-off machine has no attached worker to notify machine={machine.name}", machine);
-            RecordDeferredWorkerKnowledge(machine, machineWaypoint, null, null);
             return;
         }
-
-        RecordDeferredWorkerKnowledge(machine, machineWaypoint, null, releasedWorker);
 
         if (releasedWorker.Heart == null || releasedWorker.Heart.Role != RobotRole.Worker || releasedWorker.Memory == null)
         {
@@ -133,69 +119,9 @@ public class MachineWorkerManager : MonoBehaviour
             "machine=" + machine.name
             + " attachedWorkerNotified=True"
             + " memoryUpdated=True"
-            + " taskBlocked=True"
+            + " taskBlocked=False"
             + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None")
             + " currentTarget=" + DescribeTaskTarget(currentTask));
-        releasedWorker.Heart.BlockCurrentTask();
-    }
-
-    private static void RecordDeferredWorkerKnowledge(
-        BaseMachine machine,
-        RoomWaypoint machineWaypoint,
-        RobotBrainNew specificWorker,
-        RobotBrainNew excludedWorker)
-    {
-        var workers = specificWorker != null
-            ? new[] { specificWorker }
-            : FindObjectsByType<RobotBrainNew>(FindObjectsSortMode.None);
-
-        foreach (var brain in workers)
-        {
-            if (brain == null || brain.Heart == null || brain.Heart.Role != RobotRole.Worker || brain.Memory == null)
-                continue;
-            if (ReferenceEquals(brain, excludedWorker))
-                continue;
-
-            RobotTask currentTask = brain.Heart.CurrentTask;
-            bool targetsPoweredOffMachine = IsWorkerTargetingMachine(brain, machine, machineWaypoint);
-            bool isTraveling = currentTask != null && currentTask.Type == RobotTaskType.GoToMachine;
-
-            if (targetsPoweredOffMachine)
-            {
-                if (machineWaypoint != null)
-                    brain.Memory.SetRoomWaypointAvailability(machineWaypoint, false);
-                else
-                    brain.Memory.SetMachineWaypointAvailability(machine, false);
-
-                brain.Memory.ChangeConnectionToMachine(false);
-                brain.Memory.SetDesiredMachineType(machine.Type);
-                RobotEcosystemProbe.RecordBrainCall(
-                    brain,
-                    "MachineWorkerManager.NotifyWorkersMachinePoweredOff",
-                    "machine=" + machine.name
-                    + " attachedWorkerNotified=False"
-                    + " targetedWorkerNotified=True"
-                    + " memoryUpdated=True"
-                    + " taskBlocked=True"
-                    + " traveling=" + isTraveling
-                    + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None")
-                    + " currentTarget=" + DescribeTaskTarget(currentTask));
-                brain.Heart.BlockCurrentTask();
-                continue;
-            }
-
-            RobotEcosystemProbe.RecordBrainCall(
-                brain,
-                "MachineWorkerManager.DeferPoweredOffMachineKnowledge",
-                "machine=" + machine.name
-                + " localKnowledgeOnly=True"
-                + " memoryUpdated=False"
-                + " taskBlocked=False"
-                + " traveling=" + isTraveling
-                + " targetsPoweredOffMachine=" + targetsPoweredOffMachine
-                + " currentTask=" + (currentTask != null ? currentTask.Type.ToString() : "None")
-                + " currentTarget=" + DescribeTaskTarget(currentTask));
-        }
     }
 
     private static string DescribeTaskTarget(RobotTask task)
@@ -226,64 +152,9 @@ public class MachineWorkerManager : MonoBehaviour
         return waypoint.type + "@" + waypoint.WorldPos.ToString("F2");
     }
 
-    private static bool IsWorkerTargetingMachine(RobotBrainNew brain, BaseMachine machine, RoomWaypoint machineWaypoint)
-    {
-        if (brain == null || machine == null)
-            return false;
-
-        RobotTask currentTask = brain.Heart != null ? brain.Heart.CurrentTask : null;
-        if (currentTask == null)
-            return false;
-
-        if (currentTask.Type != RobotTaskType.GoToMachine
-            && currentTask.Type != RobotTaskType.WorkAtMachine
-            && currentTask.Type != RobotTaskType.Rest)
-        {
-            return false;
-        }
-
-        if (PayloadTargetsMachine(currentTask.Payload, machine, machineWaypoint))
-            return true;
-
-        return machineWaypoint != null
-            && brain.Body != null
-            && ReferenceEquals(brain.Body.CurrentTarget, machineWaypoint);
-    }
-
-    private static bool PayloadTargetsMachine(object payload, BaseMachine machine, RoomWaypoint machineWaypoint)
-    {
-        if (payload == null || machine == null)
-            return false;
-
-        if (ReferenceEquals(payload, machine))
-            return true;
-
-        if (payload is RoomWaypoint waypoint)
-            return machineWaypoint != null && ReferenceEquals(waypoint, machineWaypoint);
-
-        if (payload is Component component && component != null)
-            return ReferenceEquals(component.GetComponent<BaseMachine>() ?? component.GetComponentInParent<BaseMachine>(), machine);
-
-        if (payload is GameObject gameObject && gameObject != null)
-            return ReferenceEquals(gameObject.GetComponent<BaseMachine>() ?? gameObject.GetComponentInParent<BaseMachine>(), machine);
-
-        return false;
-    }
-
     private void OnMachineTurnedOn(BaseMachine machine)
     {
         NotifyWorkersMachinePoweredOn(machine);
-
-        // Any worker waiting for this machine may return to work
-        foreach (var pair in waitingWorkers.ToList())
-        {
-            if (pair.Value == machine)
-            {
-                var worker = pair.Key;
-                waitingWorkers.Remove(worker);
-                RobotDomainEventBus.PublishMachineStateDispatch(worker, machine, true);
-            }
-        }
     }
 
     private void NotifyWorkersMachinePoweredOn(BaseMachine machine)

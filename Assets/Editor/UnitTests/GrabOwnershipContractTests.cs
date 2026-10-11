@@ -113,7 +113,7 @@ public class GrabOwnershipContractTests {
         Assert.IsFalse(disabledBinder.enabled);
     }
 
-    [TestCase("Assets/Resources/Prefabs/Robots/Worker/Worker3.prefab")]
+    [TestCase("Assets/Resources/Prefabs/Robots/Worker/WorkerTransform.prefab")]
     [TestCase("Assets/Resources/Prefabs/Robots/SecurityGuard/SecurityGuard.prefab")]
     [TestCase("Assets/Resources/Prefabs/Robots/Follower/Follower.prefab")]
     [TestCase("Assets/Resources/Prefabs/Robots/Collector/CollectorRobot_Fly.prefab")]
@@ -223,7 +223,7 @@ public class GrabOwnershipContractTests {
         }
     }
 
-    [TestCase("Assets/Resources/Prefabs/Robots/Worker/Worker3.prefab", 13, null)]
+    [TestCase("Assets/Resources/Prefabs/Robots/Worker/WorkerTransform.prefab", 13, null)]
     [TestCase("Assets/Resources/Prefabs/Robots/SecurityGuard/SecurityGuard.prefab", 13, null)]
     [TestCase("Assets/Resources/Prefabs/Robots/Follower/Follower.prefab", 14, "Badge")]
     [TestCase("Assets/Resources/Prefabs/Robots/Collector/CollectorRobot_Fly.prefab", 2, "bone_Magnet")]

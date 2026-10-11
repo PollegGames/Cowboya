@@ -19,6 +19,8 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
     private Coroutine registrationRoutine;
     private readonly Dictionary<int, WorkerCollectorBodyController> reservingCollectors =
         new Dictionary<int, WorkerCollectorBodyController>();
+    private readonly Dictionary<int, WorkerCollectorBodyController> assignedCollectors =
+        new Dictionary<int, WorkerCollectorBodyController>();
 
     public RoomWaypoint ApproachWaypoint => approachWaypoint;
     public Transform DeliveryPoint => deliveryPoint;
@@ -30,6 +32,20 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
     public bool IsGarageDestination => storage != null && processor != null;
     public bool CanAcceptDelivery => isActiveAndEnabled && IsGarageDestination
         && storage.isActiveAndEnabled && processor.IsAccepting;
+
+    /// <summary>Registers a collector as part of this Garage's cooperative batch team.</summary>
+    public void RegisterCollector(WorkerCollectorBodyController collector)
+    {
+        if (collector != null)
+            assignedCollectors[collector.GetInstanceID()] = collector;
+    }
+
+    /// <summary>Removes a collector from this Garage's cooperative batch team.</summary>
+    public void UnregisterCollector(WorkerCollectorBodyController collector)
+    {
+        if (collector != null)
+            assignedCollectors.Remove(collector.GetInstanceID());
+    }
 
     private void Awake() => ResolveReferences();
     private void OnEnable()
@@ -158,11 +174,12 @@ public sealed class WorkerCollectorDropOffProvider : MonoBehaviour
 
     private void HandleBatchCompleted(int _)
     {
-        WorkerCollectorBodyController collector = batchWaitingCollector;
-        WorkerCollectorMissionAssignment assignment = batchWaitingAssignment;
         batchWaitingCollector = null;
         batchWaitingAssignment = null;
-        collector?.ReportBatchCompleted(assignment);
+        WorkerCollectorBodyController[] team = new WorkerCollectorBodyController[assignedCollectors.Count];
+        assignedCollectors.Values.CopyTo(team, 0);
+        for (int i = 0; i < team.Length; i++)
+            team[i]?.ReportTeamBatchCompleted(this);
     }
 
     private void HandleBatchInterrupted()

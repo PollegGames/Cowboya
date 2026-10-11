@@ -317,8 +317,6 @@ public class RobotBrainNew : MonoBehaviour
     {
         _ = reached;
         MachineType? nextDesiredMachineType = IsSecurityGuard
-            && machine != null
-            && machine.Type != MachineType.SecurityMachine
             ? MachineType.SecurityMachine
             : null;
 
@@ -394,9 +392,12 @@ public class RobotBrainNew : MonoBehaviour
         if (!isCollector && !isWorkerCollector)
         {
             if (ShouldNeedMachine(s)) o |= BrainOption.NeedMachine;
-            bool machineUnavailable = heart != null && heart.Role == RobotRole.Worker
-                ? !HasAnyWorkerMachineWaypoint(s)
-                : !HasAvailableWaypoint(s);
+            bool machineUnavailable = heart != null && heart.Role switch
+            {
+                RobotRole.Worker => !HasAnyWorkerMachineWaypoint(s),
+                RobotRole.SecurityGuard => !HasAnyGuardMachineWaypoint(s),
+                _ => !HasAvailableWaypoint(s)
+            };
             if (machineUnavailable) o |= BrainOption.MachineUnavailable;
         }
 
@@ -439,6 +440,22 @@ public class RobotBrainNew : MonoBehaviour
                 continue;
 
             if (entry.Key.type == WaypointType.Work || entry.Key.type == WaypointType.Rest)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool HasAnyGuardMachineWaypoint(RobotMemorySnapshotNew s)
+    {
+        if (s.AllAvailableWaypoints == null || s.AllAvailableWaypoints.Count == 0)
+            return false;
+
+        foreach (var entry in s.AllAvailableWaypoints)
+        {
+            if (entry.Key == null || !entry.Value)
+                continue;
+            if (entry.Key.type == WaypointType.Security || entry.Key.type == WaypointType.Rest)
                 return true;
         }
 
@@ -512,7 +529,7 @@ public class RobotBrainNew : MonoBehaviour
                 if (o.HasFlag(BrainOption.NeedMachine))
                 {
                     if (o.HasFlag(BrainOption.MachineUnavailable))
-                        return new RobotTask(RobotTaskType.Idle);
+                        return new RobotTask(RobotTaskType.ReturnHome, ResolveStartWaypoint());
 
                     var securityWaypoint = FindBestWaypointForRole(RobotRole.SecurityGuard, snapshot, gameObject.GetInstanceID());
                     if (securityWaypoint == null)
@@ -612,7 +629,7 @@ public class RobotBrainNew : MonoBehaviour
         return new RobotTask(RobotTaskType.CollectorDock, assignment);
     }
 
-    private static RobotTask BuildWorkerCollectorTask(RobotMemorySnapshotNew snapshot)
+    private RobotTask BuildWorkerCollectorTask(RobotMemorySnapshotNew snapshot)
     {
         WorkerCollectorMissionFacts facts = snapshot.WorkerCollector;
         WorkerCollectorMissionAssignment assignment = facts.Assignment;
@@ -624,6 +641,8 @@ public class RobotBrainNew : MonoBehaviour
                 return new RobotTask(RobotTaskType.WorkerCollectorFindCube, assignment);
             if (!facts.BatchCompleted)
                 return new RobotTask(RobotTaskType.WorkerCollectorWaitForBatch, assignment);
+            if (assignment.Rest == null)
+                return new RobotTask(RobotTaskType.ReturnHome, ResolveStartWaypoint());
             if (!facts.RestApproachReached)
                 return new RobotTask(RobotTaskType.WorkerCollectorMoveToRest, assignment);
             return new RobotTask(RobotTaskType.WorkerCollectorRest, assignment, facts.RestUntil);
@@ -792,10 +811,10 @@ public class RobotBrainNew : MonoBehaviour
         }
 
         if (snapshot.LastVisitedPoint != null && snapshot.LastVisitedPoint.type == WaypointType.Rest)
-            return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Rest, WaypointType.Security, WaypointType.Center);
+            return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Rest, WaypointType.Security);
 
         // Security guards only use security/rest stations during normal machine cycles.
-        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Security, WaypointType.Rest, WaypointType.Center);
+        return FindByPriorityBalanced(snapshot, availableOnly: true, robotId, WaypointType.Security, WaypointType.Rest);
     }
 
     private static bool IsBalancedMachineWaypointType(WaypointType type)

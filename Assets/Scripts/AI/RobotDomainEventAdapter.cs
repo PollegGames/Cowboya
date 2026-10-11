@@ -74,6 +74,15 @@ public static class RobotDomainEventBus
     public static event Action<RobotPerceptionDispatchEvent> OnPerceptionDispatchRequested;
     public static event Action<RobotCompleteReactivateDispatchEvent> OnCompleteReactivateDispatchRequested;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticSubscribers()
+    {
+        OnMachineStateDispatchRequested = null;
+        OnSecurityDispatchRequested = null;
+        OnPerceptionDispatchRequested = null;
+        OnCompleteReactivateDispatchRequested = null;
+    }
+
     public static void PublishMachineStateDispatch(RobotBrainNew brain, object payload, bool isOn)
     {
         if (brain == null)

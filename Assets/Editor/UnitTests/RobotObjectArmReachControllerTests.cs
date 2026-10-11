@@ -280,7 +280,7 @@ public class RobotObjectArmReachControllerTests
     [Test]
     public void WorkerPrefab_UpperArmBinderPairsFlowFromMasterToPhysicsPuppet()
     {
-        const string PrefabPath = "Assets/Resources/Prefabs/Robots/Worker/Worker3.prefab";
+        const string PrefabPath = "Assets/Resources/Prefabs/Robots/Worker/WorkerTransform.prefab";
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
         Assert.IsNotNull(prefab);
 

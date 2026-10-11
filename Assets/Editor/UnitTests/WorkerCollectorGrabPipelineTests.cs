@@ -553,8 +553,18 @@ public class WorkerCollectorGrabPipelineTests
     public void EachDeliveryBeforeFull_ReturnsToSameRoute_ThenFullBatchRestsAndRestarts() {
         Pipeline setup = CreatePipeline();
         WorkerCollectorMissionAssignment firstClaim = CreateAssignment(setup.Body, 22);
+        GameObject restObject = CreateObject("Rest_22");
+        WorkerCollectorSpawnRestProvider rest = restObject.AddComponent<WorkerCollectorSpawnRestProvider>();
+        firstClaim = new WorkerCollectorMissionAssignment(
+            firstClaim.MissionId,
+            firstClaim.Source,
+            firstClaim.DropOff,
+            rest,
+            firstClaim.Target,
+            firstClaim.Claim,
+            default);
         var route = new WorkerCollectorMissionAssignment(
-            firstClaim.MissionId, firstClaim.Source, firstClaim.DropOff, null);
+            firstClaim.MissionId, firstClaim.Source, firstClaim.DropOff, firstClaim.Rest);
         Assert.IsTrue(setup.Memory.TryAssignWorkerCollectorMission(route));
         WorkerCollectorMissionAssignment delivery = null;
 

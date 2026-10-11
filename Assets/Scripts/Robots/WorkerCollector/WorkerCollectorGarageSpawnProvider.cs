@@ -21,7 +21,7 @@ public sealed class WorkerCollectorGarageSpawnProvider : MonoBehaviour
     }
 
     /// <summary>Spawns this Garage's collector once, with ownership set before activation.</summary>
-    public GameObject TrySpawnCollector()
+    public GameObject TrySpawnCollector(bool restAfterBatch = true)
     {
         spawnedCollectors.RemoveAll(collector => collector == null);
         if (!Application.isPlaying || workerCollectorPrefab == null || dropOff == null
@@ -56,7 +56,7 @@ public sealed class WorkerCollectorGarageSpawnProvider : MonoBehaviour
         }
 
         WorkerCollectorBodyController body = collector.GetComponent<WorkerCollectorBodyController>();
-        WorkerCollectorMissionService.BindGarage(body, dropOff);
+        WorkerCollectorMissionService.BindGarage(body, dropOff, restAfterBatch);
         AlignNavigationBodyToSpawn(collector, rest.SpawnPosition);
         StaticRobotNavigationInitializer.TryInitializeSpawnedRobot(collector);
         collector.SetActive(true);
@@ -64,6 +64,19 @@ public sealed class WorkerCollectorGarageSpawnProvider : MonoBehaviour
         spawnedCollectors.Add(collector);
         Debug.Log($"WorkerCollectorSpawned garage={name} spawn={rest.name}", collector);
         return collector;
+    }
+
+    /// <summary>Spawns up to the requested number of collectors for this Garage.</summary>
+    public int TrySpawnCollectors(int count, bool restAfterBatch = true)
+    {
+        maximumLiveCollectors = Mathf.Max(maximumLiveCollectors, count);
+        int spawnedCount = 0;
+        for (int i = 0; i < Mathf.Max(0, count); i++)
+        {
+            if (TrySpawnCollector(restAfterBatch) != null)
+                spawnedCount++;
+        }
+        return spawnedCount;
     }
 
     private static long StableGridOrder(Transform candidate)

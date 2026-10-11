@@ -87,6 +87,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             disabledAssignment.Target.ReleaseClaim(disabledAssignment.Claim);
             disabledAssignment.DropOff?.ReleaseReservation(disabledAssignment.Reservation);
         }
+        disabledAssignment?.Rest?.ReleaseRest(brain);
         currentAssignment = null;
         RestoreCargoCollisions();
         robotBody?.StopMovement();
@@ -195,6 +196,13 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
                 if (robotBody != null && robotBody.HasArrivedAtDestination())
                 {
                     robotBody.StopMovement();
+                    if (!currentAssignment.Rest.IsPowered)
+                    {
+                        WorkerCollectorMissionService.RequestRestReassignment(this, currentAssignment);
+                        break;
+                    }
+                    if (!currentAssignment.Rest.TryEnterRest(brain))
+                        break;
                     command = Command.None;
                     Observe(
                         WorkerCollectorBodyObservation.RestApproach(currentAssignment, commandToken));
@@ -421,6 +429,24 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             WorkerCollectorBodyObservation.BatchProcessed(assignment, commandToken));
     }
 
+    /// <summary>Stops current collection work and joins the Garage team's completed-batch rest cycle.</summary>
+    public void ReportTeamBatchCompleted(WorkerCollectorDropOffProvider garage)
+    {
+        WorkerCollectorMissionAssignment assignment = currentAssignment;
+        if (assignment == null || assignment.DropOff != garage || memory == null)
+            return;
+
+        robotBody?.StopMovement();
+        CancelInvoke(nameof(FindCube));
+        CancelInvoke(nameof(ScanForCube));
+        ReleaseCurrentCargo();
+        holdArmPose = false;
+        armReachController?.ClearTarget();
+        command = Command.None;
+        commandToken++;
+        memory.TryStartWorkerCollectorTeamRest(assignment);
+    }
+
     public void ReportBatchInterrupted(WorkerCollectorMissionAssignment assignment)
     {
         if (assignment == null || !ReferenceEquals(currentAssignment, assignment))
@@ -437,8 +463,18 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
             return;
         ReleaseCurrentCargo();
         StopAllActuators();
+        assignment.Rest?.ReleaseRest(brain);
         currentAssignment = null;
         memory?.TryClearWorkerCollectorMission(assignment);
+    }
+
+    /// <summary>Updates the body command payload after Memory selects another Rest destination.</summary>
+    public void AcceptRestReassignment(WorkerCollectorMissionAssignment assignment)
+    {
+        if (assignment == null)
+            return;
+        currentAssignment = assignment;
+        command = Command.None;
     }
 
     public void CancelCurrentCommand(WorkerCollectorMissionAssignment assignment)
@@ -880,6 +916,7 @@ public class WorkerCollectorBodyController : MonoBehaviour, IWorkerCollectorTask
         WorkerCollectorMissionAssignment assignment = currentAssignment;
         if (assignment == null)
             return;
+        assignment.Rest?.ReleaseRest(brain);
         command = Command.None;
         commandToken++;
         Observe(

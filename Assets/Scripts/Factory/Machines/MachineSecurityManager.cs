@@ -16,6 +16,12 @@ public class MachineSecurityManager : MonoBehaviour
     private readonly List<BaseMachine> pendingOffMachines = new();
 
     private readonly List<RobotBrainNew> guards = new();
+    private readonly Dictionary<RobotBrainNew, SecurityMachine> guardPosts = new();
+    private RobotBrainNew activeReactivationGuard;
+    private BaseMachine activeReactivationMachine;
+
+    public bool HasActiveReactivationJob => activeReactivationMachine != null;
+    public int PendingReactivationJobCount => pendingOffMachines.Count;
 
     /// <summary> Fired whenever a registered machine is switched off. </summary>
     public event Action<FactoryMachine> OnFactoryMachineTurnedOff;
@@ -104,15 +110,20 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (guard == null) return;
         guards.Remove(guard);
+        guardPosts.Remove(guard);
+        if (ReferenceEquals(activeReactivationGuard, guard))
+            RequeueActiveReactivationJob("guard_unregistered");
     }
 
     private void HandleSecurityMachineTurningOff(SecurityMachine machine, RobotBrainNew currentGuard)
     {
-        // Dispatch a different guard to reactivate; fall back to the current guard if it's the only eligible one.
         if (machine == null)
             return;
+        if (currentGuard != null)
+            guardPosts[currentGuard] = machine;
 
-        DispatchGuardForSecurityMachine(machine, currentGuard);
+        QueuePendingOffMachine(machine, "security_power_off");
+        TryDispatchPendingOffMachine("security_power_off");
     }
 
     private void HandleMachinePowerChanged(MachinePowerChangedEvent evt)
@@ -152,7 +163,7 @@ public class MachineSecurityManager : MonoBehaviour
         }
         else
         {
-            RemovePendingOffMachine(machine, "factory_power_on");
+            HandleReactivationTargetPoweredOn(machine, "factory_power_on");
         }
     }
 
@@ -165,7 +176,7 @@ public class MachineSecurityManager : MonoBehaviour
         }
         else
         {
-            RemovePendingOffMachine(machine, "rest_power_on");
+            HandleReactivationTargetPoweredOn(machine, "rest_power_on");
         }
     }
 
@@ -173,10 +184,14 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (!isOn)
         {
+            QueuePendingOffMachine(machine, "security_power_off");
+            TryDispatchPendingOffMachine("security_power_off");
         }
-        else if (reservationService == null)
+        else
         {
-            TryAssignClosestRestingGuard(machine);
+            HandleReactivationTargetPoweredOn(machine, "security_power_on");
+            if (reservationService == null)
+                TryAssignClosestRestingGuard(machine);
         }
     }
 
@@ -187,6 +202,8 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (securityMachine == null || guard == null)
             return;
+
+        guardPosts[guard] = securityMachine;
 
         PruneResolvedPendingOffMachines("security_connect_prune");
         Debug.Log(
@@ -251,6 +268,9 @@ public class MachineSecurityManager : MonoBehaviour
 
     private bool TryDispatchPendingOffMachine(string reason)
     {
+        if (HasActiveReactivationJob)
+            return false;
+
         PruneResolvedPendingOffMachines(reason + "_prune");
         BaseMachine machine = FindClosestPendingOffMachine(null);
         if (machine == null)
@@ -274,11 +294,11 @@ public class MachineSecurityManager : MonoBehaviour
 
     private bool TryDispatchPendingOffMachineToGuard(RobotBrainNew guard, string reason)
     {
-        if (guard == null)
+        if (guard == null || HasActiveReactivationJob)
             return false;
 
         PruneResolvedPendingOffMachines(reason + "_prune");
-        BaseMachine machine = FindClosestPendingOffMachine(guard.transform.position);
+        BaseMachine machine = FindClosestPendingOffMachine(guard.transform.position, guard);
         if (machine == null)
             return false;
 
@@ -290,7 +310,7 @@ public class MachineSecurityManager : MonoBehaviour
         return true;
     }
 
-    private BaseMachine FindClosestPendingOffMachine(Vector3? position)
+    private BaseMachine FindClosestPendingOffMachine(Vector3? position, RobotBrainNew guard = null)
     {
         BaseMachine best = null;
         float bestDist = float.MaxValue;
@@ -298,6 +318,8 @@ public class MachineSecurityManager : MonoBehaviour
         foreach (var pending in pendingOffMachines)
         {
             if (pending == null || pending.IsOn)
+                continue;
+            if (!CanGuardReactivate(guard, pending))
                 continue;
 
             if (!position.HasValue)
@@ -312,35 +334,6 @@ public class MachineSecurityManager : MonoBehaviour
         }
 
         return best;
-    }
-
-    private bool DispatchGuardForSecurityMachine(SecurityMachine machine, RobotBrainNew skipGuard)
-    {
-        if (machine == null || guards.Count == 0) return false;
-        Debug.Log($"Dispatching guard for security machine: {machine.name}");
-
-        RobotBrainNew best = null;
-
-        foreach (var guard in guards)
-        {
-            if (guard == null) continue;
-            if (!IsGuardStationedAtSecurityMachine(guard)) continue;
-            if (skipGuard != null && ReferenceEquals(guard, skipGuard))
-            {
-                continue;
-            }
-
-            best = SelectCloserGuard(best, guard, machine.transform.position);
-        }
-
-        if (best == null && skipGuard != null)
-            best = skipGuard;
-
-        if (best == null)
-            return false;
-
-        DispatchGuardToReactivateMachine(best, machine, "security_power_off");
-        return true;
     }
 
     public bool RequestGuardPost(RobotBrainNew guard)
@@ -366,7 +359,9 @@ public class MachineSecurityManager : MonoBehaviour
             target = reservationService.ReserveClosestStation(
                 RobotRole.SecurityGuard,
                 guard.transform.position,
-                MachineType.SecurityMachine) as SecurityMachine;
+                MachineType.SecurityMachine,
+                guard,
+                "security_post") as SecurityMachine;
         }
 
         if (target == null)
@@ -412,8 +407,20 @@ public class MachineSecurityManager : MonoBehaviour
 
     private void HandleMachinePoweredOn(BaseMachine machine)
     {
+        HandleReactivationTargetPoweredOn(machine, "machine_powered_on");
+
         if (machine is SecurityMachine security)
             TryAssignClosestRestingGuard(security);
+    }
+
+    private void HandleReactivationTargetPoweredOn(BaseMachine machine, string reason)
+    {
+        RemovePendingOffMachine(machine, reason);
+        if (!ReferenceEquals(activeReactivationMachine, machine))
+            return;
+
+        activeReactivationMachine = null;
+        activeReactivationGuard = null;
     }
 
     private bool TryAssignClosestRestingGuard(SecurityMachine machine)
@@ -424,7 +431,11 @@ public class MachineSecurityManager : MonoBehaviour
         bool reserved = false;
         if (reservationService != null)
         {
-            reserved = reservationService.TryReserveStation(machine, RobotRole.SecurityGuard);
+            reserved = reservationService.TryReserveStation(
+                machine,
+                RobotRole.SecurityGuard,
+                owner: null,
+                purpose: "security_post_dispatch");
             if (!reserved)
                 return false;
         }
@@ -477,6 +488,8 @@ public class MachineSecurityManager : MonoBehaviour
                 + " securityPost=" + DescribeMachine(FindSecurityMachineForGuard(guard)));
 
             if (!stationed)
+                continue;
+            if (!CanGuardReactivate(guard, targetMachine))
                 continue;
 
             best = SelectCloserGuard(best, guard, position);
@@ -532,10 +545,33 @@ public class MachineSecurityManager : MonoBehaviour
             Debug.LogWarning(
                 $"[MachineSecurityManager] Cannot dispatch reactivation through Memory -> Brain -> Heart -> Task because guard={guard.name} has no {nameof(RobotMemoryNew)}.",
                 guard);
+            QueuePendingOffMachine(machine, "dispatch_missing_memory");
             return;
         }
 
+        activeReactivationGuard = guard;
+        activeReactivationMachine = machine;
         guard.Memory.AssignReactivationMachine(machine);
+    }
+
+    /// <summary>Checks that a guard is not assigned to reactivate its own security post.</summary>
+    public bool CanGuardReactivate(RobotBrainNew guard, BaseMachine targetMachine)
+    {
+        if (targetMachine == null)
+            return false;
+        if (guard == null)
+            return true;
+
+        return !ReferenceEquals(FindSecurityMachineForGuard(guard), targetMachine);
+    }
+
+    private void RequeueActiveReactivationJob(string reason)
+    {
+        BaseMachine interruptedMachine = activeReactivationMachine;
+        activeReactivationMachine = null;
+        activeReactivationGuard = null;
+        if (interruptedMachine != null && !interruptedMachine.IsOn)
+            QueuePendingOffMachine(interruptedMachine, reason);
     }
 
     private bool IsGuardStationedAtSecurityMachine(RobotBrainNew guard)
@@ -583,6 +619,9 @@ public class MachineSecurityManager : MonoBehaviour
     {
         if (guard == null)
             return null;
+
+        if (guardPosts.TryGetValue(guard, out SecurityMachine assignedPost) && assignedPost != null)
+            return assignedPost;
 
         foreach (var machine in securityMachines)
         {
