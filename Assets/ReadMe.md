@@ -1,109 +1,107 @@
-### Game Documentation: Comedic Robot Rogue-lite
+# Cowboya — Game Vision and Idea Bank
+
+This document holds the **vision** of Cowboya and the **ideas** collected
+since the first prototype. It is not a specification: the current game is
+described in the root [README](../README.md) and the detailed designs live in
+[`Docs/`](../Docs/README.md).
+
+Each idea is tagged:
+
+- **[In game]** — exists on `tourB` (possibly incomplete).
+- **[Next]** — planned for the next development steps.
+- **[Idea]** — kept as inspiration, not scheduled.
+- **[Replaced]** — superseded by another design; kept for reference.
 
 ---
 
-### 1. **Overall Game Concept**
+## 1. Concept
 
-**Genre**: 2D rogue-lite
-**Theme**: A robot world with a humorous tone
-**Player Goals**:
-   - Travel between the base camp and the robot factory to progress.
-   - Collect resources, unlock attacks and manage morality to influence your play style.
-   - Advance through factory runs by fighting enemies and bosses.
+- **Genre:** comedic 2D rogue-lite, physics-driven. **[In game]**
+- **World:** a robot factory run by working robots, guards and bosses. **[In game]**
+- **Player:** a cowboy robot, an active ragdoll with two independent arms. **[In game]**
+- **Core fantasy:** get through the factory with your hands — grab, turn,
+  throw and punch robots and objects — and choose whether you free the
+  workers or break them. **[In game]**
+- **Humor:** absurd robot behaviors, a nervous scientist, ridiculous bosses. **[Idea]**
 
----
+## 2. Run Loop
 
-### 2. **Combat System and Player Progression**
+- Hand-built levels first (Level 1-3), then generated levels with fixed
+  configurations, then random growing levels. **[In game]**
+- A **laboratory** visited between every level, where resources brought back
+  are transformed into upgrades. **[Next]**
+- The old idea of a **base camp** between runs, reached by teleport, with
+  allies and deployment stations. **[Replaced]** by the laboratory between
+  levels; the camp could come back later as the long-term hub between runs. **[Idea]**
 
-#### **Basic Attacks and Combos**
-   - **Starting attacks**: Punch, kick and pistol shot.
-   - **Combo creation**: Attacks can be rearranged via the botanist to create custom combos, affecting how you engage enemies.
+## 3. Player, Combat and Movement
 
-#### **Energy and Health**
-   - **Energy**: Automatically recharges over time. If it reaches zero the robot falls into ragdoll mode.
-   - **Health**: Can be temporarily boosted with boosters, while maximum health is permanently improved at camp.
+- **Energy:** every action costs energy; at zero the robot faints (ragdoll)
+  and recharges by moving. **[In game]**
+- **Health:** lost from hits, restored with batteries. **[In game]**
+- **Two-arm control:** each arm can rest, grab or attack independently. **[In game]**
+- **Speed attack:** a hand that moves fast enough becomes the hit. **[In game]**
+- **Passing robots:** in 2D you must go over or under a robot by grabbing it
+  and rotating it. Key skill, must become reliable. **[Next]**
+- **Starting attacks punch, kick, pistol shot.** Only arm hits exist today;
+  kick and pistol remain ideas. **[Idea]**
+- **Custom combos** (rearranging attack order). **[Idea]**
+- **Temporary boosters** (chips, drinks) during a run. **[Idea]**
 
-#### **Temporary Boosters and Permanent Upgrades**
-   - **Temporary Boosters**: Items like chips or drinks temporarily increase health and energy during a run.
-   - **Permanent Upgrades**: Increases to max health, energy capacity and recharge speed are applied permanently at camp.
+## 4. Resources and Upgrades
 
----
+- **Cubes:** white cubes (basic resource) and colored cubes — Health (green),
+  Energy (blue), Recharge, Force (attack damage). **[In game]**
+- **CubeCollecteur -> laboratory chute:** collected cubes reappear in the lab
+  as physical objects. **[In game]**
+- **Upgrade Stats machine / Builder** turning cubes into permanent stats and
+  new equipment. **[Next]**
+- **Junk:** collected in levels, given to the scientist for white cubes. **[In game]**
+- **Gears and special resources** sent home through deployment stations. **[Idea]**
+- **Robot parts** to unlock new playable characters. **[Idea]**
 
-### 3. **Progression Elements and Resources**
+## 5. Morality
 
-#### **Gears and Special Resources**
-   - **Gears**: Collected by defeating enemies or completing objectives. They are sent back to camp via deployment stations for permanent storage.
-   - **Special Resources**: Rare items used for specific upgrades. They behave like gears and are saved permanently when sent back to camp.
+- Saving robots raises morality, killing lowers it. **[In game]**
+- Factory alarm states react to violence (Normal, Wanted, Revolt, Lockdown). **[In game]**
+- **Followers** (hostile blockers) come to block a violent player. **[In game]**
+- Morality weights the rooms generated in later levels. **[In game]**
+- Morality changes how the laboratory scientist treats you. **[Next]**
+- Morality changes the **look of attacks** (nice or mean). **[Idea]**
+- A **Sheriff** who changes attacks or unlocks upgrades depending on
+  alignment. **[Idea]**
 
-#### **Morality System**
-   - **Morality Gauge**: Reset each run, affecting enemy behaviour and the look of attacks (nice or mean).
-   - **Effects**: Changes attacks and interactions and influences access to some upgrades via the sheriff.
+## 6. Characters in the Laboratory / Camp
 
----
+- **DocBot, the scientist:** works, accepts one junk per visit, becomes
+  scared if attacked, refuses to work for a visit if killed. **[In game / Next]**
+- **Botanist** (rearranges attacks into combos). **[Idea]**
+- **Sheriff** (alignment-based attack changes). **[Idea]**
+- **Mechanic** (gives or removes attacks). **[Idea]**
 
-### 4. **Structure and Function of the Base Camp**
+## 7. Robots and Enemies
 
-#### **Allies and Their Roles**
-   - **Botanist**: Allows you to rearrange attacks to form combos.
-   - **Sheriff**: Modifies attacks according to moral alignment (good or evil).
-   - **Mechanic**: Lets you obtain new attacks or remove some from the inventory.
+In game: Worker, WorkerSpawner, SecurityGuard, SecurityReception, Follower,
+Boss, flying Collector, WorkerCollector (see root README).
 
-#### **Interface and Inventory Management**
-   - **Attack Inventory**: Manage order and improvements of attacks via allies.
-   - **Deployment Stations**: Placed around the map, they send gears and resources back to camp for safekeeping.
+Comedic enemy ideas kept for later **[Idea]**:
 
----
+- **Sweeper Robot:** moves uncontrollably toward the player trying to sweep them.
+- **Office Mower:** charges frantically while shouting absurd phrases.
+- **Paparazzi Drone:** flashes the player, slowing them briefly.
+- **Dance Instructor (mini-boss):** rhythm-based attacks, vulnerable during dance breaks.
+- **Eccentric Director (final boss):** runs the factory, uses gadgets and
+  shouts ridiculous instructions.
 
-### 5. **Enemies and Bosses**
+## 8. New Characters **[Idea]**
 
-#### **Enemy Types**
-   - **Sweeper Robot**: Moves uncontrollably toward the player, trying to sweep them up.
-   - **Office Mower**: Charges frantically at the player, shouting absurd phrases.
-   - **Paparazzi Drone**: Flashes the player, slowing them briefly.
+- Unlock playable robots from collected parts: NinjaBot (stealth attacks),
+  TankBot (high health, heavy hits).
 
-   *Other enemy ideas with similarly comedic behaviours.*
+## 9. Saving **[Later]**
 
-#### **Mini-Bosses and Final Boss**
-   - **Dance Instructor**: Enemies with rhythm-based attacks, vulnerable during dance breaks.
-   - **Eccentric Director (Final Boss)**: Runs the factory, uses gadgets and shouts ridiculous instructions during battle.
-
----
-
-### 6. **Unlocking New Characters**
-
-#### **Robot Part Collection System**
-   - Robot parts can be gathered during runs, allowing new playable characters with unique styles and attacks to be unlocked.
-
-#### **Additional Characters**
-   - **Examples**: NinjaBot with stealth-style attacks, or TankBot with high health and powerful blows.
-
----
-
-### 7. **Save and Load System**
-
-#### **Data to Save and Load**
-   - **Player Stats**: Max Health, Max Energy, Unlocked Attacks, Attack Order.
-   - **Inventory**: Total Gears, Special Resources, Collected Robot Parts.
-   - **CharacterProgress**: Unlocked Characters, Morality influences.
-   - **CampBaseConfig**: Purchased Upgrades, Deployment Station Capacity, Ally interaction levels.
-   - **GameSettings**: Audio, Screen mode, Last chosen character.
-
-#### **How Loading Works**
-   - **From the Menu**: When the player hits "Play", the save file is loaded and the player is sent to camp to start a new run.
-
----
-
-### Diagrams and Flow Charts (to consider for visual documentation)
-
-1. **Run Progress Diagram**: Shows how the player collects resources, sends gears, and returns to camp to apply upgrades.
-2. **Base Camp Interaction Diagram**: Describes the roles of botanist, sheriff and mechanic, and how they manage attacks and morality.
-3. **Unlock Chart**: Shows progression of permanent upgrades, boosters and unlockable characters.
-4. **Save and Load Flow**: Details how each category is saved and loaded at the start of a session.
-
----
-
-### Conclusion
-
-This document gathers all the concepts and features needed for your rogue-lite. Key details such as inventory systems, morality and player progression are documented to ease development. Use it as a guide to implement each element and keep the game true to the original vision.
-
-Feel free to enrich it with visual diagrams for an even more complete overview!
+Saving is deliberately postponed until the start of the game feels right.
+Data to keep in mind for later: permanent stats, unlocked attacks and order,
+resources, unlocked characters, morality influences, laboratory state,
+settings (audio, screen mode, last character). Known technical issues are
+listed in [the audit](../Docs/Audit_Ameliorations_Cowboya_2026-10-08.md).
