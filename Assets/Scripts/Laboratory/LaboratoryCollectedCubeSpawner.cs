@@ -127,6 +127,13 @@ public sealed class LaboratoryCollectedCubeSpawner : MonoBehaviour {
         snapshotCubeCount = snapshotTotal;
         spawnedCubeCount = 0L;
 
+        Transform origin = spawnOrigin != null ? spawnOrigin : transform;
+        Debug.Log(
+            $"[Laboratory] Collected cubes for visit {visitId}: white {snapshot[0]}, health {snapshot[1]}, "
+            + $"energy {snapshot[2]}, recharge {snapshot[3]}, force {snapshot[4]}. "
+            + $"Drop point {origin.position + Vector3.up * fallHeight} (active={isActiveAndEnabled}).",
+            this);
+
         ResumeSnapshotIfNeeded();
         return true;
     }

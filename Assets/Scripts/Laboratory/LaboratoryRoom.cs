@@ -32,6 +32,8 @@ public sealed class LaboratoryRoom : MonoBehaviour {
     [Header("Locked room")]
     [Tooltip("Maximum distance between this room's door and a neighbouring door that must stay shut while locked.")]
     [SerializeField] private float neighbourDoorSearchRadius = 15f;
+    [Tooltip("Maximum height difference between this room's door and the neighbouring door.")]
+    [SerializeField] private float neighbourDoorMaxHeightDifference = 2f;
 
     [Header("Debug")]
     [Tooltip("Editor only: show this room even when the run has not unlocked it.")]
@@ -76,17 +78,25 @@ public sealed class LaboratoryRoom : MonoBehaviour {
     }
 
     private void LockNeighbourDoors() {
-        DoorController[] ownDoors = GetComponentsInChildren<DoorController>(true);
+        StaticRoomDoorConfig doorConfig = GetComponent<StaticRoomDoorConfig>();
         DoorController[] allDoors = FindObjectsByType<DoorController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
-        foreach (DoorController ownDoor in ownDoors) {
+        foreach (DoorController ownDoor in GetComponentsInChildren<DoorController>(true)) {
+            if (IsExitDoor(ownDoor, doorConfig)) {
+                continue; // Exit doors lead outside, never into another room.
+            }
+
             DoorController neighbour = FindFacingNeighbour(ownDoor, allDoors);
             if (neighbour == null) {
                 continue;
             }
 
             neighbour.SetExternalLock(true);
-            Debug.Log($"[Laboratory] Door '{neighbour.name}' locked: it leads to locked room {roomId}.", neighbour);
+            RoomManager neighbourRoom = neighbour.GetComponentInParent<RoomManager>();
+            Debug.Log(
+                $"[Laboratory] Door '{neighbour.name}' of '{(neighbourRoom != null ? neighbourRoom.name : "?")}' "
+                + $"locked: it leads to locked room {roomId}.",
+                neighbour);
         }
     }
 
@@ -95,6 +105,7 @@ public sealed class LaboratoryRoom : MonoBehaviour {
             return null;
         }
 
+        Vector2 ownCenter = GetDoorCenter(ownDoor);
         float ownSide = Mathf.Sign(ownDoor.moveDirection.x);
         DoorController best = null;
         float bestDistance = neighbourDoorSearchRadius;
@@ -107,7 +118,17 @@ public sealed class LaboratoryRoom : MonoBehaviour {
                 continue;
             }
 
-            float distance = Vector2.Distance(candidate.transform.position, ownDoor.transform.position);
+            Vector2 candidateCenter = GetDoorCenter(candidate);
+            if (Mathf.Abs(candidateCenter.y - ownCenter.y) > neighbourDoorMaxHeightDifference) {
+                continue; // A door on another floor is never the way into this room.
+            }
+
+            // The neighbour must sit on the side the door opens to.
+            if (Mathf.Sign(candidateCenter.x - ownCenter.x) != ownSide) {
+                continue;
+            }
+
+            float distance = Mathf.Abs(candidateCenter.x - ownCenter.x);
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = candidate;
@@ -117,6 +138,31 @@ public sealed class LaboratoryRoom : MonoBehaviour {
         return best;
     }
 
+    private static bool IsExitDoor(DoorController door, StaticRoomDoorConfig doorConfig) {
+        if (door == null || doorConfig == null) {
+            return false;
+        }
+
+        StaticDoorState state = door.moveDirection.x < 0f ? doorConfig.LeftDoorState : doorConfig.RightDoorState;
+        return state == StaticDoorState.VictoryExit;
+    }
+
+    /// <summary>
+    /// World centre of the visible door. The door root pivot can sit far from the panels,
+    /// so the panels (or the blocking collider) give the real position.
+    /// </summary>
+    public static Vector2 GetDoorCenter(DoorController door) {
+        if (door.leftPanel != null && door.rightPanel != null) {
+            return (door.leftPanel.position + door.rightPanel.position) * 0.5f;
+        }
+
+        if (door.solidCollider != null) {
+            return door.solidCollider.bounds.center;
+        }
+
+        return door.transform.position;
+    }
+
     private void CreateExitTriggers() {
         StaticRoomDoorConfig doorConfig = GetComponent<StaticRoomDoorConfig>();
         if (doorConfig == null) {
@@ -124,10 +170,8 @@ public sealed class LaboratoryRoom : MonoBehaviour {
         }
 
         foreach (DoorController door in GetComponentsInChildren<DoorController>(true)) {
-            bool isLeft = door.moveDirection.x < 0f;
-            StaticDoorState state = isLeft ? doorConfig.LeftDoorState : doorConfig.RightDoorState;
-            if (state == StaticDoorState.VictoryExit) {
-                CreateExitTrigger(door, isLeft ? Vector2.left : Vector2.right);
+            if (IsExitDoor(door, doorConfig)) {
+                CreateExitTrigger(door, door.moveDirection.x < 0f ? Vector2.left : Vector2.right);
             }
         }
     }
@@ -137,7 +181,11 @@ public sealed class LaboratoryRoom : MonoBehaviour {
         exit.SetActive(false);
         exit.layer = exitTriggerLayer;
         exit.transform.SetParent(transform, true);
-        exit.transform.position = door.transform.position + (Vector3)(outward * exitTriggerOutwardOffset);
+        Vector2 doorCenter = GetDoorCenter(door);
+        Vector3 position = doorCenter + outward * exitTriggerOutwardOffset;
+        position.z = door.transform.position.z;
+        exit.transform.position = position;
+        Debug.Log($"[Laboratory] Exit of room {roomId} placed at {position} (door centre {doorCenter}).", exit);
 
         BoxCollider2D area = exit.AddComponent<BoxCollider2D>();
         area.isTrigger = true;

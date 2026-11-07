@@ -398,11 +398,32 @@ public class GrabOwnershipContractTests {
             Vector2.zero,
             Vector2.zero,
             out Inventory inventory);
-        CubePickup cube = CreateCube("Unsupported transfer cube", Vector2.zero);
+        NoDetachHookGrabbable item = CreateObject("Unsupported transfer item")
+            .AddComponent<NoDetachHookGrabbable>();
+        inventory.SetItem(PickupType.Cube, item);
+
+        Assert.IsFalse(controller.TryDetachHeldObject(item));
+        Assert.AreSame(item, inventory.GetItem(PickupType.Cube));
+    }
+
+    [Test]
+    public void TryDetachHeldObject_DetachesCubeForLaboratoryMachines() {
+        CowboyGrabController controller = CreateGrabController(
+            Vector2.zero,
+            Vector2.zero,
+            out Inventory inventory);
+        CubePickup cube = CreateCube("Machine deposit cube", Vector2.zero);
         inventory.SetItem(PickupType.Cube, cube);
 
-        Assert.IsFalse(controller.TryDetachHeldObject(cube));
-        Assert.AreSame(cube, inventory.GetItem(PickupType.Cube));
+        Assert.IsTrue(controller.TryDetachHeldObject(cube));
+        Assert.IsNull(inventory.GetItem(PickupType.Cube));
+    }
+
+    private sealed class NoDetachHookGrabbable : MonoBehaviour, IGrabbable {
+        public bool CanBeGrabbed(Inventory inventory) => true;
+        public void OnGrab(Transform grabParent) { }
+        public void OnRelease(Vector2 throwForce) { }
+        public void OnAttract(Vector2 attractPoint) { }
     }
 
     [Test]
