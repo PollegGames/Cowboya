@@ -1,64 +1,83 @@
 #!/usr/bin/env bash
+# First-time environment check for Cowboya.
+#
+# The script never modifies the project: packages are pinned by
+# Packages/manifest.json and Packages/packages-lock.json, and the editor
+# version is read from ProjectSettings/ProjectVersion.txt.
+#
+# Usage:
+#   ./setup_env.sh               check the environment
+#   ./setup_env.sh --run-tests   check, then run the Edit Mode tests
+#
+# Set UNITY_PATH when Unity is installed outside the Unity Hub default folder.
 set -euo pipefail
 
-# Detect Linux vs Windows Git Bash
-IS_LINUX=false
-if [[ "$(uname -s 2>/dev/null)" == "Linux" ]]; then
-  IS_LINUX=true
-fi
+project_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+version_file="$project_path/ProjectSettings/ProjectVersion.txt"
+status=0
 
-# 1) (Linux only) Install prerequisites
-if $IS_LINUX && command -v apt-get &>/dev/null; then
-  echo "Installing system prerequisites via apt-get…"
-  sudo apt-get update
-  sudo apt-get install -y git wget jq unzip libgtk-3-0 libnss3 libasound2 libxss1
+ok()   { echo "  [ok]   $*"; }
+warn() { echo "  [warn] $*"; }
+fail() { echo "  [fail] $*"; status=1; }
+
+echo "Cowboya environment check"
+
+# 1) Required editor version
+if [[ ! -f "$version_file" ]]; then
+    echo "ProjectVersion.txt not found: run this script from the Cowboya repository." >&2
+    exit 1
+fi
+unity_version="$(sed -n 's/^m_EditorVersion:[[:space:]]*//p' "$version_file" | head -n 1 | tr -d '\r')"
+ok "Project requires Unity $unity_version"
+
+# 2) Git
+if command -v git >/dev/null 2>&1; then
+    ok "git $(git --version | awk '{print $3}')"
 else
-  echo "Skipping system-package install (not on a Linux apt-get host)."
+    fail "git is not installed"
 fi
 
-# 2) (Linux only) Install Unity Hub CLI
-if $IS_LINUX && ! command -v unity-hub &>/dev/null; then
-  echo "Installing Unity Hub CLI…"
-  wget -qO UnityHub.AppImage "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage"
-  chmod +x UnityHub.AppImage
-  sudo mv UnityHub.AppImage /usr/local/bin/unity-hub
+# 3) Unity editor
+unity_path="${UNITY_PATH:-}"
+if [[ -z "$unity_path" ]]; then
+    case "$(uname -s)" in
+        Darwin)
+            unity_path="/Applications/Unity/Hub/Editor/$unity_version/Unity.app/Contents/MacOS/Unity" ;;
+        MINGW*|MSYS*|CYGWIN*)
+            unity_path="/c/Program Files/Unity/Hub/Editor/$unity_version/Editor/Unity.exe" ;;
+        *)
+            unity_path="$HOME/Unity/Hub/Editor/$unity_version/Editor/Unity" ;;
+    esac
+fi
+if [[ -x "$unity_path" ]]; then
+    ok "Unity found at $unity_path"
 else
-  echo "Skipping Unity Hub CLI install (already installed or not Linux)."
+    fail "Unity $unity_version not found at '$unity_path'. Install it with Unity Hub or set UNITY_PATH."
 fi
 
-# 3) (Linux only) Install Unity Editor via Unity Hub
-UNITY_VER="2021.3.8f1"
-if $IS_LINUX && command -v unity-hub &>/dev/null; then
-  echo "Installing Unity Editor ${UNITY_VER} via Hub…"
-  unity-hub -- --headless install --version "$UNITY_VER" --accept-license
+# 4) Optional: .NET SDK for building the solution outside Unity
+if command -v dotnet >/dev/null 2>&1; then
+    ok "dotnet $(dotnet --version)"
 else
-  echo "Skipping Unity Editor install (use Unity Hub on Windows to install ${UNITY_VER})."
+    warn "dotnet SDK not found (optional, only needed to build Cowboya.sln outside Unity)"
 fi
 
-# 4) Patch manifest.json to include Test Framework & your UPM deps
-MANIFEST="Packages/manifest.json"
-if [[ -f "$MANIFEST" ]]; then
-  echo "Patching $MANIFEST for test-framework and other packages…"
-  jq '.dependencies += {
-      "com.unity.test-framework": "1.1.29",
-      "com.unity.textmeshpro": "3.0.6",
-      "com.unity.addressables": "1.21.15",
-      "com.github.yourorg.pathfinding": "https://github.com/yourorg/pathfinding.git#1.2.0"
-    }' "$MANIFEST" > "$MANIFEST.tmp" && mv "$MANIFEST.tmp" "$MANIFEST"
+# 5) Packages are restored by Unity itself on first open
+if [[ -f "$project_path/Packages/packages-lock.json" ]]; then
+    ok "Packages are pinned by Packages/packages-lock.json (Unity restores them on first open)"
 else
-  echo "ERROR: $MANIFEST not found!"
-  exit 1
+    warn "Packages/packages-lock.json is missing: package versions are not pinned"
 fi
 
-# 5) Pre-download all packages via Unity CLI (batchmode)
-if command -v unity-editor &>/dev/null; then
-  echo "Restoring UPM packages with Unity batchmode…"
-  unity-editor \
-    -batchmode \
-    -projectPath "$(pwd)" \
-    -quit
-else
-  echo "Skipping Unity batch restore (install Unity Editor on Windows and add it to your PATH as 'unity-editor')."
+if [[ $status -ne 0 ]]; then
+    echo "Environment check failed."
+    exit $status
 fi
 
-echo "✅ Environment setup script finished."
+echo "Environment ready. Open the project with Unity Hub, or run the tests:"
+echo "  ./Tools/run-editmode-tests.sh"
+echo "  powershell -ExecutionPolicy Bypass -File Tools/run-editmode-tests.ps1"
+
+if [[ "${1:-}" == "--run-tests" ]]; then
+    UNITY_PATH="$unity_path" "$project_path/Tools/run-editmode-tests.sh"
+fi
