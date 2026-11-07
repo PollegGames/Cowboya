@@ -119,7 +119,7 @@ public class WarpMeshXYSkew : MonoBehaviour
         if (player == null) return;
 
         // Get player's local position relative to the plane
-        Vector3 localPlayerPos = transform.InverseTransformPoint(player.position);
+        Vector3 localPlayerPos = transform.InverseTransformPoint(PlayerViewPoint.GetPosition(player));
         float distanceX = localPlayerPos.x;
         float distanceZ = localPlayerPos.z;
 

@@ -50,6 +50,10 @@ public class MoveWithPlayerPosition : MonoBehaviour
     [Tooltip("Time used to smooth movement. Set to zero for immediate movement.")]
     public float smoothTime = 0.1f;
 
+    [Tooltip("Follow the shared smoothed player point (same as the room perspective warp) without extra smoothing, "
+        + "so the object stays glued to the warped room.")]
+    public bool followsSharedViewPoint = true;
+
     private Vector3 initialLocalPosition;
     private Vector3 baseLocalPosition;
     private Vector3 movementVelocity;
@@ -133,7 +137,8 @@ public class MoveWithPlayerPosition : MonoBehaviour
             return;
 
         Vector3 centerPosition = GetCenterPositionInParentSpace();
-        Vector3 playerPosition = GetPositionInParentSpace(player.position);
+        // Same smoothed point as the room warp, so objects stay glued to the warped room.
+        Vector3 playerPosition = GetPositionInParentSpace(PlayerViewPoint.GetPosition(player));
         Vector3 playerOffset = playerPosition - centerPosition;
 
         float horizontalInput = Mathf.Clamp(playerOffset.x / horizontalRange, -1f, 1f);
@@ -157,6 +162,15 @@ public class MoveWithPlayerPosition : MonoBehaviour
             ? new Vector3(horizontalOffset, 0f, verticalOffset)
             : new Vector3(horizontalOffset, verticalOffset, 0f);
         Vector3 targetPosition = baseLocalPosition + movementOffset;
+
+        // While following the shared smoothed player point, extra smoothing would make the
+        // object lag behind the (already smoothed) room warp and slide visibly.
+        if (followsSharedViewPoint && PlayerViewPoint.IsTracking(player))
+        {
+            transform.localPosition = targetPosition;
+            movementVelocity = Vector3.zero;
+            return;
+        }
 
         MoveTo(targetPosition);
     }

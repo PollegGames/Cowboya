@@ -74,6 +74,11 @@ public abstract class GameInitiator : MonoBehaviour
 
     protected void SetCinemachineTarget(Transform target)
     {
+        if (target != null)
+        {
+            PlayerViewPoint.Register(target);
+        }
+
         if (_cinemachine != null && target != null)
         {
             Transform followed = target;
