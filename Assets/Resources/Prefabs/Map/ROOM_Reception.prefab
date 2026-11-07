@@ -4196,6 +4196,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FutureDesk
       objectReference: {fileID: 0}
+    - target: {fileID: 1273394523665273949, guid: 47ad799d29fbc814ba8e5edfba04d720, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5226794923736213634, guid: 47ad799d29fbc814ba8e5edfba04d720, type: 3}
       propertyPath: m_VersionIndex
       value: 16416

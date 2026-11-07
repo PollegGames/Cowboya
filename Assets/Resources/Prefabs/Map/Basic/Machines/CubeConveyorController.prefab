@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 5331651711142964507}
   - component: {fileID: 2287464628552552663}
   m_Layer: 0
-  m_Name: CubeController
+  m_Name: CubeConveyorController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
