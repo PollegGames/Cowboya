@@ -34,3 +34,17 @@ sysinfo.txt
 # Packaging you don’t want in git
 PUBLISH_WEB/
 PUBLISH_WEB.zip
+
+# WebGL builds and their archives (keep them out of git history)
+/Publish/
+/Cowboya Web/
+*.zip
+
+# Editor / VCS leftovers
+*.slnx
+*.private.0
+/Assets/_Recovery/
+/Assets/_Recovery.meta
+/ProfilerCaptures/
+/.codex-tmp/
+/.codex-worker-fix-baseline/
