@@ -60,6 +60,17 @@ public class LevelEndVictoryTrigger : MonoBehaviour
     }
 
     /// <summary>
+    /// Binds this trigger to the exit door it controls. Used by triggers created at runtime;
+    /// call before the trigger's GameObject is activated, or call RefreshFromRoomProperties after.
+    /// </summary>
+    public void ConfigureExitDoor(DoorController door)
+    {
+        doorNext = door;
+        if (doorNext != null)
+            doorNext.SetVictoryTrigger(this);
+    }
+
+    /// <summary>
     /// Returns whether this trigger controls the supplied door.
     /// </summary>
     public bool ControlsDoor(DoorController door)

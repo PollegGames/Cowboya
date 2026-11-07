@@ -156,6 +156,7 @@ GameObject:
   - component: {fileID: 187235412449160675}
   - component: {fileID: 5857107069788241263}
   - component: {fileID: 910000000000000001}
+  - component: {fileID: 573235402763338157}
   m_Layer: 3
   m_Name: ROOM_Laboratory_3
   m_TagString: Untagged
@@ -4079,3 +4080,23 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 346550217968004788, guid: 61ffb70841476144bb8e6549d16ac0fb, type: 3}
   m_PrefabInstance: {fileID: 8781579326572465687}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &573235402763338157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542146199199913260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b1a5941a7384df48573fe604da18710, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::LaboratoryRoom
+  roomId: 2
+  cubeMachineAnchor: {fileID: 0}
+  cubeIntakeSize: {x: 2.5, y: 2.5}
+  exitTriggerSize: {x: 0.8, y: 3}
+  exitTriggerOutwardOffset: 0.6
+  exitTriggerLayer: 3
+  neighbourDoorSearchRadius: 15
+  forceUnlockedInEditor: 0

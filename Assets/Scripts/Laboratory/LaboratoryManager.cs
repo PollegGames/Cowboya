@@ -106,7 +106,17 @@ public sealed class LaboratoryManager : MonoBehaviour {
         PresentCollectedCubes();
 
         visitInitialized = true;
+        LogVisitStatus();
         return true;
+    }
+
+    private void LogVisitStatus() {
+        string machine = !progress.HasVisitedLaboratory
+            ? "white-cube machine off until the next visit"
+            : progress.TryGetNextRoomToUnlock(out LaboratoryRoomId nextRoom, out int cost)
+                ? $"white-cube machine {progress.WhiteCubeMachineBank}/{cost} for room {nextRoom}"
+                : "every room unlocked";
+        Debug.Log($"[Laboratory] Visit {visitId} started: {machine}.", this);
     }
 
     /// <summary>
@@ -158,6 +168,12 @@ public sealed class LaboratoryManager : MonoBehaviour {
         }
 
         visitFinalized = true;
+        if (progress.TryGetRoomUnlockedAtLastFinalize(out LaboratoryRoomId unlockedRoom)) {
+            Debug.Log(
+                $"[Laboratory] Room {unlockedRoom} unlocked for the next visit. "
+                + $"White cubes left in the machine: {progress.WhiteCubeMachineBank}.",
+                this);
+        }
         return true;
     }
 

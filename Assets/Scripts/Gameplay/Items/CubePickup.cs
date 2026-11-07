@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(TargetJoint2D))]
-public class CubePickup : MonoBehaviour, IGrabbable
+public class CubePickup : MonoBehaviour, IGrabbable, IGrabControllerDetachReceiver
 {
 
     [Header("Target Joint Settings")]
@@ -204,6 +204,23 @@ public class CubePickup : MonoBehaviour, IGrabbable
             hasOverrideAttractPoint = true;
             joint.target = attractPoint;
         }
+    }
+
+    /// <summary>
+    /// Called when a grab controller hands the cube over (for example to a laboratory machine)
+    /// without a throw: the cube stops following the hand and keeps its current position.
+    /// </summary>
+    public void OnDetachedFromGrabController()
+    {
+        RestoreDynamicAttachment();
+        attached = false;
+        if (joint != null)
+            joint.enabled = false;
+
+        followTarget = null;
+        hasOverrideAttractPoint = false;
+        transform.SetParent(null, true);
+        ApplySortingOrder(idleSortingOrder);
     }
 
     public void OnRelease(Vector2 throwForce)

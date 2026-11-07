@@ -29,6 +29,11 @@ public class DoorController : MonoBehaviour
     private bool isRevolt = false;
     private bool isOpen = false;
     private bool isAnimating = false;
+    private bool isExternallyLocked = false;
+    private bool hasStarted = false;
+
+    /// <summary>True while another system keeps this door shut (for example a locked laboratory room).</summary>
+    public bool IsExternallyLocked => isExternallyLocked;
 
     private Vector3 leftClosedPos;
     private Vector3 rightClosedPos;
@@ -56,9 +61,21 @@ public class DoorController : MonoBehaviour
         if (roomManager != null)
             roomManager.OnRoomAlarmChanged += OnRoomAlarmChanged;
 
+        hasStarted = true;
         UpdateStatusPanel();
         // Start the safety check coroutine
         StartCoroutine(SafetyCheckRoutine());
+    }
+
+    /// <summary>
+    /// Keeps the door closed and shown as blocked, whatever its room configuration says.
+    /// Can be called before the door has started.
+    /// </summary>
+    public void SetExternalLock(bool locked)
+    {
+        isExternallyLocked = locked;
+        if (hasStarted)
+            EvaluateDoorState();
     }
 
     public void RefreshFromRoomProperties()
@@ -96,7 +113,7 @@ public class DoorController : MonoBehaviour
         {
             yield return new WaitForSeconds(safetyCheckInterval);
 
-            if (isWall)
+            if (isWall || isExternallyLocked)
             {
                 CloseDoor(forceClose: true);
                 continue;
@@ -153,6 +170,13 @@ public class DoorController : MonoBehaviour
     }
     public void EvaluateDoorState()
     {
+        if (isExternallyLocked)
+        {
+            CloseDoor(forceClose: true);
+            UpdateStatusPanel();
+            return;
+        }
+
         if (IsVictoryExitLocked())
         {
             CloseDoor(forceClose: true);
@@ -253,7 +277,7 @@ public class DoorController : MonoBehaviour
     {
         if (statusPanelRenderer == null) return;
 
-        if (isWall)
+        if (isWall || isExternallyLocked)
         {
             statusPanelRenderer.material = blockedMaterial;
         }

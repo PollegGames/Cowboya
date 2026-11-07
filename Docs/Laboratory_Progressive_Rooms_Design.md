@@ -2,7 +2,7 @@
 
 - **Date :** 7 novembre 2026
 - **Branche :** `tourB`
-- **Statut :** proposition, à valider avant implémentation
+- **Statut :** première version implémentée le 7 novembre 2026 (voir section 6)
 - **Remplace :** la structure en deux salles fixes du document
   [Laboratory_System_Concept_and_Implementation_Base.md](Laboratory_System_Concept_and_Implementation_Base.md).
   Ses principes d'état autoritaire, d'ownership des objets et de restauration sans effet restent valables.
@@ -87,3 +87,32 @@ L'existant est conservé : `LaboratoryManager`, `LaboratoryProgress` (visites, s
 5. **Cubes de couleur :** la salle des cubes de couleur applique-t-elle les améliorations tout de suite au dépôt, ou par lot avec un levier, comme dans l'ancien concept ?
 6. **Pièces détachées de la première salle :** pur décor, ou objets à ramasser qui servent à quelque chose ?
 7. **Persistance :** l'état du laboratoire vit pendant le run seulement (comme aujourd'hui). Faut-il garder les salles débloquées d'un run à l'autre ? Ça rejoint la décision globale sur la sauvegarde.
+
+## 6. Décisions et implémentation (7 novembre 2026)
+
+### Réponses retenues
+
+| Sujet | Décision |
+|---|---|
+| Salles | `ROOM_Laboratory_1` cubes blancs + scientifique (spawn), `_2` cubes de couleur, `_3` stats, `_4` upgrades, plus deux `ROOM_lift` toujours accessibles. |
+| Ordre et coûts | Colors 1 cube blanc, puis Stats 2, puis Upgrades 3. |
+| Surplus | Les cubes en trop restent dans la machine. Une seule salle se débloque par visite ; la suivante se débloque automatiquement à la visite d'après si la banque suffit. |
+| Moment du déblocage | Fin de la visite où le seuil est atteint ; la salle est visible à la visite suivante. |
+| Machine à cubes blancs | Présente dès la visite 1, accepte les cubes à partir de la visite 2. |
+| Salle verrouillée | Invisible ; la porte de l'ascenseur qui y mène reste fermée. |
+| Sorties | Porte gauche de la salle cubes blancs dès le départ, puis la porte extérieure de chaque salle débloquée. Toutes mènent au même niveau suivant. |
+| Cubes de couleur | Appliqués dès le dépôt (santé +10, énergie +10, recharge +5, force +5). |
+| Cubes non déposés | Réapparaissent à la visite suivante. |
+
+### Code
+
+| Élément | Rôle |
+|---|---|
+| `LaboratoryRoomId` | Identifiant des quatre salles. |
+| `LaboratoryProgress` (schéma 4) | Salles débloquées, banque de la machine à cubes blancs, dépôts blancs et colorés, déblocage en fin de visite. |
+| `LaboratoryRoom` (racine de chaque prefab de salle) | Au chargement : cache la salle verrouillée et ferme la porte voisine qui y mène ; sinon crée les déclencheurs de sortie sur les portes `VictoryExit` et l'entrée de cubes de la machine. |
+| `LaboratoryCubeMachine` | Entrée de machine créée sur `MachineBuilder` (cubes blancs) et `UpgradeStatsMachine` (couleur). Un cube est déposé quand le joueur le porte dans la zone. Retours par logs `[Laboratory]`. |
+| `DoorController.SetExternalLock` | Garde une porte fermée et affichée bloquée. |
+| `CubePickup` | Implémente `IGrabControllerDetachReceiver` pour être retiré proprement de la main. |
+
+Pour tester une salle verrouillée en jouant directement la scène, coche `forceUnlockedInEditor` sur son `LaboratoryRoom`.

@@ -14,6 +14,9 @@ public class StaticRoomDoorConfig : MonoBehaviour
     [SerializeField] private StaticDoorState leftDoor = StaticDoorState.Unlocked;
     [SerializeField] private StaticDoorState rightDoor = StaticDoorState.Unlocked;
 
+    public StaticDoorState LeftDoorState => leftDoor;
+    public StaticDoorState RightDoorState => rightDoor;
+
     public void Apply(RoomManager room)
     {
         if (room == null || room.roomProperties == null)

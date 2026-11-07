@@ -25,9 +25,19 @@ public enum LaboratoryVisitOutcome {
 /// </summary>
 [Serializable]
 public sealed class LaboratoryProgress : ISerializationCallbackReceiver {
-    public const int CurrentSchemaVersion = 3;
+    public const int CurrentSchemaVersion = 4;
     public const int JunkVariantCount = 8;
     public const int LaboratoryCubeTypeCount = 5;
+
+    /// <summary>
+    /// Rooms unlocked by the white-cube machine, in unlock order, with their white-cube cost.
+    /// </summary>
+    private static readonly LaboratoryRoomId[] UnlockOrder = {
+        LaboratoryRoomId.ColorCubes,
+        LaboratoryRoomId.Stats,
+        LaboratoryRoomId.Upgrades
+    };
+    private static readonly int[] UnlockCosts = { 1, 2, 3 };
 
     [SerializeField] private int schemaVersion = CurrentSchemaVersion;
     [SerializeField] private bool hasVisitedLaboratory;
@@ -54,7 +64,29 @@ public sealed class LaboratoryProgress : ISerializationCallbackReceiver {
     [SerializeField] private int[] incomingCubeCounts = new int[LaboratoryCubeTypeCount];
     [SerializeField] private int[] laboratoryFreeCubeCounts = new int[LaboratoryCubeTypeCount];
 
+    [Header("Rooms")]
+    [SerializeField] private int unlockedExtraRoomCount;
+    [SerializeField] private int whiteCubeMachineBank;
+    private bool hasRoomUnlockedAtLastFinalize;
+    private LaboratoryRoomId roomUnlockedAtLastFinalize;
+
     public int SchemaVersion => schemaVersion;
+
+    /// <summary>White cubes stored in the white-cube machine and not yet spent on a room.</summary>
+    public int WhiteCubeMachineBank => whiteCubeMachineBank;
+
+    /// <summary>True when every room after the spawn room is unlocked.</summary>
+    public bool AllRoomsUnlocked => unlockedExtraRoomCount >= UnlockOrder.Length;
+
+    /// <summary>
+    /// The white-cube machine accepts cubes from the second visit onwards, while its bank
+    /// does not already cover every locked room.
+    /// </summary>
+    public bool CanDepositWhiteCube =>
+        hasActiveVisit && hasVisitedLaboratory && whiteCubeMachineBank < GetRemainingUnlockCost();
+
+    /// <summary>The colored-cube machine accepts cubes during a visit once its room is unlocked.</summary>
+    public bool CanDepositColorCube => hasActiveVisit && IsRoomUnlocked(LaboratoryRoomId.ColorCubes);
     public bool HasVisitedLaboratory => hasVisitedLaboratory;
     public bool HasActiveVisit => hasActiveVisit;
     public int ActiveVisitId => hasActiveVisit ? activeVisitId : -1;
@@ -183,6 +215,7 @@ public sealed class LaboratoryProgress : ISerializationCallbackReceiver {
             }
         }
 
+        UnlockNextRoomFromBank();
         hasVisitedLaboratory = true;
         lastVisitOutcome = outcome;
         lastFinalizedVisitId = activeVisitId;
@@ -192,6 +225,67 @@ public sealed class LaboratoryProgress : ISerializationCallbackReceiver {
         acceptedJunkVariant = JunkVariant.None;
         scientistDiedThisVisit = false;
         return true;
+    }
+
+    /// <summary>
+    /// Returns whether a room is visible and reachable in the laboratory.
+    /// </summary>
+    public bool IsRoomUnlocked(LaboratoryRoomId room) {
+        if (room == LaboratoryRoomId.WhiteCubes) {
+            return true;
+        }
+
+        int order = Array.IndexOf(UnlockOrder, room);
+        return order >= 0 && order < unlockedExtraRoomCount;
+    }
+
+    /// <summary>
+    /// Gets the next room the white-cube machine will unlock, or false when all are unlocked.
+    /// </summary>
+    public bool TryGetNextRoomToUnlock(out LaboratoryRoomId room, out int cost) {
+        if (AllRoomsUnlocked) {
+            room = default;
+            cost = 0;
+            return false;
+        }
+
+        room = UnlockOrder[unlockedExtraRoomCount];
+        cost = UnlockCosts[unlockedExtraRoomCount];
+        return true;
+    }
+
+    /// <summary>
+    /// Gets the room unlocked by the most recent finalized visit, if any.
+    /// </summary>
+    public bool TryGetRoomUnlockedAtLastFinalize(out LaboratoryRoomId room) {
+        room = roomUnlockedAtLastFinalize;
+        return hasRoomUnlockedAtLastFinalize;
+    }
+
+    /// <summary>
+    /// Moves one free white cube into the white-cube machine. The bank is spent on the next
+    /// locked room when the visit is finalized, one room per visit.
+    /// </summary>
+    public bool TryDepositWhiteCube() {
+        SanitizeState();
+        if (!CanDepositWhiteCube || !TryTakeLaboratoryFreeCube(LaboratoryCubeType.White)) {
+            return false;
+        }
+
+        whiteCubeMachineBank = SaturatingAdd(whiteCubeMachineBank, 1);
+        return true;
+    }
+
+    /// <summary>
+    /// Consumes one free colored cube in the colored-cube machine. The caller applies the stat.
+    /// </summary>
+    public bool TryDepositColorCube(LaboratoryCubeType type) {
+        SanitizeState();
+        if (type == LaboratoryCubeType.White || !CanDepositColorCube) {
+            return false;
+        }
+
+        return TryTakeLaboratoryFreeCube(type);
     }
 
     /// <summary>
@@ -322,6 +416,10 @@ public sealed class LaboratoryProgress : ISerializationCallbackReceiver {
         storedJunkCounts = new int[JunkVariantCount];
         incomingCubeCounts = new int[LaboratoryCubeTypeCount];
         laboratoryFreeCubeCounts = new int[LaboratoryCubeTypeCount];
+        unlockedExtraRoomCount = 0;
+        whiteCubeMachineBank = 0;
+        hasRoomUnlockedAtLastFinalize = false;
+        roomUnlockedAtLastFinalize = default;
     }
 
     public void OnBeforeSerialize() {
@@ -330,6 +428,28 @@ public sealed class LaboratoryProgress : ISerializationCallbackReceiver {
 
     public void OnAfterDeserialize() {
         SanitizeState();
+    }
+
+    private void UnlockNextRoomFromBank() {
+        hasRoomUnlockedAtLastFinalize = false;
+        if (!TryGetNextRoomToUnlock(out LaboratoryRoomId room, out int cost)
+            || whiteCubeMachineBank < cost) {
+            return;
+        }
+
+        whiteCubeMachineBank -= cost;
+        unlockedExtraRoomCount++;
+        hasRoomUnlockedAtLastFinalize = true;
+        roomUnlockedAtLastFinalize = room;
+    }
+
+    private int GetRemainingUnlockCost() {
+        int total = 0;
+        for (int i = Math.Max(0, unlockedExtraRoomCount); i < UnlockCosts.Length; i++) {
+            total += UnlockCosts[i];
+        }
+
+        return total;
     }
 
     private void StoreJunk(JunkVariant variant) {
@@ -355,6 +475,8 @@ public sealed class LaboratoryProgress : ISerializationCallbackReceiver {
         availableWhiteCubeCount = Math.Max(0, availableWhiteCubeCount);
         whiteCubeCountPendingForNextVisit = Math.Max(0, whiteCubeCountPendingForNextVisit);
         lastFinalizedVisitId = Math.Max(-1, lastFinalizedVisitId);
+        unlockedExtraRoomCount = Mathf.Clamp(unlockedExtraRoomCount, 0, UnlockOrder.Length);
+        whiteCubeMachineBank = Math.Max(0, whiteCubeMachineBank);
 
         if (!IsValidDisposition(currentVisitDisposition)) {
             currentVisitDisposition = LaboratoryScientistDisposition.Work;
