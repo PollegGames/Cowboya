@@ -99,6 +99,26 @@ public class LaboratoryCubeMachineTests {
         Assert.IsNotNull(doors, prefabName);
         Assert.AreEqual(left, doors.LeftDoorState, $"{prefabName} left door");
         Assert.AreEqual(right, doors.RightDoorState, $"{prefabName} right door");
+
+        LaboratoryExitPoint exit = prefab.GetComponentInChildren<LaboratoryExitPoint>(true);
+        Assert.IsNotNull(exit, $"{prefabName} needs an authored LaboratoryExitPoint.");
+        Assert.IsTrue(exit.GetComponent<Collider2D>().isTrigger, $"{prefabName} exit must be a trigger.");
+        Assert.AreEqual(Quaternion.identity, exit.transform.rotation, $"{prefabName} exit must stay in the XY plane.");
+
+        LaboratoryCubeMachine machine = prefab.GetComponentInChildren<LaboratoryCubeMachine>(true);
+        if (expectedId == LaboratoryRoomId.WhiteCubes || expectedId == LaboratoryRoomId.ColorCubes) {
+            Assert.IsNotNull(machine, $"{prefabName} needs an authored CubeIntake.");
+            Assert.AreEqual(
+                expectedId == LaboratoryRoomId.WhiteCubes
+                    ? LaboratoryCubeMachineKind.WhiteCubeRoomBuilder
+                    : LaboratoryCubeMachineKind.ColorCubeUpgrade,
+                machine.Kind,
+                prefabName);
+            Assert.AreEqual(Quaternion.identity, machine.transform.rotation, $"{prefabName} intake must stay in the XY plane.");
+        }
+        else {
+            Assert.IsNull(machine, $"{prefabName} has no cube machine yet.");
+        }
     }
 
     private LaboratoryProgress ProgressOnSecondVisit(LaboratoryCubeType freeType, int amount) {

@@ -52,7 +52,7 @@ MonoBehaviour:
   attackDamageCubePrefab: {fileID: -3281786584640236443, guid: 91db61f0cd0e0bb45b6533dc6f61131d, type: 3}
   spawnOrigin: {fileID: 7021033058389464428}
   spawnedCubeParent: {fileID: 0}
-  fallHeight: 4
+  fallHeight: 0
   horizontalScatter: 0.15
   spawnDepth: 0.01
   spawnIntervalSeconds: 0.1

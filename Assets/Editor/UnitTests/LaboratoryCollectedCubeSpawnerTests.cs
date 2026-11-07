@@ -177,9 +177,10 @@ public class LaboratoryCollectedCubeSpawnerTests {
         AssertAssigned(serializedSpawner, "maxEnergyCubePrefab", "CubeMaxEnergy");
         AssertAssigned(serializedSpawner, "energyRechargeCubePrefab", "CubeReloadEnergy");
         AssertAssigned(serializedSpawner, "attackDamageCubePrefab", "CubeAttackDamage");
-        Assert.Greater(
-            serializedSpawner.FindProperty("fallHeight").floatValue,
-            0f);
+        // The authored SpawnPoint is the exact drop position.
+        Assert.AreEqual(
+            0f,
+            serializedSpawner.FindProperty("fallHeight").floatValue);
         Assert.Greater(
             serializedSpawner.FindProperty("spawnIntervalSeconds").floatValue,
             0f);

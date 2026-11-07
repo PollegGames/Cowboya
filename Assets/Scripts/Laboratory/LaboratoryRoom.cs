@@ -169,11 +169,56 @@ public sealed class LaboratoryRoom : MonoBehaviour {
             return;
         }
 
+        var exitDoors = new System.Collections.Generic.List<DoorController>();
         foreach (DoorController door in GetComponentsInChildren<DoorController>(true)) {
             if (IsExitDoor(door, doorConfig)) {
-                CreateExitTrigger(door, door.moveDirection.x < 0f ? Vector2.left : Vector2.right);
+                exitDoors.Add(door);
             }
         }
+
+        if (exitDoors.Count == 0) {
+            return;
+        }
+
+        LaboratoryExitPoint[] authoredExits = GetComponentsInChildren<LaboratoryExitPoint>(true);
+        if (authoredExits.Length > 0) {
+            foreach (LaboratoryExitPoint exitPoint in authoredExits) {
+                BindExitPoint(exitPoint, FindNearestDoor(exitPoint.transform.position, exitDoors));
+            }
+            return;
+        }
+
+        // No authored exit: fall back to an area just outside each exit door.
+        foreach (DoorController door in exitDoors) {
+            CreateExitTrigger(door, door.moveDirection.x < 0f ? Vector2.left : Vector2.right);
+        }
+    }
+
+    private void BindExitPoint(LaboratoryExitPoint exitPoint, DoorController door) {
+        Collider2D area = exitPoint.GetComponent<Collider2D>();
+        area.isTrigger = true;
+
+        LevelEndVictoryTrigger trigger = exitPoint.GetComponent<LevelEndVictoryTrigger>();
+        if (trigger == null) {
+            trigger = exitPoint.gameObject.AddComponent<LevelEndVictoryTrigger>();
+        }
+
+        trigger.ConfigureExitDoor(door);
+        Debug.Log($"[Laboratory] Exit '{exitPoint.name}' of room {roomId} bound to door '{door.name}'.", exitPoint);
+    }
+
+    private static DoorController FindNearestDoor(Vector2 position, System.Collections.Generic.List<DoorController> doors) {
+        DoorController best = doors[0];
+        float bestDistance = float.MaxValue;
+        foreach (DoorController door in doors) {
+            float distance = Vector2.Distance(position, GetDoorCenter(door));
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = door;
+            }
+        }
+
+        return best;
     }
 
     private void CreateExitTrigger(DoorController door, Vector2 outward) {
@@ -220,9 +265,12 @@ public sealed class LaboratoryRoom : MonoBehaviour {
             ? cubeMachineAnchor
             : FindDescendant(transform, machineChildName) ?? FindDescendant(transform, CenterWaypointChildName) ?? transform;
 
+        // Fallback when the room has no authored CubeIntake. Keep a world-aligned rotation:
+        // room prefabs are rotated and a 2D collider must stay in the XY plane.
         var intake = new GameObject($"CubeIntake_{kind}");
         intake.SetActive(false);
-        intake.transform.SetParent(anchor, false);
+        intake.transform.SetParent(anchor, true);
+        intake.transform.SetPositionAndRotation(anchor.position, Quaternion.identity);
 
         BoxCollider2D area = intake.AddComponent<BoxCollider2D>();
         area.isTrigger = true;
