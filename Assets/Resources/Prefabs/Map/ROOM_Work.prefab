@@ -4575,6 +4575,7 @@ MonoBehaviour:
   invertHorizontal: 0
   invertVertical: 0
   smoothTime: 0.1
+  followsSharedViewPoint: 1
 --- !u!4 &7267600110827688848 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5331651711142964507, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
@@ -4611,6 +4612,7 @@ MonoBehaviour:
   invertHorizontal: 0
   invertVertical: 0
   smoothTime: 0.1
+  followsSharedViewPoint: 1
 --- !u!1 &9039180105125579361 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5789370009901282538, guid: d570f9bc4e7974a4c9ff3703b57b96ae, type: 3}
@@ -4642,3 +4644,4 @@ MonoBehaviour:
   invertHorizontal: 0
   invertVertical: 0
   smoothTime: 0.1
+  followsSharedViewPoint: 1
