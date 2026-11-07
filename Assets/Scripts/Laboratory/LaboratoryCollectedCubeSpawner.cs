@@ -27,6 +27,9 @@ public sealed class LaboratoryCollectedCubeSpawner : MonoBehaviour {
     [SerializeField] private Transform spawnedCubeParent;
     [SerializeField, Min(0f)] private float fallHeight = 2f;
     [SerializeField, Min(0f)] private float horizontalScatter = 0.25f;
+    [Tooltip("Spawn cubes on the player's depth (Z) so they are drawn in front of the room. "
+        + "When off, or when no player is found, Spawn Depth is used.")]
+    [SerializeField] private bool matchPlayerDepth = true;
     [SerializeField] private float spawnDepth = 0.01f;
     [SerializeField, Min(0f)] private float spawnIntervalSeconds = 0.08f;
 
@@ -131,7 +134,8 @@ public sealed class LaboratoryCollectedCubeSpawner : MonoBehaviour {
         Debug.Log(
             $"[Laboratory] Collected cubes for visit {visitId}: white {snapshot[0]}, health {snapshot[1]}, "
             + $"energy {snapshot[2]}, recharge {snapshot[3]}, force {snapshot[4]}. "
-            + $"Drop point {origin.position + Vector3.up * fallHeight} (active={isActiveAndEnabled}).",
+            + $"Drop point {origin.position + Vector3.up * fallHeight}, depth {ResolveSpawnDepth()} "
+            + $"(active={isActiveAndEnabled}).",
             this);
 
         ResumeSnapshotIfNeeded();
@@ -194,7 +198,7 @@ public sealed class LaboratoryCollectedCubeSpawner : MonoBehaviour {
         spawnPosition += Vector3.right * UnityEngine.Random.Range(
             -horizontalScatter,
             horizontalScatter);
-        spawnPosition.z = spawnDepth;
+        spawnPosition.z = ResolveSpawnDepth();
 
         CubePickup cube = Instantiate(
             prefab,
@@ -207,6 +211,20 @@ public sealed class LaboratoryCollectedCubeSpawner : MonoBehaviour {
         nextTypeIndex = (typeIndex + 1) % SpawnOrder.Length;
         spawnedCubeCount++;
         return true;
+    }
+
+    private float ResolveSpawnDepth() {
+        if (!matchPlayerDepth) {
+            return spawnDepth;
+        }
+
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null) {
+            return player.transform.position.z;
+        }
+
+        StaticLevelSpawnPoint playerSpawn = FindFirstObjectByType<StaticLevelSpawnPoint>();
+        return playerSpawn != null ? playerSpawn.transform.position.z : spawnDepth;
     }
 
     private bool TryFindNextTypeIndex(out int typeIndex) {

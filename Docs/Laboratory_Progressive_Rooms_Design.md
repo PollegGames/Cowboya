@@ -110,8 +110,9 @@ L'existant est conservé : `LaboratoryManager`, `LaboratoryProgress` (visites, s
 |---|---|
 | `LaboratoryRoomId` | Identifiant des quatre salles. |
 | `LaboratoryProgress` (schéma 4) | Salles débloquées, banque de la machine à cubes blancs, dépôts blancs et colorés, déblocage en fin de visite. |
-| `LaboratoryRoom` (racine de chaque prefab de salle) | Au chargement : cache la salle verrouillée et ferme la porte voisine qui y mène ; sinon crée les déclencheurs de sortie sur les portes `VictoryExit` et l'entrée de cubes de la machine. |
-| `LaboratoryCubeMachine` | Entrée de machine créée sur `MachineBuilder` (cubes blancs) et `UpgradeStatsMachine` (couleur). Un cube est déposé quand le joueur le porte dans la zone. Retours par logs `[Laboratory]`. |
+| `LaboratoryRoom` (racine de chaque prefab de salle) | Au chargement : cache la salle verrouillée ; sinon relie ses `LaboratoryExitPoint` (enfants de `LaboratoryAnchors`) aux portes `VictoryExit`. |
+| `LaboratoryPassageGate` (instances `ROOM_lift` de la scène) | Indique la salle derrière chaque porte de l'ascenseur et garde la porte fermée tant que la salle est verrouillée. |
+| `LaboratoryCubeMachine` | Objet `CubeIntake` des salles cubes blancs et couleur, à placer sur la machine. Un cube est déposé quand le joueur le porte dans la zone. Retours par logs `[Laboratory]`. |
 | `DoorController.SetExternalLock` | Garde une porte fermée et affichée bloquée. |
 | `CubePickup` | Implémente `IGrabControllerDetachReceiver` pour être retiré proprement de la main. |
 

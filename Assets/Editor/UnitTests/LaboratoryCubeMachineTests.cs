@@ -79,6 +79,41 @@ public class LaboratoryCubeMachineTests {
     }
 
     [Test]
+    public void PassageGate_LocksDoorsOfLockedRoomsOnly() {
+        var lift = new GameObject("Lift");
+        created.Add(lift);
+        DoorController leftDoor = CreateDoor(lift.transform, Vector2.left);
+        DoorController rightDoor = CreateDoor(lift.transform, Vector2.right);
+        LaboratoryPassageGate gate = lift.AddComponent<LaboratoryPassageGate>();
+        SetField(gate, "leftRoom", LaboratoryRoomId.WhiteCubes);
+        SetField(gate, "rightRoom", LaboratoryRoomId.ColorCubes);
+
+        gate.Apply(new LaboratoryProgress());
+        Assert.IsFalse(leftDoor.IsExternallyLocked, "The spawn room is always reachable.");
+        Assert.IsTrue(rightDoor.IsExternallyLocked, "The colored-cube room starts locked.");
+
+        LaboratoryProgress progress = ProgressOnSecondVisit(LaboratoryCubeType.White, 1);
+        Assert.IsTrue(progress.TryDepositWhiteCube());
+        Assert.IsTrue(progress.TryFinalizeVisit());
+        gate.Apply(progress);
+        Assert.IsFalse(rightDoor.IsExternallyLocked);
+    }
+
+    private static DoorController CreateDoor(Transform parent, Vector2 direction) {
+        var go = new GameObject(direction.x < 0f ? "LeftDoor" : "RightDoor");
+        go.transform.SetParent(parent, false);
+        DoorController door = go.AddComponent<DoorController>();
+        door.moveDirection = direction;
+        return door;
+    }
+
+    private static void SetField(object target, string field, object value) {
+        target.GetType()
+            .GetField(field, BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(target, value);
+    }
+
+    [Test]
     public void LaboratoryRoomPrefabs_HaveRoomIdsAndExitDoors() {
         AssertRoomPrefab("ROOM_Laboratory_1", LaboratoryRoomId.WhiteCubes, StaticDoorState.VictoryExit, StaticDoorState.Unlocked);
         AssertRoomPrefab("ROOM_Laboratory_2", LaboratoryRoomId.ColorCubes, StaticDoorState.VictoryExit, StaticDoorState.Unlocked);

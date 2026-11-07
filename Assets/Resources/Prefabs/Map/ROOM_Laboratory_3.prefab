@@ -4067,7 +4067,6 @@ MonoBehaviour:
   exitTriggerSize: {x: 0.8, y: 3}
   exitTriggerOutwardOffset: 0.6
   exitTriggerLayer: 3
-  neighbourDoorSearchRadius: 15
   forceUnlockedInEditor: 0
 --- !u!1 &501965555217982790
 GameObject:
@@ -4128,7 +4127,7 @@ Transform:
   m_GameObject: {fileID: 589355922864477948}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25.4, y: 1.5, z: 0}
+  m_LocalPosition: {x: 29.52, y: 0.43, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Marks a room of the laboratory scene and applies the run's unlock state when the scene loads.
-/// A locked room is hidden and the neighbouring doors leading into it stay shut.
+/// A locked room is hidden; <see cref="LaboratoryPassageGate"/> keeps the lift doors leading to it shut.
 /// An unlocked room gets an exit trigger on each door configured as <see cref="StaticDoorState.VictoryExit"/>
 /// and, for machine rooms, a cube intake on its machine.
 /// </summary>
@@ -29,12 +29,6 @@ public sealed class LaboratoryRoom : MonoBehaviour {
     [SerializeField] private float exitTriggerOutwardOffset = 0.6f;
     [SerializeField] private int exitTriggerLayer = 3;
 
-    [Header("Locked room")]
-    [Tooltip("Maximum distance between this room's door and a neighbouring door that must stay shut while locked.")]
-    [SerializeField] private float neighbourDoorSearchRadius = 15f;
-    [Tooltip("Maximum height difference between this room's door and the neighbouring door.")]
-    [SerializeField] private float neighbourDoorMaxHeightDifference = 2f;
-
     [Header("Debug")]
     [Tooltip("Editor only: show this room even when the run has not unlocked it.")]
     [SerializeField] private bool forceUnlockedInEditor;
@@ -49,7 +43,6 @@ public sealed class LaboratoryRoom : MonoBehaviour {
         IsUnlocked = ResolveUnlocked(progress);
 
         if (!IsUnlocked) {
-            LockNeighbourDoors();
             Debug.Log($"[Laboratory] Room {roomId} is locked and hidden.", this);
             gameObject.SetActive(false);
             return;
@@ -75,67 +68,6 @@ public sealed class LaboratoryRoom : MonoBehaviour {
         }
 
         return progress.IsRoomUnlocked(roomId);
-    }
-
-    private void LockNeighbourDoors() {
-        StaticRoomDoorConfig doorConfig = GetComponent<StaticRoomDoorConfig>();
-        DoorController[] allDoors = FindObjectsByType<DoorController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-
-        foreach (DoorController ownDoor in GetComponentsInChildren<DoorController>(true)) {
-            if (IsExitDoor(ownDoor, doorConfig)) {
-                continue; // Exit doors lead outside, never into another room.
-            }
-
-            DoorController neighbour = FindFacingNeighbour(ownDoor, allDoors);
-            if (neighbour == null) {
-                continue;
-            }
-
-            neighbour.SetExternalLock(true);
-            RoomManager neighbourRoom = neighbour.GetComponentInParent<RoomManager>();
-            Debug.Log(
-                $"[Laboratory] Door '{neighbour.name}' of '{(neighbourRoom != null ? neighbourRoom.name : "?")}' "
-                + $"locked: it leads to locked room {roomId}.",
-                neighbour);
-        }
-    }
-
-    private DoorController FindFacingNeighbour(DoorController ownDoor, DoorController[] candidates) {
-        if (ownDoor == null) {
-            return null;
-        }
-
-        Vector2 ownCenter = GetDoorCenter(ownDoor);
-        float ownSide = Mathf.Sign(ownDoor.moveDirection.x);
-        DoorController best = null;
-        float bestDistance = neighbourDoorSearchRadius;
-        foreach (DoorController candidate in candidates) {
-            if (candidate == null || candidate.transform.IsChildOf(transform)) {
-                continue;
-            }
-
-            if (Mathf.Sign(candidate.moveDirection.x) == ownSide) {
-                continue;
-            }
-
-            Vector2 candidateCenter = GetDoorCenter(candidate);
-            if (Mathf.Abs(candidateCenter.y - ownCenter.y) > neighbourDoorMaxHeightDifference) {
-                continue; // A door on another floor is never the way into this room.
-            }
-
-            // The neighbour must sit on the side the door opens to.
-            if (Mathf.Sign(candidateCenter.x - ownCenter.x) != ownSide) {
-                continue;
-            }
-
-            float distance = Mathf.Abs(candidateCenter.x - ownCenter.x);
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                best = candidate;
-            }
-        }
-
-        return best;
     }
 
     private static bool IsExitDoor(DoorController door, StaticRoomDoorConfig doorConfig) {

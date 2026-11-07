@@ -6210,7 +6210,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1368248292}
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1471830688}
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1104437717}
   m_SourcePrefab: {fileID: 100100000, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
 --- !u!43 &479203130
 Mesh:
@@ -8178,10 +8187,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2782571302028958996, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 706902999064495847, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 161
@@ -8265,6 +8270,10 @@ PrefabInstance:
     - target: {fileID: 2782571302028958996, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_Name
       value: Load RunSetupGrid Right
+      objectReference: {fileID: 0}
+    - target: {fileID: 2782571302028958996, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3567117641040124081, guid: 12cf6aec4d8d96947b7507320b75bfe8, type: 3}
       propertyPath: m_Size.y
@@ -17043,7 +17052,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1280210845}
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 411631806}
+    - targetCorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1141976018}
   m_SourcePrefab: {fileID: 100100000, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
 --- !u!43 &1589905171
 Mesh:
@@ -19023,6 +19041,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 471112171}
+    - target: {fileID: 225508486260114391, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -20.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 225508486260114391, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.43
+      objectReference: {fileID: 0}
     - target: {fileID: 467531725607160642, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -19043,6 +19069,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 871579827}
+    - target: {fileID: 796276708435784173, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.26
+      objectReference: {fileID: 0}
+    - target: {fileID: 796276708435784173, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.56
+      objectReference: {fileID: 0}
     - target: {fileID: 814456244760004463, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -19065,11 +19099,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1031590957709354780, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.75
+      value: 3.19
       objectReference: {fileID: 0}
     - target: {fileID: 1031590957709354780, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.84
+      value: -0.91
       objectReference: {fileID: 0}
     - target: {fileID: 1096303338772001335, guid: ea22f103c57aac046beabeb5a1542536, type: 3}
       propertyPath: m_Mesh
@@ -22674,3 +22708,101 @@ SceneRoots:
   - {fileID: 267225255}
   - {fileID: 669938531}
   - {fileID: 415599569}
+--- !u!1 &1027039081 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+  m_PrefabInstance: {fileID: 1552377512}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1280210845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027039081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50306220289b44769dc39b6181d4a5de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::StaticRoomDoorConfig
+  leftDoor: 1
+  rightDoor: 1
+--- !u!114 &411631806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027039081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a02f219816174e55a97fbbf8d18695df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::StaticRoomLiftConfig
+  liftUp: 0
+  liftDown: 1
+--- !u!114 &1141976018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027039081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba6457eb5f9143c5b5c7f5a961ac04e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::LaboratoryPassageGate
+  gateLeftDoor: 1
+  leftRoom: 0
+  gateRightDoor: 1
+  rightRoom: 2
+--- !u!1 &328820995 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 542146199199913260, guid: 1c5027646d87732499c2adfeec1f8233, type: 3}
+  m_PrefabInstance: {fileID: 478087559}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1368248292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328820995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50306220289b44769dc39b6181d4a5de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::StaticRoomDoorConfig
+  leftDoor: 1
+  rightDoor: 1
+--- !u!114 &1471830688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328820995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a02f219816174e55a97fbbf8d18695df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::StaticRoomLiftConfig
+  liftUp: 1
+  liftDown: 0
+--- !u!114 &1104437717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328820995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba6457eb5f9143c5b5c7f5a961ac04e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::LaboratoryPassageGate
+  gateLeftDoor: 1
+  leftRoom: 1
+  gateRightDoor: 1
+  rightRoom: 3
