@@ -2353,6 +2353,8 @@ GameObject:
   - component: {fileID: 193686182613551049}
   - component: {fileID: 7969949290834653241}
   - component: {fileID: 6664860168519350627}
+  - component: {fileID: 595418842814949523}
+  - component: {fileID: 777000111222333444}
   m_Layer: 6
   m_Name: Cowboy_Player
   m_TagString: Player
@@ -2407,42 +2409,68 @@ MonoBehaviour:
   - Master: {fileID: 980800990847532172}
     Puppet: {fileID: 2283953631320785847}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 3034355644026048187}
     Puppet: {fileID: 4049449194343657856}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 2571996912644125469}
     Puppet: {fileID: 3575624351963827238}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 3904384451927857496}
     Puppet: {fileID: 2594515453249349219}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 130394462993237291}
     Puppet: {fileID: 1432703118786984464}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 8644158953547958747}
     Puppet: {fileID: 7338758748098967264}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 239704037233877835}
     Puppet: {fileID: 1260202480680754288}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 9039017654932051622}
     Puppet: {fileID: 8025326976224078237}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 700
   - Master: {fileID: 1131990860903885594}
     Puppet: {fileID: 2133326642056893473}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 700
   - Master: {fileID: 2087084192508145818}
     Puppet: {fileID: 1069722508078370721}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 247113993355474272}
     Puppet: {fileID: 1243932659675859547}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 8680376486850864307}
     Puppet: {fileID: 7662978787526679432}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
   - Master: {fileID: 6448434172931451811}
     Puppet: {fileID: 5427904356359214232}
     PuppetBody2D: {fileID: 0}
+    SharpnessOverride: 0
+    MaxAngularSpeed: 0
 --- !u!114 &3111911538374892419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7532,3 +7560,32 @@ Transform:
   - {fileID: 8644158953547958747}
   m_Father: {fileID: 2571996912644125469}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -176.298}
+--- !u!114 &595418842814949523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825727325489498760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dad34df650a5471ab503cc132080e11b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game::IkFootLandingSoftener
+  targets:
+  - {fileID: 7049414889136880941}
+  - {fileID: 32596840210249436}
+--- !u!114 &777000111222333444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825727325489498760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7125d92abdc64e1f96cfb48162928396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::WalkDiagnostics
+  logEnabled: 0
+  reportInterval: 2

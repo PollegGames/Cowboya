@@ -58,6 +58,24 @@ public class ArmTargetController : MonoBehaviour
     [Header("Grab")]
     [SerializeField] private float regrabLockoutDuration = 2f;
 
+    [Header("Walk Arm Swing")]
+    [Tooltip("Swings a free arm (no aim input, nothing held) while walking. Aiming or grabbing always takes over.")]
+    [SerializeField] private bool armSwingEnabled = true;
+    [Tooltip("Swing distance of the arm solver target at full walking speed (rig local units).")]
+    [SerializeField, Min(0f)] private float armSwingAmplitude = 1.4f;
+    [Tooltip("While walking, the free hand leaves its rest pose (hand on the belt) by this offset so the arm hangs.")]
+    [SerializeField] private Vector2 armSwingHangOffset = new Vector2(0f, -1.2f);
+    [Tooltip("Swing cycles per unit walked. One walk cycle of the master animation covers roughly this distance.")]
+    [SerializeField, Min(0f)] private float armSwingCyclesPerUnit = 0.35f;
+    [Tooltip("Horizontal speed at which the swing reaches full amplitude.")]
+    [SerializeField, Min(0.01f)] private float armSwingFullSpeed = 3f;
+    [SerializeField, Min(0f)] private float armSwingSpeedSmoothing = 8f;
+
+    private float armSwingPhase;
+    private float armSwingSpeed;
+    private float lastBodyX;
+    private bool hasLastBodyX;
+
     [Header("AI Attack Control")]
     [SerializeField] private bool useExternalAttackInput;
     private Coroutine externalAttackPulseRoutine;
@@ -149,6 +167,7 @@ public class ArmTargetController : MonoBehaviour
             return;
         }
 
+        UpdateArmSwing();
         DriveArm(CowboyArmSide.Left, leftArm, leftArmSolverTarget,
             leftRestLocalPosition, leftRestLocalRotation, leftRestCaptured);
         DriveArm(CowboyArmSide.Right, rightArm, rightArmSolverTarget,
@@ -399,8 +418,6 @@ public class ArmTargetController : MonoBehaviour
         Quaternion restLocalRotation,
         bool hasRest)
     {
-        _ = arm;
-
         if (solverTarget == null)
         {
             return;
@@ -412,7 +429,45 @@ public class ArmTargetController : MonoBehaviour
             return;
         }
 
+        // A free arm swings with the walk; an arm holding something stays on its rest pose.
+        if (armSwingEnabled && !ArmHasHeldObject(arm))
+        {
+            restLocalPosition += GetArmSwingOffset(arm);
+        }
+
         ReturnToRest(solverTarget, restLocalPosition, restLocalRotation, hasRest);
+    }
+
+    /// <summary>
+    /// Advances the shared walk swing phase from the body's horizontal speed. Called once per frame.
+    /// </summary>
+    private void UpdateArmSwing()
+    {
+        Transform body = bodyReference != null ? bodyReference : transform;
+        float x = body.position.x;
+        float dt = Time.deltaTime;
+        if (!hasLastBodyX || dt <= 0f)
+        {
+            lastBodyX = x;
+            hasLastBodyX = true;
+            return;
+        }
+
+        float speed = Mathf.Abs(x - lastBodyX) / dt;
+        lastBodyX = x;
+        armSwingSpeed = Mathf.Lerp(armSwingSpeed, speed, 1f - Mathf.Exp(-armSwingSpeedSmoothing * dt));
+        armSwingPhase = Mathf.Repeat(armSwingPhase + armSwingSpeed * armSwingCyclesPerUnit * dt, 1f);
+    }
+
+    private Vector3 GetArmSwingOffset(CowboyArmSide arm)
+    {
+        float weight = Mathf.Clamp01(armSwingSpeed / armSwingFullSpeed);
+        float swing = Mathf.Sin(armSwingPhase * Mathf.PI * 2f) * armSwingAmplitude * weight;
+        // Opposite arms swing in opposite directions; both hang down while walking.
+        return new Vector3(
+            (arm == CowboyArmSide.Left ? swing : -swing) + armSwingHangOffset.x * weight,
+            armSwingHangOffset.y * weight,
+            0f);
     }
 
     private void UpdateAimSpeed(ArmRuntimeState state, Transform solverTarget)
