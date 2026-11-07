@@ -15,6 +15,18 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
     private float maximumGrabAcceleration = 70f;
     [SerializeField, Min(0f)] private float releaseVelocityLimit = 12f;
 
+    [SerializeField, Min(0f), Tooltip("Seconds the released robot stays limp before its puppet binder resumes.")]
+    private float releaseRagdollSeconds = 0.4f;
+
+    [Header("Holder Collisions")]
+    [SerializeField, Tooltip("While held, the robot does not collide with the body of whoever holds it. "
+        + "Without this, pushing the held robot against your own body propels the holder.")]
+    private bool ignoreHolderCollisions = true;
+    [SerializeField, Min(0f), Tooltip("Seconds after release before collisions with the former holder come back.")]
+    private float holderCollisionRestoreDelay = 0.35f;
+    [SerializeField, Min(0f), Tooltip("Longest wait for the two bodies to separate before collisions are restored anyway.")]
+    private float holderCollisionRestoreTimeout = 2f;
+
     [Header("Robot Systems")]
     [SerializeField] private Behaviour[] extraBehavioursToPause;
     [SerializeField] private bool resetIntentOnRelease = true;
@@ -35,6 +47,9 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
     private bool jointWasCreated;
     private bool activeJointWasEnabled;
     private int releaseRestoreFrame = -1;
+    private readonly List<(Collider2D Own, Collider2D Holder)> ignoredHolderPairs = new List<(Collider2D, Collider2D)>();
+    private float holderCollisionRestoreTime = -1f;
+    private float holderCollisionRestoreDeadline = -1f;
 
     public event Action<EnemyGrabbable> OnGrabStarted;
     public event Action<EnemyGrabbable> OnGrabEnded;
@@ -55,6 +70,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
     private void OnDisable()
     {
         RestorePendingReleaseBehaviours();
+        RestoreHolderCollisions();
 
         if (grabbed)
         {
@@ -71,6 +87,15 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         if (releaseRestoreFrame >= 0 && Time.frameCount >= releaseRestoreFrame)
         {
             RestorePendingReleaseBehaviours();
+        }
+
+        if (!grabbed && holderCollisionRestoreTime >= 0f && Time.time >= holderCollisionRestoreTime)
+        {
+            // Wait until the bodies are apart so restoring collisions does not pop them.
+            if (Time.time < holderCollisionRestoreDeadline && AnyIgnoredPairOverlaps())
+                holderCollisionRestoreTime = Time.time + 0.1f;
+            else
+                RestoreHolderCollisions();
         }
     }
 
@@ -116,6 +141,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
         StopRobotActions();
         PauseRobotBehaviours();
         ReleaseFrozenRotations();
+        IgnoreHolderCollisions(grabParent);
         EnableJoint(grabParent.position);
         OnGrabStarted?.Invoke(this);
     }
@@ -298,7 +324,9 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
 
         if (pendingReleaseRestores.Count > 0)
         {
-            releaseRestoreFrame = Time.frameCount + 1;
+            // Stay limp a little after release; the binder then blends back in (see SimplePuppetBinder recovery).
+            int ragdollFrames = Mathf.Max(1, Mathf.CeilToInt(releaseRagdollSeconds / Mathf.Max(Time.deltaTime, 0.001f)));
+            releaseRestoreFrame = Time.frameCount + ragdollFrames;
         }
     }
 
@@ -480,6 +508,7 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
 
         RestoreFrozenRotations();
         ResumeRobotBehaviours(delayReleasePhysicsRestore);
+        ScheduleHolderCollisionRestore(delayReleasePhysicsRestore);
 
         if (stateController != null && stateController.CurrentState == RobotState.Dead)
         {
@@ -498,6 +527,83 @@ public class EnemyGrabbable : MonoBehaviour, IGrabbable, IGrabContextReceiver,
 
         ClearGrabContext();
         OnGrabEnded?.Invoke(this);
+    }
+
+    private void IgnoreHolderCollisions(Transform grabParent)
+    {
+        RestoreHolderCollisions();
+        if (!ignoreHolderCollisions || grabParent == null)
+        {
+            return;
+        }
+
+        CowboyGrabController holder = grabParent.GetComponentInParent<CowboyGrabController>();
+        Transform holderRoot = holder != null ? holder.transform.root : grabParent.root;
+        if (holderRoot == null || holderRoot == transform.root)
+        {
+            return;
+        }
+
+        Collider2D[] ownColliders = GetComponentsInChildren<Collider2D>(true);
+        Collider2D[] holderColliders = holderRoot.GetComponentsInChildren<Collider2D>(true);
+        foreach (Collider2D own in ownColliders)
+        {
+            if (own == null || own.isTrigger)
+                continue;
+
+            foreach (Collider2D other in holderColliders)
+            {
+                if (other == null || other.isTrigger || Physics2D.GetIgnoreCollision(own, other))
+                    continue;
+
+                Physics2D.IgnoreCollision(own, other, true);
+                ignoredHolderPairs.Add((own, other));
+            }
+        }
+    }
+
+    private void ScheduleHolderCollisionRestore(bool delayed)
+    {
+        if (ignoredHolderPairs.Count == 0)
+        {
+            return;
+        }
+
+        if (!delayed || holderCollisionRestoreDelay <= 0f)
+        {
+            RestoreHolderCollisions();
+            return;
+        }
+
+        holderCollisionRestoreTime = Time.time + holderCollisionRestoreDelay;
+        holderCollisionRestoreDeadline = Time.time + Mathf.Max(holderCollisionRestoreDelay, holderCollisionRestoreTimeout);
+    }
+
+    private bool AnyIgnoredPairOverlaps()
+    {
+        foreach ((Collider2D own, Collider2D other) in ignoredHolderPairs)
+        {
+            if (own != null && other != null && own.isActiveAndEnabled && other.isActiveAndEnabled
+                && own.Distance(other).isOverlapped)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void RestoreHolderCollisions()
+    {
+        foreach ((Collider2D own, Collider2D other) in ignoredHolderPairs)
+        {
+            if (own != null && other != null)
+                Physics2D.IgnoreCollision(own, other, false);
+        }
+
+        ignoredHolderPairs.Clear();
+        holderCollisionRestoreTime = -1f;
+        holderCollisionRestoreDeadline = -1f;
     }
 
     private void ReleaseFrozenRotations()

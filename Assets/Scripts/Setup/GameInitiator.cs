@@ -64,13 +64,42 @@ public abstract class GameInitiator : MonoBehaviour
         }
     }
 
+    [Header("Camera framing")]
+    [Tooltip("Follow a room-aware framing point instead of the raw player head.")]
+    [SerializeField] protected bool _useRoomFramingCamera = true;
+    [Tooltip("Cinemachine follow damping used with the framing point, which is already smoothed.")]
+    [SerializeField] protected float _roomFramingCinemachineDamping = 0.15f;
+
+    private RoomFramingCameraTarget _roomFramingTarget;
+
     protected void SetCinemachineTarget(Transform target)
     {
         if (_cinemachine != null && target != null)
         {
-            _cinemachine.Follow = target;
-            _cinemachine.LookAt = target;
-            Debug.Log("Cinemachine target set to: " + target.name);
+            Transform followed = target;
+            if (_useRoomFramingCamera)
+            {
+                if (_roomFramingTarget == null)
+                {
+                    _roomFramingTarget = new GameObject("CameraFramingTarget").AddComponent<RoomFramingCameraTarget>();
+                    _roomFramingTarget.transform.SetParent(transform, false);
+                }
+
+                _roomFramingTarget.Initialize(target);
+                followed = _roomFramingTarget.transform;
+
+                CinemachineFollow follow = _cinemachine.GetComponent<CinemachineFollow>();
+                if (follow != null)
+                {
+                    Unity.Cinemachine.TargetTracking.TrackerSettings tracker = follow.TrackerSettings;
+                    tracker.PositionDamping = Vector3.one * _roomFramingCinemachineDamping;
+                    follow.TrackerSettings = tracker;
+                }
+            }
+
+            _cinemachine.Follow = followed;
+            _cinemachine.LookAt = followed;
+            Debug.Log("Cinemachine target set to: " + followed.name);
         }
         else
         {

@@ -485,15 +485,16 @@ public class GrabOwnershipContractTests {
     }
 
     private static void AdvanceBinderRestoreFrame(EnemyGrabbable grabbable) {
-        Assert.AreEqual(
-            Time.frameCount + 1,
-            GetPrivateField<int>(grabbable, "releaseRestoreFrame"),
-            "Release physics must be scheduled for the following frame.");
+        int scheduledFrame = GetPrivateField<int>(grabbable, "releaseRestoreFrame");
+        Assert.Greater(
+            scheduledFrame,
+            Time.frameCount,
+            "Release physics must be scheduled for a later frame (short post-release ragdoll).");
 
         InvokeLifecycle(grabbable, "Update");
 
         Assert.AreEqual(
-            Time.frameCount + 1,
+            scheduledFrame,
             GetPrivateField<int>(grabbable, "releaseRestoreFrame"),
             "A same-frame Update must not restore release physics.");
 
