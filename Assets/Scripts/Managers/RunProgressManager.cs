@@ -63,6 +63,12 @@ public class RunProgressManager : MonoBehaviour
         }
     }
     public bool HasActiveRun => hasActiveRun;
+
+    /// <summary>
+    /// True while playing a level launched from the sandbox generation menu. Sandbox levels
+    /// never touch the normal run itinerary: finishing or restarting stays in the sandbox.
+    /// </summary>
+    public bool IsSandboxRun => currentLevelIndex == 0 && currentRunStepIndex < 0;
     public RunStepKind CurrentStepKind => GetCurrentStepKind();
 
     public RunMapConfigSO CurrentConfig
@@ -137,6 +143,17 @@ public class RunProgressManager : MonoBehaviour
         LaboratoryProgress.Reset();
         SceneController.instance.LoadScene(runSandboxSceneName);
     }
+    /// <summary>
+    /// Goes back to the sandbox generation menu after a sandbox level, keeping its settings.
+    /// </summary>
+    public void ReturnToSandboxMenu()
+    {
+        currentLevelIndex = 0;
+        currentRunStepIndex = -1;
+        hasActiveRun = false;
+        SceneController.instance.LoadScene(runSandboxSceneName);
+    }
+
     public void LoadStressTestLevel()
     {
         currentLevelIndex = 0;
@@ -168,6 +185,12 @@ public class RunProgressManager : MonoBehaviour
 
     public void LoadNextStep()
     {
+        if (IsSandboxRun)
+        {
+            ReturnToSandboxMenu();
+            return;
+        }
+
         if (!hasActiveRun)
         {
             hasActiveRun = true;
@@ -212,6 +235,12 @@ public class RunProgressManager : MonoBehaviour
     /// </summary>
     public void RestartCurrentLevel()
     {
+        if (IsSandboxRun)
+        {
+            SceneController.instance.LoadScene(runNormalSceneName);
+            return;
+        }
+
         if (!hasActiveRun || currentRunStepIndex < 0)
         {
             Debug.LogWarning("RunProgressManager: cannot restart because no run step is active.");
@@ -234,6 +263,13 @@ public class RunProgressManager : MonoBehaviour
     /// </summary>
     public void EndRunAfterDeath()
     {
+        if (IsSandboxRun)
+        {
+            // A sandbox death must not erase the checkpoint of the normal run.
+            hasActiveRun = false;
+            return;
+        }
+
         DeleteRunAndResetTransientStats();
         currentRunStepIndex = -1;
         currentLevelIndex = 1;

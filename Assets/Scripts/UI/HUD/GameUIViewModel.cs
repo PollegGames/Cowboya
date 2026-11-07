@@ -143,8 +143,13 @@ public class GameUIViewModel : MonoBehaviour
     private IEnumerator LoadSceneAfterDelay()
     {
         yield return new WaitForSeconds(2f);
-        string targetScene = RunProgressManager.Instance != null ? "MenuScene" : "MenuScene";
-        SceneController.instance.LoadScene(targetScene);
+        if (RunProgressManager.Instance != null && RunProgressManager.Instance.IsSandboxRun)
+        {
+            RunProgressManager.Instance.ReturnToSandboxMenu();
+            yield break;
+        }
+
+        SceneController.instance.LoadScene("MenuScene");
     }
 
     private void UpdateMoralityLabel()

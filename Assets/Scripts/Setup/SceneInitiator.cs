@@ -352,9 +352,14 @@ public class SceneInitiator : GameInitiator
             batterySpawner);
         if (mapConfig != null)
         {
-            int securityGuardsCount = mapManager != null
-                ? mapManager.GetPOIRoomCount(POIType.Security)
-                : 0;
+            // The sandbox uses the menu values as-is so behaviours can be stress-tested;
+            // the run places one guard per Security room.
+            bool isSandbox = RunProgressManager.Instance != null && RunProgressManager.Instance.IsSandboxRun;
+            int securityGuardsCount = isSandbox
+                ? Mathf.Max(0, mapConfig.securityGuardsCount)
+                : mapManager != null
+                    ? mapManager.GetPOIRoomCount(POIType.Security)
+                    : 0;
             WorkerPopulation workerPopulation = ResolveWorkerPopulation();
             Debug.Log($"[WorkerPopulation] Level="
                 + $"{(RunProgressManager.Instance != null ? RunProgressManager.Instance.CurrentLevelIndex : 0)} "
