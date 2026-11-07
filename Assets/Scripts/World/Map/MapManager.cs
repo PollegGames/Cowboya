@@ -68,9 +68,6 @@ public class MapManager : MonoBehaviour
         morality = RunProgressManager.Instance != null && RunProgressManager.Instance.RunStats != null
             ? RunProgressManager.Instance.RunStats.Morality
             : 0f;
-
-        // Initialize Random so the same seed always yields the same map
-        UnityEngine.Random.InitState(cfg.seed.GetHashCode());
     }
 
     /// <summary>
@@ -114,6 +111,11 @@ public class MapManager : MonoBehaviour
         var poiPrefabMapping = CreatePOIPrefabMapping();
         if (poiPrefabMapping.Any(entry => entry.Value == null))
             return;
+
+        // Seed right before generation: any Random call made by other objects between
+        // BuildFromConfig and here would otherwise shift the layout of seeded levels.
+        if (!string.IsNullOrEmpty(seed))
+            UnityEngine.Random.InitState(seed.GetHashCode());
 
         Dictionary<Vector2, Cell> cellDataGrid = null;
         bool validPath = false;

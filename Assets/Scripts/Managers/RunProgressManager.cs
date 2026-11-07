@@ -315,6 +315,7 @@ public class RunProgressManager : MonoBehaviour
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.StaticLevel, SceneName = secondStaticLevelSceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.Laboratory, SceneName = laboratorySceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.StaticLevel, SceneName = thirdStaticLevelSceneName });
+        runSteps.Add(new RunStepDefinition { Kind = RunStepKind.Laboratory, SceneName = laboratorySceneName });
         runSteps.Add(new RunStepDefinition { Kind = RunStepKind.GeneratedLevel, SceneName = runNormalSceneName });
     }
 
@@ -385,21 +386,6 @@ public class RunProgressManager : MonoBehaviour
             if (runSteps[i] != null && runSteps[i].SceneName == sceneName)
                 return i;
         }
-
-        if (sceneName == laboratorySceneName)
-            return 1;
-
-        if (sceneName == runNormalSceneName)
-            return 4;
-
-        if (sceneName == firstStaticLevelSceneName)
-            return 0;
-
-        if (sceneName == secondStaticLevelSceneName)
-            return 2;
-
-        if (sceneName == thirdStaticLevelSceneName)
-            return 3;
 
         return -1;
     }

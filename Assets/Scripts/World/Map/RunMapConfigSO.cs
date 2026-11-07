@@ -31,10 +31,5 @@ public class RunMapConfigSO : ScriptableObject
         seed = System.DateTime.Now.GetHashCode().ToString();
     }
 
-    public void EnsureValidSeed()
-    {
-        GenerateRandomSeed();
-    }
-
     public int TotalGridCells => gridWidth * gridHeight;
 }
