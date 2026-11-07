@@ -91,7 +91,7 @@ public class RobotBrainNew : MonoBehaviour
         Transform playerTransform = null,
         RoomWaypoint playerWaypoint = null)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+        if (memory == null)
             return;
 
         if ((playerInDetectZone || playerInAttackZone)
@@ -134,7 +134,7 @@ public class RobotBrainNew : MonoBehaviour
     public void OnDamageTaken(int damage, Vector3? attackerPosition)
     {
         _ = damage;
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+        if (memory == null)
             return;
 
         RobotEcosystemProbe.RecordBrainCall(
@@ -161,7 +161,7 @@ public class RobotBrainNew : MonoBehaviour
 
     public void OnMachineStateEvent(object machinePayload, bool isOn)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+        if (memory == null)
             return;
 
         RobotEcosystemProbe.RecordBrainCall(
@@ -179,7 +179,7 @@ public class RobotBrainNew : MonoBehaviour
 
     public void OnSecurityDispatch(object machinePayload)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || memory == null)
+        if (memory == null)
             return;
 
         RobotEcosystemProbe.RecordBrainCall(
@@ -679,8 +679,7 @@ public class RobotBrainNew : MonoBehaviour
     private bool CanAcceptCollectorIngress()
     {
         ResolveReferences();
-        return RobotNewPipelineRuntime.IsNewPipelineActive
-            && !planPublicationSuspended
+        return !planPublicationSuspended
             && memory != null
             && heart != null
             && heart.Role == RobotRole.Collector;
@@ -689,8 +688,7 @@ public class RobotBrainNew : MonoBehaviour
     private bool CanAcceptWorkerCollectorIngress()
     {
         ResolveReferences();
-        return RobotNewPipelineRuntime.IsNewPipelineActive
-            && !planPublicationSuspended
+        return !planPublicationSuspended
             && memory != null
             && heart != null
             && heart.Role == RobotRole.WorkerCollector;

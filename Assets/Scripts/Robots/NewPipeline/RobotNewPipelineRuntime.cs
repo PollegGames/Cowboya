@@ -1,35 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum RobotNewPipelineMode
-{
-    Disabled = 0,
-    NewShadow = 1,
-    NewOnly = 2
-}
-
 /// <summary>
-/// Runtime switches and structured trace helpers for the New robot pipeline.
+/// Debug switches for the robot pipeline (Memory -> Brain -> Heart -> Task -> Body).
+/// The pipeline itself is always active; these flags only control diagnostics.
 /// </summary>
 public static class RobotNewPipelineRuntime
 {
-    /// <summary>
-    /// Default mode for this phase: New computes decisions in parallel without prefab takeover.
-    /// </summary>
-    public static RobotNewPipelineMode Mode = RobotNewPipelineMode.NewShadow;
-
-    public static bool EnableTrace = true;
+    /// <summary>Logs one line per robot decision. Very verbose: enable only while debugging AI.</summary>
+    public static bool EnableTrace = false;
     public static bool EnableEcosystemProbe = true;
     public static bool EnableProbeSummaryOnSceneInit = true;
-    public static bool DriveGameplayInShadow = true;
     public static bool WorkerCycleValidationMode = false;
-
-    public static bool IsNewPipelineActive =>
-        Mode == RobotNewPipelineMode.NewShadow || Mode == RobotNewPipelineMode.NewOnly;
-
-    public static bool ShouldDriveGameplay =>
-        Mode == RobotNewPipelineMode.NewOnly
-        || (Mode == RobotNewPipelineMode.NewShadow && DriveGameplayInShadow);
 
     public static bool IsWorkerCycleValidationEnabled
     {

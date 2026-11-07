@@ -7,17 +7,6 @@ using UnityEngine;
 public class CollectorRobotPipelineTests
 {
     private readonly List<GameObject> createdObjects = new List<GameObject>();
-    private RobotNewPipelineMode previousMode;
-    private bool previousDriveGameplayInShadow;
-
-    [SetUp]
-    public void SetUp()
-    {
-        previousMode = RobotNewPipelineRuntime.Mode;
-        previousDriveGameplayInShadow = RobotNewPipelineRuntime.DriveGameplayInShadow;
-        RobotNewPipelineRuntime.Mode = RobotNewPipelineMode.NewOnly;
-        RobotNewPipelineRuntime.DriveGameplayInShadow = true;
-    }
 
     [TearDown]
     public void TearDown()
@@ -29,8 +18,6 @@ public class CollectorRobotPipelineTests
         }
 
         createdObjects.Clear();
-        RobotNewPipelineRuntime.Mode = previousMode;
-        RobotNewPipelineRuntime.DriveGameplayInShadow = previousDriveGameplayInShadow;
     }
 
     [Test]

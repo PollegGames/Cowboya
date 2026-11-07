@@ -223,12 +223,6 @@ public class RobotStateController : MonoBehaviour, IPooledObject
         return true;
     }
 
-    [Obsolete("Use PerformAttackByEnergy instead.")]
-    public void PerformAttackbyEnergy(float energycost)
-    {
-        PerformAttackByEnergy(energycost);
-    }
-
     private void HandleHealthChange(float healthChange)
     {
         if (Stats != null)

@@ -235,9 +235,6 @@ public class FollowPlayerTriggerHandler : MonoBehaviour
         Transform playerTransform,
         string source)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive)
-            return;
-
         if (brainNew == null)
             ResolveRobotReferences();
 

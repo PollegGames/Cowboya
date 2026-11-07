@@ -322,8 +322,7 @@ public class RobotTaskNew : IRobotTaskNew
             return;
         }
 
-        if (RobotNewPipelineRuntime.ShouldDriveGameplay)
-            context.Body.SetDestination(waypoint, includeUnavailable: true);
+        context.Body.SetDestination(waypoint, includeUnavailable: true);
         if (context.Heart != null)
         {
             if (IsBalancedMachineWaypointType(waypoint.type))
@@ -352,7 +351,7 @@ public class RobotTaskNew : IRobotTaskNew
             return;
         }
 
-        if (RobotNewPipelineRuntime.ShouldDriveGameplay && !IsAtReactivateTarget(context, machine))
+        if (!IsAtReactivateTarget(context, machine))
         {
             if (!TryMoveToPayload(context, machine, includeUnavailable: true))
             {
@@ -371,8 +370,7 @@ public class RobotTaskNew : IRobotTaskNew
             return;
         }
 
-        if (RobotNewPipelineRuntime.ShouldDriveGameplay)
-            machine.PowerOn();
+        machine.PowerOn();
 
         CompleteReactivateMachineTask(context, machine);
     }
@@ -431,12 +429,6 @@ public class RobotTaskNew : IRobotTaskNew
             }
 
             Block(context);
-            return;
-        }
-
-        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
-        {
-            ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 0.1f);
             return;
         }
 
@@ -590,8 +582,7 @@ public class RobotTaskNew : IRobotTaskNew
         bool started = false;
         context.Body?.StopMovement();
 
-        if (RobotNewPipelineRuntime.ShouldDriveGameplay
-            && context.Body != null
+        if (context.Body != null
             && context.Body.AttackController != null
             && target != null)
         {
@@ -615,12 +606,6 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static void HandleChasePlayer(RobotTaskContextNew context)
     {
-        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
-        {
-            ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: 0.25f);
-            return;
-        }
-
         if (context.Payload is RobotPlayerChaseTarget chaseTarget)
         {
             if (chaseTarget.Waypoint == null || context.Body == null)
@@ -664,12 +649,6 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static void HandleFlee(RobotTaskContextNew context)
     {
-        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
-        {
-            ScheduleOrCompleteByTaskExpiry(context, fallbackSeconds: FleeFallbackSeconds);
-            return;
-        }
-
         if (context.Body == null)
         {
             Block(context);
@@ -777,9 +756,6 @@ public class RobotTaskNew : IRobotTaskNew
             return;
         }
 
-        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
-            return;
-
         switch (type)
         {
             case RobotTaskType.CollectorLaunch:
@@ -846,9 +822,6 @@ public class RobotTaskNew : IRobotTaskNew
             workerBody.StopAllActuators();
             return;
         }
-
-        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
-            return;
 
         if (type == RobotTaskType.WorkerCollectorFindCube)
         {
@@ -949,9 +922,6 @@ public class RobotTaskNew : IRobotTaskNew
 
     private static bool TryMoveToPayload(RobotTaskContextNew context, object payload, bool includeUnavailable)
     {
-        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
-            return payload != null;
-
         if (context.Body == null || payload == null)
             return false;
 

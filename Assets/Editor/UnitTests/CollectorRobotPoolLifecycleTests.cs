@@ -6,21 +6,9 @@ using UnityEngine;
 
 public class CollectorRobotPoolLifecycleTests {
     private readonly List<GameObject> createdObjects = new();
-    private RobotNewPipelineMode previousMode;
-    private bool previousDriveInShadow;
-
-    [SetUp]
-    public void SetUp() {
-        previousMode = RobotNewPipelineRuntime.Mode;
-        previousDriveInShadow = RobotNewPipelineRuntime.DriveGameplayInShadow;
-        RobotNewPipelineRuntime.Mode = RobotNewPipelineMode.NewOnly;
-        RobotNewPipelineRuntime.DriveGameplayInShadow = true;
-    }
 
     [TearDown]
     public void TearDown() {
-        RobotNewPipelineRuntime.Mode = previousMode;
-        RobotNewPipelineRuntime.DriveGameplayInShadow = previousDriveInShadow;
         for (int i = createdObjects.Count - 1; i >= 0; i--) {
             if (createdObjects[i] != null)
                 Object.DestroyImmediate(createdObjects[i]);

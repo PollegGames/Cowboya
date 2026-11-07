@@ -158,21 +158,21 @@ public sealed class RobotDomainEventAdapter : MonoBehaviour
 
     private static void HandleMachineStateDispatchRequested(RobotMachineStateDispatchEvent evt)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || evt.Brain == null)
+        if (evt.Brain == null)
             return;
         evt.Brain.OnMachineStateEvent(evt.Payload, evt.IsOn);
     }
 
     private static void HandleSecurityDispatchRequested(RobotSecurityDispatchEvent evt)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || evt.Brain == null)
+        if (evt.Brain == null)
             return;
         evt.Brain.OnSecurityDispatch(evt.Payload);
     }
 
     private static void HandlePerceptionDispatchRequested(RobotPerceptionDispatchEvent evt)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || evt.Brain == null)
+        if (evt.Brain == null)
             return;
         evt.Brain.OnPerceptionChanged(
             evt.PlayerInDetectZone,
@@ -184,7 +184,7 @@ public sealed class RobotDomainEventAdapter : MonoBehaviour
 
     private static void HandleCompleteReactivateDispatchRequested(RobotCompleteReactivateDispatchEvent evt)
     {
-        if (!RobotNewPipelineRuntime.IsNewPipelineActive || evt.Brain == null || evt.Machine == null)
+        if (evt.Brain == null || evt.Machine == null)
             return;
         evt.Brain.CompleteReactivateTask(evt.Machine, evt.Reached);
     }

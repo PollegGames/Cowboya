@@ -8,8 +8,6 @@ public class HealthBot : MonoBehaviour
     [SerializeField] private DamageFeedback damageFeedback;
     [SerializeField] private RobotMemoryNew memory = null;
     [SerializeField] private RobotBrainNew brain = null;
-    [SerializeField] private RobotMemoryNew memoryNew = null;
-    [SerializeField] private RobotBrainNew brainNew = null;
     [SerializeField] private PlayerBrain playerBrain = null;
 
     public DamageFeedback DamageFeedback => damageFeedback;
@@ -40,13 +38,6 @@ public class HealthBot : MonoBehaviour
             return;
         }
 
-        if (RobotNewPipelineRuntime.IsNewPipelineActive)
-        {
-            RegisterAttack(memoryNew, attackerPosition);
-            brainNew?.OnDamageTaken(damage, attackerPosition);
-            return;
-        }
-
         RegisterAttack(memory, attackerPosition);
         brain?.OnDamageTaken(damage, attackerPosition);
     }
@@ -69,10 +60,6 @@ public class HealthBot : MonoBehaviour
             brain = GetComponent<RobotBrainNew>();
         if (memory == null)
             memory = GetComponent<RobotMemoryNew>();
-        if (brainNew == null)
-            brainNew = GetComponent<RobotBrainNew>();
-        if (memoryNew == null)
-            memoryNew = GetComponent<RobotMemoryNew>();
     }
 
     private static void RegisterAttack(RobotMemoryNew robotMemory, Vector3? attackerPosition)

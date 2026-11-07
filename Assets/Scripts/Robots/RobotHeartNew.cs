@@ -93,8 +93,6 @@ public class RobotHeartNew : MonoBehaviour
 
     private void Update()
     {
-        if (!RobotNewPipelineRuntime.ShouldDriveGameplay)
-            return;
         if (body == null || activeTopTask == null)
             return;
 
